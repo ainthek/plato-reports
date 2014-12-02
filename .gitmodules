@@ -1,3 +1,6 @@
 [submodule "src/dojo"]
 	path = src/dojo
 	url = https://github.com/dojo/dojo.git
+[submodule "src/plato"]
+	path = src/plato
+	url = https://github.com/es-analysis/plato
