@@ -24,7 +24,7 @@ build_stats_md(){
 	pushd src >/dev/null	
 
 	echo "|package|downloads|avg.maint|total.sloc|version|description|links|"
-	echo "|-------|--------:|--------:|---------:|-|-|-|"
+	echo "|-------|--------:|--------:|---------:|-------|-----------|-----|"
 	ls -1 -d node_modules/* |\
 	#head -n 10|\
 	while read module_path
@@ -49,6 +49,9 @@ echo "
 just playground for plato js, reports for selected node modules and libraries
 
 interesting to compare download popularity and reports statistics
+
+HOWEVER whole this is WRONG, since I'm comparing node_modules JS files (often merged, minified).
+Will download sources from github for each project soon and analyze those.
 
 "	
 
