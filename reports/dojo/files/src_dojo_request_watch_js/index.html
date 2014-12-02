@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src/dojo/request/watch.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src/dojo/request/watch.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">63.46</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">109</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">29.06</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.59</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+	&#039;./util&#039;,
+	&#039;../errors/RequestTimeoutError&#039;,
+	&#039;../errors/CancelError&#039;,
+	&#039;../_base/array&#039;,
+	&#039;../has!host-browser?../_base/window:&#039;,
+	&#039;../has!host-browser?dom-addeventlistener?:../on:&#039;
+], function(util, RequestTimeoutError, CancelError, array, win, on){
+	// avoid setting a timer per request. It degrades performance on IE
+	// something fierece if we don&#039;t use unified loops.
+	var _inFlightIntvl = null,
+		_inFlight = [];
+
+	function watchInFlight(){
+		// summary:
+		//		internal method that checks each inflight XMLHttpRequest to see
+		//		if it has completed or if the timeout situation applies.
+
+		var now = +(new Date);
+
+		// we need manual loop because we often modify _inFlight (and therefore &#039;i&#039;) while iterating
+		for(var i = 0, dfd; i &lt; _inFlight.length &amp;&amp; (dfd = _inFlight[i]); i++){
+			var response = dfd.response,
+				options = response.options;
+			if((dfd.isCanceled &amp;&amp; dfd.isCanceled()) || (dfd.isValid &amp;&amp; !dfd.isValid(response))){
+				_inFlight.splice(i--, 1);
+				watch._onAction &amp;&amp; watch._onAction();
+			}else if(dfd.isReady &amp;&amp; dfd.isReady(response)){
+				_inFlight.splice(i--, 1);
+				dfd.handleResponse(response);
+				watch._onAction &amp;&amp; watch._onAction();
+			}else if(dfd.startTime){
+				// did we timeout?
+				if(dfd.startTime + (options.timeout || 0) &lt; now){
+					_inFlight.splice(i--, 1);
+					// Cancel the request so the io module can do appropriate cleanup.
+					dfd.cancel(new RequestTimeoutError(&#039;Timeout exceeded&#039;, response));
+					watch._onAction &amp;&amp; watch._onAction();
+				}
+			}
+		}
+
+		watch._onInFlight &amp;&amp; watch._onInFlight(dfd);
+
+		if(!_inFlight.length){
+			clearInterval(_inFlightIntvl);
+			_inFlightIntvl = null;
+		}
+	}
+
+	function watch(dfd){
+		// summary:
+		//		Watches the io request represented by dfd to see if it completes.
+		// dfd: Deferred
+		//		The Deferred object to watch.
+		// response: Object
+		//		The object used as the value of the request promise.
+		// validCheck: Function
+		//		Function used to check if the IO request is still valid. Gets the dfd
+		//		object as its only argument.
+		// ioCheck: Function
+		//		Function used to check if basic IO call worked. Gets the dfd
+		//		object as its only argument.
+		// resHandle: Function
+		//		Function used to process response. Gets the dfd
+		//		object as its only argument.
+		if(dfd.response.options.timeout){
+			dfd.startTime = +(new Date);
+		}
+
+		if(dfd.isFulfilled()){
+			// bail out if the deferred is already fulfilled
+			return;
+		}
+
+		_inFlight.push(dfd);
+		if(!_inFlightIntvl){
+			_inFlightIntvl = setInterval(watchInFlight, 50);
+		}
+
+		// handle sync requests separately from async:
+		// http://bugs.dojotoolkit.org/ticket/8467
+		if(dfd.response.options.sync){
+			watchInFlight();
+		}
+	}
+
+	watch.cancelAll = function cancelAll(){
+		// summary:
+		//		Cancels all pending IO requests, regardless of IO type
+		try{
+			array.forEach(_inFlight, function(dfd){
+				try{
+					dfd.cancel(new CancelError(&#039;All requests canceled.&#039;));
+				}catch(e){}
+			});
+		}catch(e){}
+	};
+
+	if(win &amp;&amp; on &amp;&amp; win.doc.attachEvent){
+		// Automatically call cancel all io calls on unload in IE
+		// http://bugs.dojotoolkit.org/ticket/2357
+		on(win.global, &#039;unload&#039;, function(){
+			watch.cancelAll();
+		});
+	}
+
+	return watch;
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

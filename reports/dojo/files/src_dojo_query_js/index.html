@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src/dojo/query.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src/dojo/query.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">74.15</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">712</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">60.85</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.56</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([&quot;./_base/kernel&quot;, &quot;./has&quot;, &quot;./dom&quot;, &quot;./on&quot;, &quot;./_base/array&quot;, &quot;./_base/lang&quot;, &quot;./selector/_loader&quot;, &quot;./selector/_loader!default&quot;],
+	function(dojo, has, dom, on, array, lang, loader, defaultEngine){
+
+	&quot;use strict&quot;;
+
+	has.add(&quot;array-extensible&quot;, function(){
+		// test to see if we can extend an array (not supported in old IE)
+		return lang.delegate([], {length: 1}).length == 1 &amp;&amp; !has(&quot;bug-for-in-skips-shadowed&quot;);
+	});
+	
+	var ap = Array.prototype, aps = ap.slice, apc = ap.concat, forEach = array.forEach;
+
+	var tnl = function(/*Array*/ a, /*dojo/NodeList?*/ parent, /*Function?*/ NodeListCtor){
+		// summary:
+		//		decorate an array to make it look like a `dojo/NodeList`.
+		// a:
+		//		Array of nodes to decorate.
+		// parent:
+		//		An optional parent NodeList that generated the current
+		//		list of nodes. Used to call _stash() so the parent NodeList
+		//		can be accessed via end() later.
+		// NodeListCtor:
+		//		An optional constructor function to use for any
+		//		new NodeList calls. This allows a certain chain of
+		//		NodeList calls to use a different object than dojo/NodeList.
+		var nodeList = new (NodeListCtor || this._NodeListCtor || nl)(a);
+		return parent ? nodeList._stash(parent) : nodeList;
+	};
+
+	var loopBody = function(f, a, o){
+		a = [0].concat(aps.call(a, 0));
+		o = o || dojo.global;
+		return function(node){
+			a[0] = node;
+			return f.apply(o, a);
+		};
+	};
+
+	// adapters
+
+	var adaptAsForEach = function(f, o){
+		// summary:
+		//		adapts a single node function to be used in the forEach-type
+		//		actions. The initial object is returned from the specialized
+		//		function.
+		// f: Function
+		//		a function to adapt
+		// o: Object?
+		//		an optional context for f
+		return function(){
+			this.forEach(loopBody(f, arguments, o));
+			return this;	// Object
+		};
+	};
+
+	var adaptAsMap = function(f, o){
+		// summary:
+		//		adapts a single node function to be used in the map-type
+		//		actions. The return is a new array of values, as via `dojo/_base/array.map`
+		// f: Function
+		//		a function to adapt
+		// o: Object?
+		//		an optional context for f
+		return function(){
+			return this.map(loopBody(f, arguments, o));
+		};
+	};
+
+	var adaptAsFilter = function(f, o){
+		// summary:
+		//		adapts a single node function to be used in the filter-type actions
+		// f: Function
+		//		a function to adapt
+		// o: Object?
+		//		an optional context for f
+		return function(){
+			return this.filter(loopBody(f, arguments, o));
+		};
+	};
+
+	var adaptWithCondition = function(f, g, o){
+		// summary:
+		//		adapts a single node function to be used in the map-type
+		//		actions, behaves like forEach() or map() depending on arguments
+		// f: Function
+		//		a function to adapt
+		// g: Function
+		//		a condition function, if true runs as map(), otherwise runs as forEach()
+		// o: Object?
+		//		an optional context for f and g
+		return function(){
+			var a = arguments, body = loopBody(f, a, o);
+			if(g.call(o || dojo.global, a)){
+				return this.map(body);	// self
+			}
+			this.forEach(body);
+			return this;	// self
+		};
+	};
+
+	var NodeList = function(array){
+		// summary:
+		//		Array-like object which adds syntactic
+		//		sugar for chaining, common iteration operations, animation, and
+		//		node manipulation. NodeLists are most often returned as the
+		//		result of dojo/query() calls.
+		// description:
+		//		NodeList instances provide many utilities that reflect
+		//		core Dojo APIs for Array iteration and manipulation, DOM
+		//		manipulation, and event handling. Instead of needing to dig up
+		//		functions in the dojo package, NodeLists generally make the
+		//		full power of Dojo available for DOM manipulation tasks in a
+		//		simple, chainable way.
+		// example:
+		//		create a node list from a node
+		//		|	require([&quot;dojo/query&quot;, &quot;dojo/dom&quot;
+		//		|	], function(query, dom){
+		//		|		query.NodeList(dom.byId(&quot;foo&quot;));
+		//		|	});
+		// example:
+		//		get a NodeList from a CSS query and iterate on it
+		//		|	require([&quot;dojo/on&quot;, &quot;dojo/dom&quot;
+		//		|	], function(on, dom){
+		//		|		var l = query(&quot;.thinger&quot;);
+		//		|		l.forEach(function(node, index, nodeList){
+		//		|			console.log(index, node.innerHTML);
+		//		|		});
+		//		|	});
+		// example:
+		//		use native and Dojo-provided array methods to manipulate a
+		//		NodeList without needing to use dojo.* functions explicitly:
+		//		|	require([&quot;dojo/query&quot;, &quot;dojo/dom-construct&quot;, &quot;dojo/dom&quot;
+		//		|	], function(query, domConstruct, dom){
+		//		|		var l = query(&quot;.thinger&quot;);
+		//		|		// since NodeLists are real arrays, they have a length
+		//		|		// property that is both readable and writable and
+		//		|		// push/pop/shift/unshift methods
+		//		|		console.log(l.length);
+		//		|		l.push(domConstruct.create(&quot;span&quot;));
+		//		|
+		//		|		// dojo&#039;s normalized array methods work too:
+		//		|		console.log( l.indexOf(dom.byId(&quot;foo&quot;)) );
+		//		|		// ...including the special &quot;function as string&quot; shorthand
+		//		|		console.log( l.every(&quot;item.nodeType == 1&quot;) );
+		//		|
+		//		|		// NodeLists can be [..] indexed, or you can use the at()
+		//		|		// function to get specific items wrapped in a new NodeList:
+		//		|		var node = l[3]; // the 4th element
+		//		|		var newList = l.at(1, 3); // the 2nd and 4th elements
+		//		|	});
+		// example:
+		//		chainability is a key advantage of NodeLists:
+		//		|	require([&quot;dojo/query&quot;, &quot;dojo/NodeList-dom&quot;
+		//		|	], function(query){
+		//		|		query(&quot;.thinger&quot;)
+		//		|			.onclick(function(e){ /* ... */ })
+		//		|			.at(1, 3, 8) // get a subset
+		//		|				.style(&quot;padding&quot;, &quot;5px&quot;)
+		//		|				.forEach(console.log);
+		//		|	});
+
+		var isNew = this instanceof nl &amp;&amp; has(&quot;array-extensible&quot;);
+		if(typeof array == &quot;number&quot;){
+			array = Array(array);
+		}
+		var nodeArray = (array &amp;&amp; &quot;length&quot; in array) ? array : arguments;
+		if(isNew || !nodeArray.sort){
+			// make sure it&#039;s a real array before we pass it on to be wrapped 
+			var target = isNew ? this : [],
+				l = target.length = nodeArray.length;
+			for(var i = 0; i &lt; l; i++){
+				target[i] = nodeArray[i];
+			}
+			if(isNew){
+				// called with new operator, this means we are going to use this instance and push
+				// the nodes on to it. This is usually much faster since the NodeList properties
+				//	don&#039;t need to be copied (unless the list of nodes is extremely large).
+				return target;
+			}
+			nodeArray = target;
+		}
+		// called without new operator, use a real array and copy prototype properties,
+		// this is slower and exists for back-compat. Should be removed in 2.0.
+		lang._mixin(nodeArray, nlp);
+		nodeArray._NodeListCtor = function(array){
+			// call without new operator to preserve back-compat behavior
+			return nl(array);
+		};
+		return nodeArray;
+	};
+	
+	var nl = NodeList, nlp = nl.prototype = 
+		has(&quot;array-extensible&quot;) ? [] : {};// extend an array if it is extensible
+
+	// expose adapters and the wrapper as private functions
+
+	nl._wrap = nlp._wrap = tnl;
+	nl._adaptAsMap = adaptAsMap;
+	nl._adaptAsForEach = adaptAsForEach;
+	nl._adaptAsFilter  = adaptAsFilter;
+	nl._adaptWithCondition = adaptWithCondition;
+
+	// mass assignment
+
+	// add array redirectors
+	forEach([&quot;slice&quot;, &quot;splice&quot;], function(name){
+		var f = ap[name];
+		//Use a copy of the this array via this.slice() to allow .end() to work right in the splice case.
+		// CANNOT apply ._stash()/end() to splice since it currently modifies
+		// the existing this array -- it would break backward compatibility if we copy the array before
+		// the splice so that we can use .end(). So only doing the stash option to this._wrap for slice.
+		nlp[name] = function(){ return this._wrap(f.apply(this, arguments), name == &quot;slice&quot; ? this : null); };
+	});
+	// concat should be here but some browsers with native NodeList have problems with it
+
+	// add array.js redirectors
+	forEach([&quot;indexOf&quot;, &quot;lastIndexOf&quot;, &quot;every&quot;, &quot;some&quot;], function(name){
+		var f = array[name];
+		nlp[name] = function(){ return f.apply(dojo, [this].concat(aps.call(arguments, 0))); };
+	});
+
+	lang.extend(NodeList, {
+		// copy the constructors
+		constructor: nl,
+		_NodeListCtor: nl,
+		toString: function(){
+			// Array.prototype.toString can&#039;t be applied to objects, so we use join
+			return this.join(&quot;,&quot;);
+		},
+		_stash: function(parent){
+			// summary:
+			//		private function to hold to a parent NodeList. end() to return the parent NodeList.
+			//
+			// example:
+			//		How to make a `dojo/NodeList` method that only returns the third node in
+			//		the dojo/NodeList but allows access to the original NodeList by using this._stash:
+			//	|	require([&quot;dojo/query&quot;, &quot;dojo/_base/lang&quot;, &quot;dojo/NodeList&quot;, &quot;dojo/NodeList-dom&quot;
+			//	|	], function(query, lang){
+			//	|		lang.extend(NodeList, {
+			//	|			third: function(){
+			//	|				var newNodeList = NodeList(this[2]);
+			//	|				return newNodeList._stash(this);
+			//	|			}
+			//	|		});
+			//	|		// then see how _stash applies a sub-list, to be .end()&#039;ed out of
+			//	|		query(&quot;.foo&quot;)
+			//	|			.third()
+			//	|				.addClass(&quot;thirdFoo&quot;)
+			//	|			.end()
+			//	|			// access to the orig .foo list
+			//	|			.removeClass(&quot;foo&quot;)
+			//	|	});
+			//
+			this._parent = parent;
+			return this; // dojo/NodeList
+		},
+
+		on: function(eventName, listener){
+			// summary:
+			//		Listen for events on the nodes in the NodeList. Basic usage is:
+			//
+			// example:
+			//		|	require([&quot;dojo/query&quot;
+			//		|	], function(query){
+			//		|		query(&quot;.my-class&quot;).on(&quot;click&quot;, listener);
+			//			This supports event delegation by using selectors as the first argument with the event names as
+			//			pseudo selectors. For example:
+			//		| 		query(&quot;#my-list&quot;).on(&quot;li:click&quot;, listener);
+			//			This will listen for click events within `&lt;li&gt;` elements that are inside the `#my-list` element.
+			//			Because on supports CSS selector syntax, we can use comma-delimited events as well:
+			//		| 		query(&quot;#my-list&quot;).on(&quot;li button:mouseover, li:click&quot;, listener);
+			//		|	});
+			var handles = this.map(function(node){
+				return on(node, eventName, listener); // TODO: apply to the NodeList so the same selector engine is used for matches
+			});
+			handles.remove = function(){
+				for(var i = 0; i &lt; handles.length; i++){
+					handles[i].remove();
+				}
+			};
+			return handles;
+		},
+
+		end: function(){
+			// summary:
+			//		Ends use of the current `NodeList` by returning the previous NodeList
+			//		that generated the current NodeList.
+			// description:
+			//		Returns the `NodeList` that generated the current `NodeList`. If there
+			//		is no parent NodeList, an empty NodeList is returned.
+			// example:
+			//	|	require([&quot;dojo/query&quot;, &quot;dojo/NodeList-dom&quot;
+			//	|	], function(query){
+			//	|		query(&quot;a&quot;)
+			//	|			.filter(&quot;.disabled&quot;)
+			//	|				// operate on the anchors that only have a disabled class
+			//	|				.style(&quot;color&quot;, &quot;grey&quot;)
+			//	|			.end()
+			//	|			// jump back to the list of anchors
+			//	|			.style(...)
+			//	|	});
+			//
+			if(this._parent){
+				return this._parent;
+			}else{
+				//Just return empty list.
+				return new this._NodeListCtor(0);
+			}
+		},
+
+		// http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Array#Methods
+
+		// FIXME: handle return values for #3244
+		//		http://trac.dojotoolkit.org/ticket/3244
+
+		// FIXME:
+		//		need to wrap or implement:
+		//			join (perhaps w/ innerHTML/outerHTML overload for toString() of items?)
+		//			reduce
+		//			reduceRight
+
+		/*=====
+		slice: function(begin, end){
+			// summary:
+			//		Returns a new NodeList, maintaining this one in place
+			// description:
+			//		This method behaves exactly like the Array.slice method
+			//		with the caveat that it returns a `dojo/NodeList` and not a
+			//		raw Array. For more details, see Mozilla&#039;s [slice
+			//		documentation](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/slice)
+			// begin: Integer
+			//		Can be a positive or negative integer, with positive
+			//		integers noting the offset to begin at, and negative
+			//		integers denoting an offset from the end (i.e., to the left
+			//		of the end)
+			// end: Integer?
+			//		Optional parameter to describe what position relative to
+			//		the NodeList&#039;s zero index to end the slice at. Like begin,
+			//		can be positive or negative.
+			return this._wrap(a.slice.apply(this, arguments));
+		},
+
+		splice: function(index, howmany, item){
+			// summary:
+			//		Returns a new NodeList, manipulating this NodeList based on
+			//		the arguments passed, potentially splicing in new elements
+			//		at an offset, optionally deleting elements
+			// description:
+			//		This method behaves exactly like the Array.splice method
+			//		with the caveat that it returns a `dojo/NodeList` and not a
+			//		raw Array. For more details, see Mozilla&#039;s [splice
+			//		documentation](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/splice)
+			//		For backwards compatibility, calling .end() on the spliced NodeList
+			//		does not return the original NodeList -- splice alters the NodeList in place.
+			// index: Integer
+			//		begin can be a positive or negative integer, with positive
+			//		integers noting the offset to begin at, and negative
+			//		integers denoting an offset from the end (i.e., to the left
+			//		of the end)
+			// howmany: Integer?
+			//		Optional parameter to describe what position relative to
+			//		the NodeList&#039;s zero index to end the slice at. Like begin,
+			//		can be positive or negative.
+			// item: Object...?
+			//		Any number of optional parameters may be passed in to be
+			//		spliced into the NodeList
+			return this._wrap(a.splice.apply(this, arguments));	// dojo/NodeList
+		},
+
+		indexOf: function(value, fromIndex){
+			// summary:
+			//		see `dojo/_base/array.indexOf()`. The primary difference is that the acted-on
+			//		array is implicitly this NodeList
+			// value: Object
+			//		The value to search for.
+			// fromIndex: Integer?
+			//		The location to start searching from. Optional. Defaults to 0.
+			// description:
+			//		For more details on the behavior of indexOf, see Mozilla&#039;s
+			//		[indexOf
+			//		docs](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/indexOf)
+			// returns:
+			//		Positive Integer or 0 for a match, -1 of not found.
+			return d.indexOf(this, value, fromIndex); // Integer
+		},
+
+		lastIndexOf: function(value, fromIndex){
+			// summary:
+			//		see `dojo/_base/array.lastIndexOf()`. The primary difference is that the
+			//		acted-on array is implicitly this NodeList
+			// description:
+			//		For more details on the behavior of lastIndexOf, see
+			//		Mozilla&#039;s [lastIndexOf
+			//		docs](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/lastIndexOf)
+			// value: Object
+			//		The value to search for.
+			// fromIndex: Integer?
+			//		The location to start searching from. Optional. Defaults to 0.
+			// returns:
+			//		Positive Integer or 0 for a match, -1 of not found.
+			return d.lastIndexOf(this, value, fromIndex); // Integer
+		},
+
+		every: function(callback, thisObject){
+			// summary:
+			//		see `dojo/_base/array.every()` and the [Array.every
+			//		docs](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/every).
+			//		Takes the same structure of arguments and returns as
+			//		dojo/_base/array.every() with the caveat that the passed array is
+			//		implicitly this NodeList
+			// callback: Function
+			//		the callback
+			// thisObject: Object?
+			//		the context
+			return d.every(this, callback, thisObject); // Boolean
+		},
+
+		some: function(callback, thisObject){
+			// summary:
+			//		Takes the same structure of arguments and returns as
+			//		`dojo/_base/array.some()` with the caveat that the passed array is
+			//		implicitly this NodeList.  See `dojo/_base/array.some()` and Mozilla&#039;s
+			//		[Array.some
+			//		documentation](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/some).
+			// callback: Function
+			//		the callback
+			// thisObject: Object?
+			//		the context
+			return d.some(this, callback, thisObject); // Boolean
+		},
+		=====*/
+
+		concat: function(item){
+			// summary:
+			//		Returns a new NodeList comprised of items in this NodeList
+			//		as well as items passed in as parameters
+			// description:
+			//		This method behaves exactly like the Array.concat method
+			//		with the caveat that it returns a `NodeList` and not a
+			//		raw Array. For more details, see the [Array.concat
+			//		docs](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/concat)
+			// item: Object?
+			//		Any number of optional parameters may be passed in to be
+			//		spliced into the NodeList
+
+			//return this._wrap(apc.apply(this, arguments));
+			// the line above won&#039;t work for the native NodeList, or for Dojo NodeLists either :-(
+
+			// implementation notes:
+			// Array.concat() doesn&#039;t recognize native NodeLists or Dojo NodeLists
+			// as arrays, and so does not inline them into a unioned array, but
+			// appends them as single entities. Both the original NodeList and the
+			// items passed in as parameters must be converted to raw Arrays
+			// and then the concatenation result may be re-_wrap()ed as a Dojo NodeList.
+
+			var t = aps.call(this, 0),
+				m = array.map(arguments, function(a){
+					return aps.call(a, 0);
+				});
+			return this._wrap(apc.apply(t, m), this);	// dojo/NodeList
+		},
+
+		map: function(/*Function*/ func, /*Function?*/ obj){
+			// summary:
+			//		see `dojo/_base/array.map()`. The primary difference is that the acted-on
+			//		array is implicitly this NodeList and the return is a
+			//		NodeList (a subclass of Array)
+			return this._wrap(array.map(this, func, obj), this); // dojo/NodeList
+		},
+
+		forEach: function(callback, thisObj){
+			// summary:
+			//		see `dojo/_base/array.forEach()`. The primary difference is that the acted-on
+			//		array is implicitly this NodeList. If you want the option to break out
+			//		of the forEach loop, use every() or some() instead.
+			forEach(this, callback, thisObj);
+			// non-standard return to allow easier chaining
+			return this; // dojo/NodeList
+		},
+		filter: function(/*String|Function*/ filter){
+			// summary:
+			//		&quot;masks&quot; the built-in javascript filter() method (supported
+			//		in Dojo via `dojo/_base/array.filter`) to support passing a simple
+			//		string filter in addition to supporting filtering function
+			//		objects.
+			// filter:
+			//		If a string, a CSS rule like &quot;.thinger&quot; or &quot;div &gt; span&quot;.
+			// example:
+			//		&quot;regular&quot; JS filter syntax as exposed in `dojo/_base/array.filter`:
+			//		|	require([&quot;dojo/query&quot;, &quot;dojo/NodeList-dom&quot;
+			//		|	], function(query){
+			//		|		query(&quot;*&quot;).filter(function(item){
+			//		|			// highlight every paragraph
+			//		|			return (item.nodeName == &quot;p&quot;);
+			//		|		}).style(&quot;backgroundColor&quot;, &quot;yellow&quot;);
+			//		|	});
+			// example:
+			//		the same filtering using a CSS selector
+			//		|	require([&quot;dojo/query&quot;, &quot;dojo/NodeList-dom&quot;
+			//		|	], function(query){
+			//		|		query(&quot;*&quot;).filter(&quot;p&quot;).styles(&quot;backgroundColor&quot;, &quot;yellow&quot;);
+			//		|	});
+
+			var a = arguments, items = this, start = 0;
+			if(typeof filter == &quot;string&quot;){ // inline&#039;d type check
+				items = query._filterResult(this, a[0]);
+				if(a.length == 1){
+					// if we only got a string query, pass back the filtered results
+					return items._stash(this); // dojo/NodeList
+				}
+				// if we got a callback, run it over the filtered items
+				start = 1;
+			}
+			return this._wrap(array.filter(items, a[start], a[start + 1]), this);	// dojo/NodeList
+		},
+		instantiate: function(/*String|Object*/ declaredClass, /*Object?*/ properties){
+			// summary:
+			//		Create a new instance of a specified class, using the
+			//		specified properties and each node in the NodeList as a
+			//		srcNodeRef.
+			// example:
+			//		Grabs all buttons in the page and converts them to dijit/form/Button&#039;s.
+			//	|	var buttons = query(&quot;button&quot;).instantiate(Button, {showLabel: true});
+			var c = lang.isFunction(declaredClass) ? declaredClass : lang.getObject(declaredClass);
+			properties = properties || {};
+			return this.forEach(function(node){
+				new c(properties, node);
+			});	// dojo/NodeList
+		},
+		at: function(/*===== index =====*/){
+			// summary:
+			//		Returns a new NodeList comprised of items in this NodeList
+			//		at the given index or indices.
+			//
+			// index: Integer...
+			//		One or more 0-based indices of items in the current
+			//		NodeList. A negative index will start at the end of the
+			//		list and go backwards.
+			//
+			// example:
+			//	Shorten the list to the first, second, and third elements
+			//	|	require([&quot;dojo/query&quot;
+			//	|	], function(query){
+			//	|		query(&quot;a&quot;).at(0, 1, 2).forEach(fn);
+			//	|	});
+			//
+			// example:
+			//	Retrieve the first and last elements of a unordered list:
+			//	|	require([&quot;dojo/query&quot;
+			//	|	], function(query){
+			//	|		query(&quot;ul &gt; li&quot;).at(0, -1).forEach(cb);
+			//	|	});
+			//
+			// example:
+			//	Do something for the first element only, but end() out back to
+			//	the original list and continue chaining:
+			//	|	require([&quot;dojo/query&quot;
+			//	|	], function(query){
+			//	|		query(&quot;a&quot;).at(0).onclick(fn).end().forEach(function(n){
+			//	|			console.log(n); // all anchors on the page.
+			//	|	})
+			//	|	});
+
+			var t = new this._NodeListCtor(0);
+			forEach(arguments, function(i){
+				if(i &lt; 0){ i = this.length + i; }
+				if(this[i]){ t.push(this[i]); }
+			}, this);
+			return t._stash(this); // dojo/NodeList
+		}
+	});
+
+	function queryForEngine(engine, NodeList){
+		var query = function(/*String*/ query, /*String|DOMNode?*/ root){
+			// summary:
+			//		Returns nodes which match the given CSS selector, searching the
+			//		entire document by default but optionally taking a node to scope
+			//		the search by. Returns an instance of NodeList.
+			if(typeof root == &quot;string&quot;){
+				root = dom.byId(root);
+				if(!root){
+					return new NodeList([]);
+				}
+			}
+			var results = typeof query == &quot;string&quot; ? engine(query, root) : query ? (query.end &amp;&amp; query.on) ? query : [query] : [];
+			if(results.end &amp;&amp; results.on){
+				// already wrapped
+				return results;
+			}
+			return new NodeList(results);
+		};
+		query.matches = engine.match || function(node, selector, root){
+			// summary:
+			//		Test to see if a node matches a selector
+			return query.filter([node], selector, root).length &gt; 0;
+		};
+		// the engine provides a filtering function, use it to for matching
+		query.filter = engine.filter || function(nodes, selector, root){
+			// summary:
+			//		Filters an array of nodes. Note that this does not guarantee to return a NodeList, just an array.
+			return query(selector, root).filter(function(node){
+				return array.indexOf(nodes, node) &gt; -1;
+			});
+		};
+		if(typeof engine != &quot;function&quot;){
+			var search = engine.search;
+			engine = function(selector, root){
+				// Slick does it backwards (or everyone else does it backwards, probably the latter)
+				return search(root || document, selector);
+			};
+		}
+		return query;
+	}
+	var query = queryForEngine(defaultEngine, NodeList);
+	/*=====
+	query = function(selector, context){
+		// summary:
+		//		This modules provides DOM querying functionality. The module export is a function
+		//		that can be used to query for DOM nodes by CSS selector and returns a NodeList
+		//		representing the matching nodes.
+		// selector: String
+		//		A CSS selector to search for.
+		// context: String|DomNode?
+		//		An optional context to limit the searching scope. Only nodes under `context` will be
+		//		scanned.
+		// example:
+		//		add an onclick handler to every submit button in the document
+		//		which causes the form to be sent via Ajax instead:
+		//	|	require([&quot;dojo/query&quot;, &quot;dojo/request&quot;, &quot;dojo/dom-form&quot;, &quot;dojo/dom-construct&quot;, &quot;dojo/dom-style&quot;
+		//	|	], function(query, request, domForm, domConstruct, domStyle){
+		//	|		query(&quot;input[type=&#039;submit&#039;]&quot;).on(&quot;click&quot;, function(e){
+		//	|			e.preventDefault(); // prevent sending the form
+		//	|			var btn = e.target;
+		//	|			request.post(&quot;http://example.com/&quot;, {
+		//	|				data: domForm.toObject(btn.form)
+		//	|			}).then(function(response){
+		//	|				// replace the form with the response
+		//	|				domConstruct.create(div, {innerHTML: response}, btn.form, &quot;after&quot;);
+		//	|				domStyle.set(btn.form, &quot;display&quot;, &quot;none&quot;);
+		//	|			});
+		//	|		});
+		//	|	});
+		//
+		// description:
+		//		dojo/query is responsible for loading the appropriate query engine and wrapping
+		//		its results with a `NodeList`. You can use dojo/query with a specific selector engine
+		//		by using it as a plugin. For example, if you installed the sizzle package, you could
+		//		use it as the selector engine with:
+		//		|	require([&quot;dojo/query!sizzle&quot;], function(query){
+		//		|		query(&quot;div&quot;)...
+		//
+		//		The id after the ! can be a module id of the selector engine or one of the following values:
+		//
+		//		- acme: This is the default engine used by Dojo base, and will ensure that the full
+		//		Acme engine is always loaded.
+		//
+		//		- css2: If the browser has a native selector engine, this will be used, otherwise a
+		//		very minimal lightweight selector engine will be loaded that can do simple CSS2 selectors
+		//		(by #id, .class, tag, and [name=value] attributes, with standard child or descendant (&gt;)
+		//		operators) and nothing more.
+		//
+		//		- css2.1: If the browser has a native selector engine, this will be used, otherwise the
+		//		full Acme engine will be loaded.
+		//
+		//		- css3: If the browser has a native selector engine with support for CSS3 pseudo
+		//		selectors (most modern browsers except IE8), this will be used, otherwise the
+		//		full Acme engine will be loaded.
+		//
+		//		- Or the module id of a selector engine can be used to explicitly choose the selector engine
+		//
+		//		For example, if you are using CSS3 pseudo selectors in module, you can specify that
+		//		you will need support them with:
+		//		|	require([&quot;dojo/query!css3&quot;], function(query){
+		//		|		query(&#039;#t &gt; h3:nth-child(odd)&#039;)...
+		//
+		//		You can also choose the selector engine/load configuration by setting the query-selector:
+		//		For example:
+		//		|	&lt;script data-dojo-config=&quot;query-selector:&#039;css3&#039;&quot; src=&quot;dojo.js&quot;&gt;&lt;/script&gt;
+		//
+		return new NodeList(); // dojo/NodeList
+	 };
+	 =====*/
+
+	// the query that is returned from this module is slightly different than dojo.query,
+	// because dojo.query has to maintain backwards compatibility with returning a
+	// true array which has performance problems. The query returned from the module
+	// does not use true arrays, but rather inherits from Array, making it much faster to
+	// instantiate.
+	dojo.query = queryForEngine(defaultEngine, function(array){
+		// call it without the new operator to invoke the back-compat behavior that returns a true array
+		return NodeList(array);	// dojo/NodeList
+	});
+
+	query.load = function(id, parentRequire, loaded){
+		// summary:
+		//		can be used as AMD plugin to conditionally load new query engine
+		// example:
+		//	|	require([&quot;dojo/query!custom&quot;], function(qsa){
+		//	|		// loaded selector/custom.js as engine
+		//	|		qsa(&quot;#foobar&quot;).forEach(...);
+		//	|	});
+		loader.load(id, parentRequire, function(engine){
+			loaded(queryForEngine(engine, NodeList));
+		});
+	};
+
+	dojo._filterQueryResult = query._filterResult = function(nodes, selector, root){
+		return new NodeList(query.filter(nodes, selector, root));
+	};
+	dojo.NodeList = query.NodeList = NodeList;
+	return query;
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

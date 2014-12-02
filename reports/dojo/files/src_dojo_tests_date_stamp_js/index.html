@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src/dojo/tests/date/stamp.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src/dojo/tests/date/stamp.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">54.18</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">98</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">16.89</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.95</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([&quot;doh&quot;, &quot;dojo/date/stamp&quot;], function(doh, stamp){
+
+
+doh.register(&quot;tests.date.stamp&quot;, [
+
+function test_date_iso(t){
+	var rfc  = &quot;2005-06-29T08:05:00-07:00&quot;;
+	var date = stamp.fromISOString(rfc);
+	t.is(2005,date.getFullYear());
+	t.is(5,date.getMonth());
+	t.is(29,date.getUTCDate());
+	t.is(15,date.getUTCHours());
+	t.is(5,date.getUTCMinutes());
+	t.is(0,date.getSeconds());
+
+	rfc  = &quot;2004-02-29&quot;;
+	date = stamp.fromISOString(rfc);
+	t.is(2004,date.getFullYear());
+	t.is(1,date.getMonth());
+	t.is(29,date.getDate());
+
+	rfc  = &quot;2004-01&quot;;
+	date = stamp.fromISOString(rfc);
+	t.is(2004,date.getFullYear());
+	t.is(0,date.getMonth());
+	t.is(1,date.getDate());
+
+	// No TZ info means local time
+	rfc  = &quot;2004-02-29T01:23:45&quot;;
+	date = stamp.fromISOString(rfc);
+	t.is(2004,date.getFullYear());
+	t.is(1,date.getMonth());
+	t.is(29,date.getDate());
+	t.is(1,date.getHours());
+
+	date = new Date(2005,5,29,8,5,0);
+	rfc = stamp.toISOString(date);
+	//truncate for comparison
+	t.is(&quot;2005-06&quot;,rfc.substring(0,7));
+
+	date = new Date(101,0,2);
+	date.setFullYear(101);
+	rfc = stamp.toISOString(date);
+	//truncate for comparison
+	t.is(&quot;0101-01&quot;,rfc.substring(0,7));
+
+	rfc  = &quot;0101-01-01&quot;;
+	date = stamp.fromISOString(rfc);
+	t.is(101,date.getFullYear());
+	t.is(0,date.getMonth());
+	t.is(1,date.getDate());
+
+	rfc = &quot;0001-01T00:00:00&quot;;
+	date = stamp.fromISOString(rfc);
+	t.is(1,date.getFullYear());
+
+	date = stamp.fromISOString(&quot;T18:46:39&quot;);
+	t.is(18, date.getHours());
+	t.is(46, date.getMinutes());
+	t.is(39, date.getSeconds());
+},
+
+function test_date_iso_tz(t){
+
+	//23:59:59.9942 or 235959.9942
+//	var date = stamp.fromISOString(&quot;T18:46:39.9942&quot;);
+//	t.is(18, date.getHours());
+//	t.is(46, date.getMinutes());
+//	t.is(39, date.getSeconds());
+//	t.is(994, date.getMilliseconds());
+	
+	//1995-02-04 24:00 = 1995-02-05 00:00
+
+	//timezone tests
+	var offset = new Date().getTimezoneOffset()/60;
+	date = stamp.fromISOString(&quot;T18:46:39+07:00&quot;);
+	t.is(11, date.getUTCHours());
+
+	date = stamp.fromISOString(&quot;T18:46:39+00:00&quot;);
+	t.is(18, date.getUTCHours());
+
+	date = stamp.fromISOString(&quot;T18:46:39Z&quot;);
+	t.is(18, date.getUTCHours());
+
+	date = stamp.fromISOString(&quot;T16:46:39-07:00&quot;);
+	t.is(23, date.getUTCHours());
+	
+	date = stamp.fromISOString(&quot;T00:00:00Z&quot;, new Date(2010,3,1));
+	t.is(0, date.getUTCHours());
+	t.is(2010, date.getFullYear());
+	
+	//+hh:mm, +hhmm, or +hh
+	
+	//-hh:mm, -hhmm, or -hh
+}
+]);
+
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

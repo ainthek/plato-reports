@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src/dojo/tests/_base/scrollingIframe.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src/dojo/tests/_base/scrollingIframe.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">56.94</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">103</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">36.49</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.41</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">var isQuirks = document.compatMode == &quot;BackCompat&quot;;
+
+function runScrollingTest(resultNode){
+	// reposition the absolute-positioned tag to the top/left of the static control
+	//	element and check to make sure each has the same offsetLeft/Top
+	if(!(&quot;dojo&quot; in window)){
+		var doc = frameElement.ownerDocument;
+		var win = doc.parentWindow || doc.defaultView;
+		dojo = win.dojo;
+	}
+	var isLtr = dojo.hitch(dojo, &quot;withGlobal&quot;)(window, &quot;_isBodyLtr&quot;, dojo, []);
+	var root = isQuirks? document.body : document.documentElement;
+	var control = document.getElementById(&quot;control&quot;);
+	var clientWidth = document.getElementById(&quot;clientWidth&quot;);
+	var abs1 = document.getElementById(&quot;abs1&quot;);
+	window.scrollTo(0, 0); // start with standarized placement
+	setTimeout(function(){
+		var cw = dojo.hitch(dojo, &quot;withGlobal&quot;)(window, &quot;position&quot;, dojo, [clientWidth, false]);
+		if(cw.x != 0){
+			scrollBy(cw.x, 0); // scroll width:100% control element fully into view
+		}
+		var p = dojo.hitch(dojo, &quot;withGlobal&quot;)(window, &quot;position&quot;, dojo, [control, true]);
+		abs1.style.left = p.x + &quot;px&quot;;
+		abs1.style.top = p.y + &quot;px&quot;;
+		setTimeout(function(){
+			cw = dojo.hitch(dojo, &quot;withGlobal&quot;)(window, &quot;position&quot;, dojo, [clientWidth, false]);
+			if(cw.x &gt;= 0 || (cw.x &lt; 0 &amp;&amp; Math.round(root.clientWidth - cw.w - cw.x) == 0)){
+				if(abs1.offsetLeft == control.offsetLeft){
+					if(abs1.offsetTop == control.offsetTop){
+						resultNode.testResult = &quot;EQUAL&quot;;
+					}else{
+						resultNode.testResult = &quot;abs1.offsetTop=&quot;+abs1.offsetTop + &quot; control.offsetTop=&quot;+control.offsetTop;
+					}
+				}else{
+					resultNode.testResult = &quot;abs1.offsetLeft=&quot;+abs1.offsetLeft + &quot; control.offsetLeft=&quot;+control.offsetLeft;
+				}
+			}else{
+				resultNode.testResult = &quot;100% width element start/size=&quot; + cw.x+&#039;/&#039;+cw.w + &quot; frame client left/width=&quot;+root.clientLeft+&#039;/&#039;+root.clientWidth;
+			}
+			if(resultNode.resultReady){ resultNode.resultReady(); }
+		}, 100);
+	}, 100);
+}
+
+function genScrollingTestNodes(hScroll, vScroll, large){
+	document.write(
+		&#039;&lt;DIV id=&quot;abs1&quot; style=&quot;position:absolute;background-color:red;left:0;top:0;width:1em;font-family:monospace;font-size:16px;&quot;&gt;&amp;nbsp;&lt;/DIV&gt;&#039; +
+		&#039;&lt;DIV id=&quot;control&quot; style=&quot;width:2em;height:2em;font-family:monospace;font-size:16px;background-color:cyan;margin:0 1em;border:0;padding:0;&quot;&gt;&amp;nbsp;&amp;nbsp;&lt;/DIV&gt;&#039; +
+		( large
+			? (
+				(hScroll ? &#039;&lt;DIV style=&quot;float:left;position:relative;width:600px;&quot;&gt;&amp;nbsp;&lt;/DIV&gt;&#039; : &#039;&#039;) +
+				(hScroll ? &#039;&lt;DIV style=&quot;float:right;position:relative;width:600px;&quot;&gt;&amp;nbsp;&lt;/DIV&gt;&#039; : &#039;&#039;) +
+				(vScroll ? &#039;&lt;CENTER style=&quot;width:1px;height:600px;&quot;&gt;&amp;nbsp;&lt;/CENTER&gt;&#039; : &#039;&#039;)
+			)
+			: &#039;&#039;
+		) +
+	&#039;&#039;);
+}
+
+function genScrollingTestBody(){
+	var options = window.location.search.substr(1).toLowerCase().split(/&amp;/);
+	options.dir = &quot;ltr&quot;;
+	for(var i=0; i &lt; options.length; i++){
+		var option = options[i];
+		switch(option){
+			case &quot;ltr&quot;:
+			case &quot;rtl&quot;:
+				options.dir = option;
+				break;
+			case&quot;both&quot;:
+				options.horz = 1;
+				options.vert = 1;
+				break;
+			default: options[option] = 1;
+		}
+	}
+	var html = document.getElementsByTagName(&quot;HTML&quot;)[0];
+	html.dir = options.dir;
+	// the setTimeout in the onload allows the browser time to scroll the iframe to the previous position
+	var scroll = options.large ? &#039;&#039; : &#039;scroll&#039;;
+	if(!options.horz){
+		html.style.overflowX = &quot;hidden&quot;;
+	}else if(!isQuirks &amp;&amp; !options.large){
+		html.style.overflowX = scroll;
+	}
+	if(!options.vert){
+		html.style.overflowY = &quot;hidden&quot;;
+	}else if(!isQuirks &amp;&amp; !options.large){
+		html.style.overflowY = scroll;
+	}
+	document.write(&#039;&lt;BODY style=&quot;height:100%;margin:0;padding:0;border:0;background-color:white;overflow-x:&#039; + (options.horz ? (isQuirks ? scroll : &#039;&#039;) : &#039;hidden&#039;) + &#039;;overflow-y:&#039; + (isQuirks ? (options.vert ? scroll : &#039;hidden&#039;) : &#039;&#039;) + &#039;;&quot;&gt;&#039;);
+	document.write(&#039;&lt;DIV id=&quot;clientWidth&quot;&gt;&lt;CENTER&gt;&#039;+(isQuirks?&#039;quirks &#039;:&#039;strict &#039;)+(options.horz?&#039;horiz &#039;:&#039;&#039;)+(options.vert?&#039;vert &#039;:&#039;&#039;)+(options.large?&#039;scrolling &#039;:&#039;&#039;)+options.dir+&#039;&lt;/CENTER&gt;&lt;/DIV&gt;&#039;);
+	genScrollingTestNodes(options.horz, options.vert, options.large);
+	document.write(&#039;&lt;/BODY&gt;&#039;);
+}
+
+if(!document.body){
+	frameElement.runScrollingTest = runScrollingTest;
+	genScrollingTestBody();
+}else{
+	document.write(&#039;&lt;DIV id=&quot;clientWidth&quot; style=&quot;background-color:transparent;&quot;&gt;&amp;nbsp;&lt;/DIV&gt;&#039;);
+	genScrollingTestNodes();
+}</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

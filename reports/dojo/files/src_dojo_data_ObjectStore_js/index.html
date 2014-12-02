@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src/dojo/data/ObjectStore.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src/dojo/data/ObjectStore.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">68.59</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">544</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">86.45</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">3.82</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([&quot;../_base/lang&quot;, &quot;../Evented&quot;, &quot;../_base/declare&quot;, &quot;../_base/Deferred&quot;, &quot;../_base/array&quot;, 
+	&quot;../_base/connect&quot;, &quot;../regexp&quot;
+], function(lang, Evented, declare, Deferred, array, connect, regexp){
+
+// module:
+//		dojo/data/ObjectStore
+
+function convertRegex(character){
+	return character == &#039;*&#039; ? &#039;.*&#039; : character == &#039;?&#039; ? &#039;.&#039; : character; 
+}
+return declare(&quot;dojo.data.ObjectStore&quot;, [Evented],{
+		// summary:
+		//		A Dojo Data implementation that wraps Dojo object stores for backwards
+		//		compatibility.
+
+		objectStore: null,
+		constructor: function(options){
+			// options:
+			//		The configuration information to pass into the data store.
+			//
+			//		- options.objectStore:
+			//
+			//		The object store to use as the source provider for this data store
+			
+			this._dirtyObjects = [];
+			if(options.labelAttribute){
+				// accept the old labelAttribute to make it easier to switch from old data stores
+				options.labelProperty = options.labelAttribute; 
+			}
+			lang.mixin(this, options);
+		},
+		labelProperty: &quot;label&quot;,
+
+		getValue: function(/*Object*/ item, /*String*/property, /*value?*/defaultValue){
+			// summary:
+			//		Gets the value of an item&#039;s &#039;property&#039;
+			// item:
+			//		The item to get the value from
+			// property:
+			//		property to look up value for
+			// defaultValue:
+			//		the default value
+
+			return typeof item.get === &quot;function&quot; ? item.get(property) :
+				property in item ?
+					item[property] : defaultValue;
+		},
+		getValues: function(item, property){
+			// summary:
+			//		Gets the value of an item&#039;s &#039;property&#039; and returns
+			//		it. If this value is an array it is just returned,
+			//		if not, the value is added to an array and that is returned.
+			// item: Object
+			// property: String
+			//		property to look up value for
+
+			var val = this.getValue(item,property);
+			return val instanceof Array ? val : val === undefined ? [] : [val];
+		},
+
+		getAttributes: function(item){
+			// summary:
+			//		Gets the available attributes of an item&#039;s &#039;property&#039; and returns
+			//		it as an array.
+			// item: Object
+
+			var res = [];
+			for(var i in item){
+				if(item.hasOwnProperty(i) &amp;&amp; !(i.charAt(0) == &#039;_&#039; &amp;&amp; i.charAt(1) == &#039;_&#039;)){
+					res.push(i);
+				}
+			}
+			return res;
+		},
+
+		hasAttribute: function(item,attribute){
+			// summary:
+			//		Checks to see if item has attribute
+			// item: Object
+			//		The item to check
+			// attribute: String
+			//		The attribute to check
+			return attribute in item;
+		},
+
+		containsValue: function(item, attribute, value){
+			// summary:
+			//		Checks to see if &#039;item&#039; has &#039;value&#039; at &#039;attribute&#039;
+			// item: Object
+			//		The item to check
+			// attribute: String
+			//		The attribute to check
+			// value: Anything
+			//		The value to look for
+			return array.indexOf(this.getValues(item,attribute),value) &gt; -1;
+		},
+
+
+		isItem: function(item){
+			// summary:
+			//		Checks to see if the argument is an item
+			// item: Object
+			//		The item to check
+
+			// we have no way of determining if it belongs, we just have object returned from
+			// service queries
+			return (typeof item == &#039;object&#039;) &amp;&amp; item &amp;&amp; !(item instanceof Date);
+		},
+
+		isItemLoaded: function(item){
+			// summary:
+			//		Checks to see if the item is loaded.
+			// item: Object
+			//		The item to check
+
+			return item &amp;&amp; typeof item.load !== &quot;function&quot;;
+		},
+
+		loadItem: function(args){
+			// summary:
+			//		Loads an item and calls the callback handler. Note, that this will call the callback
+			//		handler even if the item is loaded. Consequently, you can use loadItem to ensure
+			//		that an item is loaded is situations when the item may or may not be loaded yet.
+			//		If you access a value directly through property access, you can use this to load
+			//		a lazy value as well (doesn&#039;t need to be an item).
+			// args: Object
+			//		See dojo/data/api/Read.fetch()
+			// example:
+			//	|	store.loadItem({
+			//	|		item: item, // this item may or may not be loaded
+			//	|		onItem: function(item){
+			//	|			// do something with the item
+			//	|		}
+			//	|	});
+
+			var item;
+			if(typeof args.item.load === &quot;function&quot;){
+				Deferred.when(args.item.load(), function(result){
+					item = result; // in synchronous mode this can allow loadItem to return the value
+					var func = result instanceof Error ? args.onError : args.onItem;
+					if(func){
+						func.call(args.scope, result);
+					}
+				});
+			}else if(args.onItem){
+				// even if it is already loaded, we will use call the callback, this makes it easier to
+				// use when it is not known if the item is loaded (you can always safely call loadItem).
+				args.onItem.call(args.scope, args.item);
+			}
+			return item;
+		},
+		close: function(request){
+			// summary:
+			// 		See dojo/data/api/Read.close()
+			return request &amp;&amp; request.abort &amp;&amp; request.abort();
+		},
+		fetch: function(args){
+			// summary:
+			//		See dojo/data/api/Read.fetch()
+
+			args = lang.delegate(args, args &amp;&amp; args.queryOptions);
+			var self = this;
+			var scope = args.scope || self;
+			var query = args.query;
+			if(typeof query == &quot;object&quot;){ // can be null, but that is ignore by for-in
+				query = lang.delegate(query); // don&#039;t modify the original
+				for(var i in query){
+					// find any strings and convert them to regular expressions for wildcard support
+					var required = query[i];
+					if(typeof required == &quot;string&quot;){
+						query[i] = RegExp(&quot;^&quot; + regexp.escapeString(required, &quot;*?\\&quot;).replace(/\\.|\*|\?/g, convertRegex) + &quot;$&quot;, args.ignoreCase ? &quot;mi&quot; : &quot;m&quot;);
+						query[i].toString = (function(original){
+							return function(){
+								return original;
+							};
+						})(required);
+					}
+				}
+			}
+
+			var results = this.objectStore.query(query, args);
+			Deferred.when(results.total, function(totalCount){
+				Deferred.when(results, function(results){
+					if(args.onBegin){
+						args.onBegin.call(scope, totalCount || results.length, args);
+					}
+					if(args.onItem){
+						for(var i=0; i&lt;results.length;i++){
+							args.onItem.call(scope, results[i], args);
+						}
+					}
+					if(args.onComplete){
+						args.onComplete.call(scope, args.onItem ? null : results, args);
+					}
+					return results;
+				}, errorHandler);
+			}, errorHandler);
+			function errorHandler(error){
+				if(args.onError){
+					args.onError.call(scope, error, args);
+				}
+			}
+			args.abort = function(){
+				// abort the request
+				if(results.cancel){
+					results.cancel();
+				}
+			};
+			if(results.observe){
+				if(this.observing){
+					// if we were previously observing, cancel the last time to avoid multiple notifications. Just the best we can do for the impedance mismatch between APIs
+					this.observing.cancel();
+				}
+				this.observing = results.observe(function(object, removedFrom, insertedInto){
+					if(array.indexOf(self._dirtyObjects, object) == -1){
+						if(removedFrom == -1){
+							self.onNew(object);
+						}
+						else if(insertedInto == -1){
+							self.onDelete(object);
+						}
+						else{
+							for(var i in object){
+								if(i != self.objectStore.idProperty){
+									self.onSet(object, i, null, object[i]);
+								}
+							}
+						}
+					}
+				}, true);
+			}
+			this.onFetch(results);
+			args.store = this;
+			return args;
+		},
+		getFeatures: function(){
+			// summary:
+			//		return the store feature set
+
+			return {
+				&quot;dojo.data.api.Read&quot;: !!this.objectStore.get,
+				&quot;dojo.data.api.Identity&quot;: true,
+				&quot;dojo.data.api.Write&quot;: !!this.objectStore.put,
+				&quot;dojo.data.api.Notification&quot;: true
+			};
+		},
+
+		getLabel: function(/* dojo/data/api/Item */ item){
+			// summary:
+			//		See dojo/data/api/Read.getLabel()
+			if(this.isItem(item)){
+				return this.getValue(item,this.labelProperty); //String
+			}
+			return undefined; //undefined
+		},
+
+		getLabelAttributes: function(/* dojo/data/api/Item */ item){
+			// summary:
+			//		See dojo/data/api/Read.getLabelAttributes()
+			return [this.labelProperty]; //array
+		},
+
+		//Identity API Support
+
+
+		getIdentity: function(item){
+			// summary:
+			//		returns the identity of the given item
+			//		See dojo/data/api/Read.getIdentity()
+			return this.objectStore.getIdentity ? this.objectStore.getIdentity(item) : item[this.objectStore.idProperty || &quot;id&quot;];
+		},
+
+		getIdentityAttributes: function(item){
+			// summary:
+			//		returns the attributes which are used to make up the
+			//		identity of an item.	Basically returns this.objectStore.idProperty
+			//		See dojo/data/api/Read.getIdentityAttributes()
+
+			return [this.objectStore.idProperty];
+		},
+
+		fetchItemByIdentity: function(args){
+			// summary:
+			//		fetch an item by its identity, by looking in our index of what we have loaded
+			var item;
+			Deferred.when(this.objectStore.get(args.identity),
+				function(result){
+					item = result;
+					args.onItem.call(args.scope, result);
+				},
+				function(error){
+					args.onError.call(args.scope, error);
+				}
+			);
+			return item;
+		},
+
+		newItem: function(data, parentInfo){
+			// summary:
+			//		adds a new item to the store at the specified point.
+			//		Takes two parameters, data, and options.
+			// data: Object
+			//		The data to be added in as an item.
+			// data: Object
+			//		See dojo/data/api/Write.newItem()
+					
+			if(parentInfo){
+				// get the previous value or any empty array
+				var values = this.getValue(parentInfo.parent,parentInfo.attribute,[]);
+				// set the new value
+				values = values.concat([data]);
+				data.__parent = values;
+				this.setValue(parentInfo.parent, parentInfo.attribute, values);
+			}
+			this._dirtyObjects.push({object:data, save: true});
+			this.onNew(data);
+			return data;
+		},
+		deleteItem: function(item){
+			// summary:
+			//		deletes item and any references to that item from the store.
+			// item:
+			//		item to delete
+
+			// If the desire is to delete only one reference, unsetAttribute or
+			// setValue is the way to go.
+			this.changing(item, true);
+
+			this.onDelete(item);
+		},
+		setValue: function(item, attribute, value){
+			// summary:
+			//		sets &#039;attribute&#039; on &#039;item&#039; to &#039;value&#039;
+			//		See dojo/data/api/Write.setValue()
+			
+			var old = item[attribute];
+			this.changing(item);
+			item[attribute]=value;
+			this.onSet(item,attribute,old,value);
+		},
+		setValues: function(item, attribute, values){
+			// summary:
+			//		sets &#039;attribute&#039; on &#039;item&#039; to &#039;value&#039; value
+			//		must be an array.
+			//		See dojo/data/api/Write.setValues()
+
+			if(!lang.isArray(values)){
+				throw new Error(&quot;setValues expects to be passed an Array object as its value&quot;);
+			}
+			this.setValue(item,attribute,values);
+		},
+
+		unsetAttribute: function(item, attribute){
+			// summary:
+			//		unsets &#039;attribute&#039; on &#039;item&#039;
+			//		See dojo/data/api/Write.unsetAttribute()
+
+			this.changing(item);
+			var old = item[attribute];
+			delete item[attribute];
+			this.onSet(item,attribute,old,undefined);
+		},
+
+		changing: function(object,_deleting){
+			// summary:
+			//		adds an object to the list of dirty objects.  This object
+			//		contains a reference to the object itself as well as a
+			//		cloned and trimmed version of old object for use with
+			//		revert.
+			// object: Object
+			//		Indicates that the given object is changing and should be marked as 
+			// 		dirty for the next save
+			// _deleting: [private] Boolean
+			
+			object.__isDirty = true;
+			//if an object is already in the list of dirty objects, don&#039;t add it again
+			//or it will overwrite the premodification data set.
+			for(var i=0; i&lt;this._dirtyObjects.length; i++){
+				var dirty = this._dirtyObjects[i];
+				if(object==dirty.object){
+					if(_deleting){
+						// we are deleting, no object is an indicator of deletiong
+						dirty.object = false;
+						if(!this._saveNotNeeded){
+							dirty.save = true;
+						}
+					}
+					return;
+				}
+			}
+			var old = object instanceof Array ? [] : {};
+			for(i in object){
+				if(object.hasOwnProperty(i)){
+					old[i] = object[i];
+				}
+			}
+			this._dirtyObjects.push({object: !_deleting &amp;&amp; object, old: old, save: !this._saveNotNeeded});
+		},
+
+		save: function(kwArgs){
+			// summary:
+			//		Saves the dirty data using object store provider. See dojo/data/api/Write for API.
+			// kwArgs:
+			//		- kwArgs.global:
+			//		  This will cause the save to commit the dirty data for all
+			//		  ObjectStores as a single transaction.
+			//
+			//		- kwArgs.revertOnError:
+			//		  This will cause the changes to be reverted if there is an
+			//		  error on the save. By default a revert is executed unless
+			//		  a value of false is provide for this parameter.
+			//
+			//		- kwArgs.onError:
+			//		  Called when an error occurs in the commit
+			//
+			//		- kwArgs.onComplete:
+			//		  Called when an the save/commit is completed
+
+			kwArgs = kwArgs || {};
+			var result, actions = [];
+			var savingObjects = [];
+			var self = this;
+			var dirtyObjects = this._dirtyObjects;
+			var left = dirtyObjects.length;// this is how many changes are remaining to be received from the server
+			try{
+				connect.connect(kwArgs,&quot;onError&quot;,function(){
+					if(kwArgs.revertOnError !== false){
+						var postCommitDirtyObjects = dirtyObjects;
+						dirtyObjects = savingObjects;
+						self.revert(); // revert if there was an error
+						self._dirtyObjects = postCommitDirtyObjects;
+					}
+					else{
+						self._dirtyObjects = dirtyObjects.concat(savingObjects);
+					}
+				});
+				if(this.objectStore.transaction){
+					var transaction = this.objectStore.transaction();
+				}
+				for(var i = 0; i &lt; dirtyObjects.length; i++){
+					var dirty = dirtyObjects[i];
+					var object = dirty.object;
+					var old = dirty.old;
+					delete object.__isDirty;
+					if(object){
+						result = this.objectStore.put(object, {overwrite: !!old});
+					}
+					else if(typeof old != &quot;undefined&quot;){
+						result = this.objectStore.remove(this.getIdentity(old));
+					}
+					savingObjects.push(dirty);
+					dirtyObjects.splice(i--,1);
+					Deferred.when(result, function(value){
+						if(!(--left)){
+							if(kwArgs.onComplete){
+								kwArgs.onComplete.call(kwArgs.scope, actions);
+							}
+						}
+					},function(value){
+
+						// on an error we want to revert, first we want to separate any changes that were made since the commit
+						left = -1; // first make sure that success isn&#039;t called
+						kwArgs.onError.call(kwArgs.scope, value);
+					});
+
+				}
+				if(transaction){
+					transaction.commit();
+				}
+			}catch(e){
+				kwArgs.onError.call(kwArgs.scope, value);
+			}
+		},
+
+		revert: function(){
+			// summary:
+			//		returns any modified data to its original state prior to a save();
+
+			var dirtyObjects = this._dirtyObjects;
+			for(var i = dirtyObjects.length; i &gt; 0;){
+				i--;
+				var dirty = dirtyObjects[i];
+				var object = dirty.object;
+				var old = dirty.old;
+				if(object &amp;&amp; old){
+					// changed
+					for(var j in old){
+						if(old.hasOwnProperty(j) &amp;&amp; object[j] !== old[j]){
+							this.onSet(object, j, object[j], old[j]);
+							object[j] = old[j];
+						}
+					}
+					for(j in object){
+						if(!old.hasOwnProperty(j)){
+							this.onSet(object, j, object[j]);
+							delete object[j];
+						}
+					}
+				}else if(!old){
+					// was an addition, remove it
+					this.onDelete(object);
+				}else{
+					// was a deletion, we will add it back
+					this.onNew(old);
+				}
+				delete (object || old).__isDirty;
+				dirtyObjects.splice(i, 1);
+			}
+
+		},
+		isDirty: function(item){
+			// summary:
+			//		returns true if the item is marked as dirty or true if there are any dirty items
+			// item: Object
+			//		The item to check
+			if(!item){
+				return !!this._dirtyObjects.length;
+			}
+			return item.__isDirty;
+		},
+
+		// Notification Support
+
+		onSet: function(){
+			// summary:
+			// 		See dojo/data/api/Notification.onSet()
+		},
+		onNew: function(){
+			// summary:
+			// 		See dojo/data/api/Notification.onNew()
+		},
+		onDelete:	function(){
+			// summary:
+			// 		See dojo/data/api/Notification.onDelete()
+		},
+		// an extra to get result sets
+		onFetch: function(results){
+			// summary:
+			// 		Called when a fetch occurs			
+		}
+
+	}
+);
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

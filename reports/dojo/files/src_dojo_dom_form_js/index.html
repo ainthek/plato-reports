@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src/dojo/dom-form.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src/dojo/dom-form.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">60.93</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">149</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">34.43</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.81</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([&quot;./_base/lang&quot;, &quot;./dom&quot;, &quot;./io-query&quot;, &quot;./json&quot;], function(lang, dom, ioq, json){
+	// module:
+	//		dojo/dom-form
+
+    function setValue(/*Object*/ obj, /*String*/ name, /*String*/ value){
+        // summary:
+        //		For the named property in object, set the value. If a value
+        //		already exists and it is a string, convert the value to be an
+        //		array of values.
+
+        // Skip it if there is no value
+        if(value === null){
+            return;
+        }
+
+        var val = obj[name];
+        if(typeof val == &quot;string&quot;){ // inline&#039;d type check
+            obj[name] = [val, value];
+        }else if(lang.isArray(val)){
+            val.push(value);
+        }else{
+            obj[name] = value;
+        }
+    }
+
+	var exclude = &quot;file|submit|image|reset|button&quot;;
+
+	var form = {
+		// summary:
+		//		This module defines form-processing functions.
+
+		fieldToObject: function fieldToObject(/*DOMNode|String*/ inputNode){
+			// summary:
+			//		Serialize a form field to a JavaScript object.
+			// description:
+			//		Returns the value encoded in a form field as
+			//		as a string or an array of strings. Disabled form elements
+			//		and unchecked radio and checkboxes are skipped.	Multi-select
+			//		elements are returned as an array of string values.
+			// inputNode: DOMNode|String
+			// returns: Object
+
+			var ret = null;
+			inputNode = dom.byId(inputNode);
+			if(inputNode){
+				var _in = inputNode.name, type = (inputNode.type || &quot;&quot;).toLowerCase();
+				if(_in &amp;&amp; type &amp;&amp; !inputNode.disabled){
+					if(type == &quot;radio&quot; || type == &quot;checkbox&quot;){
+						if(inputNode.checked){
+							ret = inputNode.value;
+						}
+					}else if(inputNode.multiple){
+						ret = [];
+						var nodes = [inputNode.firstChild];
+						while(nodes.length){
+							for(var node = nodes.pop(); node; node = node.nextSibling){
+								if(node.nodeType == 1 &amp;&amp; node.tagName.toLowerCase() == &quot;option&quot;){
+									if(node.selected){
+										ret.push(node.value);
+									}
+								}else{
+									if(node.nextSibling){
+										nodes.push(node.nextSibling);
+									}
+									if(node.firstChild){
+										nodes.push(node.firstChild);
+									}
+									break;
+								}
+							}
+						}
+					}else{
+						ret = inputNode.value;
+					}
+				}
+			}
+			return ret; // Object
+		},
+
+		toObject: function formToObject(/*DOMNode|String*/ formNode){
+			// summary:
+			//		Serialize a form node to a JavaScript object.
+			// description:
+			//		Returns the values encoded in an HTML form as
+			//		string properties in an object which it then returns. Disabled form
+			//		elements, buttons, and other non-value form elements are skipped.
+			//		Multi-select elements are returned as an array of string values.
+			// formNode: DOMNode|String
+			// example:
+			//		This form:
+			//		|	&lt;form id=&quot;test_form&quot;&gt;
+			//		|		&lt;input type=&quot;text&quot; name=&quot;blah&quot; value=&quot;blah&quot;&gt;
+			//		|		&lt;input type=&quot;text&quot; name=&quot;no_value&quot; value=&quot;blah&quot; disabled&gt;
+			//		|		&lt;input type=&quot;button&quot; name=&quot;no_value2&quot; value=&quot;blah&quot;&gt;
+			//		|		&lt;select type=&quot;select&quot; multiple name=&quot;multi&quot; size=&quot;5&quot;&gt;
+			//		|			&lt;option value=&quot;blah&quot;&gt;blah&lt;/option&gt;
+			//		|			&lt;option value=&quot;thud&quot; selected&gt;thud&lt;/option&gt;
+			//		|			&lt;option value=&quot;thonk&quot; selected&gt;thonk&lt;/option&gt;
+			//		|		&lt;/select&gt;
+			//		|	&lt;/form&gt;
+			//
+			//		yields this object structure as the result of a call to
+			//		formToObject():
+			//
+			//		|	{
+			//		|		blah: &quot;blah&quot;,
+			//		|		multi: [
+			//		|			&quot;thud&quot;,
+			//		|			&quot;thonk&quot;
+			//		|		]
+			//		|	};
+
+			var ret = {}, elems = dom.byId(formNode).elements;
+			for(var i = 0, l = elems.length; i &lt; l; ++i){
+				var item = elems[i], _in = item.name, type = (item.type || &quot;&quot;).toLowerCase();
+				if(_in &amp;&amp; type &amp;&amp; exclude.indexOf(type) &lt; 0 &amp;&amp; !item.disabled){
+					setValue(ret, _in, form.fieldToObject(item));
+					if(type == &quot;image&quot;){
+						ret[_in + &quot;.x&quot;] = ret[_in + &quot;.y&quot;] = ret[_in].x = ret[_in].y = 0;
+					}
+				}
+			}
+			return ret; // Object
+		},
+
+		toQuery: function formToQuery(/*DOMNode|String*/ formNode){
+			// summary:
+			//		Returns a URL-encoded string representing the form passed as either a
+			//		node or string ID identifying the form to serialize
+			// formNode: DOMNode|String
+			// returns: String
+
+			return ioq.objectToQuery(form.toObject(formNode)); // String
+		},
+
+		toJson: function formToJson(/*DOMNode|String*/ formNode, /*Boolean?*/ prettyPrint){
+			// summary:
+			//		Create a serialized JSON string from a form node or string
+			//		ID identifying the form to serialize
+			// formNode: DOMNode|String
+			// prettyPrint: Boolean?
+			// returns: String
+
+			return json.stringify(form.toObject(formNode), null, prettyPrint ? 4 : 0); // String
+		}
+	};
+
+    return form;
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src/dojo/nls/uk/colors.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src/dojo/nls/uk/colors.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">35.30</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">156</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">1.56</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.22</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define(
+({
+// local representation of all CSS3 named colors, companion to dojo.colors.  To be used where descriptive information
+// is required for each color, such as a palette widget, and not for specifying color programatically.
+	//Note: due to the SVG 1.0 spec additions, some of these are alternate spellings for the same color (e.g. gray / grey).
+	//TODO: should we be using unique rgb values as keys instead and avoid these duplicates, or rely on the caller to do the reverse mapping?
+	aliceblue: &quot;сіро-блакитний&quot;,
+	antiquewhite: &quot;білий антик&quot;,
+	aqua: &quot;зеленувато-блакитний&quot;,
+	aquamarine: &quot;аквамарин&quot;,
+	azure: &quot;лазурний&quot;,
+	beige: &quot;бежевий&quot;,
+	bisque: &quot;кремовий&quot;,
+	black: &quot;чорний&quot;,
+	blanchedalmond: &quot;світло-мигдалевий&quot;,
+	blue: &quot;блакитний&quot;,
+	blueviolet: &quot;блакитно-фіолетовий&quot;,
+	brown: &quot;брунатний&quot;,
+	burlywood: &quot;світло-брунатний&quot;,
+	cadetblue: &quot;сіро-синій&quot;,
+	chartreuse: &quot;жовто-салатовий&quot;,
+	chocolate: &quot;шоколадний&quot;,
+	coral: &quot;коралевий&quot;,
+	cornflowerblue: &quot;фіолетово-синій&quot;,
+	cornsilk: &quot;шовковий відтінок&quot;,
+	crimson: &quot;малиновий&quot;,
+	cyan: &quot;синій&quot;,
+	darkblue: &quot;темно-блакитний&quot;,
+	darkcyan: &quot;темно-синій&quot;,
+	darkgoldenrod: &quot;темно-золотавий&quot;,
+	darkgray: &quot;темно-сірий&quot;,
+	darkgreen: &quot;темно-зелений&quot;,
+	darkgrey: &quot;темно-сірий&quot;, // same as darkgray
+	darkkhaki: &quot;темний хакі&quot;,
+	darkmagenta: &quot;темно-пурпуровий&quot;,
+	darkolivegreen: &quot;темно-оливковий&quot;,
+	darkorange: &quot;темно-жовтогарячий&quot;,
+	darkorchid: &quot;темний орсель&quot;,
+	darkred: &quot;темно-червоний&quot;,
+	darksalmon: &quot;темно-лососевий&quot;,
+	darkseagreen: &quot;темний колір морської хвилі&quot;,
+	darkslateblue: &quot;темний грифельно-синій&quot;,
+	darkslategray: &quot;темний грифельно-сірий&quot;,
+	darkslategrey: &quot;темний грифельно-сірий&quot;, // same as darkslategray
+	darkturquoise: &quot;темно-бірюзовий&quot;,
+	darkviolet: &quot;темно-фіолетовий&quot;,
+	deeppink: &quot;темно-рожевий&quot;,
+	deepskyblue: &quot;насичений світло-блакитний&quot;,
+	dimgray: &quot;тьмяно-сірий&quot;,
+	dimgrey: &quot;тьмяно-сірий&quot;, // same as dimgray
+	dodgerblue: &quot;блідо-блакитний&quot;,
+	firebrick: &quot;цеглястий&quot;,
+	floralwhite: &quot;квітково-білий&quot;,
+	forestgreen: &quot;зелений лісний&quot;,
+	fuchsia: &quot;фуксин&quot;,
+	gainsboro: &quot;блідо-сірий&quot;,
+	ghostwhite: &quot;молочно-білий&quot;,
+	gold: &quot;золотий&quot;,
+	goldenrod: &quot;золотавий&quot;,
+	gray: &quot;сірий&quot;,
+	green: &quot;зелений&quot;,
+	greenyellow: &quot;зелено-жовтий&quot;,
+	grey: &quot;сірий&quot;, // same as gray
+	honeydew: &quot;медовий&quot;,
+	hotpink: &quot;червоно-рожевий&quot;,
+	indianred: &quot;індійський червоний&quot;,
+	indigo: &quot;індиго&quot;,
+	ivory: &quot;слонової кістки&quot;,
+	khaki: &quot;хакі&quot;,
+	lavender: &quot;лавандовий&quot;,
+	lavenderblush: &quot;рожево-лавандовий&quot;,
+	lawngreen: &quot;трав&#039;янистий&quot;,
+	lemonchiffon: &quot;блідо-лимонний&quot;,
+	lightblue: &quot;світло-блакитний&quot;,
+	lightcoral: &quot;світло-коралевий&quot;,
+	lightcyan: &quot;світло-синій&quot;,
+	lightgoldenrodyellow: &quot;світло-золотаво-жовтий&quot;,
+	lightgray: &quot;світло-сірий&quot;,
+	lightgreen: &quot;світло-зелений&quot;,
+	lightgrey: &quot;світло-сірий&quot;, // same as lightgray
+	lightpink: &quot;світло-рожевий&quot;,
+	lightsalmon: &quot;світло-лососевий&quot;,
+	lightseagreen: &quot;світлий морської хвилі&quot;,
+	lightskyblue: &quot;світлий небесно-блакитний&quot;,
+	lightslategray: &quot;світлий грифельно-сірий&quot;,
+	lightslategrey: &quot;світлий грифельно-сірий&quot;, // same as lightslategray
+	lightsteelblue: &quot;світлий сталевий&quot;,
+	lightyellow: &quot;світло-жовтий&quot;,
+	lime: &quot;лайм&quot;,
+	limegreen: &quot;зелений лайм&quot;,
+	linen: &quot;лляний&quot;,
+	magenta: &quot;пурпурний&quot;,
+	maroon: &quot;темно-брунатний&quot;,
+	mediumaquamarine: &quot;нейтральний аквамарин&quot;,
+	mediumblue: &quot;нейтральний блакитний&quot;,
+	mediumorchid: &quot;нейтральний орсель&quot;,
+	mediumpurple: &quot;нейтральний фіолетовий&quot;,
+	mediumseagreen: &quot;нейтральний морської хвилі&quot;,
+	mediumslateblue: &quot;нейтральний грифельно-синій&quot;,
+	mediumspringgreen: &quot;нейтральний весняний зелений&quot;,
+	mediumturquoise: &quot;нейтральний бірюзовий&quot;,
+	mediumvioletred: &quot;нейтральний фіолетово-червоний&quot;,
+	midnightblue: &quot;північно-синій&quot;,
+	mintcream: &quot;м&#039;ятно-кремовий&quot;,
+	mistyrose: &quot;тьмяно-рожевий&quot;,
+	moccasin: &quot;болотний&quot;,
+	navajowhite: &quot;білий навахо&quot;,
+	navy: &quot;темно-синій&quot;,
+	oldlace: &quot;матово-білий&quot;,
+	olive: &quot;оливковий&quot;,
+	olivedrab: &quot;оливково-сірий&quot;,
+	orange: &quot;жовтогарячий&quot;,
+	orangered: &quot;жовтогаряче-червоний&quot;,
+	orchid: &quot;світло-бузковий&quot;,
+	palegoldenrod: &quot;блідо-золотавий&quot;,
+	palegreen: &quot;блідо-зелений&quot;,
+	paleturquoise: &quot;блідо-бірюзовий&quot;,
+	palevioletred: &quot;блідо-фіолетово-червоний&quot;,
+	papayawhip: &quot;динне дерево&quot;,
+	peachpuff: &quot;персиковий&quot;,
+	peru: &quot;перу&quot;,
+	pink: &quot;рожевий&quot;,
+	plum: &quot;сливовий&quot;,
+	powderblue: &quot;зеленувато-блакитний&quot;,
+	purple: &quot;фіолетовий&quot;,
+	red: &quot;червоний&quot;,
+	rosybrown: &quot;рожево-брунатний&quot;,
+	royalblue: &quot;королевський блакитний&quot;,
+	saddlebrown: &quot;шкіряно-брунатний&quot;,
+	salmon: &quot;лососевий&quot;,
+	sandybrown: &quot;брунатно-пісочний&quot;,
+	seagreen: &quot;морської хвилі&quot;,
+	seashell: &quot;морська скойка&quot;,
+	sienna: &quot;охра&quot;,
+	silver: &quot;сріблястий&quot;,
+	skyblue: &quot;небесно-блакитний&quot;,
+	slateblue: &quot;грифельно-синій&quot;,
+	slategray: &quot;грифельно-сірий&quot;,
+	slategrey: &quot;грифельно-сірий&quot;, // same as slategray
+	snow: &quot;білосніжний&quot;,
+	springgreen: &quot;весняний зелений&quot;,
+	steelblue: &quot;сталевий&quot;,
+	tan: &quot;бронзовий&quot;,
+	teal: &quot;темно-бірюзовий&quot;,
+	thistle: &quot;будяк&quot;,
+	tomato: &quot;томатний&quot;,
+	transparent: &quot;прозорий&quot;,
+	turquoise: &quot;бірюзовий&quot;,
+	violet: &quot;фіолетовий&quot;,
+	wheat: &quot;пшениця&quot;,
+	white: &quot;білий&quot;,
+	whitesmoke: &quot;попелясто-білий&quot;,
+	yellow: &quot;жовтий&quot;,
+	yellowgreen: &quot;жовто-зелений&quot;
+})
+);</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

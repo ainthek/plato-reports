@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src/dojo/ready.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src/dojo/ready.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">62.61</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">153</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">29.80</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.66</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([&quot;./_base/kernel&quot;, &quot;./has&quot;, &quot;require&quot;, &quot;./has!host-browser?./domReady&quot;, &quot;./_base/lang&quot;], function(dojo, has, require, domReady, lang){
+	// module:
+	//		dojo/ready
+	// note:
+	//		This module should be unnecessary in dojo 2.0
+
+	var
+		// truthy if DOMContentLoaded or better (e.g., window.onload fired) has been achieved
+		isDomReady = 0,
+
+		// The queue of functions waiting to execute as soon as dojo.ready conditions satisfied
+		loadQ = [],
+
+		// prevent recursion in onLoad
+		onLoadRecursiveGuard = 0,
+
+		handleDomReady = function(){
+			isDomReady = 1;
+			dojo._postLoad = dojo.config.afterOnLoad = true;
+			onEvent();
+		},
+
+		onEvent = function(){
+			// Called when some state changes:
+			//		- dom ready
+			//		- dojo/domReady has finished processing everything in its queue
+			//		- task added to loadQ
+			//		- require() has finished loading all currently requested modules
+			//
+			// Run the functions queued with dojo.ready if appropriate.
+
+
+			//guard against recursions into this function
+			if(onLoadRecursiveGuard){
+				return;
+			}
+			onLoadRecursiveGuard = 1;
+
+			// Run tasks in queue if require() is finished loading modules, the dom is ready, and there are no
+			// pending tasks registered via domReady().
+			// The last step is necessary so that a user defined dojo.ready() callback is delayed until after the
+			// domReady() calls inside of dojo.	  Failure can be seen on dijit/tests/robot/Dialog_ally.html on IE8
+			// because the dijit/focus.js domReady() callback doesn&#039;t execute until after the test starts running.
+			while(isDomReady &amp;&amp; (!domReady || domReady._Q.length == 0) &amp;&amp; (require.idle ? require.idle() : true) &amp;&amp; loadQ.length){
+				var f = loadQ.shift();
+				try{
+					f();
+				}catch(e){
+					// force the dojo.js on(&quot;error&quot;) handler do display the message
+					e.info = e.message;
+					if(require.signal){
+						require.signal(&quot;error&quot;, e);
+					}else{
+						throw e;
+					}
+				}
+			}
+
+			onLoadRecursiveGuard = 0;
+		};
+
+	// Check if we should run the next queue operation whenever require() finishes loading modules or domReady
+	// finishes processing it&#039;s queue.
+	require.on &amp;&amp; require.on(&quot;idle&quot;, onEvent);
+	if(domReady){
+		domReady._onQEmpty = onEvent;
+	}
+
+	var ready = dojo.ready = dojo.addOnLoad = function(priority, context, callback){
+		// summary:
+		//		Add a function to execute on DOM content loaded and all requested modules have arrived and been evaluated.
+		//		In most cases, the `domReady` plug-in should suffice and this method should not be needed.
+		//
+		//		When called in a non-browser environment, just checks that all requested modules have arrived and been
+		//		evaluated.
+		// priority: Integer?
+		//		The order in which to exec this callback relative to other callbacks, defaults to 1000
+		// context: Object?|Function
+		//		The context in which to run execute callback, or a callback if not using context
+		// callback: Function?
+		//		The function to execute.
+		//
+		// example:
+		//	Simple DOM and Modules ready syntax
+		//	|	require([&quot;dojo/ready&quot;], function(ready){
+		//	|		ready(function(){ alert(&quot;Dom ready!&quot;); });
+		//	|	});
+		//
+		// example:
+		//	Using a priority
+		//	|	require([&quot;dojo/ready&quot;], function(ready){
+		//	|		ready(2, function(){ alert(&quot;low priority ready!&quot;); })
+		//	|	});
+		//
+		// example:
+		//	Using context
+		//	|	require([&quot;dojo/ready&quot;], function(ready){
+		//	|		ready(foo, function(){
+		//	|			// in here, this == foo
+		//	|		});
+		//	|	});
+		//
+		// example:
+		//	Using dojo/hitch style args:
+		//	|	require([&quot;dojo/ready&quot;], function(ready){
+		//	|		var foo = { dojoReady: function(){ console.warn(this, &quot;dojo dom and modules ready.&quot;); } };
+		//	|		ready(foo, &quot;dojoReady&quot;);
+		//	|	});
+
+		var hitchArgs = lang._toArray(arguments);
+		if(typeof priority != &quot;number&quot;){
+			callback = context;
+			context = priority;
+			priority = 1000;
+		}else{
+			hitchArgs.shift();
+		}
+		callback = callback ?
+			lang.hitch.apply(dojo, hitchArgs) :
+			function(){
+				context();
+			};
+		callback.priority = priority;
+		for(var i = 0; i &lt; loadQ.length &amp;&amp; priority &gt;= loadQ[i].priority; i++){}
+		loadQ.splice(i, 0, callback);
+		onEvent();
+	};
+
+	has.add(&quot;dojo-config-addOnLoad&quot;, 1);
+	if(has(&quot;dojo-config-addOnLoad&quot;)){
+		var dca = dojo.config.addOnLoad;
+		if(dca){
+			ready[(lang.isArray(dca) ? &quot;apply&quot; : &quot;call&quot;)](dojo, dca);
+		}
+	}
+
+	if(has(&quot;dojo-sync-loader&quot;) &amp;&amp; dojo.config.parseOnLoad &amp;&amp; !dojo.isAsync){
+		ready(99, function(){
+			if(!dojo.parser){
+				dojo.deprecated(&quot;Add explicit require([&#039;dojo/parser&#039;]);&quot;, &quot;&quot;, &quot;2.0&quot;);
+				require([&quot;dojo/parser&quot;]);
+			}
+		});
+	}
+
+	if(domReady){
+		domReady(handleDomReady);
+	}else{
+		handleDomReady();
+	}
+
+	return ready;
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

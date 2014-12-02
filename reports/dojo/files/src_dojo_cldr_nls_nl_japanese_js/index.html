@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src/dojo/cldr/nls/nl/japanese.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src/dojo/cldr/nls/nl/japanese.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">40.27</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">323</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">2.05</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.38</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define(
+//begin v1.x content
+{
+	&quot;field-second-relative+0&quot;: &quot;nu&quot;,
+	&quot;field-weekday&quot;: &quot;Dag van de week&quot;,
+	&quot;field-wed-relative+0&quot;: &quot;deze woensdag&quot;,
+	&quot;field-wed-relative+1&quot;: &quot;volgende week woensdag&quot;,
+	&quot;dateFormatItem-GyMMMEd&quot;: &quot;E d MMM y G&quot;,
+	&quot;dateFormatItem-MMMEd&quot;: &quot;E d MMM&quot;,
+	&quot;field-tue-relative+-1&quot;: &quot;afgelopen dinsdag&quot;,
+	&quot;dateFormat-long&quot;: &quot;d MMMM y G&quot;,
+	&quot;field-fri-relative+-1&quot;: &quot;afgelopen vrijdag&quot;,
+	&quot;field-wed-relative+-1&quot;: &quot;afgelopen woensdag&quot;,
+	&quot;dateFormatItem-yyyyQQQ&quot;: &quot;QQQ y G&quot;,
+	&quot;dateTimeFormat-medium&quot;: &quot;{1} {0}&quot;,
+	&quot;dateFormat-full&quot;: &quot;EEEE d MMMM y G&quot;,
+	&quot;dateFormatItem-yyyyMEd&quot;: &quot;E d-M-y GGGGG&quot;,
+	&quot;field-thu-relative+-1&quot;: &quot;afgelopen donderdag&quot;,
+	&quot;dateFormatItem-Md&quot;: &quot;d-M&quot;,
+	&quot;field-era&quot;: &quot;Tijdperk&quot;,
+	&quot;field-year&quot;: &quot;Jaar&quot;,
+	&quot;dateFormatItem-yyyyMMMM&quot;: &quot;MMMM y G&quot;,
+	&quot;field-hour&quot;: &quot;Uur&quot;,
+	&quot;field-sat-relative+0&quot;: &quot;deze zaterdag&quot;,
+	&quot;field-sat-relative+1&quot;: &quot;volgende week zaterdag&quot;,
+	&quot;field-day-relative+0&quot;: &quot;vandaag&quot;,
+	&quot;field-thu-relative+0&quot;: &quot;deze donderdag&quot;,
+	&quot;field-day-relative+1&quot;: &quot;morgen&quot;,
+	&quot;field-thu-relative+1&quot;: &quot;volgende week donderdag&quot;,
+	&quot;dateFormatItem-GyMMMd&quot;: &quot;d MMM y G&quot;,
+	&quot;field-day-relative+2&quot;: &quot;overmorgen&quot;,
+	&quot;dateFormatItem-Gy&quot;: &quot;y G&quot;,
+	&quot;dateFormatItem-yyyyMMMEd&quot;: &quot;E d MMM y G&quot;,
+	&quot;dateFormatItem-M&quot;: &quot;L&quot;,
+	&quot;dateFormatItem-yyyyMMM&quot;: &quot;MMM y G&quot;,
+	&quot;dateFormatItem-yyyyMMMd&quot;: &quot;d MMM y G&quot;,
+	&quot;dateFormatItem-MMMMd&quot;: &quot;d MMMM&quot;,
+	&quot;field-sun-relative+0&quot;: &quot;deze zondag&quot;,
+	&quot;field-sun-relative+1&quot;: &quot;volgende week zondag&quot;,
+	&quot;eraAbbr&quot;: [
+		&quot;Taika (645-650)&quot;,
+		&quot;Hakuchi (650-671)&quot;,
+		&quot;Hakuhō (672-686)&quot;,
+		&quot;Shuchō (686-701)&quot;,
+		&quot;Taihō (701-704)&quot;,
+		&quot;Keiun (704-708)&quot;,
+		&quot;Wadō (708-715)&quot;,
+		&quot;Reiki (715-717)&quot;,
+		&quot;Yōrō (717-724)&quot;,
+		&quot;Jinki (724-729)&quot;,
+		&quot;Tempyō (729-749)&quot;,
+		&quot;Tempyō-kampō (749-749)&quot;,
+		&quot;Tempyō-shōhō (749-757)&quot;,
+		&quot;Tempyō-hōji (757-765)&quot;,
+		&quot;Temphō-jingo (765-767)&quot;,
+		&quot;Jingo-keiun (767-770)&quot;,
+		&quot;Hōki (770-780)&quot;,
+		&quot;Ten-ō (781-782)&quot;,
+		&quot;Enryaku (782-806)&quot;,
+		&quot;Daidō (806-810)&quot;,
+		&quot;Kōnin (810-824)&quot;,
+		&quot;Tenchō (824-834)&quot;,
+		&quot;Jōwa (834-848)&quot;,
+		&quot;Kajō (848-851)&quot;,
+		&quot;Ninju (851-854)&quot;,
+		&quot;Saiko (854-857)&quot;,
+		&quot;Tennan (857-859)&quot;,
+		&quot;Jōgan (859-877)&quot;,
+		&quot;Genkei (877-885)&quot;,
+		&quot;Ninna (885-889)&quot;,
+		&quot;Kampyō (889-898)&quot;,
+		&quot;Shōtai (898-901)&quot;,
+		&quot;Engi (901-923)&quot;,
+		&quot;Enchō (923-931)&quot;,
+		&quot;Shōhei (931-938)&quot;,
+		&quot;Tengyō (938-947)&quot;,
+		&quot;Tenryaku (947-957)&quot;,
+		&quot;Tentoku (957-961)&quot;,
+		&quot;Ōwa (961-964)&quot;,
+		&quot;Kōhō (964-968)&quot;,
+		&quot;Anna (968-970)&quot;,
+		&quot;Tenroku (970-973)&quot;,
+		&quot;Ten-en (973-976)&quot;,
+		&quot;Jōgen (976-978)&quot;,
+		&quot;Tengen (978-983)&quot;,
+		&quot;Eikan (983-985)&quot;,
+		&quot;Kanna (985-987)&quot;,
+		&quot;Ei-en (987-989)&quot;,
+		&quot;Eiso (989-990)&quot;,
+		&quot;Shōryaku (990-995)&quot;,
+		&quot;Chōtoku (995-999)&quot;,
+		&quot;Chōhō (999-1004)&quot;,
+		&quot;Kankō (1004-1012)&quot;,
+		&quot;Chōwa (1012-1017)&quot;,
+		&quot;Kannin (1017-1021)&quot;,
+		&quot;Jian (1021-1024)&quot;,
+		&quot;Manju (1024-1028)&quot;,
+		&quot;Chōgen (1028-1037)&quot;,
+		&quot;Chōryaku (1037-1040)&quot;,
+		&quot;Chōkyū (1040-1044)&quot;,
+		&quot;Kantoku (1044-1046)&quot;,
+		&quot;Eishō (1046-1053)&quot;,
+		&quot;Tengi (1053-1058)&quot;,
+		&quot;Kōhei (1058-1065)&quot;,
+		&quot;Jiryaku (1065-1069)&quot;,
+		&quot;Enkyū (1069-1074)&quot;,
+		&quot;Shōho (1074-1077)&quot;,
+		&quot;Shōryaku (1077-1081)&quot;,
+		&quot;Eiho (1081-1084)&quot;,
+		&quot;Ōtoku (1084-1087)&quot;,
+		&quot;Kanji (1087-1094)&quot;,
+		&quot;Kaho (1094-1096)&quot;,
+		&quot;Eichō (1096-1097)&quot;,
+		&quot;Shōtoku (1097-1099)&quot;,
+		&quot;Kōwa (1099-1104)&quot;,
+		&quot;Chōji (1104-1106)&quot;,
+		&quot;Kashō (1106-1108)&quot;,
+		&quot;Tennin (1108-1110)&quot;,
+		&quot;Ten-ei (1110-1113)&quot;,
+		&quot;Eikyū (1113-1118)&quot;,
+		&quot;Gen-ei (1118-1120)&quot;,
+		&quot;Hoan (1120-1124)&quot;,
+		&quot;Tenji (1124-1126)&quot;,
+		&quot;Daiji (1126-1131)&quot;,
+		&quot;Tenshō (1131-1132)&quot;,
+		&quot;Chōshō (1132-1135)&quot;,
+		&quot;Hoen (1135-1141)&quot;,
+		&quot;Eiji (1141-1142)&quot;,
+		&quot;Kōji (1142-1144)&quot;,
+		&quot;Tenyō (1144-1145)&quot;,
+		&quot;Kyūan (1145-1151)&quot;,
+		&quot;Ninpei (1151-1154)&quot;,
+		&quot;Kyūju (1154-1156)&quot;,
+		&quot;Hogen (1156-1159)&quot;,
+		&quot;Heiji (1159-1160)&quot;,
+		&quot;Eiryaku (1160-1161)&quot;,
+		&quot;Ōho (1161-1163)&quot;,
+		&quot;Chōkan (1163-1165)&quot;,
+		&quot;Eiman (1165-1166)&quot;,
+		&quot;Nin-an (1166-1169)&quot;,
+		&quot;Kaō (1169-1171)&quot;,
+		&quot;Shōan (1171-1175)&quot;,
+		&quot;Angen (1175-1177)&quot;,
+		&quot;Jishō (1177-1181)&quot;,
+		&quot;Yōwa (1181-1182)&quot;,
+		&quot;Juei (1182-1184)&quot;,
+		&quot;Genryuku (1184-1185)&quot;,
+		&quot;Bunji (1185-1190)&quot;,
+		&quot;Kenkyū (1190-1199)&quot;,
+		&quot;Shōji (1199-1201)&quot;,
+		&quot;Kennin (1201-1204)&quot;,
+		&quot;Genkyū (1204-1206)&quot;,
+		&quot;Ken-ei (1206-1207)&quot;,
+		&quot;Shōgen (1207-1211)&quot;,
+		&quot;Kenryaku (1211-1213)&quot;,
+		&quot;Kenpō (1213-1219)&quot;,
+		&quot;Shōkyū (1219-1222)&quot;,
+		&quot;Jōō (1222-1224)&quot;,
+		&quot;Gennin (1224-1225)&quot;,
+		&quot;Karoku (1225-1227)&quot;,
+		&quot;Antei (1227-1229)&quot;,
+		&quot;Kanki (1229-1232)&quot;,
+		&quot;Jōei (1232-1233)&quot;,
+		&quot;Tempuku (1233-1234)&quot;,
+		&quot;Bunryaku (1234-1235)&quot;,
+		&quot;Katei (1235-1238)&quot;,
+		&quot;Ryakunin (1238-1239)&quot;,
+		&quot;En-ō (1239-1240)&quot;,
+		&quot;Ninji (1240-1243)&quot;,
+		&quot;Kangen (1243-1247)&quot;,
+		&quot;Hōji (1247-1249)&quot;,
+		&quot;Kenchō (1249-1256)&quot;,
+		&quot;Kōgen (1256-1257)&quot;,
+		&quot;Shōka (1257-1259)&quot;,
+		&quot;Shōgen (1259-1260)&quot;,
+		&quot;Bun-ō (1260-1261)&quot;,
+		&quot;Kōchō (1261-1264)&quot;,
+		&quot;Bun-ei (1264-1275)&quot;,
+		&quot;Kenji (1275-1278)&quot;,
+		&quot;Kōan (1278-1288)&quot;,
+		&quot;Shōō (1288-1293)&quot;,
+		&quot;Einin (1293-1299)&quot;,
+		&quot;Shōan (1299-1302)&quot;,
+		&quot;Kengen (1302-1303)&quot;,
+		&quot;Kagen (1303-1306)&quot;,
+		&quot;Tokuji (1306-1308)&quot;,
+		&quot;Enkei (1308-1311)&quot;,
+		&quot;Ōchō (1311-1312)&quot;,
+		&quot;Shōwa (1312-1317)&quot;,
+		&quot;Bunpō (1317-1319)&quot;,
+		&quot;Genō (1319-1321)&quot;,
+		&quot;Genkyō (1321-1324)&quot;,
+		&quot;Shōchū (1324-1326)&quot;,
+		&quot;Kareki (1326-1329)&quot;,
+		&quot;Gentoku (1329-1331)&quot;,
+		&quot;Genkō (1331-1334)&quot;,
+		&quot;Kemmu (1334-1336)&quot;,
+		&quot;Engen (1336-1340)&quot;,
+		&quot;Kōkoku (1340-1346)&quot;,
+		&quot;Shōhei (1346-1370)&quot;,
+		&quot;Kentoku (1370-1372)&quot;,
+		&quot;Bunchū (1372-1375)&quot;,
+		&quot;Tenju (1375-1379)&quot;,
+		&quot;Kōryaku (1379-1381)&quot;,
+		&quot;Kōwa (1381-1384)&quot;,
+		&quot;Genchū (1384-1392)&quot;,
+		&quot;Meitoku (1384-1387)&quot;,
+		&quot;Kakei (1387-1389)&quot;,
+		&quot;Kōō (1389-1390)&quot;,
+		&quot;Meitoku (1390-1394)&quot;,
+		&quot;Ōei (1394-1428)&quot;,
+		&quot;Shōchō (1428-1429)&quot;,
+		&quot;Eikyō (1429-1441)&quot;,
+		&quot;Kakitsu (1441-1444)&quot;,
+		&quot;Bun-an (1444-1449)&quot;,
+		&quot;Hōtoku (1449-1452)&quot;,
+		&quot;Kyōtoku (1452-1455)&quot;,
+		&quot;Kōshō (1455-1457)&quot;,
+		&quot;Chōroku (1457-1460)&quot;,
+		&quot;Kanshō (1460-1466)&quot;,
+		&quot;Bunshō (1466-1467)&quot;,
+		&quot;Ōnin (1467-1469)&quot;,
+		&quot;Bunmei (1469-1487)&quot;,
+		&quot;Chōkyō (1487-1489)&quot;,
+		&quot;Entoku (1489-1492)&quot;,
+		&quot;Meiō (1492-1501)&quot;,
+		&quot;Bunki (1501-1504)&quot;,
+		&quot;Eishō (1504-1521)&quot;,
+		&quot;Taiei (1521-1528)&quot;,
+		&quot;Kyōroku (1528-1532)&quot;,
+		&quot;Tenmon (1532-1555)&quot;,
+		&quot;Kōji (1555-1558)&quot;,
+		&quot;Eiroku (1558-1570)&quot;,
+		&quot;Genki (1570-1573)&quot;,
+		&quot;Tenshō (1573-1592)&quot;,
+		&quot;Bunroku (1592-1596)&quot;,
+		&quot;Keichō (1596-1615)&quot;,
+		&quot;Genwa (1615-1624)&quot;,
+		&quot;Kan-ei (1624-1644)&quot;,
+		&quot;Shōho (1644-1648)&quot;,
+		&quot;Keian (1648-1652)&quot;,
+		&quot;Shōō (1652-1655)&quot;,
+		&quot;Meiryaku (1655-1658)&quot;,
+		&quot;Manji (1658-1661)&quot;,
+		&quot;Kanbun (1661-1673)&quot;,
+		&quot;Enpō (1673-1681)&quot;,
+		&quot;Tenwa (1681-1684)&quot;,
+		&quot;Jōkyō (1684-1688)&quot;,
+		&quot;Genroku (1688-1704)&quot;,
+		&quot;Hōei (1704-1711)&quot;,
+		&quot;Shōtoku (1711-1716)&quot;,
+		&quot;Kyōhō (1716-1736)&quot;,
+		&quot;Genbun (1736-1741)&quot;,
+		&quot;Kanpō (1741-1744)&quot;,
+		&quot;Enkyō (1744-1748)&quot;,
+		&quot;Kan-en (1748-1751)&quot;,
+		&quot;Hōryaku (1751-1764)&quot;,
+		&quot;Meiwa (1764-1772)&quot;,
+		&quot;An-ei (1772-1781)&quot;,
+		&quot;Tenmei (1781-1789)&quot;,
+		&quot;Kansei (1789-1801)&quot;,
+		&quot;Kyōwa (1801-1804)&quot;,
+		&quot;Bunka (1804-1818)&quot;,
+		&quot;Bunsei (1818-1830)&quot;,
+		&quot;Tenpō (1830-1844)&quot;,
+		&quot;Kōka (1844-1848)&quot;,
+		&quot;Kaei (1848-1854)&quot;,
+		&quot;Ansei (1854-1860)&quot;,
+		&quot;Man-en (1860-1861)&quot;,
+		&quot;Bunkyū (1861-1864)&quot;,
+		&quot;Genji (1864-1865)&quot;,
+		&quot;Keiō (1865-1868)&quot;,
+		&quot;Meiji&quot;,
+		&quot;Taishō&quot;,
+		&quot;Shōwa&quot;,
+		&quot;Heisei&quot;
+	],
+	&quot;field-minute&quot;: &quot;Minuut&quot;,
+	&quot;field-dayperiod&quot;: &quot;AM/PM&quot;,
+	&quot;dateFormatItem-d&quot;: &quot;d&quot;,
+	&quot;field-day-relative+-1&quot;: &quot;gisteren&quot;,
+	&quot;dateTimeFormat-long&quot;: &quot;{1} {0}&quot;,
+	&quot;field-day-relative+-2&quot;: &quot;eergisteren&quot;,
+	&quot;dateFormatItem-MMMd&quot;: &quot;d MMM&quot;,
+	&quot;dateFormatItem-MEd&quot;: &quot;E d-M&quot;,
+	&quot;dateTimeFormat-full&quot;: &quot;{1} {0}&quot;,
+	&quot;field-fri-relative+0&quot;: &quot;deze vrijdag&quot;,
+	&quot;field-fri-relative+1&quot;: &quot;volgende week vrijdag&quot;,
+	&quot;field-day&quot;: &quot;Dag&quot;,
+	&quot;field-zone&quot;: &quot;Zone&quot;,
+	&quot;dateFormatItem-y&quot;: &quot;y G&quot;,
+	&quot;field-year-relative+-1&quot;: &quot;vorig jaar&quot;,
+	&quot;field-month-relative+-1&quot;: &quot;vorige maand&quot;,
+	&quot;dateFormatItem-yyyyMd&quot;: &quot;d-M-y GGGGG&quot;,
+	&quot;field-month&quot;: &quot;Maand&quot;,
+	&quot;dateFormatItem-MMM&quot;: &quot;LLL&quot;,
+	&quot;field-tue-relative+0&quot;: &quot;deze dinsdag&quot;,
+	&quot;field-tue-relative+1&quot;: &quot;volgende week dinsdag&quot;,
+	&quot;field-mon-relative+0&quot;: &quot;deze maandag&quot;,
+	&quot;field-mon-relative+1&quot;: &quot;volgende week maandag&quot;,
+	&quot;dateFormat-short&quot;: &quot;dd-MM-yy GGGGG&quot;,
+	&quot;field-second&quot;: &quot;Seconde&quot;,
+	&quot;field-sat-relative+-1&quot;: &quot;afgelopen zaterdag&quot;,
+	&quot;field-sun-relative+-1&quot;: &quot;afgelopen zondag&quot;,
+	&quot;field-month-relative+0&quot;: &quot;deze maand&quot;,
+	&quot;field-month-relative+1&quot;: &quot;volgende maand&quot;,
+	&quot;dateFormatItem-Ed&quot;: &quot;E d&quot;,
+	&quot;field-week&quot;: &quot;Week&quot;,
+	&quot;dateFormat-medium&quot;: &quot;d MMM y G&quot;,
+	&quot;field-year-relative+0&quot;: &quot;dit jaar&quot;,
+	&quot;field-week-relative+-1&quot;: &quot;vorige week&quot;,
+	&quot;dateFormatItem-yyyyM&quot;: &quot;M-y GGGGG&quot;,
+	&quot;field-year-relative+1&quot;: &quot;volgend jaar&quot;,
+	&quot;dateFormatItem-yyyyQQQQ&quot;: &quot;QQQQ y G&quot;,
+	&quot;dateTimeFormat-short&quot;: &quot;{1} {0}&quot;,
+	&quot;dateFormatItem-GyMMM&quot;: &quot;MMM y G&quot;,
+	&quot;field-mon-relative+-1&quot;: &quot;afgelopen maandag&quot;,
+	&quot;dateFormatItem-yyyy&quot;: &quot;y G&quot;,
+	&quot;field-week-relative+0&quot;: &quot;deze week&quot;,
+	&quot;field-week-relative+1&quot;: &quot;volgende week&quot;
+}
+//end v1.x content
+);</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

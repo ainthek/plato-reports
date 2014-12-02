@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src/dojo/cldr/nls/es/buddhist.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src/dojo/cldr/nls/es/buddhist.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">37.47</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">284</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">2.51</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.34</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define(
+//begin v1.x content
+{
+	&quot;days-standAlone-short&quot;: [
+		&quot;DO&quot;,
+		&quot;LU&quot;,
+		&quot;MA&quot;,
+		&quot;MI&quot;,
+		&quot;JU&quot;,
+		&quot;VI&quot;,
+		&quot;SA&quot;
+	],
+	&quot;months-format-narrow&quot;: [
+		&quot;E&quot;,
+		&quot;F&quot;,
+		&quot;M&quot;,
+		&quot;A&quot;,
+		&quot;M&quot;,
+		&quot;J&quot;,
+		&quot;J&quot;,
+		&quot;A&quot;,
+		&quot;S&quot;,
+		&quot;O&quot;,
+		&quot;N&quot;,
+		&quot;D&quot;
+	],
+	&quot;field-second-relative+0&quot;: &quot;ahora&quot;,
+	&quot;quarters-standAlone-narrow&quot;: [
+		&quot;1T&quot;,
+		&quot;2T&quot;,
+		&quot;3T&quot;,
+		&quot;4T&quot;
+	],
+	&quot;field-weekday&quot;: &quot;día de la semana&quot;,
+	&quot;field-wed-relative+0&quot;: &quot;este miércoles&quot;,
+	&quot;field-wed-relative+1&quot;: &quot;el próximo miércoles&quot;,
+	&quot;dateFormatItem-GyMMMEd&quot;: &quot;E, d &#039;de&#039; MMMM &#039;de&#039; y G&quot;,
+	&quot;dateFormatItem-MMMEd&quot;: &quot;E, d MMM&quot;,
+	&quot;field-tue-relative+-1&quot;: &quot;el martes pasado&quot;,
+	&quot;days-format-short&quot;: [
+		&quot;DO&quot;,
+		&quot;LU&quot;,
+		&quot;MA&quot;,
+		&quot;MI&quot;,
+		&quot;JU&quot;,
+		&quot;VI&quot;,
+		&quot;SA&quot;
+	],
+	&quot;dateFormat-long&quot;: &quot;d &#039;de&#039; MMMM &#039;de&#039; y G&quot;,
+	&quot;field-fri-relative+-1&quot;: &quot;el viernes pasado&quot;,
+	&quot;field-wed-relative+-1&quot;: &quot;el miércoles pasado&quot;,
+	&quot;months-format-wide&quot;: [
+		&quot;enero&quot;,
+		&quot;febrero&quot;,
+		&quot;marzo&quot;,
+		&quot;abril&quot;,
+		&quot;mayo&quot;,
+		&quot;junio&quot;,
+		&quot;julio&quot;,
+		&quot;agosto&quot;,
+		&quot;septiembre&quot;,
+		&quot;octubre&quot;,
+		&quot;noviembre&quot;,
+		&quot;diciembre&quot;
+	],
+	&quot;dateFormatItem-yyyyQQQ&quot;: &quot;QQQ y G&quot;,
+	&quot;dayPeriods-format-wide-pm&quot;: &quot;p. m.&quot;,
+	&quot;dateFormat-full&quot;: &quot;EEEE, d &#039;de&#039; MMMM &#039;de&#039; y G&quot;,
+	&quot;dateFormatItem-yyyyMEd&quot;: &quot;E, d/M/y GGGGG&quot;,
+	&quot;field-thu-relative+-1&quot;: &quot;el jueves pasado&quot;,
+	&quot;dateFormatItem-Md&quot;: &quot;d/M&quot;,
+	&quot;field-era&quot;: &quot;era&quot;,
+	&quot;months-standAlone-wide&quot;: [
+		&quot;Enero&quot;,
+		&quot;Febrero&quot;,
+		&quot;Marzo&quot;,
+		&quot;Abril&quot;,
+		&quot;Mayo&quot;,
+		&quot;Junio&quot;,
+		&quot;Julio&quot;,
+		&quot;Agosto&quot;,
+		&quot;Septiembre&quot;,
+		&quot;Octubre&quot;,
+		&quot;Noviembre&quot;,
+		&quot;Diciembre&quot;
+	],
+	&quot;timeFormat-short&quot;: &quot;H:mm&quot;,
+	&quot;quarters-format-wide&quot;: [
+		&quot;1.er trimestre&quot;,
+		&quot;2.º trimestre&quot;,
+		&quot;3.er trimestre&quot;,
+		&quot;4.º trimestre&quot;
+	],
+	&quot;timeFormat-long&quot;: &quot;H:mm:ss z&quot;,
+	&quot;field-year&quot;: &quot;año&quot;,
+	&quot;field-hour&quot;: &quot;hora&quot;,
+	&quot;months-format-abbr&quot;: [
+		&quot;ene.&quot;,
+		&quot;feb.&quot;,
+		&quot;mar.&quot;,
+		&quot;abr.&quot;,
+		&quot;may.&quot;,
+		&quot;jun.&quot;,
+		&quot;jul.&quot;,
+		&quot;ago.&quot;,
+		&quot;sept.&quot;,
+		&quot;oct.&quot;,
+		&quot;nov.&quot;,
+		&quot;dic.&quot;
+	],
+	&quot;field-sat-relative+0&quot;: &quot;este sábado&quot;,
+	&quot;field-sat-relative+1&quot;: &quot;el próximo sábado&quot;,
+	&quot;timeFormat-full&quot;: &quot;H:mm:ss (zzzz)&quot;,
+	&quot;field-day-relative+0&quot;: &quot;hoy&quot;,
+	&quot;field-thu-relative+0&quot;: &quot;este jueves&quot;,
+	&quot;field-day-relative+1&quot;: &quot;mañana&quot;,
+	&quot;field-thu-relative+1&quot;: &quot;el próximo jueves&quot;,
+	&quot;dateFormatItem-GyMMMd&quot;: &quot;d MMM y G&quot;,
+	&quot;field-day-relative+2&quot;: &quot;pasado mañana&quot;,
+	&quot;months-standAlone-abbr&quot;: [
+		&quot;Ene.&quot;,
+		&quot;Feb.&quot;,
+		&quot;Mar.&quot;,
+		&quot;Abr.&quot;,
+		&quot;May.&quot;,
+		&quot;Jun.&quot;,
+		&quot;Jul.&quot;,
+		&quot;Ago.&quot;,
+		&quot;Sept.&quot;,
+		&quot;Oct.&quot;,
+		&quot;Nov.&quot;,
+		&quot;Dic.&quot;
+	],
+	&quot;quarters-format-abbr&quot;: [
+		&quot;T1&quot;,
+		&quot;T2&quot;,
+		&quot;T3&quot;,
+		&quot;T4&quot;
+	],
+	&quot;quarters-standAlone-wide&quot;: [
+		&quot;1.er trimestre&quot;,
+		&quot;2.º trimestre&quot;,
+		&quot;3.er trimestre&quot;,
+		&quot;4.º trimestre&quot;
+	],
+	&quot;dateFormatItem-Gy&quot;: &quot;y G&quot;,
+	&quot;dateFormatItem-yyyyMMMEd&quot;: &quot;E, d &#039;de&#039; MMMM &#039;de&#039; y G&quot;,
+	&quot;days-standAlone-wide&quot;: [
+		&quot;Domingo&quot;,
+		&quot;Lunes&quot;,
+		&quot;Martes&quot;,
+		&quot;Miércoles&quot;,
+		&quot;Jueves&quot;,
+		&quot;Viernes&quot;,
+		&quot;Sábado&quot;
+	],
+	&quot;dateFormatItem-yyyyMMM&quot;: &quot;MMM y G&quot;,
+	&quot;dateFormatItem-yyyyMMMd&quot;: &quot;d MMM y G&quot;,
+	&quot;timeFormat-medium&quot;: &quot;H:mm:ss&quot;,
+	&quot;field-sun-relative+0&quot;: &quot;este domingo&quot;,
+	&quot;field-sun-relative+1&quot;: &quot;el próximo domingo&quot;,
+	&quot;quarters-standAlone-abbr&quot;: [
+		&quot;T1&quot;,
+		&quot;T2&quot;,
+		&quot;T3&quot;,
+		&quot;T4&quot;
+	],
+	&quot;eraAbbr&quot;: [
+		&quot;BE&quot;
+	],
+	&quot;field-minute&quot;: &quot;minuto&quot;,
+	&quot;field-dayperiod&quot;: &quot;periodo del día&quot;,
+	&quot;days-standAlone-abbr&quot;: [
+		&quot;Dom.&quot;,
+		&quot;Lun.&quot;,
+		&quot;Mar.&quot;,
+		&quot;Mié.&quot;,
+		&quot;Jue.&quot;,
+		&quot;Vie.&quot;,
+		&quot;Sáb.&quot;
+	],
+	&quot;quarters-format-narrow&quot;: [
+		&quot;1T&quot;,
+		&quot;2T&quot;,
+		&quot;3T&quot;,
+		&quot;4T&quot;
+	],
+	&quot;field-day-relative+-1&quot;: &quot;ayer&quot;,
+	&quot;dateFormatItem-h&quot;: &quot;hh a&quot;,
+	&quot;dateTimeFormat-long&quot;: &quot;{1}, {0}&quot;,
+	&quot;dayPeriods-format-narrow-am&quot;: &quot;a.m.&quot;,
+	&quot;field-day-relative+-2&quot;: &quot;antes de ayer&quot;,
+	&quot;dateFormatItem-MMMd&quot;: &quot;d MMM&quot;,
+	&quot;dateFormatItem-MEd&quot;: &quot;E, d/M&quot;,
+	&quot;dateTimeFormat-full&quot;: &quot;{1}, {0}&quot;,
+	&quot;field-fri-relative+0&quot;: &quot;este viernes&quot;,
+	&quot;field-fri-relative+1&quot;: &quot;el próximo viernes&quot;,
+	&quot;field-day&quot;: &quot;día&quot;,
+	&quot;days-format-wide&quot;: [
+		&quot;domingo&quot;,
+		&quot;lunes&quot;,
+		&quot;martes&quot;,
+		&quot;miércoles&quot;,
+		&quot;jueves&quot;,
+		&quot;viernes&quot;,
+		&quot;sábado&quot;
+	],
+	&quot;field-zone&quot;: &quot;zona horaria&quot;,
+	&quot;dateFormatItem-y&quot;: &quot;y G&quot;,
+	&quot;months-standAlone-narrow&quot;: [
+		&quot;E&quot;,
+		&quot;F&quot;,
+		&quot;M&quot;,
+		&quot;A&quot;,
+		&quot;M&quot;,
+		&quot;J&quot;,
+		&quot;J&quot;,
+		&quot;A&quot;,
+		&quot;S&quot;,
+		&quot;O&quot;,
+		&quot;N&quot;,
+		&quot;D&quot;
+	],
+	&quot;field-year-relative+-1&quot;: &quot;el año pasado&quot;,
+	&quot;field-month-relative+-1&quot;: &quot;el mes pasado&quot;,
+	&quot;dateFormatItem-hm&quot;: &quot;hh:mm a&quot;,
+	&quot;days-format-abbr&quot;: [
+		&quot;dom.&quot;,
+		&quot;lun.&quot;,
+		&quot;mar.&quot;,
+		&quot;mié.&quot;,
+		&quot;jue.&quot;,
+		&quot;vie.&quot;,
+		&quot;sáb.&quot;
+	],
+	&quot;days-format-narrow&quot;: [
+		&quot;D&quot;,
+		&quot;L&quot;,
+		&quot;M&quot;,
+		&quot;X&quot;,
+		&quot;J&quot;,
+		&quot;V&quot;,
+		&quot;S&quot;
+	],
+	&quot;dateFormatItem-yyyyMd&quot;: &quot;d/M/y GGGGG&quot;,
+	&quot;field-month&quot;: &quot;mes&quot;,
+	&quot;days-standAlone-narrow&quot;: [
+		&quot;D&quot;,
+		&quot;L&quot;,
+		&quot;M&quot;,
+		&quot;X&quot;,
+		&quot;J&quot;,
+		&quot;V&quot;,
+		&quot;S&quot;
+	],
+	&quot;field-tue-relative+0&quot;: &quot;este martes&quot;,
+	&quot;field-tue-relative+1&quot;: &quot;el próximo martes&quot;,
+	&quot;dayPeriods-format-wide-am&quot;: &quot;a. m.&quot;,
+	&quot;field-mon-relative+0&quot;: &quot;este lunes&quot;,
+	&quot;field-mon-relative+1&quot;: &quot;el próximo lunes&quot;,
+	&quot;dateFormat-short&quot;: &quot;dd/MM/yy GGGGG&quot;,
+	&quot;field-second&quot;: &quot;segundo&quot;,
+	&quot;field-sat-relative+-1&quot;: &quot;el sábado pasado&quot;,
+	&quot;field-sun-relative+-1&quot;: &quot;el domingo pasado&quot;,
+	&quot;field-month-relative+0&quot;: &quot;este mes&quot;,
+	&quot;field-month-relative+1&quot;: &quot;el próximo mes&quot;,
+	&quot;dateFormatItem-Ed&quot;: &quot;E d&quot;,
+	&quot;field-week&quot;: &quot;semana&quot;,
+	&quot;dateFormat-medium&quot;: &quot;dd/MM/y G&quot;,
+	&quot;field-year-relative+0&quot;: &quot;este año&quot;,
+	&quot;field-week-relative+-1&quot;: &quot;la semana pasada&quot;,
+	&quot;dateFormatItem-yyyyM&quot;: &quot;M/y GGGGG&quot;,
+	&quot;field-year-relative+1&quot;: &quot;el próximo año&quot;,
+	&quot;dayPeriods-format-narrow-pm&quot;: &quot;p.m.&quot;,
+	&quot;dateFormatItem-yyyyQQQQ&quot;: &quot;QQQQ &#039;de&#039; y G&quot;,
+	&quot;dateFormatItem-hms&quot;: &quot;hh:mm:ss a&quot;,
+	&quot;dateFormatItem-GyMMM&quot;: &quot;MMM y G&quot;,
+	&quot;field-mon-relative+-1&quot;: &quot;el lunes pasado&quot;,
+	&quot;dateFormatItem-yyyy&quot;: &quot;y G&quot;,
+	&quot;field-week-relative+0&quot;: &quot;esta semana&quot;,
+	&quot;field-week-relative+1&quot;: &quot;la próxima semana&quot;
+}
+//end v1.x content
+);</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src/dojo/data/util/sorter.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src/dojo/data/util/sorter.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">65.20</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">99</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">39.63</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.48</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([&quot;../../_base/lang&quot;], function(lang){
+	// module:
+	//		dojo/data/util/sorter
+	// summary:
+	//		TODOC
+
+var sorter = {};
+lang.setObject(&quot;dojo.data.util.sorter&quot;, sorter);
+
+sorter.basicComparator = function(	/*anything*/ a,
+													/*anything*/ b){
+	// summary:
+	//		Basic comparison function that compares if an item is greater or less than another item
+	// description:
+	//		returns 1 if a &gt; b, -1 if a &lt; b, 0 if equal.
+	//		&#039;null&#039; values (null, undefined) are treated as larger values so that they&#039;re pushed to the end of the list.
+	//		And compared to each other, null is equivalent to undefined.
+
+	//null is a problematic compare, so if null, we set to undefined.
+	//Makes the check logic simple, compact, and consistent
+	//And (null == undefined) === true, so the check later against null
+	//works for undefined and is less bytes.
+	var r = -1;
+	if(a === null){
+		a = undefined;
+	}
+	if(b === null){
+		b = undefined;
+	}
+	if(a == b){
+		r = 0;
+	}else if(a &gt; b || a == null){
+		r = 1;
+	}
+	return r; //int {-1,0,1}
+};
+
+sorter.createSortFunction = function(	/* attributes[] */sortSpec, /*dojo/data/api/Read*/ store){
+	// summary:
+	//		Helper function to generate the sorting function based off the list of sort attributes.
+	// description:
+	//		The sort function creation will look for a property on the store called &#039;comparatorMap&#039;.  If it exists
+	//		it will look in the mapping for comparisons function for the attributes.  If one is found, it will
+	//		use it instead of the basic comparator, which is typically used for strings, ints, booleans, and dates.
+	//		Returns the sorting function for this particular list of attributes and sorting directions.
+	// sortSpec:
+	//		A JS object that array that defines out what attribute names to sort on and whether it should be descenting or asending.
+	//		The objects should be formatted as follows:
+	// |	{
+	// |		attribute: &quot;attributeName-string&quot; || attribute,
+	// |		descending: true|false;   // Default is false.
+	// |	}
+	// store:
+	//		The datastore object to look up item values from.
+
+	var sortFunctions=[];
+
+	function createSortFunction(attr, dir, comp, s){
+		//Passing in comp and s (comparator and store), makes this
+		//function much faster.
+		return function(itemA, itemB){
+			var a = s.getValue(itemA, attr);
+			var b = s.getValue(itemB, attr);
+			return dir * comp(a,b); //int
+		};
+	}
+	var sortAttribute;
+	var map = store.comparatorMap;
+	var bc = sorter.basicComparator;
+	for(var i = 0; i &lt; sortSpec.length; i++){
+		sortAttribute = sortSpec[i];
+		var attr = sortAttribute.attribute;
+		if(attr){
+			var dir = (sortAttribute.descending) ? -1 : 1;
+			var comp = bc;
+			if(map){
+				if(typeof attr !== &quot;string&quot; &amp;&amp; (&quot;toString&quot; in attr)){
+					 attr = attr.toString();
+				}
+				comp = map[attr] || bc;
+			}
+			sortFunctions.push(createSortFunction(attr,
+				dir, comp, store));
+		}
+	}
+	return function(rowA, rowB){
+		var i=0;
+		while(i &lt; sortFunctions.length){
+			var ret = sortFunctions[i++](rowA, rowB);
+			if(ret !== 0){
+				return ret;//int
+			}
+		}
+		return 0; //int
+	}; // Function
+};
+
+return sorter;
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

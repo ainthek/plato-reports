@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src/dojo/nls/sk/colors.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src/dojo/nls/sk/colors.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">35.31</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">156</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">1.55</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.22</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define(
+({
+// local representation of all CSS3 named colors, companion to dojo.colors.  To be used where descriptive information
+// is required for each color, such as a palette widget, and not for specifying color programatically.
+	//Note: due to the SVG 1.0 spec additions, some of these are alternate spellings for the same color (e.g. gray / grey).
+	//TODO: should we be using unique rgb values as keys instead and avoid these duplicates, or rely on the caller to do the reverse mapping?
+	aliceblue: &quot;modrá (alice)&quot;,
+	antiquewhite: &quot;antická biela&quot;,
+	aqua: &quot;vodová&quot;,
+	aquamarine: &quot;akvamarínová&quot;,
+	azure: &quot;azúrová&quot;,
+	beige: &quot;béžová&quot;,
+	bisque: &quot;porcelánová&quot;,
+	black: &quot;čierna&quot;,
+	blanchedalmond: &quot;bledá mandľová&quot;,
+	blue: &quot;modrá&quot;,
+	blueviolet: &quot;modro-fialová&quot;,
+	brown: &quot;hnedá&quot;,
+	burlywood: &quot;drevená hnedá&quot;,
+	cadetblue: &quot;červeno modrá&quot;,
+	chartreuse: &quot;kartúzska&quot;,
+	chocolate: &quot;čokoládová&quot;,
+	coral: &quot;koralová&quot;,
+	cornflowerblue: &quot;nevädzová modrá&quot;,
+	cornsilk: &quot;ôstie kukurice&quot;,
+	crimson: &quot;karmínová&quot;,
+	cyan: &quot;zelenomodrá&quot;,
+	darkblue: &quot;tmavomodrá&quot;,
+	darkcyan: &quot;tmavá zelenomodrá&quot;,
+	darkgoldenrod: &quot;tmavá zlatobyľ&quot;,
+	darkgray: &quot;tmavosivá&quot;,
+	darkgreen: &quot;tmavozelená&quot;,
+	darkgrey: &quot;tmavosivá&quot;, // same as darkgray
+	darkkhaki: &quot;tmavá žltohnedá&quot;,
+	darkmagenta: &quot;tmavá purpurová&quot;,
+	darkolivegreen: &quot;tmavá olivovo zelená&quot;,
+	darkorange: &quot;tmavá oranžová&quot;,
+	darkorchid: &quot;tmavá orchidea&quot;,
+	darkred: &quot;tmavočervená&quot;,
+	darksalmon: &quot;tmavá lososová&quot;,
+	darkseagreen: &quot;tmavá morská zelená&quot;,
+	darkslateblue: &quot;tmavá bridlicová modrá&quot;,
+	darkslategray: &quot;tmavá bridlicová sivá&quot;,
+	darkslategrey: &quot;tmavá bridlicová sivá&quot;, // same as darkslategray
+	darkturquoise: &quot;tmavá tyrkysová&quot;,
+	darkviolet: &quot;tmavofialová&quot;,
+	deeppink: &quot;hlboká ružová&quot;,
+	deepskyblue: &quot;hlboká modrá obloha&quot;,
+	dimgray: &quot;matná sivá&quot;,
+	dimgrey: &quot;matná sivá&quot;, // same as dimgray
+	dodgerblue: &quot;modrá (dodger)&quot;,
+	firebrick: &quot;pálená tehla&quot;,
+	floralwhite: &quot;biely kvet&quot;,
+	forestgreen: &quot;lesná zelená&quot;,
+	fuchsia: &quot;fuchsia&quot;,
+	gainsboro: &quot;sivá - gainsboro&quot;,
+	ghostwhite: &quot;biela (ghost white)&quot;,
+	gold: &quot;zlatá&quot;,
+	goldenrod: &quot;zlatobyľ&quot;,
+	gray: &quot;sivá&quot;,
+	green: &quot;zelená&quot;,
+	greenyellow: &quot;zelenožltá&quot;,
+	grey: &quot;sivá&quot;, // same as gray
+	honeydew: &quot;ambrózia&quot;,
+	hotpink: &quot;horúca ružová&quot;,
+	indianred: &quot;indiánska červená&quot;,
+	indigo: &quot;indigo&quot;,
+	ivory: &quot;slonovina&quot;,
+	khaki: &quot;kaki&quot;,
+	lavender: &quot;levanduľa&quot;,
+	lavenderblush: &quot;rumencová levanduľa&quot;,
+	lawngreen: &quot;trávová zelená&quot;,
+	lemonchiffon: &quot;citrónový šifón&quot;,
+	lightblue: &quot;svetlomodrá&quot;,
+	lightcoral: &quot;svetlá koralová&quot;,
+	lightcyan: &quot;svetlá zelenomodrá&quot;,
+	lightgoldenrodyellow: &quot;svetlá zlatobyľová žltá&quot;,
+	lightgray: &quot;svetlosivá&quot;,
+	lightgreen: &quot;svetlozelená&quot;,
+	lightgrey: &quot;svetlosivá&quot;, // same as lightgray
+	lightpink: &quot;svetloružová&quot;,
+	lightsalmon: &quot;svetlá lososová&quot;,
+	lightseagreen: &quot;svetlá morská zelená&quot;,
+	lightskyblue: &quot;svetlá modrá obloha&quot;,
+	lightslategray: &quot;svetlá bridlicová sivá&quot;,
+	lightslategrey: &quot;svetlá bridlicová sivá&quot;, // same as lightslategray
+	lightsteelblue: &quot;svetlá oceľovomodrá&quot;,
+	lightyellow: &quot;svetložltá&quot;,
+	lime: &quot;limetková&quot;,
+	limegreen: &quot;limetková zelená&quot;,
+	linen: &quot;ľan&quot;,
+	magenta: &quot;purpurová&quot;,
+	maroon: &quot;gaštanová hnedá&quot;,
+	mediumaquamarine: &quot;stredná akvamarínová&quot;,
+	mediumblue: &quot;stredná modrá&quot;,
+	mediumorchid: &quot;stredná orchideová&quot;,
+	mediumpurple: &quot;stredná purpurová&quot;,
+	mediumseagreen: &quot;stredná morská zelená&quot;,
+	mediumslateblue: &quot;stredná bridlicová modrá&quot;,
+	mediumspringgreen: &quot;stredná jarná zelená&quot;,
+	mediumturquoise: &quot;stredná tyrkysová&quot;,
+	mediumvioletred: &quot;stredná fialovočervená&quot;,
+	midnightblue: &quot;polnočná modrá&quot;,
+	mintcream: &quot;mätová krémová&quot;,
+	mistyrose: &quot;zahmlená ruža&quot;,
+	moccasin: &quot;mokasínová&quot;,
+	navajowhite: &quot;navajská biela&quot;,
+	navy: &quot;námornícka&quot;,
+	oldlace: &quot;stará čipka&quot;,
+	olive: &quot;olivová&quot;,
+	olivedrab: &quot;fádna olivová&quot;,
+	orange: &quot;oranžová&quot;,
+	orangered: &quot;oranžovo červená&quot;,
+	orchid: &quot;orchideová&quot;,
+	palegoldenrod: &quot;bledá zlatobyľová&quot;,
+	palegreen: &quot;bledá zelená&quot;,
+	paleturquoise: &quot;bledá tyrkysová&quot;,
+	palevioletred: &quot;bledá fialovo červená&quot;,
+	papayawhip: &quot;papájový krém&quot;,
+	peachpuff: &quot;broskyňový nádych&quot;,
+	peru: &quot;peru&quot;,
+	pink: &quot;ružová&quot;,
+	plum: &quot;slivková&quot;,
+	powderblue: &quot;prášková modrá&quot;,
+	purple: &quot;purpurová&quot;,
+	red: &quot;červená&quot;,
+	rosybrown: &quot;ružovo hnedá&quot;,
+	royalblue: &quot;kráľovská modrá&quot;,
+	saddlebrown: &quot;sedlová hnedá&quot;,
+	salmon: &quot;lososová&quot;,
+	sandybrown: &quot;piesková hnedá&quot;,
+	seagreen: &quot;morská zelená&quot;,
+	seashell: &quot;lastúrová&quot;,
+	sienna: &quot;sienská&quot;,
+	silver: &quot;strieborná&quot;,
+	skyblue: &quot;modré nebo&quot;,
+	slateblue: &quot;bridlicová modrá&quot;,
+	slategray: &quot;bridlicová sivá&quot;,
+	slategrey: &quot;bridlicová sivá&quot;, // same as slategray
+	snow: &quot;snehová&quot;,
+	springgreen: &quot;jarná zelená&quot;,
+	steelblue: &quot;oceľovomodrá&quot;,
+	tan: &quot;žltohnedá&quot;,
+	teal: &quot;zelenomodrá&quot;,
+	thistle: &quot;bodliaková&quot;,
+	tomato: &quot;paradajková&quot;,
+	transparent: &quot;priesvitná&quot;,
+	turquoise: &quot;tyrkysová&quot;,
+	violet: &quot;fialová&quot;,
+	wheat: &quot;pšeničná&quot;,
+	white: &quot;biela&quot;,
+	whitesmoke: &quot;biely dym&quot;,
+	yellow: &quot;žltá&quot;,
+	yellowgreen: &quot;žltozelená&quot;
+})
+);</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

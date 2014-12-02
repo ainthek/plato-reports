@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src/dojo/robot.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src/dojo/robot.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">65.35</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">170</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">42.47</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.27</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+	&quot;./_base/array&quot;,
+	&quot;./dom&quot;,
+	&quot;./dom-geometry&quot;,
+	&quot;./_base/kernel&quot;,
+	&quot;./_base/lang&quot;,
+	&quot;./_base/window&quot;,
+	&quot;doh/_browserRunner&quot;,
+	&quot;doh/robot&quot;,
+	&quot;./window&quot;
+], function(array, dom, geom, kernel, lang, win, doh, robot, winUtils){
+
+kernel.experimental(&quot;dojo.robot&quot;);
+
+// users who use doh+dojo get the added convenience of robot.mouseMoveAt(),
+// instead of computing the absolute coordinates of their elements themselves
+lang.mixin(robot, {
+
+	_resolveNode: function(/*String||DOMNode||Function*/ n){
+		if(typeof n == &quot;function&quot;){
+			// if the user passed a function returning a node, evaluate it
+			n = n();
+		}
+		return n ? dom.byId(n) : null;
+	},
+
+	_scrollIntoView: function(/*Node*/ n){
+		// scrolls the passed node into view, scrolling all ancestor frames/windows as well.
+		// Assumes parent iframes can be made fully visible given the current browser window size
+		var p = null;
+		array.forEach(robot._getWindowChain(n), function(w){
+			// get the position of the node wrt its parent window
+			// if it is a parent frame, its padding and border extents will get added in
+			var p2 = geom.position(n, false),
+				b = geom.getPadBorderExtents(n),
+				oldp = null;
+			// if p2 is the position of the original passed node, store the position away as p
+			// otherwise, node is actually an iframe. in this case, add the iframe&#039;s position wrt its parent window and also the iframe&#039;s padding and border extents
+			if(!p){
+				p = p2;
+			}else{
+				oldp = p;
+				p = {x: p.x+p2.x+b.l,
+					y: p.y+p2.y+b.t,
+					w: p.w,
+					h: p.h};
+
+			}
+			// scroll the parent window so that the node translated into the parent window&#039;s coordinate space is in view
+			winUtils.scrollIntoView(n,p);
+			// adjust position for the new scroll offsets
+			p2 = geom.position(n, false);
+			if(!oldp){
+				p = p2;
+			}else{
+				p = {x: oldp.x+p2.x+b.l,
+					y: oldp.y+p2.y+b.t,
+					w: p.w,
+					h: p.h};
+			}
+			// get the parent iframe so it can be scrolled too
+			n = w.frameElement;
+		});
+	},
+
+	_position: function(/*Node*/ n){
+		// Returns the geom.position of the passed node wrt the passed window&#039;s viewport,
+		// following any parent iframes containing the node and clipping the node to each iframe.
+		// precondition: _scrollIntoView already called
+		var p = null, max = Math.max, min = Math.min;
+		// p: the returned position of the node
+		array.forEach(robot._getWindowChain(n), function(w){
+			// get the position of the node wrt its parent window
+			// if it is a parent frame, its padding and border extents will get added in
+			var p2 = geom.position(n, false), b = geom.getPadBorderExtents(n);
+			// if p2 is the position of the original passed node, store the position away as p
+			// otherwise, node is actually an iframe. in this case, add the iframe&#039;s position wrt its parent window and also the iframe&#039;s padding and border extents
+			if(!p){
+				p = p2;
+			}else{
+				var view = winUtils.getBox(n.contentWindow.document);
+				p2.r = p2.x+view.w;
+				p2.b = p2.y+view.h;
+				p = {x: max(p.x+p2.x,p2.x)+b.l, // clip left edge of node wrt the iframe
+					y: max(p.y+p2.y,p2.y)+b.t,	// top edge
+					r: min(p.x+p2.x+p.w,p2.r)+b.l,	// right edge (to compute width)
+					b: min(p.y+p2.y+p.h,p2.b)+b.t}; // bottom edge (to compute height)
+				// save a few bytes by computing width and height from r and b
+				p.w = p.r-p.x;
+				p.h = p.b-p.y;
+			}
+			// the new node is now the old node&#039;s parent iframe
+			n=w.frameElement;
+		});
+		return p;
+	},
+
+	_getWindowChain : function(/*Node*/ n){
+		// Returns an array of windows starting from the passed node&#039;s parent window and ending at dojo&#039;s window
+		var cW = winUtils.get(n.ownerDocument);
+		var arr = [cW];
+		var f = cW.frameElement;
+		return (cW == win.global || !f) ? arr : arr.concat(robot._getWindowChain(f));
+	},
+
+	scrollIntoView : function(/*String||DOMNode||Function*/ node, /*Number, optional*/ delay){
+		// summary:
+		//		Scroll the passed node into view, if it is not.
+		// node:
+		//		The id of the node, or the node itself, to move the mouse to.
+		//		If you pass an id or a function that returns a node, the node will not be evaluated until the movement executes.
+		//		This is useful if you need to move the mouse to an node that is not yet present.
+		// delay:
+		//		Delay, in milliseconds, to wait before firing.
+		//		The delay is a delta with respect to the previous automation call.
+
+		robot.sequence(function(){
+			robot._scrollIntoView(robot._resolveNode(node));
+		}, delay);
+	},
+
+	mouseMoveAt : function(/*String||DOMNode||Function*/ node, /*Integer, optional*/ delay, /*Integer, optional*/ duration, /*Number, optional*/ offsetX, /*Number, optional*/ offsetY){
+		// summary:
+		//		Moves the mouse over the specified node at the specified relative x,y offset.
+		// description:
+		//		Moves the mouse over the specified node at the specified relative x,y offset.
+		//		If you do not specify an offset, mouseMove will default to move to the middle of the node.
+		//		Example: to move the mouse over a ComboBox&#039;s down arrow node, call doh.mouseMoveAt(dijit.byId(&#039;setvaluetest&#039;).downArrowNode);
+		// node:
+		//		The id of the node, or the node itself, to move the mouse to.
+		//		If you pass an id or a function that returns a node, the node will not be evaluated until the movement executes.
+		//		This is useful if you need to move the mouse to an node that is not yet present.
+		// delay:
+		//		Delay, in milliseconds, to wait before firing.
+		//		The delay is a delta with respect to the previous automation call.
+		//		For example, the following code ends after 600ms:
+		// |	robot.mouseClick({left:true}, 100) // first call; wait 100ms
+		// |	robot.typeKeys(&quot;dij&quot;, 500) // 500ms AFTER previous call; 600ms in all
+		// duration:
+		//		Approximate time Robot will spend moving the mouse
+		//		The default is 100ms.
+		// offsetX:
+		//		x offset relative to the node, in pixels, to move the mouse. The default is half the node&#039;s width.
+		// offsetY:
+		//		y offset relative to the node, in pixels, to move the mouse. The default is half the node&#039;s height.
+
+		robot._assertRobot();
+
+		// Schedule an action to scroll the node into view, then calculate it&#039;s center point
+		var point = {};
+		this.sequence(function(){
+			node = robot._resolveNode(node);
+			robot._scrollIntoView(node);
+			var pos = robot._position(node);
+			if(offsetY === undefined){
+				offsetX = pos.w/2;
+				offsetY = pos.h/2;
+			}
+			point.x = pos.x+offsetX;
+			point.y = pos.y+offsetY;
+		}, delay);
+
+		// Schedule a bunch of actions to move the mouse from the current position to point.
+		// These actions won&#039;t run until after the above callback.
+		this.mouseMoveTo(point, 0, duration, false);
+	}
+});
+
+return robot;
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

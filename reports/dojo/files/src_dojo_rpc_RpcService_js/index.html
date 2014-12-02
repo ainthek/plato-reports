@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src/dojo/rpc/RpcService.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src/dojo/rpc/RpcService.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">69.08</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">178</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">32.45</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.94</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+	&quot;../_base/array&quot;, &quot;../_base/declare&quot;, &quot;../_base/Deferred&quot;, &quot;../_base/kernel&quot;,&quot;../_base/lang&quot;,
+	&quot;../_base/url&quot;, &quot;../_base/xhr&quot;
+], function(array, declare, Deferred, kernel, lang, _Url, xhr){
+
+// module:
+//		dojo/rpc/RpcService
+
+return declare(&quot;dojo.rpc.RpcService&quot;, null, {
+	// summary:
+	//		TODOC
+
+	constructor: function(args){
+		// summary:
+		//		Take a string as a url to retrieve an smd or an object that is an smd or partial smd to use
+		//		as a definition for the service
+		//
+		// args: object
+		//		Takes a number of properties as kwArgs for defining the service.  It also
+		//		accepts a string.  When passed a string, it is treated as a url from
+		//		which it should synchronously retrieve an smd file.  Otherwise it is a kwArgs
+		//		object.  It accepts serviceUrl, to manually define a url for the rpc service
+		//		allowing the rpc system to be used without an smd definition. strictArgChecks
+		//		forces the system to verify that the # of arguments provided in a call
+		//		matches those defined in the smd.  smdString allows a developer to pass
+		//		a jsonString directly, which will be converted into an object or alternatively
+		//		smdObject is accepts an smdObject directly.
+		//
+		if(args){
+			//if the arg is a string, we assume it is a url to retrieve an smd definition from
+			if( (lang.isString(args)) || (args instanceof _Url)){
+				if (args instanceof _Url){
+					var url = args + &quot;&quot;;
+				}else{
+					url = args;
+				}
+				var def = xhr.get({
+					url: url,
+					handleAs: &quot;json-comment-optional&quot;,
+					sync: true
+				});
+
+				def.addCallback(this, &quot;processSmd&quot;);
+				def.addErrback(function(){
+					throw new Error(&quot;Unable to load SMD from &quot; + args);
+				});
+
+			}else if(args.smdStr){
+				this.processSmd(kernel.eval(&quot;(&quot;+args.smdStr+&quot;)&quot;));
+			}else{
+				// otherwise we assume it&#039;s an arguments object with the following
+				// (optional) properties:
+				//		- serviceUrl
+				//		- strictArgChecks
+				//		- smdStr
+				//		- smdObj
+
+				if(args.serviceUrl){
+					this.serviceUrl = args.serviceUrl;
+				}
+
+				this.timeout = args.timeout || 0;
+
+				if(&quot;strictArgChecks&quot; in args){
+					this.strictArgChecks = args.strictArgChecks;
+				}
+
+				this.processSmd(args);
+			}
+		}
+	},
+
+	strictArgChecks: true,
+	serviceUrl: &quot;&quot;,
+
+	parseResults: function(obj){
+		// summary:
+		//		parse the results coming back from an rpc request.  this
+		//		base implementation, just returns the full object
+		//		subclasses should parse and only return the actual results
+		// obj: Object
+		//		Object that is the return results from an rpc request
+		return obj;
+	},
+
+	errorCallback: function(/* dojo/_base/Deferred */ deferredRequestHandler){
+		// summary:
+		//		create callback that calls the Deferred errback method
+		// deferredRequestHandler: Deferred
+		//		The deferred object handling a request.
+		return function(data){
+			deferredRequestHandler.errback(data.message);
+		};
+	},
+
+	resultCallback: function(/* dojo/_base/Deferred */ deferredRequestHandler){
+		// summary:
+		//		create callback that calls the Deferred&#039;s callback method
+		// deferredRequestHandler: Deferred
+		//		The deferred object handling a request.
+
+		return lang.hitch(this,
+			function(obj){
+				if(obj.error!=null){
+					var err;
+					if(typeof obj.error == &#039;object&#039;){
+						err = new Error(obj.error.message);
+						err.code = obj.error.code;
+						err.error = obj.error.error;
+					}else{
+						err = new Error(obj.error);
+					}
+					err.id = obj.id;
+					err.errorObject = obj;
+					deferredRequestHandler.errback(err);
+				}else{
+					deferredRequestHandler.callback(this.parseResults(obj));
+				}
+			}
+		);
+	},
+
+	generateMethod: function(/*string*/ method, /*array*/ parameters, /*string*/ url){
+		// summary:
+		//		generate the local bind methods for the remote object
+		// method: string
+		//		The name of the method we are generating
+		// parameters: array
+		//		the array of parameters for this call.
+		// url: string
+		//		the service url for this call
+
+		return lang.hitch(this, function(){
+			var deferredRequestHandler = new Deferred();
+
+			// if params weren&#039;t specified, then we can assume it&#039;s varargs
+			if( (this.strictArgChecks) &amp;&amp;
+				(parameters != null) &amp;&amp;
+				(arguments.length != parameters.length)
+			){
+				// put error stuff here, no enough params
+				throw new Error(&quot;Invalid number of parameters for remote method.&quot;);
+			}else{
+				this.bind(method, lang._toArray(arguments), deferredRequestHandler, url);
+			}
+
+			return deferredRequestHandler;
+		});
+	},
+
+	processSmd: function(object){
+		// summary:
+		//		callback method for receipt of a smd object.  Parse the smd
+		//		and generate functions based on the description
+		// object:
+		//		smd object defining this service.
+
+		if(object.methods){
+			array.forEach(object.methods, function(m){
+				if(m &amp;&amp; m.name){
+					this[m.name] = this.generateMethod(	m.name,
+										m.parameters,
+										m.url||m.serviceUrl||m.serviceURL);
+					if(!lang.isFunction(this[m.name])){
+						throw new Error(&quot;RpcService: Failed to create&quot; + m.name + &quot;()&quot;);
+						/*console.log(&quot;RpcService: Failed to create&quot;, m.name, &quot;()&quot;);*/
+					}
+				}
+			}, this);
+		}
+
+		this.serviceUrl = object.serviceUrl||object.serviceURL;
+		this.required = object.required;
+		this.smd = object;
+	}
+});
+
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

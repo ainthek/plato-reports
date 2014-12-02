@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src/dojo/cldr/nls/hu/gregorian.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src/dojo/cldr/nls/hu/gregorian.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">35.44</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">315</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">2.90</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.52</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define(
+//begin v1.x content
+{
+	&quot;dateFormatItem-Ehm&quot;: &quot;E h:mm a&quot;,
+	&quot;days-standAlone-short&quot;: [
+		&quot;V&quot;,
+		&quot;H&quot;,
+		&quot;K&quot;,
+		&quot;Sze&quot;,
+		&quot;Cs&quot;,
+		&quot;P&quot;,
+		&quot;Szo&quot;
+	],
+	&quot;months-format-narrow&quot;: [
+		&quot;J&quot;,
+		&quot;F&quot;,
+		&quot;M&quot;,
+		&quot;Á&quot;,
+		&quot;M&quot;,
+		&quot;J&quot;,
+		&quot;J&quot;,
+		&quot;A&quot;,
+		&quot;Sz&quot;,
+		&quot;O&quot;,
+		&quot;N&quot;,
+		&quot;D&quot;
+	],
+	&quot;field-second-relative+0&quot;: &quot;most&quot;,
+	&quot;quarters-standAlone-narrow&quot;: [
+		&quot;1.&quot;,
+		&quot;2.&quot;,
+		&quot;3.&quot;,
+		&quot;4.&quot;
+	],
+	&quot;field-weekday&quot;: &quot;hét napja&quot;,
+	&quot;dateFormatItem-yQQQ&quot;: &quot;y. QQQ&quot;,
+	&quot;dateFormatItem-yMEd&quot;: &quot;y. MM. dd., E&quot;,
+	&quot;field-wed-relative+0&quot;: &quot;ez a szerda&quot;,
+	&quot;field-wed-relative+1&quot;: &quot;következő szerda&quot;,
+	&quot;dateFormatItem-GyMMMEd&quot;: &quot;G y. MMM d., E&quot;,
+	&quot;dateFormatItem-MMMEd&quot;: &quot;MMM d., E&quot;,
+	&quot;eraNarrow&quot;: [
+		&quot;ie.&quot;,
+		&quot;isz.&quot;,
+		&quot;i. sz.&quot;,
+		&quot;Kr. u.&quot;
+	],
+	&quot;field-tue-relative+-1&quot;: &quot;előző kedd&quot;,
+	&quot;days-format-short&quot;: [
+		&quot;V&quot;,
+		&quot;H&quot;,
+		&quot;K&quot;,
+		&quot;Sze&quot;,
+		&quot;Cs&quot;,
+		&quot;P&quot;,
+		&quot;Szo&quot;
+	],
+	&quot;dateFormat-long&quot;: &quot;y. MMMM d.&quot;,
+	&quot;field-fri-relative+-1&quot;: &quot;előző péntek&quot;,
+	&quot;field-wed-relative+-1&quot;: &quot;előző szerda&quot;,
+	&quot;months-format-wide&quot;: [
+		&quot;január&quot;,
+		&quot;február&quot;,
+		&quot;március&quot;,
+		&quot;április&quot;,
+		&quot;május&quot;,
+		&quot;június&quot;,
+		&quot;július&quot;,
+		&quot;augusztus&quot;,
+		&quot;szeptember&quot;,
+		&quot;október&quot;,
+		&quot;november&quot;,
+		&quot;december&quot;
+	],
+	&quot;dateTimeFormat-medium&quot;: &quot;{1} {0}&quot;,
+	&quot;dayPeriods-format-wide-pm&quot;: &quot;du.&quot;,
+	&quot;dateFormat-full&quot;: &quot;y. MMMM d., EEEE&quot;,
+	&quot;field-thu-relative+-1&quot;: &quot;előző csütörtök&quot;,
+	&quot;dateFormatItem-Md&quot;: &quot;M. d.&quot;,
+	&quot;dateFormatItem-yMd&quot;: &quot;y. MM. dd.&quot;,
+	&quot;field-era&quot;: &quot;éra&quot;,
+	&quot;dateFormatItem-yM&quot;: &quot;y. M.&quot;,
+	&quot;months-standAlone-wide&quot;: [
+		&quot;január&quot;,
+		&quot;február&quot;,
+		&quot;március&quot;,
+		&quot;április&quot;,
+		&quot;május&quot;,
+		&quot;június&quot;,
+		&quot;július&quot;,
+		&quot;augusztus&quot;,
+		&quot;szeptember&quot;,
+		&quot;október&quot;,
+		&quot;november&quot;,
+		&quot;december&quot;
+	],
+	&quot;timeFormat-short&quot;: &quot;H:mm&quot;,
+	&quot;quarters-format-wide&quot;: [
+		&quot;I. negyedév&quot;,
+		&quot;II. negyedév&quot;,
+		&quot;III. negyedév&quot;,
+		&quot;IV. negyedév&quot;
+	],
+	&quot;dateFormatItem-yQQQQ&quot;: &quot;y. QQQQ&quot;,
+	&quot;timeFormat-long&quot;: &quot;H:mm:ss z&quot;,
+	&quot;field-year&quot;: &quot;év&quot;,
+	&quot;dateFormatItem-yMMM&quot;: &quot;y. MMM&quot;,
+	&quot;field-hour&quot;: &quot;óra&quot;,
+	&quot;months-format-abbr&quot;: [
+		&quot;jan.&quot;,
+		&quot;febr.&quot;,
+		&quot;márc.&quot;,
+		&quot;ápr.&quot;,
+		&quot;máj.&quot;,
+		&quot;jún.&quot;,
+		&quot;júl.&quot;,
+		&quot;aug.&quot;,
+		&quot;szept.&quot;,
+		&quot;okt.&quot;,
+		&quot;nov.&quot;,
+		&quot;dec.&quot;
+	],
+	&quot;field-sat-relative+0&quot;: &quot;ez a szombat&quot;,
+	&quot;field-sat-relative+1&quot;: &quot;következő szombat&quot;,
+	&quot;timeFormat-full&quot;: &quot;H:mm:ss zzzz&quot;,
+	&quot;field-day-relative+0&quot;: &quot;ma&quot;,
+	&quot;field-thu-relative+0&quot;: &quot;ez a csütörtök&quot;,
+	&quot;field-day-relative+1&quot;: &quot;holnap&quot;,
+	&quot;field-thu-relative+1&quot;: &quot;következő csütörtök&quot;,
+	&quot;dateFormatItem-GyMMMd&quot;: &quot;G y. MMM d.&quot;,
+	&quot;field-day-relative+2&quot;: &quot;holnapután&quot;,
+	&quot;dateFormatItem-H&quot;: &quot;H&quot;,
+	&quot;months-standAlone-abbr&quot;: [
+		&quot;jan.&quot;,
+		&quot;febr.&quot;,
+		&quot;márc.&quot;,
+		&quot;ápr.&quot;,
+		&quot;máj.&quot;,
+		&quot;jún.&quot;,
+		&quot;júl.&quot;,
+		&quot;aug.&quot;,
+		&quot;szept.&quot;,
+		&quot;okt.&quot;,
+		&quot;nov.&quot;,
+		&quot;dec.&quot;
+	],
+	&quot;quarters-format-abbr&quot;: [
+		&quot;N1&quot;,
+		&quot;N2&quot;,
+		&quot;N3&quot;,
+		&quot;N4&quot;
+	],
+	&quot;quarters-standAlone-wide&quot;: [
+		&quot;1. negyedév&quot;,
+		&quot;2. negyedév&quot;,
+		&quot;3. negyedév&quot;,
+		&quot;4. negyedév&quot;
+	],
+	&quot;dateFormatItem-Gy&quot;: &quot;G y.&quot;,
+	&quot;dateFormatItem-M&quot;: &quot;L&quot;,
+	&quot;days-standAlone-wide&quot;: [
+		&quot;vasárnap&quot;,
+		&quot;hétfő&quot;,
+		&quot;kedd&quot;,
+		&quot;szerda&quot;,
+		&quot;csütörtök&quot;,
+		&quot;péntek&quot;,
+		&quot;szombat&quot;
+	],
+	&quot;dateFormatItem-MMMMd&quot;: &quot;MMMM d.&quot;,
+	&quot;timeFormat-medium&quot;: &quot;H:mm:ss&quot;,
+	&quot;field-sun-relative+0&quot;: &quot;ez a vasárnap&quot;,
+	&quot;dateFormatItem-Hm&quot;: &quot;H:mm&quot;,
+	&quot;field-sun-relative+1&quot;: &quot;következő vasárnap&quot;,
+	&quot;quarters-standAlone-abbr&quot;: [
+		&quot;N1&quot;,
+		&quot;N2&quot;,
+		&quot;N3&quot;,
+		&quot;N4&quot;
+	],
+	&quot;eraAbbr&quot;: [
+		&quot;i. e.&quot;,
+		&quot;Kr. e.&quot;,
+		&quot;i. sz.&quot;,
+		&quot;Kr. u.&quot;
+	],
+	&quot;field-minute&quot;: &quot;perc&quot;,
+	&quot;field-dayperiod&quot;: &quot;napszak&quot;,
+	&quot;days-standAlone-abbr&quot;: [
+		&quot;V&quot;,
+		&quot;H&quot;,
+		&quot;K&quot;,
+		&quot;Sze&quot;,
+		&quot;Cs&quot;,
+		&quot;P&quot;,
+		&quot;Szo&quot;
+	],
+	&quot;dateFormatItem-d&quot;: &quot;d&quot;,
+	&quot;dateFormatItem-ms&quot;: &quot;mm:ss&quot;,
+	&quot;quarters-format-narrow&quot;: [
+		&quot;1.&quot;,
+		&quot;2.&quot;,
+		&quot;3.&quot;,
+		&quot;4.&quot;
+	],
+	&quot;field-day-relative+-1&quot;: &quot;tegnap&quot;,
+	&quot;dateFormatItem-h&quot;: &quot;a h&quot;,
+	&quot;dateTimeFormat-long&quot;: &quot;{1} {0}&quot;,
+	&quot;dayPeriods-format-narrow-am&quot;: &quot;de.&quot;,
+	&quot;field-day-relative+-2&quot;: &quot;tegnapelőtt&quot;,
+	&quot;dateFormatItem-MMMd&quot;: &quot;MMM d.&quot;,
+	&quot;dateFormatItem-MEd&quot;: &quot;M. d., E&quot;,
+	&quot;dateTimeFormat-full&quot;: &quot;{1} {0}&quot;,
+	&quot;field-fri-relative+0&quot;: &quot;ez a péntek&quot;,
+	&quot;dateFormatItem-yMMMM&quot;: &quot;y. MMMM&quot;,
+	&quot;field-fri-relative+1&quot;: &quot;következő péntek&quot;,
+	&quot;field-day&quot;: &quot;nap&quot;,
+	&quot;days-format-wide&quot;: [
+		&quot;vasárnap&quot;,
+		&quot;hétfő&quot;,
+		&quot;kedd&quot;,
+		&quot;szerda&quot;,
+		&quot;csütörtök&quot;,
+		&quot;péntek&quot;,
+		&quot;szombat&quot;
+	],
+	&quot;field-zone&quot;: &quot;időzóna&quot;,
+	&quot;dateFormatItem-y&quot;: &quot;y.&quot;,
+	&quot;months-standAlone-narrow&quot;: [
+		&quot;J&quot;,
+		&quot;F&quot;,
+		&quot;M&quot;,
+		&quot;Á&quot;,
+		&quot;M&quot;,
+		&quot;J&quot;,
+		&quot;J&quot;,
+		&quot;A&quot;,
+		&quot;Sz&quot;,
+		&quot;O&quot;,
+		&quot;N&quot;,
+		&quot;D&quot;
+	],
+	&quot;field-year-relative+-1&quot;: &quot;előző év&quot;,
+	&quot;field-month-relative+-1&quot;: &quot;előző hónap&quot;,
+	&quot;dateFormatItem-hm&quot;: &quot;a h:mm&quot;,
+	&quot;days-format-abbr&quot;: [
+		&quot;V&quot;,
+		&quot;H&quot;,
+		&quot;K&quot;,
+		&quot;Sze&quot;,
+		&quot;Cs&quot;,
+		&quot;P&quot;,
+		&quot;Szo&quot;
+	],
+	&quot;dateFormatItem-yMMMd&quot;: &quot;y. MMM d.&quot;,
+	&quot;eraNames&quot;: [
+		&quot;időszámításunk előtt&quot;,
+		&quot;időszámításunk szerint&quot;,
+		&quot;i. sz.&quot;,
+		&quot;Kr. u.&quot;
+	],
+	&quot;days-format-narrow&quot;: [
+		&quot;V&quot;,
+		&quot;H&quot;,
+		&quot;K&quot;,
+		&quot;Sz&quot;,
+		&quot;Cs&quot;,
+		&quot;P&quot;,
+		&quot;Sz&quot;
+	],
+	&quot;days-standAlone-narrow&quot;: [
+		&quot;V&quot;,
+		&quot;H&quot;,
+		&quot;K&quot;,
+		&quot;Sz&quot;,
+		&quot;Cs&quot;,
+		&quot;P&quot;,
+		&quot;Sz&quot;
+	],
+	&quot;dateFormatItem-MMM&quot;: &quot;LLL&quot;,
+	&quot;field-month&quot;: &quot;hónap&quot;,
+	&quot;field-tue-relative+0&quot;: &quot;ez a kedd&quot;,
+	&quot;field-tue-relative+1&quot;: &quot;következő kedd&quot;,
+	&quot;dayPeriods-format-wide-am&quot;: &quot;de.&quot;,
+	&quot;dateFormatItem-EHm&quot;: &quot;E HH:mm&quot;,
+	&quot;field-mon-relative+0&quot;: &quot;ez a hétfő&quot;,
+	&quot;field-mon-relative+1&quot;: &quot;következő hétfő&quot;,
+	&quot;dateFormat-short&quot;: &quot;y. MM. dd.&quot;,
+	&quot;dateFormatItem-EHms&quot;: &quot;E HH:mm:ss&quot;,
+	&quot;dateFormatItem-Ehms&quot;: &quot;E h:mm:ss a&quot;,
+	&quot;field-second&quot;: &quot;másodperc&quot;,
+	&quot;field-sat-relative+-1&quot;: &quot;előző szombat&quot;,
+	&quot;dateFormatItem-yMMMEd&quot;: &quot;y. MMM d., E&quot;,
+	&quot;field-sun-relative+-1&quot;: &quot;előző vasárnap&quot;,
+	&quot;field-month-relative+0&quot;: &quot;ez a hónap&quot;,
+	&quot;field-month-relative+1&quot;: &quot;következő hónap&quot;,
+	&quot;dateFormatItem-Ed&quot;: &quot;d., E&quot;,
+	&quot;dateTimeFormats-appendItem-Timezone&quot;: &quot;{0} {1}&quot;,
+	&quot;field-week&quot;: &quot;hét&quot;,
+	&quot;dateFormat-medium&quot;: &quot;y. MMM d.&quot;,
+	&quot;field-year-relative+0&quot;: &quot;ez az év&quot;,
+	&quot;field-week-relative+-1&quot;: &quot;előző hét&quot;,
+	&quot;field-year-relative+1&quot;: &quot;következő év&quot;,
+	&quot;dateFormatItem-mmss&quot;: &quot;mm:ss&quot;,
+	&quot;dayPeriods-format-narrow-pm&quot;: &quot;du.&quot;,
+	&quot;dateTimeFormat-short&quot;: &quot;{1} {0}&quot;,
+	&quot;dateFormatItem-Hms&quot;: &quot;H:mm:ss&quot;,
+	&quot;dateFormatItem-hms&quot;: &quot;a h:mm:ss&quot;,
+	&quot;dateFormatItem-GyMMM&quot;: &quot;G y. MMM&quot;,
+	&quot;field-mon-relative+-1&quot;: &quot;előző hétfő&quot;,
+	&quot;field-week-relative+0&quot;: &quot;ez a hét&quot;,
+	&quot;field-week-relative+1&quot;: &quot;következő hét&quot;
+}
+//end v1.x content
+);</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

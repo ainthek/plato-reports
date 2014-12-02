@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src/dojo/nls/he/colors.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src/dojo/nls/he/colors.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">35.24</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">156</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">1.61</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.21</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define(
+({
+// local representation of all CSS3 named colors, companion to dojo.colors.  To be used where descriptive information
+// is required for each color, such as a palette widget, and not for specifying color programatically.
+//Note: due to the SVG 1.0 spec additions, some of these are alternate spellings for the same color (e.g. gray / grey).
+//TODO: should we be using unique rgb values as keys instead and avoid these duplicates, or rely on the caller to do the reverse mapping?
+aliceblue: &quot;כחול פלדה&quot;,
+antiquewhite: &quot;לבן עתיק&quot;,
+aqua: &quot;אקווה&quot;,
+aquamarine: &quot;אקוומארין&quot;,
+azure: &quot;תכלת עז&quot;,
+beige: &quot;בז&#039;&quot;,
+bisque: &quot;לבן שקד&quot;,
+black: &quot;שחור&quot;,
+blanchedalmond: &quot;שקד&quot;,
+blue: &quot;כחול&quot;,
+blueviolet: &quot;כחול-סגול&quot;,
+brown: &quot;חום&quot;,
+burlywood: &quot;חום דהוי&quot;,
+cadetblue: &quot;כחול ים&quot;,
+chartreuse: &quot;ירוק-צהוב&quot;,
+chocolate: &quot;שוקולד&quot;,
+coral: &quot;אלמוג&quot;,
+cornflowerblue: &quot;כחול דרדר&quot;,
+cornsilk: &quot;צהבהב&quot;,
+crimson: &quot;ארגמן&quot;,
+cyan: &quot;טורקיז&quot;,
+darkblue: &quot;כחול כהה&quot;,
+darkcyan: &quot;טורקיז כהה&quot;,
+darkgoldenrod: &quot;זהוב כהה&quot;,
+darkgray: &quot;אפור כהה&quot;,
+darkgreen: &quot;ירוק כהה&quot;,
+darkgrey: &quot;אפור כהה&quot;, // same as darkgray
+darkkhaki: &quot;חאקי כהה&quot;,
+darkmagenta: &quot;בורדו כהה&quot;,
+darkolivegreen: &quot;ירוק זית כהה&quot;,
+darkorange: &quot;כתום כהה&quot;,
+darkorchid: &quot;סחלב כהה&quot;,
+darkred: &quot;אדום כהה&quot;,
+darksalmon: &quot;סלמון כהה&quot;,
+darkseagreen: &quot;ירוק ים כהה&quot;,
+darkslateblue: &quot;כחול צפחה כהה&quot;,
+darkslategray: &quot;אפור צפחה כהה&quot;,
+darkslategrey: &quot;אפור צפחה כהה&quot;, // same as darkslategray
+darkturquoise: &quot;טורקיז כהה&quot;,
+darkviolet: &quot;סגול כהה&quot;,
+deeppink: &quot;ורוד עמוק&quot;,
+deepskyblue: &quot;כחול שמיים עמוק&quot;,
+dimgray: &quot;אפור עמום&quot;,
+dimgrey: &quot;אפור עמום&quot;, // same as dimgray
+dodgerblue: &quot;כחול&quot;,
+firebrick: &quot;לבנה שרופה&quot;,
+floralwhite: &quot;לבן פרחוני&quot;,
+forestgreen: &quot;ירוק יער&quot;,
+fuchsia: &quot;ורוד בהיר&quot;,
+gainsboro: &quot;גיינסבורו&quot;,
+ghostwhite: &quot;לבן רפאים&quot;,
+gold: &quot;זהב&quot;,
+goldenrod: &quot;זהוב&quot;,
+gray: &quot;אפור&quot;,
+green: &quot;ירוק&quot;,
+greenyellow: &quot;ירוק-צהוב&quot;,
+grey: &quot;אפור&quot;, // same as gray
+honeydew: &quot;ירקרק&quot;,
+hotpink: &quot;ורוד לוהט&quot;,
+indianred: &quot;אדום דהוי&quot;,
+indigo: &quot;אינדיגו&quot;,
+ivory: &quot;שנהב&quot;,
+khaki: &quot;חאקי&quot;,
+lavender: &quot;לבנדר&quot;,
+lavenderblush: &quot;סומק לבנדר&quot;,
+lawngreen: &quot;ירוק דשא&quot;,
+lemonchiffon: &quot;ירוק לימון&quot;,
+lightblue: &quot;תכלת&quot;,
+lightcoral: &quot;אלמוג בהיר&quot;,
+lightcyan: &quot;טורקיז בהיר&quot;,
+lightgoldenrodyellow: &quot;צהוב בהיר&quot;,
+lightgray: &quot;אפור בהיר&quot;,
+lightgreen: &quot;ירוק בהיר&quot;,
+lightgrey: &quot;אפור בהיר&quot;, // same as lightgray
+lightpink: &quot;ורוד בהיר&quot;,
+lightsalmon: &quot;סלמון בהיר&quot;,
+lightseagreen: &quot;ירוק ים בהיר&quot;,
+lightskyblue: &quot;כחול שמיים בהיר&quot;,
+lightslategray: &quot;אפור צפחה בהיר&quot;,
+lightslategrey: &quot;אפור צפחה בהיר&quot;, // same as lightslategray
+lightsteelblue: &quot;כחול פלדה בהיר&quot;,
+lightyellow: &quot;צהוב בהיר&quot;,
+lime: &quot;לימון&quot;,
+limegreen: &quot;ירוק לימוני&quot;,
+linen: &quot;פשתן&quot;,
+magenta: &quot;בורדו&quot;,
+maroon: &quot;חום אדמדם&quot;,
+mediumaquamarine: &quot;כחול בינוני&quot;,
+mediumblue: &quot;תכלת בינוני&quot;,
+mediumorchid: &quot;סחלב בינוני&quot;,
+mediumpurple: &quot;סגול בינוני&quot;,
+mediumseagreen: &quot;ירוק ים בינוני&quot;,
+mediumslateblue: &quot;כחול צפחה בינוני&quot;,
+mediumspringgreen: &quot;ירוק אביב בינוני&quot;,
+mediumturquoise: &quot;טורקיז בינוני&quot;,
+mediumvioletred: &quot;סגול-אדום בינוני&quot;,
+midnightblue: &quot;כחול כהה&quot;,
+mintcream: &quot;קרם מנטה&quot;,
+mistyrose: &quot;ורוד מעורפל&quot;,
+moccasin: &quot;מוקסין&quot;,
+navajowhite: &quot;לבן נוואחו&quot;,
+navy: &quot;כחול כהה&quot;,
+oldlace: &quot;תחרה עתיקה&quot;,
+olive: &quot;זית&quot;,
+olivedrab: &quot;זית עמום&quot;,
+orange: &quot;כתום&quot;,
+orangered: &quot;כתום אדום&quot;,
+orchid: &quot;סחלב&quot;,
+palegoldenrod: &quot;זהוב בהיר&quot;,
+palegreen: &quot;ירוק בהיר&quot;,
+paleturquoise: &quot;טורקיז בהיר&quot;,
+palevioletred: &quot;סגול-אדום בהיר&quot;,
+papayawhip: &quot;פפאיה&quot;,
+peachpuff: &quot;קציפת אפרסק&quot;,
+peru: &quot;פרו&quot;,
+pink: &quot;ורוד&quot;,
+plum: &quot;שזיף&quot;,
+powderblue: &quot;כחול חיוור&quot;,
+purple: &quot;סגול&quot;,
+red: &quot;אדום&quot;,
+rosybrown: &quot;חום ורדרד&quot;,
+royalblue: &quot;כחול מלכותי&quot;,
+saddlebrown: &quot;חום דהוי&quot;,
+salmon: &quot;סלמון&quot;,
+sandybrown: &quot;חום חולי&quot;,
+seagreen: &quot;ירוק ים&quot;,
+seashell: &quot;צדף&quot;,
+sienna: &quot;סיינה&quot;,
+silver: &quot;כסף&quot;,
+skyblue: &quot;כחול שמיים&quot;,
+slateblue: &quot;כחול צפחה&quot;,
+slategray: &quot;אפור צפחה&quot;,
+slategrey: &quot;אפור צפחה&quot;, // same as slategray
+snow: &quot;שלג&quot;,
+springgreen: &quot;ירוק אביב&quot;,
+steelblue: &quot;כחול פלדה&quot;,
+tan: &quot;חום אדמדם&quot;,
+teal: &quot;כחול-ירוק כהה&quot;,
+thistle: &quot;דרדר&quot;,
+tomato: &quot;עגבניה&quot;,
+transparent: &quot;שקוף&quot;,
+turquoise: &quot;טורקיז&quot;,
+violet: &quot;סגול&quot;,
+wheat: &quot;חיוט&quot;,
+white: &quot;לבן&quot;,
+whitesmoke: &quot;עשן לבן&quot;,
+yellow: &quot;צהוב&quot;,
+yellowgreen: &quot;ירוק צהוב&quot;
+})
+);</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

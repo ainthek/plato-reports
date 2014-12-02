@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src/dojo/dom-class.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src/dojo/dom-class.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">62.18</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">326</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">61.07</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.97</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([&quot;./_base/lang&quot;, &quot;./_base/array&quot;, &quot;./dom&quot;], function(lang, array, dom){
+	// module:
+	//		dojo/dom-class
+
+	var className = &quot;className&quot;;
+
+	/* Part I of classList-based implementation is preserved here for posterity
+	var classList = &quot;classList&quot;;
+	has.add(&quot;dom-classList&quot;, function(){
+		return classList in document.createElement(&quot;p&quot;);
+	});
+	*/
+
+	// =============================
+	// (CSS) Class Functions
+	// =============================
+
+	var cls, // exports object
+		spaces = /\s+/, a1 = [&quot;&quot;];
+
+	function str2array(s){
+		if(typeof s == &quot;string&quot; || s instanceof String){
+			if(s &amp;&amp; !spaces.test(s)){
+				a1[0] = s;
+				return a1;
+			}
+			var a = s.split(spaces);
+			if(a.length &amp;&amp; !a[0]){
+				a.shift();
+			}
+			if(a.length &amp;&amp; !a[a.length - 1]){
+				a.pop();
+			}
+			return a;
+		}
+		// assumed to be an array
+		if(!s){
+			return [];
+		}
+		return array.filter(s, function(x){ return x; });
+	}
+
+	/* Part II of classList-based implementation is preserved here for posterity
+	if(has(&quot;dom-classList&quot;)){
+		// new classList version
+		cls = {
+			contains: function containsClass(node, classStr){
+				var clslst = classStr &amp;&amp; dom.byId(node)[classList];
+				return clslst &amp;&amp; clslst.contains(classStr); // Boolean
+			},
+
+			add: function addClass(node, classStr){
+				node = dom.byId(node);
+				classStr = str2array(classStr);
+				for(var i = 0, len = classStr.length; i &lt; len; ++i){
+					node[classList].add(classStr[i]);
+				}
+			},
+
+			remove: function removeClass(node, classStr){
+				node = dom.byId(node);
+				if(classStr === undefined){
+					node[className] = &quot;&quot;;
+				}else{
+					classStr = str2array(classStr);
+					for(var i = 0, len = classStr.length; i &lt; len; ++i){
+						node[classList].remove(classStr[i]);
+					}
+				}
+			},
+
+			replace: function replaceClass(node, addClassStr, removeClassStr){
+				node = dom.byId(node);
+				if(removeClassStr === undefined){
+					node[className] = &quot;&quot;;
+				}else{
+					removeClassStr = str2array(removeClassStr);
+					for(var i = 0, len = removeClassStr.length; i &lt; len; ++i){
+						node[classList].remove(removeClassStr[i]);
+					}
+				}
+				addClassStr = str2array(addClassStr);
+				for(i = 0, len = addClassStr.length; i &lt; len; ++i){
+					node[classList].add(addClassStr[i]);
+				}
+			},
+
+			toggle: function toggleClass(node, classStr, condition){
+				node = dom.byId(node);
+				if(condition === undefined){
+					classStr = str2array(classStr);
+					for(var i = 0, len = classStr.length; i &lt; len; ++i){
+						node[classList].toggle(classStr[i]);
+					}
+				}else{
+					cls[condition ? &quot;add&quot; : &quot;remove&quot;](node, classStr);
+				}
+				return condition;   // Boolean
+			}
+		}
+	}
+	*/
+
+	// regular DOM version
+	var fakeNode = {};  // for effective replacement
+	cls = {
+		// summary:
+		//		This module defines the core dojo DOM class API.
+
+		contains: function containsClass(/*DomNode|String*/ node, /*String*/ classStr){
+			// summary:
+			//		Returns whether or not the specified classes are a portion of the
+			//		class list currently applied to the node.
+			// node: String|DOMNode
+			//		String ID or DomNode reference to check the class for.
+			// classStr: String
+			//		A string class name to look for.
+			// example:
+			//		Do something if a node with id=&quot;someNode&quot; has class=&quot;aSillyClassName&quot; present
+			//	|	if(dojo.hasClass(&quot;someNode&quot;,&quot;aSillyClassName&quot;)){ ... }
+
+			return ((&quot; &quot; + dom.byId(node)[className] + &quot; &quot;).indexOf(&quot; &quot; + classStr + &quot; &quot;) &gt;= 0); // Boolean
+		},
+
+		add: function addClass(/*DomNode|String*/ node, /*String|Array*/ classStr){
+			// summary:
+			//		Adds the specified classes to the end of the class list on the
+			//		passed node. Will not re-apply duplicate classes.
+			//
+			// node: String|DOMNode
+			//		String ID or DomNode reference to add a class string too
+			//
+			// classStr: String|Array
+			//		A String class name to add, or several space-separated class names,
+			//		or an array of class names.
+			//
+			// example:
+			//		Add a class to some node:
+			//	|	require([&quot;dojo/dom-class&quot;], function(domClass){
+			//	|		domClass.add(&quot;someNode&quot;, &quot;anewClass&quot;);
+			//	|	});
+			//
+			// example:
+			//		Add two classes at once:
+			//	|	require([&quot;dojo/dom-class&quot;], function(domClass){
+			//	|		domClass.add(&quot;someNode&quot;, &quot;firstClass secondClass&quot;);
+			//	|	});
+			//
+			// example:
+			//		Add two classes at once (using array):
+			//	|	require([&quot;dojo/dom-class&quot;], function(domClass){
+			//	|		domClass.add(&quot;someNode&quot;, [&quot;firstClass&quot;, &quot;secondClass&quot;]);
+			//	|	});
+			//
+			// example:
+			//		Available in `dojo/NodeList` for multiple additions
+			//	|	require([&quot;dojo/query&quot;], function(query){
+			//	|		query(&quot;ul &gt; li&quot;).addClass(&quot;firstLevel&quot;);
+			//	|	});
+
+			node = dom.byId(node);
+			classStr = str2array(classStr);
+			var cls = node[className], oldLen;
+			cls = cls ? &quot; &quot; + cls + &quot; &quot; : &quot; &quot;;
+			oldLen = cls.length;
+			for(var i = 0, len = classStr.length, c; i &lt; len; ++i){
+				c = classStr[i];
+				if(c &amp;&amp; cls.indexOf(&quot; &quot; + c + &quot; &quot;) &lt; 0){
+					cls += c + &quot; &quot;;
+				}
+			}
+			if(oldLen &lt; cls.length){
+				node[className] = cls.substr(1, cls.length - 2);
+			}
+		},
+
+		remove: function removeClass(/*DomNode|String*/ node, /*String|Array?*/ classStr){
+			// summary:
+			//		Removes the specified classes from node. No `contains()`
+			//		check is required.
+			//
+			// node: String|DOMNode
+			//		String ID or DomNode reference to remove the class from.
+			//
+			// classStr: String|Array
+			//		An optional String class name to remove, or several space-separated
+			//		class names, or an array of class names. If omitted, all class names
+			//		will be deleted.
+			//
+			// example:
+			//		Remove a class from some node:
+			//	|	require([&quot;dojo/dom-class&quot;], function(domClass){
+			//	|		domClass.remove(&quot;someNode&quot;, &quot;firstClass&quot;);
+			//	|	});
+			//
+			// example:
+			//		Remove two classes from some node:
+			//	|	require([&quot;dojo/dom-class&quot;], function(domClass){
+			//	|		domClass.remove(&quot;someNode&quot;, &quot;firstClass secondClass&quot;);
+			//	|	});
+			//
+			// example:
+			//		Remove two classes from some node (using array):
+			//	|	require([&quot;dojo/dom-class&quot;], function(domClass){
+			//	|		domClass.remove(&quot;someNode&quot;, [&quot;firstClass&quot;, &quot;secondClass&quot;]);
+			//	|	});
+			//
+			// example:
+			//		Remove all classes from some node:
+			//	|	require([&quot;dojo/dom-class&quot;], function(domClass){
+			//	|		domClass.remove(&quot;someNode&quot;);
+			//	|	});
+			//
+			// example:
+			//		Available in `dojo/NodeList` for multiple removal
+			//	|	require([&quot;dojo/query&quot;], function(query){
+			//	|		query(&quot;ul &gt; li&quot;).removeClass(&quot;foo&quot;);
+			//	|	});
+
+			node = dom.byId(node);
+			var cls;
+			if(classStr !== undefined){
+				classStr = str2array(classStr);
+				cls = &quot; &quot; + node[className] + &quot; &quot;;
+				for(var i = 0, len = classStr.length; i &lt; len; ++i){
+					cls = cls.replace(&quot; &quot; + classStr[i] + &quot; &quot;, &quot; &quot;);
+				}
+				cls = lang.trim(cls);
+			}else{
+				cls = &quot;&quot;;
+			}
+			if(node[className] != cls){ node[className] = cls; }
+		},
+
+		replace: function replaceClass(/*DomNode|String*/ node, /*String|Array*/ addClassStr, /*String|Array?*/ removeClassStr){
+			// summary:
+			//		Replaces one or more classes on a node if not present.
+			//		Operates more quickly than calling dojo.removeClass and dojo.addClass
+			//
+			// node: String|DOMNode
+			//		String ID or DomNode reference to remove the class from.
+			//
+			// addClassStr: String|Array
+			//		A String class name to add, or several space-separated class names,
+			//		or an array of class names.
+			//
+			// removeClassStr: String|Array?
+			//		A String class name to remove, or several space-separated class names,
+			//		or an array of class names.
+			//
+			// example:
+			//	|	require([&quot;dojo/dom-class&quot;], function(domClass){
+			//	|		domClass.replace(&quot;someNode&quot;, &quot;add1 add2&quot;, &quot;remove1 remove2&quot;);
+			//	|	});
+			//
+			// example:
+			//	Replace all classes with addMe
+			//	|	require([&quot;dojo/dom-class&quot;], function(domClass){
+			//	|		domClass.replace(&quot;someNode&quot;, &quot;addMe&quot;);
+			//	|	});
+			//
+			// example:
+			//	Available in `dojo/NodeList` for multiple toggles
+			//	|	require([&quot;dojo/query&quot;], function(query){
+			//	|		query(&quot;.findMe&quot;).replaceClass(&quot;addMe&quot;, &quot;removeMe&quot;);
+			//	|	});
+
+			node = dom.byId(node);
+			fakeNode[className] = node[className];
+			cls.remove(fakeNode, removeClassStr);
+			cls.add(fakeNode, addClassStr);
+			if(node[className] !== fakeNode[className]){
+				node[className] = fakeNode[className];
+			}
+		},
+
+		toggle: function toggleClass(/*DomNode|String*/ node, /*String|Array*/ classStr, /*Boolean?*/ condition){
+			// summary:
+			//		Adds a class to node if not present, or removes if present.
+			//		Pass a boolean condition if you want to explicitly add or remove.
+			//		Returns the condition that was specified directly or indirectly.
+			//
+			// node: String|DOMNode
+			//		String ID or DomNode reference to toggle a class string
+			//
+			// classStr: String|Array
+			//		A String class name to toggle, or several space-separated class names,
+			//		or an array of class names.
+			//
+			// condition:
+			//		If passed, true means to add the class, false means to remove.
+			//		Otherwise dojo.hasClass(node, classStr) is used to detect the class presence.
+			//
+			// example:
+			//	|	require([&quot;dojo/dom-class&quot;], function(domClass){
+			//	|		domClass.toggle(&quot;someNode&quot;, &quot;hovered&quot;);
+			//	|	});
+			//
+			// example:
+			//		Forcefully add a class
+			//	|	require([&quot;dojo/dom-class&quot;], function(domClass){
+			//	|		domClass.toggle(&quot;someNode&quot;, &quot;hovered&quot;, true);
+			//	|	});
+			//
+			// example:
+			//		Available in `dojo/NodeList` for multiple toggles
+			//	|	require([&quot;dojo/query&quot;], function(query){
+			//	|		query(&quot;.toggleMe&quot;).toggleClass(&quot;toggleMe&quot;);
+			//	|	});
+
+			node = dom.byId(node);
+			if(condition === undefined){
+				classStr = str2array(classStr);
+				for(var i = 0, len = classStr.length, c; i &lt; len; ++i){
+					c = classStr[i];
+					cls[cls.contains(node, c) ? &quot;remove&quot; : &quot;add&quot;](node, c);
+				}
+			}else{
+				cls[condition ? &quot;add&quot; : &quot;remove&quot;](node, classStr);
+			}
+			return condition;   // Boolean
+		}
+	};
+
+	return cls;
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

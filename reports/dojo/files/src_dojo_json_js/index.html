@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src/dojo/json.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src/dojo/json.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">59.07</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">162</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">39.60</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.09</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([&quot;./has&quot;], function(has){
+	&quot;use strict&quot;;
+	var hasJSON = typeof JSON != &quot;undefined&quot;;
+	has.add(&quot;json-parse&quot;, hasJSON); // all the parsers work fine
+		// Firefox 3.5/Gecko 1.9 fails to use replacer in stringify properly https://bugzilla.mozilla.org/show_bug.cgi?id=509184
+	has.add(&quot;json-stringify&quot;, hasJSON &amp;&amp; JSON.stringify({a:0}, function(k,v){return v||1;}) == &#039;{&quot;a&quot;:1}&#039;);
+
+	/*=====
+	return {
+		// summary:
+		//		Functions to parse and serialize JSON
+
+		parse: function(str, strict){
+			// summary:
+			//		Parses a [JSON](http://json.org) string to return a JavaScript object.
+			// description:
+			//		This function follows [native JSON API](https://developer.mozilla.org/en/JSON)
+			//		Throws for invalid JSON strings. This delegates to eval() if native JSON
+			//		support is not available. By default this will evaluate any valid JS expression.
+			//		With the strict parameter set to true, the parser will ensure that only
+			//		valid JSON strings are parsed (otherwise throwing an error). Without the strict
+			//		parameter, the content passed to this method must come
+			//		from a trusted source.
+			// str:
+			//		a string literal of a JSON item, for instance:
+			//		`&#039;{ &quot;foo&quot;: [ &quot;bar&quot;, 1, { &quot;baz&quot;: &quot;thud&quot; } ] }&#039;`
+			// strict:
+			//		When set to true, this will ensure that only valid, secure JSON is ever parsed.
+			//		Make sure this is set to true for untrusted content. Note that on browsers/engines
+			//		without native JSON support, setting this to true will run slower.
+		},
+		stringify: function(value, replacer, spacer){
+			// summary:
+			//		Returns a [JSON](http://json.org) serialization of an object.
+			// description:
+			//		Returns a [JSON](http://json.org) serialization of an object.
+			//		This function follows [native JSON API](https://developer.mozilla.org/en/JSON)
+			//		Note that this doesn&#039;t check for infinite recursion, so don&#039;t do that!
+			// value:
+			//		A value to be serialized.
+			// replacer:
+			//		A replacer function that is called for each value and can return a replacement
+			// spacer:
+			//		A spacer string to be used for pretty printing of JSON
+			// example:
+			//		simple serialization of a trivial object
+			//	|	define([&quot;dojo/json&quot;], function(JSON){
+			// 	|		var jsonStr = JSON.stringify({ howdy: &quot;stranger!&quot;, isStrange: true });
+			//	|		doh.is(&#039;{&quot;howdy&quot;:&quot;stranger!&quot;,&quot;isStrange&quot;:true}&#039;, jsonStr);
+		}
+	};
+	=====*/
+
+	if(has(&quot;json-stringify&quot;)){
+		return JSON;
+	}else{
+		var escapeString = function(/*String*/str){
+			// summary:
+			//		Adds escape sequences for non-visual characters, double quote and
+			//		backslash and surrounds with double quotes to form a valid string
+			//		literal.
+			return (&#039;&quot;&#039; + str.replace(/([&quot;\\])/g, &#039;\\$1&#039;) + &#039;&quot;&#039;).
+				replace(/[\f]/g, &quot;\\f&quot;).replace(/[\b]/g, &quot;\\b&quot;).replace(/[\n]/g, &quot;\\n&quot;).
+				replace(/[\t]/g, &quot;\\t&quot;).replace(/[\r]/g, &quot;\\r&quot;); // string
+		};
+		return {
+			parse: has(&quot;json-parse&quot;) ? JSON.parse : function(str, strict){
+				if(strict &amp;&amp; !/^([\s\[\{]*(?:&quot;(?:\\.|[^&quot;])*&quot;|-?\d[\d\.]*(?:[Ee][+-]?\d+)?|null|true|false|)[\s\]\}]*(?:,|:|$))+$/.test(str)){
+					throw new SyntaxError(&quot;Invalid characters in JSON&quot;);
+				}
+				return eval(&#039;(&#039; + str + &#039;)&#039;);
+			},
+			stringify: function(value, replacer, spacer){
+				var undef;
+				if(typeof replacer == &quot;string&quot;){
+					spacer = replacer;
+					replacer = null;
+				}
+				function stringify(it, indent, key){
+					if(replacer){
+						it = replacer(key, it);
+					}
+					var val, objtype = typeof it;
+					if(objtype == &quot;number&quot;){
+						return isFinite(it) ? it + &quot;&quot; : &quot;null&quot;;
+					}
+					if(objtype == &quot;boolean&quot;){
+						return it + &quot;&quot;;
+					}
+					if(it === null){
+						return &quot;null&quot;;
+					}
+					if(typeof it == &quot;string&quot;){
+						return escapeString(it);
+					}
+					if(objtype == &quot;function&quot; || objtype == &quot;undefined&quot;){
+						return undef; // undefined
+					}
+					// short-circuit for objects that support &quot;json&quot; serialization
+					// if they return &quot;self&quot; then just pass-through...
+					if(typeof it.toJSON == &quot;function&quot;){
+						return stringify(it.toJSON(key), indent, key);
+					}
+					if(it instanceof Date){
+						return &#039;&quot;{FullYear}-{Month+}-{Date}T{Hours}:{Minutes}:{Seconds}Z&quot;&#039;.replace(/\{(\w+)(\+)?\}/g, function(t, prop, plus){
+							var num = it[&quot;getUTC&quot; + prop]() + (plus ? 1 : 0);
+							return num &lt; 10 ? &quot;0&quot; + num : num;
+						});
+					}
+					if(it.valueOf() !== it){
+						// primitive wrapper, try again unwrapped:
+						return stringify(it.valueOf(), indent, key);
+					}
+					var nextIndent= spacer ? (indent + spacer) : &quot;&quot;;
+					/* we used to test for DOM nodes and throw, but FF serializes them as {}, so cross-browser consistency is probably not efficiently attainable */ 
+				
+					var sep = spacer ? &quot; &quot; : &quot;&quot;;
+					var newLine = spacer ? &quot;\n&quot; : &quot;&quot;;
+				
+					// array
+					if(it instanceof Array){
+						var itl = it.length, res = [];
+						for(key = 0; key &lt; itl; key++){
+							var obj = it[key];
+							val = stringify(obj, nextIndent, key);
+							if(typeof val != &quot;string&quot;){
+								val = &quot;null&quot;;
+							}
+							res.push(newLine + nextIndent + val);
+						}
+						return &quot;[&quot; + res.join(&quot;,&quot;) + newLine + indent + &quot;]&quot;;
+					}
+					// generic object code path
+					var output = [];
+					for(key in it){
+						var keyStr;
+						if(it.hasOwnProperty(key)){
+							if(typeof key == &quot;number&quot;){
+								keyStr = &#039;&quot;&#039; + key + &#039;&quot;&#039;;
+							}else if(typeof key == &quot;string&quot;){
+								keyStr = escapeString(key);
+							}else{
+								// skip non-string or number keys
+								continue;
+							}
+							val = stringify(it[key], nextIndent, key);
+							if(typeof val != &quot;string&quot;){
+								// skip non-serializable values
+								continue;
+							}
+							// At this point, the most non-IE browsers don&#039;t get in this branch 
+							// (they have native JSON), so push is definitely the way to
+							output.push(newLine + nextIndent + keyStr + &quot;:&quot; + sep + val);
+						}
+					}
+					return &quot;{&quot; + output.join(&quot;,&quot;) + newLine + indent + &quot;}&quot;; // String
+				}
+				return stringify(value, &quot;&quot;, &quot;&quot;);
+			}
+		};
+	}
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

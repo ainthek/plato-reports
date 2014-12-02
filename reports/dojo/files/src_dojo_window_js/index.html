@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src/dojo/window.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src/dojo/window.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">50.23</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">238</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">67.24</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.80</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([&quot;./_base/lang&quot;, &quot;./sniff&quot;, &quot;./_base/window&quot;, &quot;./dom&quot;, &quot;./dom-geometry&quot;, &quot;./dom-style&quot;, &quot;./dom-construct&quot;],
+	function(lang, has, baseWindow, dom, geom, style, domConstruct){
+
+	// feature detection
+	/* not needed but included here for future reference
+	has.add(&quot;rtl-innerVerticalScrollBar-on-left&quot;, function(win, doc){
+		var	body = baseWindow.body(doc),
+			scrollable = domConstruct.create(&#039;div&#039;, {
+				style: {overflow:&#039;scroll&#039;, overflowX:&#039;hidden&#039;, direction:&#039;rtl&#039;, visibility:&#039;hidden&#039;, position:&#039;absolute&#039;, left:&#039;0&#039;, width:&#039;64px&#039;, height:&#039;64px&#039;}
+			}, body, &quot;last&quot;),
+			center = domConstruct.create(&#039;center&#039;, {
+				style: {overflow:&#039;hidden&#039;, direction:&#039;ltr&#039;}
+			}, scrollable, &quot;last&quot;),
+			inner = domConstruct.create(&#039;div&#039;, {
+				style: {overflow:&#039;visible&#039;, display:&#039;inline&#039; }
+			}, center, &quot;last&quot;);
+		inner.innerHTML=&quot;&amp;nbsp;&quot;;
+		var midPoint = Math.max(inner.offsetLeft, geom.position(inner).x);
+		var ret = midPoint &gt;= 32;
+		center.removeChild(inner);
+		scrollable.removeChild(center);
+		body.removeChild(scrollable);
+		return ret;
+	});
+	*/
+	has.add(&quot;rtl-adjust-position-for-verticalScrollBar&quot;, function(win, doc){
+		var	body = baseWindow.body(doc),
+			scrollable = domConstruct.create(&#039;div&#039;, {
+				style: {overflow:&#039;scroll&#039;, overflowX:&#039;visible&#039;, direction:&#039;rtl&#039;, visibility:&#039;hidden&#039;, position:&#039;absolute&#039;, left:&#039;0&#039;, top:&#039;0&#039;, width:&#039;64px&#039;, height:&#039;64px&#039;}
+			}, body, &quot;last&quot;),
+			div = domConstruct.create(&#039;div&#039;, {
+				style: {overflow:&#039;hidden&#039;, direction:&#039;ltr&#039;}
+			}, scrollable, &quot;last&quot;),
+			ret = geom.position(div).x != 0;
+		scrollable.removeChild(div);
+		body.removeChild(scrollable);
+		return ret;
+	});
+
+	has.add(&quot;position-fixed-support&quot;, function(win, doc){
+		// IE6, IE7+quirks, and some older mobile browsers don&#039;t support position:fixed
+		var	body = baseWindow.body(doc),
+			outer = domConstruct.create(&#039;span&#039;, {
+				style: {visibility:&#039;hidden&#039;, position:&#039;fixed&#039;, left:&#039;1px&#039;, top:&#039;1px&#039;}
+			}, body, &quot;last&quot;),
+			inner = domConstruct.create(&#039;span&#039;, {
+				style: {position:&#039;fixed&#039;, left:&#039;0&#039;, top:&#039;0&#039;}
+			}, outer, &quot;last&quot;),
+			ret = geom.position(inner).x != geom.position(outer).x;
+		outer.removeChild(inner);
+		body.removeChild(outer);
+		return ret;
+	});
+
+	// module:
+	//		dojo/window
+
+	var window = {
+		// summary:
+		//		TODOC
+
+		getBox: function(/*Document?*/ doc){
+			// summary:
+			//		Returns the dimensions and scroll position of the viewable area of a browser window
+
+			doc = doc || baseWindow.doc;
+
+			var
+				scrollRoot = (doc.compatMode == &#039;BackCompat&#039;) ? baseWindow.body(doc) : doc.documentElement,
+				// get scroll position
+				scroll = geom.docScroll(doc), // scrollRoot.scrollTop/Left should work
+				w, h;
+
+			if(has(&quot;touch&quot;)){ // if(scrollbars not supported)
+				var uiWindow = window.get(doc);   // use UI window, not dojo.global window
+				// on mobile, scrollRoot.clientHeight &lt;= uiWindow.innerHeight &lt;= scrollRoot.offsetHeight, return uiWindow.innerHeight
+				w = uiWindow.innerWidth || scrollRoot.clientWidth; // || scrollRoot.clientXXX probably never evaluated
+				h = uiWindow.innerHeight || scrollRoot.clientHeight;
+			}else{
+				// on desktops, scrollRoot.clientHeight &lt;= scrollRoot.offsetHeight &lt;= uiWindow.innerHeight, return scrollRoot.clientHeight
+				// uiWindow.innerWidth/Height includes the scrollbar and cannot be used
+				w = scrollRoot.clientWidth;
+				h = scrollRoot.clientHeight;
+			}
+			return {
+				l: scroll.x,
+				t: scroll.y,
+				w: w,
+				h: h
+			};
+		},
+
+		get: function(/*Document*/ doc){
+			// summary:
+			//		Get window object associated with document doc.
+			// doc:
+			//		The document to get the associated window for.
+
+			// In some IE versions (at least 6.0), document.parentWindow does not return a
+			// reference to the real window object (maybe a copy), so we must fix it as well
+			// We use IE specific execScript to attach the real window reference to
+			// document._parentWindow for later use
+			if(has(&quot;ie&quot;) &amp;&amp; window !== document.parentWindow){
+				/*
+				In IE 6, only the variable &quot;window&quot; can be used to connect events (others
+				may be only copies).
+				*/
+				doc.parentWindow.execScript(&quot;document._parentWindow = window;&quot;, &quot;Javascript&quot;);
+				//to prevent memory leak, unset it after use
+				//another possibility is to add an onUnload handler which seems overkill to me (liucougar)
+				var win = doc._parentWindow;
+				doc._parentWindow = null;
+				return win;	//	Window
+			}
+
+			return doc.parentWindow || doc.defaultView;	//	Window
+		},
+
+		scrollIntoView: function(/*DomNode*/ node, /*Object?*/ pos){
+			// summary:
+			//		Scroll the passed node into view using minimal movement, if it is not already.
+
+			// Don&#039;t rely on node.scrollIntoView working just because the function is there since
+			// it forces the node to the page&#039;s bottom or top (and left or right in IE) without consideration for the minimal movement.
+			// WebKit&#039;s node.scrollIntoViewIfNeeded doesn&#039;t work either for inner scrollbars in right-to-left mode
+			// and when there&#039;s a fixed position scrollable element
+
+			try{ // catch unexpected/unrecreatable errors (#7808) since we can recover using a semi-acceptable native method
+				node = dom.byId(node);
+				var	doc = node.ownerDocument || baseWindow.doc,	// TODO: why baseWindow.doc?  Isn&#039;t node.ownerDocument always defined?
+					body = baseWindow.body(doc),
+					html = doc.documentElement || body.parentNode,
+					isIE = has(&quot;ie&quot;),
+					isWK = has(&quot;webkit&quot;);
+				// if an untested browser, then use the native method
+				if(node == body || node == html){ return; }
+				if(!(has(&quot;mozilla&quot;) || isIE || isWK || has(&quot;opera&quot;) || has(&quot;trident&quot;)) &amp;&amp; (&quot;scrollIntoView&quot; in node)){
+					node.scrollIntoView(false); // short-circuit to native if possible
+					return;
+				}
+				var	backCompat = doc.compatMode == &#039;BackCompat&#039;,
+					rootWidth = Math.min(body.clientWidth || html.clientWidth, html.clientWidth || body.clientWidth),
+					rootHeight = Math.min(body.clientHeight || html.clientHeight, html.clientHeight || body.clientHeight),
+					scrollRoot = (isWK || backCompat) ? body : html,
+					nodePos = pos || geom.position(node),
+					el = node.parentNode,
+					isFixed = function(el){
+						return (isIE &lt;= 6 || (isIE == 7 &amp;&amp; backCompat))
+							? false
+							: (has(&quot;position-fixed-support&quot;) &amp;&amp; (style.get(el, &#039;position&#039;).toLowerCase() == &quot;fixed&quot;));
+					},
+					self = this,
+					scrollElementBy = function(el, x, y){
+						if(el.tagName == &quot;BODY&quot; || el.tagName == &quot;HTML&quot;){
+							self.get(el.ownerDocument).scrollBy(x, y);
+						}else{
+							x &amp;&amp; (el.scrollLeft += x);
+							y &amp;&amp; (el.scrollTop += y);
+						}
+					};
+				if(isFixed(node)){ return; } // nothing to do
+				while(el){
+					if(el == body){ el = scrollRoot; }
+					var	elPos = geom.position(el),
+						fixedPos = isFixed(el),
+						rtl = style.getComputedStyle(el).direction.toLowerCase() == &quot;rtl&quot;;
+
+					if(el == scrollRoot){
+						elPos.w = rootWidth; elPos.h = rootHeight;
+						if(scrollRoot == html &amp;&amp; (isIE || has(&quot;trident&quot;)) &amp;&amp; rtl){ elPos.x += scrollRoot.offsetWidth-elPos.w; } // IE workaround where scrollbar causes negative x
+						if(elPos.x &lt; 0 || !isIE || isIE &gt;= 9 || has(&quot;trident&quot;)){ elPos.x = 0; } // older IE can have values &gt; 0
+						if(elPos.y &lt; 0 || !isIE || isIE &gt;= 9 || has(&quot;trident&quot;)){ elPos.y = 0; }
+					}else{
+						var pb = geom.getPadBorderExtents(el);
+						elPos.w -= pb.w; elPos.h -= pb.h; elPos.x += pb.l; elPos.y += pb.t;
+						var clientSize = el.clientWidth,
+							scrollBarSize = elPos.w - clientSize;
+						if(clientSize &gt; 0 &amp;&amp; scrollBarSize &gt; 0){
+							if(rtl &amp;&amp; has(&quot;rtl-adjust-position-for-verticalScrollBar&quot;)){
+								elPos.x += scrollBarSize;
+							}
+							elPos.w = clientSize;
+						}
+						clientSize = el.clientHeight;
+						scrollBarSize = elPos.h - clientSize;
+						if(clientSize &gt; 0 &amp;&amp; scrollBarSize &gt; 0){
+							elPos.h = clientSize;
+						}
+					}
+					if(fixedPos){ // bounded by viewport, not parents
+						if(elPos.y &lt; 0){
+							elPos.h += elPos.y; elPos.y = 0;
+						}
+						if(elPos.x &lt; 0){
+							elPos.w += elPos.x; elPos.x = 0;
+						}
+						if(elPos.y + elPos.h &gt; rootHeight){
+							elPos.h = rootHeight - elPos.y;
+						}
+						if(elPos.x + elPos.w &gt; rootWidth){
+							elPos.w = rootWidth - elPos.x;
+						}
+					}
+					// calculate overflow in all 4 directions
+					var	l = nodePos.x - elPos.x, // beyond left: &lt; 0
+//						t = nodePos.y - Math.max(elPos.y, 0), // beyond top: &lt; 0
+						t = nodePos.y - elPos.y, // beyond top: &lt; 0
+						r = l + nodePos.w - elPos.w, // beyond right: &gt; 0
+						bot = t + nodePos.h - elPos.h; // beyond bottom: &gt; 0
+					var s, old;
+					if(r * l &gt; 0 &amp;&amp; (!!el.scrollLeft || el == scrollRoot || el.scrollWidth &gt; el.offsetHeight)){
+						s = Math[l &lt; 0? &quot;max&quot; : &quot;min&quot;](l, r);
+						if(rtl &amp;&amp; ((isIE == 8 &amp;&amp; !backCompat) || isIE &gt;= 9 || has(&quot;trident&quot;))){ s = -s; }
+						old = el.scrollLeft;
+						scrollElementBy(el, s, 0);
+						s = el.scrollLeft - old;
+						nodePos.x -= s;
+					}
+					if(bot * t &gt; 0 &amp;&amp; (!!el.scrollTop || el == scrollRoot || el.scrollHeight &gt; el.offsetHeight)){
+						s = Math.ceil(Math[t &lt; 0? &quot;max&quot; : &quot;min&quot;](t, bot));
+						old = el.scrollTop;
+						scrollElementBy(el, 0, s);
+						s = el.scrollTop - old;
+						nodePos.y -= s;
+					}
+					el = (el != scrollRoot) &amp;&amp; !fixedPos &amp;&amp; el.parentNode;
+				}
+			}catch(error){
+				console.error(&#039;scrollIntoView: &#039; + error);
+				node.scrollIntoView(false);
+			}
+		}
+	};
+
+	has(&quot;extend-dojo&quot;) &amp;&amp; lang.setObject(&quot;dojo.window&quot;, window);
+
+	return window;
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

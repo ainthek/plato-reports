@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src/dojo/cookie.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src/dojo/cookie.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">59.26</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">98</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">29.00</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.44</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([&quot;./_base/kernel&quot;, &quot;./regexp&quot;], function(dojo, regexp){
+
+// module:
+//		dojo/cookie
+
+/*=====
+var __cookieProps = {
+	// expires: Date|String|Number?
+	//		If a number, the number of days from today at which the cookie
+	//		will expire. If a date, the date past which the cookie will expire.
+	//		If expires is in the past, the cookie will be deleted.
+	//		If expires is omitted or is 0, the cookie will expire when the browser closes.
+	// path: String?
+	//		The path to use for the cookie.
+	// domain: String?
+	//		The domain to use for the cookie.
+	// secure: Boolean?
+	//		Whether to only send the cookie on secure connections
+};
+=====*/
+
+
+dojo.cookie = function(/*String*/name, /*String?*/ value, /*__cookieProps?*/ props){
+	// summary:
+	//		Get or set a cookie.
+	// description:
+	//		If one argument is passed, returns the value of the cookie
+	//		For two or more arguments, acts as a setter.
+	// name:
+	//		Name of the cookie
+	// value:
+	//		Value for the cookie
+	// props:
+	//		Properties for the cookie
+	// example:
+	//		set a cookie with the JSON-serialized contents of an object which
+	//		will expire 5 days from now:
+	//	|	require([&quot;dojo/cookie&quot;, &quot;dojo/json&quot;], function(cookie, json){
+	//	|		cookie(&quot;configObj&quot;, json.stringify(config, {expires: 5 }));
+	//	|	});
+	//
+	// example:
+	//		de-serialize a cookie back into a JavaScript object:
+	//	|	require([&quot;dojo/cookie&quot;, &quot;dojo/json&quot;], function(cookie, json){
+	//	|		config = json.parse(cookie(&quot;configObj&quot;));
+	//	|	});
+	//
+	// example:
+	//		delete a cookie:
+	//	|	require([&quot;dojo/cookie&quot;], function(cookie){
+	//	|		cookie(&quot;configObj&quot;, null, {expires: -1});
+	//	|	});
+	var c = document.cookie, ret;
+	if(arguments.length == 1){
+		var matches = c.match(new RegExp(&quot;(?:^|; )&quot; + regexp.escapeString(name) + &quot;=([^;]*)&quot;));
+		ret = matches ? decodeURIComponent(matches[1]) : undefined; 
+	}else{
+		props = props || {};
+// FIXME: expires=0 seems to disappear right away, not on close? (FF3)  Change docs?
+		var exp = props.expires;
+		if(typeof exp == &quot;number&quot;){
+			var d = new Date();
+			d.setTime(d.getTime() + exp*24*60*60*1000);
+			exp = props.expires = d;
+		}
+		if(exp &amp;&amp; exp.toUTCString){ props.expires = exp.toUTCString(); }
+
+		value = encodeURIComponent(value);
+		var updatedCookie = name + &quot;=&quot; + value, propName;
+		for(propName in props){
+			updatedCookie += &quot;; &quot; + propName;
+			var propValue = props[propName];
+			if(propValue !== true){ updatedCookie += &quot;=&quot; + propValue; }
+		}
+		document.cookie = updatedCookie;
+	}
+	return ret; // String|undefined
+};
+
+dojo.cookie.isSupported = function(){
+	// summary:
+	//		Use to determine if the current browser supports cookies or not.
+	//
+	//		Returns true if user allows cookies.
+	//		Returns false if user doesn&#039;t allow cookies.
+
+	if(!(&quot;cookieEnabled&quot; in navigator)){
+		this(&quot;__djCookieTest__&quot;, &quot;CookiesAllowed&quot;);
+		navigator.cookieEnabled = this(&quot;__djCookieTest__&quot;) == &quot;CookiesAllowed&quot;;
+		if(navigator.cookieEnabled){
+			this(&quot;__djCookieTest__&quot;, &quot;&quot;, {expires: -1});
+		}
+	}
+	return navigator.cookieEnabled;
+};
+
+return dojo.cookie;
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

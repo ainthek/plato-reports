@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src/dojo/request/util.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src/dojo/request/util.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">68.89</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">158</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">46.72</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.30</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+	&#039;exports&#039;,
+	&#039;../errors/RequestError&#039;,
+	&#039;../errors/CancelError&#039;,
+	&#039;../Deferred&#039;,
+	&#039;../io-query&#039;,
+	&#039;../_base/array&#039;,
+	&#039;../_base/lang&#039;,
+	&#039;../promise/Promise&#039;
+], function(exports, RequestError, CancelError, Deferred, ioQuery, array, lang, Promise){
+	exports.deepCopy = function deepCopy(target, source){
+		for(var name in source){
+			var tval = target[name],
+				sval = source[name];
+			if(tval !== sval){
+				if(tval &amp;&amp; typeof tval === &#039;object&#039; &amp;&amp; sval &amp;&amp; typeof sval === &#039;object&#039;){
+					exports.deepCopy(tval, sval);
+				}else{
+					target[name] = sval;
+				}
+			}
+		}
+		return target;
+	};
+
+	exports.deepCreate = function deepCreate(source, properties){
+		properties = properties || {};
+		var target = lang.delegate(source),
+			name, value;
+
+		for(name in source){
+			value = source[name];
+
+			if(value &amp;&amp; typeof value === &#039;object&#039;){
+				target[name] = exports.deepCreate(value, properties[name]);
+			}
+		}
+		return exports.deepCopy(target, properties);
+	};
+
+	var freeze = Object.freeze || function(obj){ return obj; };
+	function okHandler(response){
+		return freeze(response);
+	}
+	function dataHandler (response) {
+		return response.data || response.text;
+	}
+
+	exports.deferred = function deferred(response, cancel, isValid, isReady, handleResponse, last){
+		var def = new Deferred(function(reason){
+			cancel &amp;&amp; cancel(def, response);
+
+			if(!reason || !(reason instanceof RequestError) &amp;&amp; !(reason instanceof CancelError)){
+				return new CancelError(&#039;Request canceled&#039;, response);
+			}
+			return reason;
+		});
+
+		def.response = response;
+		def.isValid = isValid;
+		def.isReady = isReady;
+		def.handleResponse = handleResponse;
+
+		function errHandler(error){
+			error.response = response;
+			throw error;
+		}
+		var responsePromise = def.then(okHandler).otherwise(errHandler);
+
+		if(exports.notify){
+			responsePromise.then(
+				lang.hitch(exports.notify, &#039;emit&#039;, &#039;load&#039;),
+				lang.hitch(exports.notify, &#039;emit&#039;, &#039;error&#039;)
+			);
+		}
+
+		var dataPromise = responsePromise.then(dataHandler);
+
+		// http://bugs.dojotoolkit.org/ticket/16794
+		// The following works around a leak in IE9 through the
+		// prototype using lang.delegate on dataPromise and
+		// assigning the result a property with a reference to
+		// responsePromise.
+		var promise = new Promise();
+		for (var prop in dataPromise) {
+			if (dataPromise.hasOwnProperty(prop)) {
+				promise[prop] = dataPromise[prop];
+			}
+		}
+		promise.response = responsePromise;
+		freeze(promise);
+		// End leak fix
+
+
+		if(last){
+			def.then(function(response){
+				last.call(def, response);
+			}, function(error){
+				last.call(def, response, error);
+			});
+		}
+
+		def.promise = promise;
+		def.then = promise.then;
+
+		return def;
+	};
+
+	exports.addCommonMethods = function addCommonMethods(provider, methods){
+		array.forEach(methods||[&#039;GET&#039;, &#039;POST&#039;, &#039;PUT&#039;, &#039;DELETE&#039;], function(method){
+			provider[(method === &#039;DELETE&#039; ? &#039;DEL&#039; : method).toLowerCase()] = function(url, options){
+				options = lang.delegate(options||{});
+				options.method = method;
+				return provider(url, options);
+			};
+		});
+	};
+
+	exports.parseArgs = function parseArgs(url, options, skipData){
+		var data = options.data,
+			query = options.query;
+		
+		if(data &amp;&amp; !skipData){
+			if(typeof data === &#039;object&#039;){
+				options.data = ioQuery.objectToQuery(data);
+			}
+		}
+
+		if(query){
+			if(typeof query === &#039;object&#039;){
+				query = ioQuery.objectToQuery(query);
+			}
+			if(options.preventCache){
+				query += (query ? &#039;&amp;&#039; : &#039;&#039;) + &#039;request.preventCache=&#039; + (+(new Date));
+			}
+		}else if(options.preventCache){
+			query = &#039;request.preventCache=&#039; + (+(new Date));
+		}
+
+		if(url &amp;&amp; query){
+			url += (~url.indexOf(&#039;?&#039;) ? &#039;&amp;&#039; : &#039;?&#039;) + query;
+		}
+
+		return {
+			url: url,
+			options: options,
+			getHeader: function(headerName){ return null; }
+		};
+	};
+
+	exports.checkStatus = function(stat){
+		stat = stat || 0;
+		return (stat &gt;= 200 &amp;&amp; stat &lt; 300) || // allow any 2XX response code
+			stat === 304 ||                 // or, get it out of the cache
+			stat === 1223 ||                // or, Internet Explorer mangled the status code
+			!stat;                         // or, we&#039;re Titanium/browser chrome/chrome extension requesting a local file
+	};
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

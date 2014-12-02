@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - src/dojo/tests/_base/lang.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>src/dojo/tests/_base/lang.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">66.24</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">362</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">61.05</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">5.28</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([&quot;doh/main&quot;, &quot;dojo/_base/array&quot;, &quot;dojo/_base/lang&quot;, &quot;dojo/_base/kernel&quot;
+], function(doh, array, lang, kernel){
+
+  doh.register(&quot;tests._base.lang&quot;, [
+		function exists(t){
+			var test = {
+				foo : 0
+			};
+			t.assertTrue(lang.exists(&quot;foo&quot;, test), &#039;lang.exists(&quot;foo&quot;, test)&#039;);
+			t.assertFalse(lang.exists(&quot;foo.bar&quot;, test), &#039;lang.exists(&quot;foo.bar&quot;, test)&#039;);
+
+			// global tests
+			t.assertFalse(lang.exists(&quot;_existsTest&quot;), &#039;lang.exists(&quot;_existsTest&quot;) #1&#039;);
+			kernel.global._existsTest = false;
+			t.assertTrue(lang.exists(&quot;_existsTest&quot;), &#039;lang.exists(&quot;_existsTest&quot;) #2&#039;);
+			t.assertFalse(lang.exists(&quot;_existsTest.bar&quot;), &#039;lang.exists(&quot;_existsTest.bar&quot;)&#039;);
+
+			// scopeMap tests
+			t.assertTrue(lang.exists(&quot;dojo.dijit&quot;), &#039;lang.exists(&quot;dojo.dijit&quot;)&#039;);
+			t.assertFalse(lang.exists(&quot;dojo.foo&quot;), &#039;lang.exists(&quot;dojo.foo&quot;)&#039;);
+		},
+
+		function getObject(t){
+			var test = {
+				foo : {}
+			};
+			t.assertEqual(test.foo, lang.getObject(&quot;foo&quot;, false, test), &#039;lang.getObject(&quot;foo&quot;, false, test)&#039;);
+			t.assertEqual(&quot;undefined&quot;, typeof lang.getObject(&quot;foo.bar&quot;, false, test), // don&#039;t create
+				&#039;typeof lang.getObject(&quot;foo.bar&quot;, false, test)&#039;);
+			t.assertEqual({}, lang.getObject(&quot;foo.bar&quot;, true, test),  // do create
+				&#039;lang.getObject(&quot;foo.bar&quot;, true, test)&#039;);
+			test.foo.bar.baz = &quot;test&quot;;
+			t.assertEqual(test.foo.bar, lang.getObject(&quot;foo.bar&quot;, false, test),
+				&#039;lang.getObject(&quot;foo.bar&quot;, false, test)&#039;);
+
+			// global tests
+			t.assertEqual(&quot;undefined&quot;, typeof lang.getObject(&quot;_getObjectTest.bar&quot;, false),	// don&#039;t create
+				&#039;typeof lang.getObject(&quot;_getObjectTest.bar&quot;, false)&#039;);
+			kernel.global._getObjectTest = {};
+			t.assertEqual(kernel.global._getObjectTest, lang.getObject(&quot;_getObjectTest&quot;, false), // don&#039;t create
+				&#039;lang.getObject(&quot;_getObjectTest&quot;, false)&#039;);
+			t.assertEqual({}, lang.getObject(&quot;_getObjectTest.bar&quot;, true), &#039;lang.getObject(&quot;_getObjectTest.bar&quot;, true)&#039;); // do create
+
+			// strangely, parser does this
+			t.assertEqual(&quot;undefined&quot;, typeof lang.getObject(&quot;./TestWidget&quot;), &#039;typeof lang.getObject(&quot;./TestWidget&quot;)&#039;);
+
+			// empty path should return the same object
+			t.assertEqual(test, lang.getObject(&quot;&quot;, false, test));
+			t.assertEqual(kernel.global, lang.getObject(&quot;&quot;));
+		},
+
+		function setObject(t){
+			var test = {
+				foo : 0
+			};
+			t.assertTrue(lang.setObject(&quot;foo&quot;, {bar : &quot;test&quot;}, test));
+			t.assertEqual({bar : &quot;test&quot;}, lang.getObject(&quot;foo&quot;, false, test));
+		},
+
+		function mixin(t){
+			t.assertEqual(&quot;object&quot;, typeof lang.mixin());
+			t.assertEqual(&quot;object&quot;, typeof lang.mixin(undefined));
+			t.assertEqual(&quot;object&quot;, typeof lang.mixin(null));
+			var src = {
+				foo: function(){
+					t.debug(&quot;foo&quot;);
+				},
+				bar: &quot;bar&quot;
+			};
+			var dest = {};
+			lang.mixin(dest, src);
+			t.assertEqual(&quot;function&quot;, typeof dest[&quot;foo&quot;]);
+			t.assertEqual(&quot;string&quot;, typeof dest[&quot;bar&quot;]);
+		},
+
+		function extend(t){
+			var src = {
+				foo: function(){
+					t.debug(&quot;foo&quot;);
+				},
+				bar: &quot;bar&quot;
+			};
+			function dest(){}
+			lang.extend(dest, src);
+			var test = new dest();
+			t.assertEqual(&quot;function&quot;, typeof test[&quot;foo&quot;]);
+			t.assertEqual(&quot;string&quot;, typeof test[&quot;bar&quot;]);
+		},
+
+		function isFunction(t){
+			t.assertTrue(lang.isFunction(new Function()));
+			t.assertTrue(lang.isFunction(isFunction));
+			if(lang.isBrowser){ // test the Safari workaround for NodeList
+				t.assertFalse(lang.isFunction(lang.doc.getElementsByName(&quot;html&quot;)));
+				t.assertFalse(lang.isFunction(lang.doc.createElement(&quot;object&quot;)));
+			}
+		},
+
+		function isObject(t){
+			t.assertFalse(lang.isObject(true));
+			t.assertFalse(lang.isObject(false));
+			t.assertFalse(lang.isObject(&quot;foo&quot;));
+			t.assertTrue(lang.isObject(new String(&quot;foo&quot;)));
+			t.assertTrue(lang.isObject(null));
+			t.assertTrue(lang.isObject({}));
+			t.assertTrue(lang.isObject([]));
+			t.assertTrue(lang.isObject(new Array()));
+		},
+
+		function isArray(t){
+			t.assertTrue(lang.isArray([]));
+			t.assertTrue(lang.isArray(new Array()));
+			t.assertFalse(lang.isArray({}));
+			t.assertFalse(lang.isArray(&#039;&#039;));
+			t.assertFalse(lang.isArray(0));
+			t.assertFalse(lang.isArray(NaN));
+			t.assertFalse(lang.isArray(null));
+			t.assertFalse(lang.isArray(undefined));
+			if(typeof window != &quot;undefined&quot;){
+				t.assertFalse(lang.isArray(window));
+			}
+			t.assertFalse(lang.isArray(Function));
+
+			function Tricky() {}
+			Tricky.prototype = [];
+			t.assertFalse(lang.isArray(new Tricky));
+		},
+
+		function isArrayLike(t){
+			t.assertFalse(lang.isArrayLike(&quot;thinger&quot;));
+			t.assertTrue(lang.isArrayLike(new Array()));
+			t.assertFalse(lang.isArrayLike({}));
+			t.assertTrue(lang.isArrayLike(arguments));
+			t.assertFalse(lang.isArrayLike(&quot;&quot;));
+			t.assertFalse(lang.isArrayLike(false));
+			t.assertFalse(lang.isArrayLike(NaN));
+			t.assertFalse(lang.isArrayLike(undefined));
+			t.assertFalse(lang.isArrayLike(null));
+			if(typeof window != &quot;undefined&quot;){
+				t.assertTrue(lang.isArrayLike(window));
+			}
+			t.assertFalse(lang.isArrayLike(Function));
+
+			t.assertTrue(lang.isArrayLike({0: 1, 1: 2, length: 2}));
+			function Tricky() {}
+			Tricky.prototype = [];
+			t.assertTrue(lang.isArrayLike(new Tricky));
+		},
+
+		function isString(t){
+			t.assertFalse(lang.isString(true));
+			t.assertFalse(lang.isString(false));
+			t.assertTrue(lang.isString(&quot;foo&quot;));
+			t.assertTrue(lang.isString(new String(&quot;foo&quot;)));
+			t.assertFalse(lang.isString(null));
+			t.assertFalse(lang.isString({}));
+			t.assertFalse(lang.isString([]));
+		},
+
+		function partial(t){
+			var scope = { foo: &quot;bar&quot; };
+			var scope2 = { foo: &quot;baz&quot; };
+			function thinger(arg1, arg2){
+				return [this.foo, arg1, arg2];
+			}
+			
+			var st1 = lang.partial(thinger);
+			t.assertEqual(&quot;bar&quot;, st1.call(scope)[0]);
+			t.assertEqual(undefined, st1()[0]);
+			var st2 = lang.partial(thinger, &quot;foo&quot;, &quot;bar&quot;);
+			t.assertEqual(&quot;bar&quot;, st2()[2]);
+			var st3 = lang.partial(thinger, &quot;foo&quot;, &quot;bar&quot;);
+		},
+
+		function nestedPartial(t){
+			function thinger(arg1, arg2){
+				return [arg1, arg2];
+			}
+			
+			var st1 = lang.partial(thinger, &quot;foo&quot;);
+			t.assertEqual(undefined, st1()[1]);
+			t.assertEqual(&quot;bar&quot;, st1(&quot;bar&quot;)[1]);
+
+			// partials can accumulate
+			var st2 = lang.partial(st1, &quot;thud&quot;);
+			t.assertEqual(&quot;foo&quot;, st2()[0]);
+			t.assertEqual(&quot;thud&quot;, st2()[1]);
+		},
+
+		function hitch(t){
+			var scope = { foo: &quot;bar&quot; };
+			var scope2 = { foo: &quot;baz&quot; };
+			function thinger(){
+				return [this.foo, arguments.length];
+			}
+			
+			var st1 = lang.hitch(scope, thinger);
+			t.assertEqual(&quot;bar&quot;, st1()[0]);
+			t.assertEqual(0, st1()[1]);
+
+			var st2 = lang.hitch(scope2, thinger);
+			t.assertEqual(&quot;baz&quot;, st2()[0]);
+			t.assertEqual(0, st1()[1]);
+			t.assertEqual(1, st1(&quot;blah&quot;)[1]);
+
+			// st2 should be &quot;scope proof&quot;
+			t.assertEqual(&quot;baz&quot;, st2.call(scope)[0]);
+		},
+
+		function hitchWithArgs(t){
+			var scope = { foo: &quot;bar&quot; };
+			var scope2 = { foo: &quot;baz&quot; };
+			function thinger(){
+				return [this.foo, arguments.length];
+			}
+			
+			var st1 = lang.hitch(scope, thinger, &quot;foo&quot;, &quot;bar&quot;);
+			t.assertEqual(&quot;bar&quot;, st1()[0]);
+			t.assertEqual(2, st1()[1]);
+			var st2 = lang.hitch(scope2, thinger, &quot;foo&quot;, &quot;bar&quot;);
+			t.assertEqual(&quot;baz&quot;, st2()[0]);
+			t.assertEqual(2, st2()[1]);
+		},
+
+		function hitchAsPartial(t){
+			var scope = { foo: &quot;bar&quot; };
+			var scope2 = { foo: &quot;baz&quot; };
+			function thinger(arg1, arg2){
+				return [this.foo, arg1, arg2];
+			}
+			
+			var st1 = lang.hitch(null, thinger);
+			t.assertEqual(&quot;bar&quot;, st1.call(scope)[0]);
+			t.assertEqual(undefined, st1()[0]);
+			var st2 = lang.hitch(null, thinger, &quot;foo&quot;, &quot;bar&quot;);
+			t.assertEqual(&quot;bar&quot;, st2()[2]);
+			var st3 = lang.hitch(null, thinger, &quot;foo&quot;, &quot;bar&quot;);
+		},
+
+		function _toArray(t){
+			var obj1 = [ &#039;foo&#039;, &#039;bar&#039;, &#039;spam&#039;, &#039;ham&#039; ];
+
+			function thinger(){
+				return lang._toArray(arguments);
+			}
+			var obj2 = thinger.apply(this, obj1);
+			t.assertEqual(obj1[0], obj2[0]);
+
+			if(lang.isBrowser){
+				//test DomCollection
+				var div = document.createElement(&#039;div&#039;);
+				div.innerHTML=&quot;&lt;a href=&#039;#&#039;&gt;link&lt;/a&gt;text&quot;;
+				var r=lang._toArray(div.childNodes);
+				t.is(2,r.length);
+			}
+		},
+		
+		function clone(t){
+			var obj1 = {
+				foo: &#039;bar&#039;,
+				answer: 42,
+				jan102007: new Date(2007, 0, 10),
+				baz: {
+					a: null,
+					b: [1, &quot;b&quot;, 2.3, true, false],
+					c: {
+						d: undefined,
+						e: 99,
+						f: function(){ console.log(42); return 42; },
+						g: /\d+/gm
+					}
+				},
+				toString: function(){ return &quot;meow&quot;; }
+			};
+			var obj2 = lang.clone(obj1);
+			t.assertEqual(obj1.foo, obj2.foo);
+			t.assertEqual(obj1.answer, obj2.answer);
+			t.assertEqual(obj1.jan102007, obj2.jan102007);
+			t.assertEqual(obj1.baz.a, obj2.baz.a);
+			for(var i = 0; i &lt; obj1.baz.b.length; ++i){
+				t.assertEqual(obj1.baz.b[i], obj2.baz.b[i]);
+			}
+			t.assertEqual(obj1.baz.c.d, obj2.baz.c.d);
+			t.assertEqual(obj1.baz.c.e, obj2.baz.c.e);
+			t.assertEqual(obj1.baz.c.f, obj2.baz.c.f);
+			t.assertEqual(obj1.baz.c.f(), obj2.baz.c.f());
+			t.assertEqual(obj1.baz.c.g, obj2.baz.c.g);
+			t.assertEqual(obj1.toString, obj2.toString);
+			t.assertEqual(obj1.toString(), obj2.toString());
+		},
+		
+		function delegate(t){
+			var a = {
+				x: 1,
+				y: function(){ return 2; },
+				z1: 99
+			};
+			var b = {
+				x: 11,
+				y: function(){ return 12; },
+				z2: 33,
+				toString: function(){ return &quot;bark!&quot;; },
+				toLocaleString: function(){ return &quot;le bark-s!&quot;; }
+			};
+			t.is(1, a.x);
+			t.is(2, a.y());
+			t.is(99, a.z1);
+			var c = lang.delegate(a, b);
+			t.is(1, a.x);
+			t.is(2, a.y());
+			t.is(99, a.z1);
+			t.is(11, c.x);
+			t.is(12, c.y());
+			t.is(&quot;bark!&quot;, c.toString());
+			t.is(&quot;le bark-s!&quot;, c.toLocaleString());
+			t.is(99, c.z1);
+			t.is(33, c.z2);
+		},
+
+		function replace(t){
+			var s1 = lang.replace(&quot;Hello, {name.first} {name.last} AKA {nick}!&quot;,
+				{
+					nick: &quot;Bob&quot;,
+					name: {
+						first:  &quot;Robert&quot;,
+						middle: &quot;X&quot;,
+						last:   &quot;Cringely&quot;
+					}
+				});
+			t.is(&quot;Hello, Robert Cringely AKA Bob!&quot;, s1);
+
+			var s2 = lang.replace(&quot;Hello, {0} {2}!&quot;, [&quot;Robert&quot;, &quot;X&quot;, &quot;Cringely&quot;]);
+			t.is(&quot;Hello, Robert Cringely!&quot;, s2);
+
+			function sum(a){
+				var t = 0;
+				array.forEach(a, function(x){ t += x; });
+				return t;
+			}
+			var s3 = lang.replace(
+				&quot;{count} payments averaging {avg} USD per payment.&quot;,
+				lang.hitch(
+					{ payments: [11, 16, 12] },
+					function(_, key){
+						switch(key){
+							case &quot;count&quot;: return this.payments.length;
+							case &quot;min&quot;:   return Math.min.apply(Math, this.payments);
+							case &quot;max&quot;:   return Math.max.apply(Math, this.payments);
+							case &quot;sum&quot;:   return sum(this.payments);
+							case &quot;avg&quot;:   return sum(this.payments) / this.payments.length;
+						}
+						return &quot;&quot;;
+					}
+				));
+			t.is(&quot;3 payments averaging 13 USD per payment.&quot;, s3);
+
+			var s4 = lang.replace(&quot;Hello, ${0} ${2}!&quot;, [&quot;Robert&quot;, &quot;X&quot;, &quot;Cringely&quot;], /\$\{([^\}]+)\}/g);
+			t.is(&quot;Hello, Robert Cringely!&quot;, s4);
+		}
+	]
+  );
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>
