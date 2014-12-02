@@ -4,3 +4,6 @@
 [submodule "src/plato"]
 	path = src/plato
 	url = https://github.com/es-analysis/plato
+[submodule "src/plato-ainthek"]
+	path = src/plato-ainthek
+	url = https://github.com/ainthek/plato.git
