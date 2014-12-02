@@ -26,7 +26,6 @@
     "ctype": "~0.5.3",
     "delayed-stream": "0.0.6",
     "boom": "~2.6.1",
-    "nan": "~1.4.1",
     "cryptiles": "~2.0.4",
     "sntp": "~1.0.9",
     "wordwrap": "0.0.2",
