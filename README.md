@@ -7,24 +7,11 @@ just playground for plato js, reports for selected node modules and libraries
 interesting to compare download popularity and reports statistics
 
 
+| package | downloads |avg.maint | total.sloc | version | description | links |
+|-------|--------:|--------:|---------:|-|-|-|
+|a|a|a|a|a|a|a|
 
 
-# plato-reports
-
-just playground for plato js, reports for selected node modules and libraries
-
-interesting to compare download popularity and reports statistics
-
-
-| package | downloads |
-|-------|--------:|
-|a|a|
-
-| package | downloads | avg.maint | 
-|-------|--------:|--------:|
-|a|a|a|
-
-Also some other frameworks analyzed:
 
 - [dojo](http://htmlpreview.github.io/?https://github.com/ainthek/plato-reports/blob/master/reports/dojo/index.html)
 
