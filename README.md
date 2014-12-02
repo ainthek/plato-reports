@@ -20,6 +20,10 @@ interesting to compare download popularity and reports statistics
 |-------|--------:|
 |a|a|
 
+| package | downloads | avg.maint | 
+|-------|--------:|--------:|
+|a|a|a|
+
 Also some other frameworks analyzed:
 
 - [dojo](http://htmlpreview.github.io/?https://github.com/ainthek/plato-reports/blob/master/reports/dojo/index.html)
