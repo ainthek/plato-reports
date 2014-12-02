@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - request/tests/test-redirect.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>request/tests/test-redirect.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">71.57</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">319</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">66.65</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">3.74</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">&#039;use strict&#039;
+
+var server = require(&#039;./server&#039;)
+  , assert = require(&#039;assert&#039;)
+  , request = require(&#039;../index&#039;)
+  , tape = require(&#039;tape&#039;)
+
+var s = server.createServer()
+  , ss = server.createSSLServer()
+  , hits = {}
+  , jar = request.jar()
+
+s.on(&#039;/ssl&#039;, function(req, res) {
+  res.writeHead(302, {
+    location : ss.url + &#039;/&#039;
+  })
+  res.end()
+})
+
+ss.on(&#039;/&#039;, function(req, res) {
+  res.writeHead(200)
+  res.end(&#039;SSL&#039;)
+})
+
+function createRedirectEndpoint(code, label, landing) {
+  s.on(&#039;/&#039; + label, function(req, res) {
+    hits[label] = true
+    res.writeHead(code, {
+      &#039;location&#039;: s.url + &#039;/&#039; + landing,
+      &#039;set-cookie&#039;: &#039;ham=eggs&#039;
+    })
+    res.end()
+  })
+}
+
+function createLandingEndpoint(landing) {
+  s.on(&#039;/&#039; + landing, function(req, res) {
+    // Make sure the cookie doesn&#039;t get included twice, see #139:
+    // Make sure cookies are set properly after redirect
+    assert.equal(req.headers.cookie, &#039;foo=bar; quux=baz; ham=eggs&#039;)
+    hits[landing] = true
+    res.writeHead(200)
+    res.end(req.method.toUpperCase() + &#039; &#039; + landing)
+  })
+}
+
+function bouncer(code, label, hops) {
+  var hop,
+      landing = label + &#039;_landing&#039;,
+      currentLabel,
+      currentLanding
+
+  hops = hops || 1
+
+  if (hops === 1) {
+    createRedirectEndpoint(code, label, landing)
+  } else {
+    for (hop = 0; hop &lt; hops; hop++) {
+      currentLabel = (hop === 0) ? label : label + &#039;_&#039; + (hop + 1)
+      currentLanding = (hop === hops - 1) ? landing : label + &#039;_&#039; + (hop + 2)
+
+      createRedirectEndpoint(code, currentLabel, currentLanding)
+    }
+  }
+
+  createLandingEndpoint(landing)
+}
+
+tape(&#039;setup&#039;, function(t) {
+  s.listen(s.port, function() {
+    ss.listen(ss.port, function() {
+      bouncer(301, &#039;temp&#039;)
+      bouncer(301, &#039;double&#039;, 2)
+      bouncer(301, &#039;treble&#039;, 3)
+      bouncer(302, &#039;perm&#039;)
+      bouncer(302, &#039;nope&#039;)
+      bouncer(307, &#039;fwd&#039;)
+      t.end()
+    })
+  })
+})
+
+tape(&#039;permanent bounce&#039;, function(t) {
+  jar.setCookie(&#039;quux=baz&#039;, s.url)
+  hits = {}
+  request({
+    uri: s.url + &#039;/perm&#039;,
+    jar: jar,
+    headers: { cookie: &#039;foo=bar&#039; }
+  }, function(err, res, body) {
+    t.equal(err, null)
+    t.equal(res.statusCode, 200)
+    t.ok(hits.perm, &#039;Original request is to /perm&#039;)
+    t.ok(hits.perm_landing, &#039;Forward to permanent landing URL&#039;)
+    t.equal(body, &#039;GET perm_landing&#039;, &#039;Got permanent landing content&#039;)
+    t.end()
+  })
+})
+
+tape(&#039;temporary bounce&#039;, function(t) {
+  hits = {}
+  request({
+    uri: s.url + &#039;/temp&#039;,
+    jar: jar,
+    headers: { cookie: &#039;foo=bar&#039; }
+  }, function(err, res, body) {
+    t.equal(err, null)
+    t.equal(res.statusCode, 200)
+    t.ok(hits.temp, &#039;Original request is to /temp&#039;)
+    t.ok(hits.temp_landing, &#039;Forward to temporary landing URL&#039;)
+    t.equal(body, &#039;GET temp_landing&#039;, &#039;Got temporary landing content&#039;)
+    t.end()
+  })
+})
+
+tape(&#039;prevent bouncing&#039;, function(t) {
+  hits = {}
+  request({
+    uri: s.url + &#039;/nope&#039;,
+    jar: jar,
+    headers: { cookie: &#039;foo=bar&#039; },
+    followRedirect: false
+  }, function(err, res, body) {
+    t.equal(err, null)
+    t.equal(res.statusCode, 302)
+    t.ok(hits.nope, &#039;Original request to /nope&#039;)
+    t.ok(!hits.nope_landing, &#039;No chasing the redirect&#039;)
+    t.equal(res.statusCode, 302, &#039;Response is the bounce itself&#039;)
+    t.end()
+  })
+})
+
+tape(&#039;should not follow post redirects by default&#039;, function(t) {
+  hits = {}
+  request.post(s.url + &#039;/temp&#039;, {
+    jar: jar,
+    headers: { cookie: &#039;foo=bar&#039; }
+  }, function(err, res, body) {
+    t.equal(err, null)
+    t.equal(res.statusCode, 301)
+    t.ok(hits.temp, &#039;Original request is to /temp&#039;)
+    t.ok(!hits.temp_landing, &#039;No chasing the redirect when post&#039;)
+    t.equal(res.statusCode, 301, &#039;Response is the bounce itself&#039;)
+    t.end()
+  })
+})
+
+tape(&#039;should follow post redirects when followallredirects true&#039;, function(t) {
+  hits = {}
+  request.post({
+    uri: s.url + &#039;/temp&#039;,
+    followAllRedirects: true,
+    jar: jar,
+    headers: { cookie: &#039;foo=bar&#039; }
+  }, function(err, res, body) {
+    t.equal(err, null)
+    t.equal(res.statusCode, 200)
+    t.ok(hits.temp, &#039;Original request is to /temp&#039;)
+    t.ok(hits.temp_landing, &#039;Forward to temporary landing URL&#039;)
+    t.equal(body, &#039;GET temp_landing&#039;, &#039;Got temporary landing content&#039;)
+    t.end()
+  })
+})
+
+tape(&#039;should not follow post redirects when followallredirects false&#039;, function(t) {
+  hits = {}
+  request.post({
+    uri: s.url + &#039;/temp&#039;,
+    followAllRedirects: false,
+    jar: jar,
+    headers: { cookie: &#039;foo=bar&#039; }
+  }, function(err, res, body) {
+    t.equal(err, null)
+    t.equal(res.statusCode, 301)
+    t.ok(hits.temp, &#039;Original request is to /temp&#039;)
+    t.ok(!hits.temp_landing, &#039;No chasing the redirect&#039;)
+    t.equal(res.statusCode, 301, &#039;Response is the bounce itself&#039;)
+    t.end()
+  })
+})
+
+tape(&#039;should not follow delete redirects by default&#039;, function(t) {
+  hits = {}
+  request.del(s.url + &#039;/temp&#039;, {
+    jar: jar,
+    headers: { cookie: &#039;foo=bar&#039; }
+  }, function(err, res, body) {
+    t.equal(err, null)
+    t.ok(res.statusCode &gt;= 301 &amp;&amp; res.statusCode &lt; 400, &#039;Status is a redirect&#039;)
+    t.ok(hits.temp, &#039;Original request is to /temp&#039;)
+    t.ok(!hits.temp_landing, &#039;No chasing the redirect when delete&#039;)
+    t.equal(res.statusCode, 301, &#039;Response is the bounce itself&#039;)
+    t.end()
+  })
+})
+
+tape(&#039;should not follow delete redirects even if followredirect is set to true&#039;, function(t) {
+  hits = {}
+  request.del(s.url + &#039;/temp&#039;, {
+    followRedirect: true,
+    jar: jar,
+    headers: { cookie: &#039;foo=bar&#039; }
+  }, function(err, res, body) {
+    t.equal(err, null)
+    t.equal(res.statusCode, 301)
+    t.ok(hits.temp, &#039;Original request is to /temp&#039;)
+    t.ok(!hits.temp_landing, &#039;No chasing the redirect when delete&#039;)
+    t.equal(res.statusCode, 301, &#039;Response is the bounce itself&#039;)
+    t.end()
+  })
+})
+
+tape(&#039;should follow delete redirects when followallredirects true&#039;, function(t) {
+  hits = {}
+  request.del(s.url + &#039;/temp&#039;, {
+    followAllRedirects: true,
+    jar: jar,
+    headers: { cookie: &#039;foo=bar&#039; }
+  }, function(err, res, body) {
+    t.equal(err, null)
+    t.equal(res.statusCode, 200)
+    t.ok(hits.temp, &#039;Original request is to /temp&#039;)
+    t.ok(hits.temp_landing, &#039;Forward to temporary landing URL&#039;)
+    t.equal(body, &#039;GET temp_landing&#039;, &#039;Got temporary landing content&#039;)
+    t.end()
+  })
+})
+
+tape(&#039;should follow 307 delete redirects when followallredirects true&#039;, function(t) {
+  hits = {}
+  request.del(s.url + &#039;/fwd&#039;, {
+    followAllRedirects: true,
+    jar: jar,
+    headers: { cookie: &#039;foo=bar&#039; }
+  }, function(err, res, body) {
+    t.equal(err, null)
+    t.equal(res.statusCode, 200)
+    t.ok(hits.fwd, &#039;Original request is to /fwd&#039;)
+    t.ok(hits.fwd_landing, &#039;Forward to temporary landing URL&#039;)
+    t.equal(body, &#039;DELETE fwd_landing&#039;, &#039;Got temporary landing content&#039;)
+    t.end()
+  })
+})
+
+tape(&#039;double bounce&#039;, function(t) {
+  hits = {}
+  request({
+    uri: s.url + &#039;/double&#039;,
+    jar: jar,
+    headers: { cookie: &#039;foo=bar&#039; }
+  }, function(err, res, body) {
+    t.equal(err, null)
+    t.equal(res.statusCode, 200)
+    t.ok(hits.double, &#039;Original request is to /double&#039;)
+    t.ok(hits.double_2, &#039;Forward to temporary landing URL&#039;)
+    t.ok(hits.double_landing, &#039;Forward to landing URL&#039;)
+    t.equal(body, &#039;GET double_landing&#039;, &#039;Got temporary landing content&#039;)
+    t.end()
+  })
+})
+
+tape(&#039;double bounce terminated after first redirect&#039;, function(t) {
+  function filterDouble(response) {
+    return (response.headers.location || &#039;&#039;).indexOf(&#039;double_2&#039;) === -1
+  }
+
+  hits = {}
+  request({
+    uri: s.url + &#039;/double&#039;,
+    jar: jar,
+    headers: { cookie: &#039;foo=bar&#039; },
+    followRedirect: filterDouble
+  }, function(err, res, body) {
+    t.equal(err, null)
+    t.equal(res.statusCode, 301)
+    t.ok(hits.double, &#039;Original request is to /double&#039;)
+    t.equal(res.headers.location, s.url + &#039;/double_2&#039;, &#039;Current location should be &#039; + s.url + &#039;/double_2&#039;)
+    t.end()
+  })
+})
+
+tape(&#039;triple bounce terminated after second redirect&#039;, function(t) {
+  function filterTreble(response) {
+    return (response.headers.location || &#039;&#039;).indexOf(&#039;treble_3&#039;) === -1
+  }
+
+  hits = {}
+  request({
+    uri: s.url + &#039;/treble&#039;,
+    jar: jar,
+    headers: { cookie: &#039;foo=bar&#039; },
+    followRedirect: filterTreble
+  }, function(err, res, body) {
+    t.equal(err, null)
+    t.equal(res.statusCode, 301)
+    t.ok(hits.treble, &#039;Original request is to /treble&#039;)
+    t.equal(res.headers.location, s.url + &#039;/treble_3&#039;, &#039;Current location should be &#039; + s.url + &#039;/treble_3&#039;)
+    t.end()
+  })
+})
+
+tape(&#039;http to https redirect&#039;, function(t) {
+  hits = {}
+  request.get({
+    uri: require(&#039;url&#039;).parse(s.url + &#039;/ssl&#039;),
+    rejectUnauthorized: false
+  }, function(err, res, body) {
+    t.equal(err, null)
+    t.equal(res.statusCode, 200)
+    t.equal(body, &#039;SSL&#039;, &#039;Got SSL redirect&#039;)
+    t.end()
+  })
+})
+
+tape(&#039;cleanup&#039;, function(t) {
+  s.close()
+  ss.close()
+  t.end()
+})</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

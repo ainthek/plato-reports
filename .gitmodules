@@ -7,3 +7,9 @@
 [submodule "src/plato-ainthek"]
 	path = src/plato-ainthek
 	url = https://github.com/ainthek/plato.git
+[submodule "src/async"]
+	path = src/async
+	url = https://github.com/caolan/async.git
+[submodule "src/request"]
+	path = src/request
+	url = https://github.com/request/request.git

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - request/tests/test-oauth.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>request/tests/test-oauth.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">67.75</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">303</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">22.74</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.34</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">&#039;use strict&#039;
+
+var oauth = require(&#039;oauth-sign&#039;)
+  , qs = require(&#039;querystring&#039;)
+  , fs = require(&#039;fs&#039;)
+  , path = require(&#039;path&#039;)
+  , request = require(&#039;../index&#039;)
+  , tape = require(&#039;tape&#039;)
+
+function getSignature(r) {
+  var sign
+  r.headers.Authorization.slice(&#039;OAuth &#039;.length).replace(/,\ /g, &#039;,&#039;).split(&#039;,&#039;).forEach(function(v) {
+    if (v.slice(0, &#039;oauth_signature=&quot;&#039;.length) === &#039;oauth_signature=&quot;&#039;) {
+      sign = v.slice(&#039;oauth_signature=&quot;&#039;.length, -1)
+    }
+  })
+  return decodeURIComponent(sign)
+}
+
+// Tests from Twitter documentation https://dev.twitter.com/docs/auth/oauth
+
+var hmacsign = oauth.hmacsign
+  , rsasign = oauth.rsasign
+  , rsa_private_pem = fs.readFileSync(path.join(__dirname, &#039;ssl&#039;, &#039;test.key&#039;))
+  , reqsign
+  , reqsign_rsa
+  , accsign
+  , accsign_rsa
+  , upsign
+  , upsign_rsa
+
+tape(&#039;reqsign&#039;, function(t) {
+  reqsign = hmacsign(&#039;POST&#039;, &#039;https://api.twitter.com/oauth/request_token&#039;,
+    { oauth_callback: &#039;http://localhost:3005/the_dance/process_callback?service_provider_id=11&#039;
+    , oauth_consumer_key: &#039;GDdmIQH6jhtmLUypg82g&#039;
+    , oauth_nonce: &#039;QP70eNmVz8jvdPevU3oJD2AfF7R7odC2XJcn4XlZJqk&#039;
+    , oauth_signature_method: &#039;HMAC-SHA1&#039;
+    , oauth_timestamp: &#039;1272323042&#039;
+    , oauth_version: &#039;1.0&#039;
+    }, &#039;MCD8BKwGdgPHvAuvgvz4EQpqDAtx89grbuNMRd7Eh98&#039;)
+
+  t.equal(reqsign, &#039;8wUi7m5HFQy76nowoCThusfgB+Q=&#039;)
+  t.end()
+})
+
+tape(&#039;reqsign_rsa&#039;, function(t) {
+  reqsign_rsa = rsasign(&#039;POST&#039;, &#039;https://api.twitter.com/oauth/request_token&#039;,
+    { oauth_callback: &#039;http://localhost:3005/the_dance/process_callback?service_provider_id=11&#039;
+    , oauth_consumer_key: &#039;GDdmIQH6jhtmLUypg82g&#039;
+    , oauth_nonce: &#039;QP70eNmVz8jvdPevU3oJD2AfF7R7odC2XJcn4XlZJqk&#039;
+    , oauth_signature_method: &#039;RSA-SHA1&#039;
+    , oauth_timestamp: &#039;1272323042&#039;
+    , oauth_version: &#039;1.0&#039;
+    }, rsa_private_pem, &#039;this parameter is not used for RSA signing&#039;)
+
+  t.equal(reqsign_rsa, &#039;MXdzEnIrQco3ACPoVWxCwv5pxYrm5MFRXbsP3LfRV+zfcRr+WMp/dOPS/3r+Wcb+17Z2IK3uJ8dMHfzb5LiDNCTUIj7SWBrbxOpy3Y6SA6z3vcrtjSekkTHLek1j+mzxOi3r3fkbYaNwjHx3PyoFSazbEstnkQQotbITeFt5FBE=&#039;)
+  t.end()
+})
+
+tape(&#039;accsign&#039;, function(t) {
+  accsign = hmacsign(&#039;POST&#039;, &#039;https://api.twitter.com/oauth/access_token&#039;,
+    { oauth_consumer_key: &#039;GDdmIQH6jhtmLUypg82g&#039;
+    , oauth_nonce: &#039;9zWH6qe0qG7Lc1telCn7FhUbLyVdjEaL3MO5uHxn8&#039;
+    , oauth_signature_method: &#039;HMAC-SHA1&#039;
+    , oauth_token: &#039;8ldIZyxQeVrFZXFOZH5tAwj6vzJYuLQpl0WUEYtWc&#039;
+    , oauth_timestamp: &#039;1272323047&#039;
+    , oauth_verifier: &#039;pDNg57prOHapMbhv25RNf75lVRd6JDsni1AJJIDYoTY&#039;
+    , oauth_version: &#039;1.0&#039;
+    }, &#039;MCD8BKwGdgPHvAuvgvz4EQpqDAtx89grbuNMRd7Eh98&#039;, &#039;x6qpRnlEmW9JbQn4PQVVeVG8ZLPEx6A0TOebgwcuA&#039;)
+
+  t.equal(accsign, &#039;PUw/dHA4fnlJYM6RhXk5IU/0fCc=&#039;)
+  t.end()
+})
+
+tape(&#039;accsign_rsa&#039;, function(t) {
+  accsign_rsa = rsasign(&#039;POST&#039;, &#039;https://api.twitter.com/oauth/access_token&#039;,
+    { oauth_consumer_key: &#039;GDdmIQH6jhtmLUypg82g&#039;
+    , oauth_nonce: &#039;9zWH6qe0qG7Lc1telCn7FhUbLyVdjEaL3MO5uHxn8&#039;
+    , oauth_signature_method: &#039;RSA-SHA1&#039;
+    , oauth_token: &#039;8ldIZyxQeVrFZXFOZH5tAwj6vzJYuLQpl0WUEYtWc&#039;
+    , oauth_timestamp: &#039;1272323047&#039;
+    , oauth_verifier: &#039;pDNg57prOHapMbhv25RNf75lVRd6JDsni1AJJIDYoTY&#039;
+    , oauth_version: &#039;1.0&#039;
+    }, rsa_private_pem)
+
+  t.equal(accsign_rsa, &#039;gZrMPexdgGMVUl9H6RxK0MbR6Db8tzf2kIIj52kOrDFcMgh4BunMBgUZAO1msUwz6oqZIvkVqyfyDAOP2wIrpYem0mBg3vqwPIroSE1AlUWo+TtQxOTuqrU+3kDcXpdvJe7CAX5hUx9Np/iGRqaCcgByqb9DaCcQ9ViQ+0wJiXI=&#039;)
+  t.end()
+})
+
+tape(&#039;upsign&#039;, function(t) {
+  upsign = hmacsign(&#039;POST&#039;, &#039;http://api.twitter.com/1/statuses/update.json&#039;,
+    { oauth_consumer_key: &#039;GDdmIQH6jhtmLUypg82g&#039;
+    , oauth_nonce: &#039;oElnnMTQIZvqvlfXM56aBLAf5noGD0AQR3Fmi7Q6Y&#039;
+    , oauth_signature_method: &#039;HMAC-SHA1&#039;
+    , oauth_token: &#039;819797-Jxq8aYUDRmykzVKrgoLhXSq67TEa5ruc4GJC2rWimw&#039;
+    , oauth_timestamp: &#039;1272325550&#039;
+    , oauth_version: &#039;1.0&#039;
+    , status: &#039;setting up my twitter 私のさえずりを設定する&#039;
+    }, &#039;MCD8BKwGdgPHvAuvgvz4EQpqDAtx89grbuNMRd7Eh98&#039;, &#039;J6zix3FfA9LofH0awS24M3HcBYXO5nI1iYe8EfBA&#039;)
+
+  t.equal(upsign, &#039;yOahq5m0YjDDjfjxHaXEsW9D+X0=&#039;)
+  t.end()
+})
+
+tape(&#039;upsign_rsa&#039;, function(t) {
+  upsign_rsa = rsasign(&#039;POST&#039;, &#039;http://api.twitter.com/1/statuses/update.json&#039;,
+    { oauth_consumer_key: &#039;GDdmIQH6jhtmLUypg82g&#039;
+    , oauth_nonce: &#039;oElnnMTQIZvqvlfXM56aBLAf5noGD0AQR3Fmi7Q6Y&#039;
+    , oauth_signature_method: &#039;RSA-SHA1&#039;
+    , oauth_token: &#039;819797-Jxq8aYUDRmykzVKrgoLhXSq67TEa5ruc4GJC2rWimw&#039;
+    , oauth_timestamp: &#039;1272325550&#039;
+    , oauth_version: &#039;1.0&#039;
+    , status: &#039;setting up my twitter 私のさえずりを設定する&#039;
+    }, rsa_private_pem)
+
+  t.equal(upsign_rsa, &#039;fF4G9BNzDxPu/htctzh9CWzGhtXo9DYYl+ZyRO1/QNOhOZPqnWVUOT+CGUKxmAeJSzLKMAH8y/MFSHI0lzihqwgfZr7nUhTx6kH7lUChcVasr+TZ4qPqvGGEhfJ8Av8D5dF5fytfCSzct62uONU0iHYVqainP+zefk1K7Ptb6hI=&#039;)
+  t.end()
+})
+
+tape(&#039;rsign&#039;, function(t) {
+  var rsign = request.post(
+    { url: &#039;https://api.twitter.com/oauth/request_token&#039;
+    , oauth:
+      { callback: &#039;http://localhost:3005/the_dance/process_callback?service_provider_id=11&#039;
+      , consumer_key: &#039;GDdmIQH6jhtmLUypg82g&#039;
+      , nonce: &#039;QP70eNmVz8jvdPevU3oJD2AfF7R7odC2XJcn4XlZJqk&#039;
+      , timestamp: &#039;1272323042&#039;
+      , version: &#039;1.0&#039;
+      , consumer_secret: &#039;MCD8BKwGdgPHvAuvgvz4EQpqDAtx89grbuNMRd7Eh98&#039;
+      }
+    })
+
+  process.nextTick(function() {
+    t.equal(reqsign, getSignature(rsign))
+    rsign.abort()
+    t.end()
+  })
+})
+
+tape(&#039;rsign_rsa&#039;, function(t) {
+  var rsign_rsa = request.post(
+    { url: &#039;https://api.twitter.com/oauth/request_token&#039;
+    , oauth:
+      { callback: &#039;http://localhost:3005/the_dance/process_callback?service_provider_id=11&#039;
+      , consumer_key: &#039;GDdmIQH6jhtmLUypg82g&#039;
+      , nonce: &#039;QP70eNmVz8jvdPevU3oJD2AfF7R7odC2XJcn4XlZJqk&#039;
+      , timestamp: &#039;1272323042&#039;
+      , version: &#039;1.0&#039;
+      , private_key: rsa_private_pem
+      , signature_method: &#039;RSA-SHA1&#039;
+      }
+    })
+
+  process.nextTick(function() {
+    t.equal(reqsign_rsa, getSignature(rsign_rsa))
+    rsign_rsa.abort()
+    t.end()
+  })
+})
+
+tape(&#039;raccsign&#039;, function(t) {
+  var raccsign = request.post(
+    { url: &#039;https://api.twitter.com/oauth/access_token&#039;
+    , oauth:
+      { consumer_key: &#039;GDdmIQH6jhtmLUypg82g&#039;
+      , nonce: &#039;9zWH6qe0qG7Lc1telCn7FhUbLyVdjEaL3MO5uHxn8&#039;
+      , signature_method: &#039;HMAC-SHA1&#039;
+      , token: &#039;8ldIZyxQeVrFZXFOZH5tAwj6vzJYuLQpl0WUEYtWc&#039;
+      , timestamp: &#039;1272323047&#039;
+      , verifier: &#039;pDNg57prOHapMbhv25RNf75lVRd6JDsni1AJJIDYoTY&#039;
+      , version: &#039;1.0&#039;
+      , consumer_secret: &#039;MCD8BKwGdgPHvAuvgvz4EQpqDAtx89grbuNMRd7Eh98&#039;
+      , token_secret: &#039;x6qpRnlEmW9JbQn4PQVVeVG8ZLPEx6A0TOebgwcuA&#039;
+      }
+    })
+
+  process.nextTick(function() {
+    t.equal(accsign, getSignature(raccsign))
+    raccsign.abort()
+    t.end()
+  })
+})
+
+tape(&#039;raccsign_rsa&#039;, function(t) {
+  var raccsign_rsa = request.post(
+    { url: &#039;https://api.twitter.com/oauth/access_token&#039;
+    , oauth:
+      { consumer_key: &#039;GDdmIQH6jhtmLUypg82g&#039;
+      , nonce: &#039;9zWH6qe0qG7Lc1telCn7FhUbLyVdjEaL3MO5uHxn8&#039;
+      , signature_method: &#039;RSA-SHA1&#039;
+      , token: &#039;8ldIZyxQeVrFZXFOZH5tAwj6vzJYuLQpl0WUEYtWc&#039;
+      , timestamp: &#039;1272323047&#039;
+      , verifier: &#039;pDNg57prOHapMbhv25RNf75lVRd6JDsni1AJJIDYoTY&#039;
+      , version: &#039;1.0&#039;
+      , private_key: rsa_private_pem
+      , token_secret: &#039;x6qpRnlEmW9JbQn4PQVVeVG8ZLPEx6A0TOebgwcuA&#039;
+      }
+    })
+
+  process.nextTick(function() {
+    t.equal(accsign_rsa, getSignature(raccsign_rsa))
+    raccsign_rsa.abort()
+    t.end()
+  })
+})
+
+tape(&#039;rupsign&#039;, function(t) {
+  var rupsign = request.post(
+    { url: &#039;http://api.twitter.com/1/statuses/update.json&#039;
+    , oauth:
+      { consumer_key: &#039;GDdmIQH6jhtmLUypg82g&#039;
+      , nonce: &#039;oElnnMTQIZvqvlfXM56aBLAf5noGD0AQR3Fmi7Q6Y&#039;
+      , signature_method: &#039;HMAC-SHA1&#039;
+      , token: &#039;819797-Jxq8aYUDRmykzVKrgoLhXSq67TEa5ruc4GJC2rWimw&#039;
+      , timestamp: &#039;1272325550&#039;
+      , version: &#039;1.0&#039;
+      , consumer_secret: &#039;MCD8BKwGdgPHvAuvgvz4EQpqDAtx89grbuNMRd7Eh98&#039;
+      , token_secret: &#039;J6zix3FfA9LofH0awS24M3HcBYXO5nI1iYe8EfBA&#039;
+      }
+    , form: {status: &#039;setting up my twitter 私のさえずりを設定する&#039;}
+    })
+  process.nextTick(function() {
+    t.equal(upsign, getSignature(rupsign))
+    rupsign.abort()
+    t.end()
+  })
+})
+
+tape(&#039;rupsign_rsa&#039;, function(t) {
+  var rupsign_rsa = request.post(
+    { url: &#039;http://api.twitter.com/1/statuses/update.json&#039;
+    , oauth:
+      { consumer_key: &#039;GDdmIQH6jhtmLUypg82g&#039;
+      , nonce: &#039;oElnnMTQIZvqvlfXM56aBLAf5noGD0AQR3Fmi7Q6Y&#039;
+      , signature_method: &#039;RSA-SHA1&#039;
+      , token: &#039;819797-Jxq8aYUDRmykzVKrgoLhXSq67TEa5ruc4GJC2rWimw&#039;
+      , timestamp: &#039;1272325550&#039;
+      , version: &#039;1.0&#039;
+      , private_key: rsa_private_pem
+      , token_secret: &#039;J6zix3FfA9LofH0awS24M3HcBYXO5nI1iYe8EfBA&#039;
+      }
+    , form: {status: &#039;setting up my twitter 私のさえずりを設定する&#039;}
+    })
+  process.nextTick(function() {
+    t.equal(upsign_rsa, getSignature(rupsign_rsa))
+    rupsign_rsa.abort()
+    t.end()
+  })
+})
+
+tape(&#039;rfc5849 example&#039;, function(t) {
+  var rfc5849 = request.post(
+    { url: &#039;http://example.com/request?b5=%3D%253D&amp;a3=a&amp;c%40=&amp;a2=r%20b&#039;
+    , oauth:
+      { consumer_key: &#039;9djdj82h48djs9d2&#039;
+      , nonce: &#039;7d8f3e4a&#039;
+      , signature_method: &#039;HMAC-SHA1&#039;
+      , token: &#039;kkk9d7dh3k39sjv7&#039;
+      , timestamp: &#039;137131201&#039;
+      , consumer_secret: &#039;j49sk3j29djd&#039;
+      , token_secret: &#039;dh893hdasih9&#039;
+      , realm: &#039;Example&#039;
+      }
+    , form: {
+        c2: &#039;&#039;,
+        a3: &#039;2 q&#039;
+      }
+    })
+
+  process.nextTick(function() {
+    // different signature in rfc5849 because request sets oauth_version by default
+    t.equal(&#039;OB33pYjWAnf+xtOHN4Gmbdil168=&#039;, getSignature(rfc5849))
+    rfc5849.abort()
+    t.end()
+  })
+})
+
+tape(&#039;rfc5849 RSA example&#039;, function(t) {
+  var rfc5849_rsa = request.post(
+    { url: &#039;http://example.com/request?b5=%3D%253D&amp;a3=a&amp;c%40=&amp;a2=r%20b&#039;
+    , oauth:
+      { consumer_key: &#039;9djdj82h48djs9d2&#039;
+      , nonce: &#039;7d8f3e4a&#039;
+      , signature_method: &#039;RSA-SHA1&#039;
+      , token: &#039;kkk9d7dh3k39sjv7&#039;
+      , timestamp: &#039;137131201&#039;
+      , private_key: rsa_private_pem
+      , token_secret: &#039;dh893hdasih9&#039;
+      , realm: &#039;Example&#039;
+      }
+    , form: {
+        c2: &#039;&#039;,
+        a3: &#039;2 q&#039;
+      }
+    })
+
+  process.nextTick(function() {
+    // different signature in rfc5849 because request sets oauth_version by default
+    t.equal(&#039;ThNYfZhYogcAU6rWgI3ZFlPEhoIXHMZcuMzl+jykJZW/ab+AxyefS03dyd64CclIZ0u8JEW64TQ5SHthoQS8aM8qir4t+t88lRF3LDkD2KtS1krgCZTUQxkDL5BO5pxsqAQ2Zfdcrzaxb6VMGD1Hf+Pno+fsHQo/UUKjq4V3RMo=&#039;, getSignature(rfc5849_rsa))
+    rfc5849_rsa.abort()
+    t.end()
+  })
+})</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

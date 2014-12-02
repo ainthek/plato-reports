@@ -10,12 +10,12 @@ HOWEVER whole this is WRONG, since I'm comparing node_modules JS files (often me
 Will download sources from github for each project soon and analyze those.
 
 
-| package | downloads |avg.maint | total.sloc | version | description | links |
-|-------|--------:|--------:|---------:|-------|--------|-------------| ------| 
-| async | 6186458 | 74.32|1114 | 0.9.0|Higher-order functions and common patterns for asynchronous code  | [report](http://htmlpreview.github.io/?https://github.com/ainthek/plato-reports/blob/master/reports/async/index.html), [npm](https://www.npmjs.org/package/async) |
+|package|downloads|avg.maint|total.sloc|version|description|links|
+|-------|--------:|--------:|---------:|-------|-----------|-----|
+| async | 6186458 | 75.29|6244 | 0.9.0|Higher-order functions and common patterns for asynchronous code  | [report](http://htmlpreview.github.io/?https://github.com/ainthek/plato-reports/blob/master/reports/async/index.html), [npm](https://www.npmjs.org/package/async) |
 | glob | 5669048 | 58.95|1187 | 4.3.1|a little globber  | [report](http://htmlpreview.github.io/?https://github.com/ainthek/plato-reports/blob/master/reports/glob/index.html), [npm](https://www.npmjs.org/package/glob) |
 | minimatch | 5606466 | 67.82|2755 | 2.0.1|a glob matcher in javascript  | [report](http://htmlpreview.github.io/?https://github.com/ainthek/plato-reports/blob/master/reports/minimatch/index.html), [npm](https://www.npmjs.org/package/minimatch) |
-| request | 5276601 | 75.37|2077 | 2.49.0|Simplified HTTP request client.  | [report](http://htmlpreview.github.io/?https://github.com/ainthek/plato-reports/blob/master/reports/request/index.html), [npm](https://www.npmjs.org/package/request) |
+| request | 5276601 | 76.20|6948 | 2.49.0|Simplified HTTP request client.  | [report](http://htmlpreview.github.io/?https://github.com/ainthek/plato-reports/blob/master/reports/request/index.html), [npm](https://www.npmjs.org/package/request) |
 | readable-stream | 4754553 | 79.20|1564 | 1.0.33|Streams2, a user-land copy of the stream library from Node.js v0.10.x  | [report](http://htmlpreview.github.io/?https://github.com/ainthek/plato-reports/blob/master/reports/readable-stream/index.html), [npm](https://www.npmjs.org/package/readable-stream) |
 | graceful-fs | 4583813 | 75.25|590 | 3.0.5|A drop-in replacement for fs, making various improvements.  | [report](http://htmlpreview.github.io/?https://github.com/ainthek/plato-reports/blob/master/reports/graceful-fs/index.html), [npm](https://www.npmjs.org/package/graceful-fs) |
 | lru-cache | 4076837 | 65.15|721 | 2.5.0|A cache object that deletes the least-recently-used items.  | [report](http://htmlpreview.github.io/?https://github.com/ainthek/plato-reports/blob/master/reports/lru-cache/index.html), [npm](https://www.npmjs.org/package/lru-cache) |

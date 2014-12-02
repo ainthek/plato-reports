@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - request/tests/test-http-signature.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>request/tests/test-http-signature.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">78.27</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">108</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">8.90</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.68</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">&#039;use strict&#039;
+
+var http = require(&#039;http&#039;)
+  , request = require(&#039;../index&#039;)
+  , httpSignature = require(&#039;http-signature&#039;)
+  , tape = require(&#039;tape&#039;)
+
+var privateKeyPEMs = {}
+
+privateKeyPEMs[&#039;key-1&#039;] =
+  &#039;-----BEGIN RSA PRIVATE KEY-----\n&#039; +
+  &#039;MIIEpAIBAAKCAQEAzWSJl+Z9Bqv00FVL5N3+JCUoqmQPjIlya1BbeqQroNQ5yG1i\n&#039; +
+  &#039;VbYTTnMRa1zQtR6r2fNvWeg94DvxivxIG9diDMnrzijAnYlTLOl84CK2vOxkj5b6\n&#039; +
+  &#039;8zrLH9b/Gd6NOHsywo8IjvXvCeTfca5WUHcuVi2lT9VjygFs1ILG4RyeX1BXUumu\n&#039; +
+  &#039;Y8fzmposxLYdMxCqUTzAn0u9Saq2H2OVj5u114wS7OQPigu6G99dpn/iPHa3zBm8\n&#039; +
+  &#039;7baBWDbqZWRW0BP3K6eqq8sut1+NLhNW8ADPTdnO/SO+kvXy7fqd8atSn+HlQcx6\n&#039; +
+  &#039;tW42dhXf3E9uE7K78eZtW0KvfyNGAjsI1Fft2QIDAQABAoIBAG1exe3/LEBrPLfb\n&#039; +
+  &#039;U8iRdY0lxFvHYIhDgIwohC3wUdMYb5SMurpNdEZn+7Sh/fkUVgp/GKJViu1mvh52\n&#039; +
+  &#039;bKd2r52DwG9NQBQjVgkqY/auRYSglIPpr8PpYNSZlcneunCDGeqEY9hMmXc5Ssqs\n&#039; +
+  &#039;PQYoEKKPN+IlDTg6PguDgAfLR4IUvt9KXVvmB/SSgV9tSeTy35LECt1Lq3ozbUgu\n&#039; +
+  &#039;30HZI3U6/7H+X22Pxxf8vzBtzkg5rRCLgv+OeNPo16xMnqbutt4TeqEkxRv5rtOo\n&#039; +
+  &#039;/A1i9khBeki0OJAFJsE82qnaSZodaRsxic59VnN8sWBwEKAt87tEu5A3K3j4XSDU\n&#039; +
+  &#039;/avZxAECgYEA+pS3DvpiQLtHlaO3nAH6MxHRrREOARXWRDe5nUQuUNpS1xq9wte6\n&#039; +
+  &#039;DkFtba0UCvDLic08xvReTCbo9kH0y6zEy3zMpZuJlKbcWCkZf4S5miYPI0RTZtF8\n&#039; +
+  &#039;yps6hWqzYFSiO9hMYws9k4OJLxX0x3sLK7iNZ32ujcSrkPBSiBr0gxkCgYEA0dWl\n&#039; +
+  &#039;637K41AJ/zy0FP0syq+r4eIkfqv+/t6y2aQVUBvxJYrj9ci6XHBqoxpDV8lufVYj\n&#039; +
+  &#039;fUAfeI9/MZaWvQJRbnYLre0I6PJfLuCBIL5eflO77BGso165AF7QJZ+fwtgKv3zv\n&#039; +
+  &#039;ZX75eudCSS/cFo0po9hlbcLMT4B82zEkgT8E2MECgYEAnz+3/wrdOmpLGiyL2dff\n&#039; +
+  &#039;3GjsqmJ2VfY8z+niSrI0BSpbD11tT9Ct67VlCBjA7hsOH6uRfpd6/kaUMzzDiFVq\n&#039; +
+  &#039;VDAiFvV8QD6zNkwYalQ9aFvbrvwTTPrBpjl0vamMCiJ/YC0cjq1sGr2zh3sar1Ph\n&#039; +
+  &#039;S43kP+s97dcZeelhaiJHVrECgYEAsx61q/loJ/LDFeYzs1cLTVn4V7I7hQY9fkOM\n&#039; +
+  &#039;WM0AhInVqD6PqdfXfeFYpjJdGisQ7l0BnoGGW9vir+nkcyPvb2PFRIr6+B8tsU5j\n&#039; +
+  &#039;7BeVgjDoUfQkcrEBK5fEBtnj/ud9BUkY8oMZZBjVNLRuI7IMwZiPvMp0rcj4zAN/\n&#039; +
+  &#039;LfUlpgECgYArBvFcBxSkNAzR3Rtteud1YDboSKluRM37Ey5plrn4BS0DD0jm++aD\n&#039; +
+  &#039;0pG2Hsik000hibw92lCkzvvBVAqF8BuAcnPlAeYfsOaa97PGEjSKEN5bJVWZ9/om\n&#039; +
+  &#039;9FV1axotRN2XWlwrhixZLEaagkREXhgQc540FS5O8IaI2Vpa80Atzg==\n&#039; +
+  &#039;-----END RSA PRIVATE KEY-----&#039;
+
+var publicKeyPEMs = {}
+
+publicKeyPEMs[&#039;key-1&#039;] =
+  &#039;-----BEGIN PUBLIC KEY-----\n&#039; +
+  &#039;MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzWSJl+Z9Bqv00FVL5N3+\n&#039; +
+  &#039;JCUoqmQPjIlya1BbeqQroNQ5yG1iVbYTTnMRa1zQtR6r2fNvWeg94DvxivxIG9di\n&#039; +
+  &#039;DMnrzijAnYlTLOl84CK2vOxkj5b68zrLH9b/Gd6NOHsywo8IjvXvCeTfca5WUHcu\n&#039; +
+  &#039;Vi2lT9VjygFs1ILG4RyeX1BXUumuY8fzmposxLYdMxCqUTzAn0u9Saq2H2OVj5u1\n&#039; +
+  &#039;14wS7OQPigu6G99dpn/iPHa3zBm87baBWDbqZWRW0BP3K6eqq8sut1+NLhNW8ADP\n&#039; +
+  &#039;TdnO/SO+kvXy7fqd8atSn+HlQcx6tW42dhXf3E9uE7K78eZtW0KvfyNGAjsI1Fft\n&#039; +
+  &#039;2QIDAQAB\n&#039; +
+  &#039;-----END PUBLIC KEY-----&#039;
+
+publicKeyPEMs[&#039;key-2&#039;] =
+  &#039;-----BEGIN PUBLIC KEY-----\n&#039; +
+  &#039;MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqp04VVr9OThli9b35Omz\n&#039; +
+  &#039;VqSfWbsoQuRrgyWsrNRn3XkFmbWw4FzZwQ42OgGMzQ84Ta4d9zGKKQyFriTiPjPf\n&#039; +
+  &#039;xhhrsaJnDuybcpVhcr7UNKjSZ0S59tU3hpRiEz6hO+Nc/OSSLkvalG0VKrxOln7J\n&#039; +
+  &#039;LK/h3rNS/l6wDZ5S/KqsI6CYtV2ZLpn3ahLrizvEYNY038Qcm38qMWx+VJAvZ4di\n&#039; +
+  &#039;qqmW7RLIsLT59SWmpXdhFKnkYYGhxrk1Mwl22dBTJNY5SbriU5G3gWgzYkm8pgHr\n&#039; +
+  &#039;6CtrXch9ciJAcDJehPrKXNvNDOdUh8EW3fekNJerF1lWcwQg44/12v8sDPyfbaKB\n&#039; +
+  &#039;dQIDAQAB\n&#039; +
+  &#039;-----END PUBLIC KEY-----&#039;
+
+var server = http.createServer(function (req, res) {
+  var parsed = httpSignature.parseRequest(req)
+  var publicKeyPEM = publicKeyPEMs[parsed.keyId]
+  var verified = httpSignature.verifySignature(parsed, publicKeyPEM)
+  res.writeHead(verified ? 200 : 400)
+  res.end()
+})
+
+tape(&#039;setup&#039;, function(t) {
+  server.listen(6767, function() {
+    t.end()
+  })
+})
+
+tape(&#039;correct key&#039;, function(t) {
+  var options = {
+    httpSignature: {
+      keyId: &#039;key-1&#039;,
+      key: privateKeyPEMs[&#039;key-1&#039;]
+    }
+  }
+  request(&#039;http://localhost:6767&#039;, options, function(err, res, body) {
+    t.equal(err, null)
+    t.equal(200, res.statusCode)
+    t.end()
+  })
+})
+
+tape(&#039;incorrect key&#039;, function(t) {
+  var options = {
+    httpSignature: {
+      keyId: &#039;key-2&#039;,
+      key: privateKeyPEMs[&#039;key-1&#039;]
+    }
+  }
+  request(&#039;http://localhost:6767&#039;, options, function(err, res, body) {
+    t.equal(err, null)
+    t.equal(400, res.statusCode)
+    t.end()
+  })
+})
+
+tape(&#039;cleanup&#039;, function(t) {
+  server.close()
+  t.end()
+})</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

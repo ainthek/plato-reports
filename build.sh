@@ -1,15 +1,20 @@
 # private use ;-) not met to be run by someone else, somewhere else
-# super slow. will optimize and polish
+# super slow. will optimize and polish, sorry for cats...;-)
+
+from_sources=$(cat <<END
+dojo
+plato
+async
+request
+END)
 
 build_reports(){
 	pushd src >/dev/null	
 
 	(
-	# projects	
-	echo "dojo"
-	echo "plato"	
-	# node modules
-	ls -1 -d node_modules/*
+	echo "$from_sources"	
+	# node modules except thos built from sources
+	ls -1 -d node_modules/* | grep -v -F "$from_sources"
 	) |\
 	while read module_path
 	do
