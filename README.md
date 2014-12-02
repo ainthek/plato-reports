@@ -8,7 +8,7 @@ interesting to compare download popularity and reports statistics
 
 
 | package | downloads |avg.maint | total.sloc | version | description | links |
-|-------|--------:|--------:|---------:|-|-|-|
+|-------|--------:|--------:|---------:|-------|--------|-------------| ------| 
 | async | 6186458 | 74.32|1114 | 0.9.0|Higher-order functions and common patterns for asynchronous code  | [report](http://htmlpreview.github.io/?https://github.com/ainthek/plato-reports/blob/master/reports/async/index.html), [npm](https://www.npmjs.org/package/async) |
 | glob | 5669048 | 58.95|1187 | 4.3.1|a little globber  | [report](http://htmlpreview.github.io/?https://github.com/ainthek/plato-reports/blob/master/reports/glob/index.html), [npm](https://www.npmjs.org/package/glob) |
 | minimatch | 5606466 | 67.82|2755 | 2.0.1|a glob matcher in javascript  | [report](http://htmlpreview.github.io/?https://github.com/ainthek/plato-reports/blob/master/reports/minimatch/index.html), [npm](https://www.npmjs.org/package/minimatch) |
