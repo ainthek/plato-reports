@@ -7,9 +7,9 @@ just playground for plato js, reports for selected node modules and libraries
 interesting to compare download popularity and reports statistics
 
 
-| package | downloads |avg.maint | total.sloc | version | description | links |
-|-------|--------:|--------:|---------:|-|-|-|
-|a|a|a|a|a|a|a|
+| package | downloads |avg.maint | total.sloc | version | description |
+|-------|--------:|--------:|---------:|-|-|
+|a|a|a|a|a|a|
 
 
 
