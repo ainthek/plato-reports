@@ -8,7 +8,7 @@ interesting to compare download popularity and reports statistics
 
 
 | package | downloads |avg.maint | total.sloc | version |
-|-------|--------:|--------:|---------:|:- |
+|-------|--------:|--------:|---------:|---------:|
 |a|a|a|a|a|
 
 
