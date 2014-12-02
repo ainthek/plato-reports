@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/_base/array.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/_base/array.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">59.51</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">350</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">83.07</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.30</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([&quot;./kernel&quot;, &quot;../has&quot;, &quot;./lang&quot;], function(dojo, has, lang){
+	// module:
+	//		dojo/_base/array
+
+	// our old simple function builder stuff
+	var cache = {}, u;
+
+	function buildFn(fn){
+		return cache[fn] = new Function(&quot;item&quot;, &quot;index&quot;, &quot;array&quot;, fn); // Function
+	}
+	// magic snippet: if(typeof fn == &quot;string&quot;) fn = cache[fn] || buildFn(fn);
+
+	// every &amp; some
+
+	function everyOrSome(some){
+		var every = !some;
+		return function(a, fn, o){
+			var i = 0, l = a &amp;&amp; a.length || 0, result;
+			if(l &amp;&amp; typeof a == &quot;string&quot;) a = a.split(&quot;&quot;);
+			if(typeof fn == &quot;string&quot;) fn = cache[fn] || buildFn(fn);
+			if(o){
+				for(; i &lt; l; ++i){
+					result = !fn.call(o, a[i], i, a);
+					if(some ^ result){
+						return !result;
+					}
+				}
+			}else{
+				for(; i &lt; l; ++i){
+					result = !fn(a[i], i, a);
+					if(some ^ result){
+						return !result;
+					}
+				}
+			}
+			return every; // Boolean
+		};
+	}
+
+	// indexOf, lastIndexOf
+
+	function index(up){
+		var delta = 1, lOver = 0, uOver = 0;
+		if(!up){
+			delta = lOver = uOver = -1;
+		}
+		return function(a, x, from, last){
+			if(last &amp;&amp; delta &gt; 0){
+				// TODO: why do we use a non-standard signature? why do we need &quot;last&quot;?
+				return array.lastIndexOf(a, x, from);
+			}
+			var l = a &amp;&amp; a.length || 0, end = up ? l + uOver : lOver, i;
+			if(from === u){
+				i = up ? lOver : l + uOver;
+			}else{
+				if(from &lt; 0){
+					i = l + from;
+					if(i &lt; 0){
+						i = lOver;
+					}
+				}else{
+					i = from &gt;= l ? l + uOver : from;
+				}
+			}
+			if(l &amp;&amp; typeof a == &quot;string&quot;) a = a.split(&quot;&quot;);
+			for(; i != end; i += delta){
+				if(a[i] == x){
+					return i; // Number
+				}
+			}
+			return -1; // Number
+		};
+	}
+
+	var array = {
+		// summary:
+		//		The Javascript v1.6 array extensions.
+
+		every: everyOrSome(false),
+		/*=====
+		 every: function(arr, callback, thisObject){
+			 // summary:
+			 //		Determines whether or not every item in arr satisfies the
+			 //		condition implemented by callback.
+			 // arr: Array|String
+			 //		the array to iterate on. If a string, operates on individual characters.
+			 // callback: Function|String
+			 //		a function is invoked with three arguments: item, index,
+			 //		and array and returns true if the condition is met.
+			 // thisObject: Object?
+			 //		may be used to scope the call to callback
+			 // returns: Boolean
+			 // description:
+			 //		This function corresponds to the JavaScript 1.6 Array.every() method, with one difference: when
+			 //		run over sparse arrays, this implementation passes the &quot;holes&quot; in the sparse array to
+			 //		the callback function with a value of undefined. JavaScript 1.6&#039;s every skips the holes in the sparse array.
+			 //		For more details, see:
+			 //		https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Objects/Array/every
+			 // example:
+			 //	|	// returns false
+			 //	|	array.every([1, 2, 3, 4], function(item){ return item&gt;1; });
+			 // example:
+			 //	|	// returns true
+			 //	|	array.every([1, 2, 3, 4], function(item){ return item&gt;0; });
+		 },
+		 =====*/
+
+		some: everyOrSome(true),
+		/*=====
+		some: function(arr, callback, thisObject){
+			// summary:
+			//		Determines whether or not any item in arr satisfies the
+			//		condition implemented by callback.
+			// arr: Array|String
+			//		the array to iterate over. If a string, operates on individual characters.
+			// callback: Function|String
+			//		a function is invoked with three arguments: item, index,
+			//		and array and returns true if the condition is met.
+			// thisObject: Object?
+			//		may be used to scope the call to callback
+			// returns: Boolean
+			// description:
+			//		This function corresponds to the JavaScript 1.6 Array.some() method, with one difference: when
+			//		run over sparse arrays, this implementation passes the &quot;holes&quot; in the sparse array to
+			//		the callback function with a value of undefined. JavaScript 1.6&#039;s some skips the holes in the sparse array.
+			//		For more details, see:
+			//		https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Objects/Array/some
+			// example:
+			//	| // is true
+			//	| array.some([1, 2, 3, 4], function(item){ return item&gt;1; });
+			// example:
+			//	| // is false
+			//	| array.some([1, 2, 3, 4], function(item){ return item&lt;1; });
+		},
+		=====*/
+
+		indexOf: index(true),
+		/*=====
+		indexOf: function(arr, value, fromIndex, findLast){
+			// summary:
+			//		locates the first index of the provided value in the
+			//		passed array. If the value is not found, -1 is returned.
+			// description:
+			//		This method corresponds to the JavaScript 1.6 Array.indexOf method, with two differences:
+			//
+			//		1. when run over sparse arrays, the Dojo function invokes the callback for every index
+			//		   whereas JavaScript 1.6&#039;s indexOf skips the holes in the sparse array.
+			//		2. uses equality (==) rather than strict equality (===)
+			//
+			//		For details on this method, see:
+			//		https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Objects/Array/indexOf
+			// arr: Array
+			// value: Object
+			// fromIndex: Integer?
+			// findLast: Boolean?
+			//		Makes indexOf() work like lastIndexOf().  Used internally; not meant for external usage.
+			// returns: Number
+		},
+		=====*/
+
+		lastIndexOf: index(false),
+		/*=====
+		lastIndexOf: function(arr, value, fromIndex){
+			// summary:
+			//		locates the last index of the provided value in the passed
+			//		array. If the value is not found, -1 is returned.
+			// description:
+		 	//		This method corresponds to the JavaScript 1.6 Array.lastIndexOf method, with two differences:
+		 	//
+		 	//		1. when run over sparse arrays, the Dojo function invokes the callback for every index
+		 	//		   whereas JavaScript 1.6&#039;s lasIndexOf skips the holes in the sparse array.
+		 	//		2. uses equality (==) rather than strict equality (===)
+		 	//
+		 	//		For details on this method, see:
+		 	//		https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Objects/Array/lastIndexOf
+			// arr: Array,
+			// value: Object,
+			// fromIndex: Integer?
+			// returns: Number
+		},
+		=====*/
+
+		forEach: function(arr, callback, thisObject){
+			// summary:
+			//		for every item in arr, callback is invoked. Return values are ignored.
+			//		If you want to break out of the loop, consider using array.every() or array.some().
+			//		forEach does not allow breaking out of the loop over the items in arr.
+			// arr:
+			//		the array to iterate over. If a string, operates on individual characters.
+			// callback:
+			//		a function is invoked with three arguments: item, index, and array
+			// thisObject:
+			//		may be used to scope the call to callback
+			// description:
+			//		This function corresponds to the JavaScript 1.6 Array.forEach() method, with one difference: when
+			//		run over sparse arrays, this implementation passes the &quot;holes&quot; in the sparse array to
+			//		the callback function with a value of undefined. JavaScript 1.6&#039;s forEach skips the holes in the sparse array.
+			//		For more details, see:
+			//		https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Objects/Array/forEach
+			// example:
+			//	| // log out all members of the array:
+			//	| array.forEach(
+			//	|		[ &quot;thinger&quot;, &quot;blah&quot;, &quot;howdy&quot;, 10 ],
+			//	|		function(item){
+			//	|			console.log(item);
+			//	|		}
+			//	| );
+			// example:
+			//	| // log out the members and their indexes
+			//	| array.forEach(
+			//	|		[ &quot;thinger&quot;, &quot;blah&quot;, &quot;howdy&quot;, 10 ],
+			//	|		function(item, idx, arr){
+			//	|			console.log(item, &quot;at index:&quot;, idx);
+			//	|		}
+			//	| );
+			// example:
+			//	| // use a scoped object member as the callback
+			//	|
+			//	| var obj = {
+			//	|		prefix: &quot;logged via obj.callback:&quot;,
+			//	|		callback: function(item){
+			//	|			console.log(this.prefix, item);
+			//	|		}
+			//	| };
+			//	|
+			//	| // specifying the scope function executes the callback in that scope
+			//	| array.forEach(
+			//	|		[ &quot;thinger&quot;, &quot;blah&quot;, &quot;howdy&quot;, 10 ],
+			//	|		obj.callback,
+			//	|		obj
+			//	| );
+			//	|
+			//	| // alternately, we can accomplish the same thing with lang.hitch()
+			//	| array.forEach(
+			//	|		[ &quot;thinger&quot;, &quot;blah&quot;, &quot;howdy&quot;, 10 ],
+			//	|		lang.hitch(obj, &quot;callback&quot;)
+			//	| );
+			// arr: Array|String
+			// callback: Function|String
+			// thisObject: Object?
+
+			var i = 0, l = arr &amp;&amp; arr.length || 0;
+			if(l &amp;&amp; typeof arr == &quot;string&quot;) arr = arr.split(&quot;&quot;);
+			if(typeof callback == &quot;string&quot;) callback = cache[callback] || buildFn(callback);
+			if(thisObject){
+				for(; i &lt; l; ++i){
+					callback.call(thisObject, arr[i], i, arr);
+				}
+			}else{
+				for(; i &lt; l; ++i){
+					callback(arr[i], i, arr);
+				}
+			}
+		},
+
+		map: function(arr, callback, thisObject, Ctr){
+			// summary:
+			//		applies callback to each element of arr and returns
+			//		an Array with the results
+			// arr: Array|String
+			//		the array to iterate on. If a string, operates on
+			//		individual characters.
+			// callback: Function|String
+			//		a function is invoked with three arguments, (item, index,
+			//		array),	 and returns a value
+			// thisObject: Object?
+			//		may be used to scope the call to callback
+			// returns: Array
+			// description:
+			//		This function corresponds to the JavaScript 1.6 Array.map() method, with one difference: when
+			//		run over sparse arrays, this implementation passes the &quot;holes&quot; in the sparse array to
+			//		the callback function with a value of undefined. JavaScript 1.6&#039;s map skips the holes in the sparse array.
+			//		For more details, see:
+			//		https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Objects/Array/map
+			// example:
+			//	| // returns [2, 3, 4, 5]
+			//	| array.map([1, 2, 3, 4], function(item){ return item+1 });
+
+			// TODO: why do we have a non-standard signature here? do we need &quot;Ctr&quot;?
+			var i = 0, l = arr &amp;&amp; arr.length || 0, out = new (Ctr || Array)(l);
+			if(l &amp;&amp; typeof arr == &quot;string&quot;) arr = arr.split(&quot;&quot;);
+			if(typeof callback == &quot;string&quot;) callback = cache[callback] || buildFn(callback);
+			if(thisObject){
+				for(; i &lt; l; ++i){
+					out[i] = callback.call(thisObject, arr[i], i, arr);
+				}
+			}else{
+				for(; i &lt; l; ++i){
+					out[i] = callback(arr[i], i, arr);
+				}
+			}
+			return out; // Array
+		},
+
+		filter: function(arr, callback, thisObject){
+			// summary:
+			//		Returns a new Array with those items from arr that match the
+			//		condition implemented by callback.
+			// arr: Array
+			//		the array to iterate over.
+			// callback: Function|String
+			//		a function that is invoked with three arguments (item,
+			//		index, array). The return of this function is expected to
+			//		be a boolean which determines whether the passed-in item
+			//		will be included in the returned array.
+			// thisObject: Object?
+			//		may be used to scope the call to callback
+			// returns: Array
+			// description:
+			//		This function corresponds to the JavaScript 1.6 Array.filter() method, with one difference: when
+			//		run over sparse arrays, this implementation passes the &quot;holes&quot; in the sparse array to
+			//		the callback function with a value of undefined. JavaScript 1.6&#039;s filter skips the holes in the sparse array.
+			//		For more details, see:
+			//		https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Objects/Array/filter
+			// example:
+			//	| // returns [2, 3, 4]
+			//	| array.filter([1, 2, 3, 4], function(item){ return item&gt;1; });
+
+			// TODO: do we need &quot;Ctr&quot; here like in map()?
+			var i = 0, l = arr &amp;&amp; arr.length || 0, out = [], value;
+			if(l &amp;&amp; typeof arr == &quot;string&quot;) arr = arr.split(&quot;&quot;);
+			if(typeof callback == &quot;string&quot;) callback = cache[callback] || buildFn(callback);
+			if(thisObject){
+				for(; i &lt; l; ++i){
+					value = arr[i];
+					if(callback.call(thisObject, value, i, arr)){
+						out.push(value);
+					}
+				}
+			}else{
+				for(; i &lt; l; ++i){
+					value = arr[i];
+					if(callback(value, i, arr)){
+						out.push(value);
+					}
+				}
+			}
+			return out; // Array
+		},
+
+		clearCache: function(){
+			cache = {};
+		}
+	};
+
+
+	has(&quot;extend-dojo&quot;) &amp;&amp; lang.mixin(dojo, array);
+
+	return array;
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

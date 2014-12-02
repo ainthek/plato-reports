@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/_base/window.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/_base/window.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">65.39</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">134</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">20.30</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.56</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([&quot;./kernel&quot;, &quot;./lang&quot;, &quot;../sniff&quot;], function(dojo, lang, has){
+// module:
+//		dojo/_base/window
+
+var ret = {
+	// summary:
+	//		API to save/set/restore the global/document scope.
+
+	global: dojo.global,
+	/*=====
+	 global: {
+		 // summary:
+		 //		Alias for the current window. &#039;global&#039; can be modified
+		 //		for temporary context shifting. See also withGlobal().
+		 // description:
+		 //		Use this rather than referring to &#039;window&#039; to ensure your code runs
+		 //		correctly in managed contexts.
+	 },
+	 =====*/
+
+	doc: dojo.global[&quot;document&quot;] || null,
+	/*=====
+	doc: {
+		// summary:
+		//		Alias for the current document. &#039;doc&#039; can be modified
+		//		for temporary context shifting. See also withDoc().
+		// description:
+		//		Use this rather than referring to &#039;window.document&#039; to ensure your code runs
+		//		correctly in managed contexts.
+		// example:
+		//	|	n.appendChild(dojo.doc.createElement(&#039;div&#039;));
+	},
+	=====*/
+
+	body: function(/*Document?*/ doc){
+		// summary:
+		//		Return the body element of the specified document or of dojo/_base/window::doc.
+		// example:
+		//	|	win.body().appendChild(dojo.doc.createElement(&#039;div&#039;));
+
+		// Note: document.body is not defined for a strict xhtml document
+		// Would like to memoize this, but dojo.doc can change vi dojo.withDoc().
+		doc = doc || dojo.doc;
+		return doc.body || doc.getElementsByTagName(&quot;body&quot;)[0]; // Node
+	},
+
+	setContext: function(/*Object*/ globalObject, /*DocumentElement*/ globalDocument){
+		// summary:
+		//		changes the behavior of many core Dojo functions that deal with
+		//		namespace and DOM lookup, changing them to work in a new global
+		//		context (e.g., an iframe). The varibles dojo.global and dojo.doc
+		//		are modified as a result of calling this function and the result of
+		//		`dojo.body()` likewise differs.
+		dojo.global = ret.global = globalObject;
+		dojo.doc = ret.doc = globalDocument;
+	},
+
+	withGlobal: function(	/*Object*/ globalObject,
+							/*Function*/ callback,
+							/*Object?*/ thisObject,
+							/*Array?*/ cbArguments){
+		// summary:
+		//		Invoke callback with globalObject as dojo.global and
+		//		globalObject.document as dojo.doc.
+		// description:
+		//		Invoke callback with globalObject as dojo.global and
+		//		globalObject.document as dojo.doc. If provided, globalObject
+		//		will be executed in the context of object thisObject
+		//		When callback() returns or throws an error, the dojo.global
+		//		and dojo.doc will be restored to its previous state.
+
+		var oldGlob = dojo.global;
+		try{
+			dojo.global = ret.global = globalObject;
+			return ret.withDoc.call(null, globalObject.document, callback, thisObject, cbArguments);
+		}finally{
+			dojo.global = ret.global = oldGlob;
+		}
+	},
+
+	withDoc: function(	/*DocumentElement*/ documentObject,
+						/*Function*/ callback,
+						/*Object?*/ thisObject,
+						/*Array?*/ cbArguments){
+		// summary:
+		//		Invoke callback with documentObject as dojo/_base/window::doc.
+		// description:
+		//		Invoke callback with documentObject as dojo/_base/window::doc. If provided,
+		//		callback will be executed in the context of object thisObject
+		//		When callback() returns or throws an error, the dojo/_base/window::doc will
+		//		be restored to its previous state.
+
+		var oldDoc = ret.doc,
+			oldQ = has(&quot;quirks&quot;),
+			oldIE = has(&quot;ie&quot;), isIE, mode, pwin;
+
+		try{
+			dojo.doc = ret.doc = documentObject;
+			// update dojo.isQuirks and the value of the has feature &quot;quirks&quot;.
+			// remove setting dojo.isQuirks and dojo.isIE for 2.0
+			dojo.isQuirks = has.add(&quot;quirks&quot;, dojo.doc.compatMode == &quot;BackCompat&quot;, true, true); // no need to check for QuirksMode which was Opera 7 only
+
+			if(has(&quot;ie&quot;)){
+				if((pwin = documentObject.parentWindow) &amp;&amp; pwin.navigator){
+					// re-run IE detection logic and update dojo.isIE / has(&quot;ie&quot;)
+					// (the only time parentWindow/navigator wouldn&#039;t exist is if we were not
+					// passed an actual legitimate document object)
+					isIE = parseFloat(pwin.navigator.appVersion.split(&quot;MSIE &quot;)[1]) || undefined;
+					mode = documentObject.documentMode;
+					if(mode &amp;&amp; mode != 5 &amp;&amp; Math.floor(isIE) != mode){
+						isIE = mode;
+					}
+					dojo.isIE = has.add(&quot;ie&quot;, isIE, true, true);
+				}
+			}
+
+			if(thisObject &amp;&amp; typeof callback == &quot;string&quot;){
+				callback = thisObject[callback];
+			}
+
+			return callback.apply(thisObject, cbArguments || []);
+		}finally{
+			dojo.doc = ret.doc = oldDoc;
+			dojo.isQuirks = has.add(&quot;quirks&quot;, oldQ, true, true);
+			dojo.isIE = has.add(&quot;ie&quot;, oldIE, true, true);
+		}
+	}
+};
+
+has(&quot;extend-dojo&quot;) &amp;&amp; lang.mixin(dojo, ret);
+
+return ret;
+
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

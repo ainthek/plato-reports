@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/cldr/nls/tr/ethiopic.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/cldr/nls/tr/ethiopic.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">47.71</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">68</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">2.02</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.37</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define(
+//begin v1.x content
+{
+	&quot;field-sat-relative+0&quot;: &quot;bu cumartesi&quot;,
+	&quot;field-sat-relative+1&quot;: &quot;gelecek cumartesi&quot;,
+	&quot;field-dayperiod&quot;: &quot;ÖÖ/ÖS&quot;,
+	&quot;field-sun-relative+-1&quot;: &quot;geçen pazar&quot;,
+	&quot;field-mon-relative+-1&quot;: &quot;geçen pazartesi&quot;,
+	&quot;field-minute&quot;: &quot;Dakika&quot;,
+	&quot;field-day-relative+-1&quot;: &quot;dün&quot;,
+	&quot;field-weekday&quot;: &quot;Haftanın Günü&quot;,
+	&quot;field-day-relative+-2&quot;: &quot;evvelsi gün&quot;,
+	&quot;field-era&quot;: &quot;Miladi Dönem&quot;,
+	&quot;field-hour&quot;: &quot;Saat&quot;,
+	&quot;field-sun-relative+0&quot;: &quot;bu pazar&quot;,
+	&quot;field-sun-relative+1&quot;: &quot;gelecek pazar&quot;,
+	&quot;field-wed-relative+-1&quot;: &quot;geçen çarşamba&quot;,
+	&quot;field-day-relative+0&quot;: &quot;bugün&quot;,
+	&quot;field-day-relative+1&quot;: &quot;yarın&quot;,
+	&quot;field-day-relative+2&quot;: &quot;öbür gün&quot;,
+	&quot;field-tue-relative+0&quot;: &quot;bu salı&quot;,
+	&quot;field-zone&quot;: &quot;Saat Dilimi&quot;,
+	&quot;field-tue-relative+1&quot;: &quot;gelecek salı&quot;,
+	&quot;field-week-relative+-1&quot;: &quot;geçen hafta&quot;,
+	&quot;field-year-relative+0&quot;: &quot;bu yıl&quot;,
+	&quot;field-year-relative+1&quot;: &quot;gelecek yıl&quot;,
+	&quot;field-sat-relative+-1&quot;: &quot;geçen cumartesi&quot;,
+	&quot;field-year-relative+-1&quot;: &quot;geçen yıl&quot;,
+	&quot;field-year&quot;: &quot;Yıl&quot;,
+	&quot;field-fri-relative+0&quot;: &quot;bu cuma&quot;,
+	&quot;field-fri-relative+1&quot;: &quot;gelecek cuma&quot;,
+	&quot;field-week&quot;: &quot;Hafta&quot;,
+	&quot;field-week-relative+0&quot;: &quot;bu hafta&quot;,
+	&quot;field-week-relative+1&quot;: &quot;gelecek hafta&quot;,
+	&quot;field-month-relative+0&quot;: &quot;bu ay&quot;,
+	&quot;field-month&quot;: &quot;Ay&quot;,
+	&quot;field-month-relative+1&quot;: &quot;gelecek ay&quot;,
+	&quot;field-fri-relative+-1&quot;: &quot;geçen cuma&quot;,
+	&quot;field-second&quot;: &quot;Saniye&quot;,
+	&quot;field-tue-relative+-1&quot;: &quot;geçen salı&quot;,
+	&quot;field-day&quot;: &quot;Gün&quot;,
+	&quot;field-mon-relative+0&quot;: &quot;bu pazartesi&quot;,
+	&quot;field-mon-relative+1&quot;: &quot;gelecek pazartesi&quot;,
+	&quot;field-thu-relative+0&quot;: &quot;bu perşembe&quot;,
+	&quot;field-second-relative+0&quot;: &quot;şimdi&quot;,
+	&quot;field-thu-relative+1&quot;: &quot;gelecek perşembe&quot;,
+	&quot;field-wed-relative+0&quot;: &quot;bu çarşamba&quot;,
+	&quot;months-format-wide&quot;: [
+		&quot;Meskerem&quot;,
+		&quot;Tikimt&quot;,
+		&quot;Hidar&quot;,
+		&quot;Tahsas&quot;,
+		&quot;Tir&quot;,
+		&quot;Yakatit&quot;,
+		&quot;Magabit&quot;,
+		&quot;Miyazya&quot;,
+		&quot;Ginbot&quot;,
+		&quot;Sene&quot;,
+		&quot;Hamle&quot;,
+		&quot;Nehasa&quot;,
+		&quot;Pagumiene&quot;
+	],
+	&quot;field-wed-relative+1&quot;: &quot;gelecek çarşamba&quot;,
+	&quot;field-month-relative+-1&quot;: &quot;geçen ay&quot;,
+	&quot;field-thu-relative+-1&quot;: &quot;geçen perşembe&quot;
+}
+//end v1.x content
+);</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

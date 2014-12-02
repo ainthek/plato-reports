@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/has.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/has.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">65.32</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">187</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">30.11</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.99</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([&quot;require&quot;, &quot;module&quot;], function(require, module){
+	// module:
+	//		dojo/has
+	// summary:
+	//		Defines the has.js API and several feature tests used by dojo.
+	// description:
+	//		This module defines the has API as described by the project has.js with the following additional features:
+	//
+	//		- the has test cache is exposed at has.cache.
+	//		- the method has.add includes a forth parameter that controls whether or not existing tests are replaced
+	//		- the loader&#039;s has cache may be optionally copied into this module&#039;s has cahce.
+	//
+	//		This module adopted from https://github.com/phiggins42/has.js; thanks has.js team!
+
+	// try to pull the has implementation from the loader; both the dojo loader and bdLoad provide one
+	// if using a foreign loader, then the has cache may be initialized via the config object for this module
+	// WARNING: if a foreign loader defines require.has to be something other than the has.js API, then this implementation fail
+	var has = require.has || function(){};
+	if(!has(&quot;dojo-has-api&quot;)){
+		var
+			isBrowser =
+				// the most fundamental decision: are we in the browser?
+				typeof window != &quot;undefined&quot; &amp;&amp;
+				typeof location != &quot;undefined&quot; &amp;&amp;
+				typeof document != &quot;undefined&quot; &amp;&amp;
+				window.location == location &amp;&amp; window.document == document,
+
+			// has API variables
+			global = (function () { return this; })(),
+			doc = isBrowser &amp;&amp; document,
+			element = doc &amp;&amp; doc.createElement(&quot;DiV&quot;),
+			cache = (module.config &amp;&amp; module.config()) || {};
+
+		has = function(name){
+			// summary:
+			//		Return the current value of the named feature.
+			//
+			// name: String|Integer
+			//		The name (if a string) or identifier (if an integer) of the feature to test.
+			//
+			// description:
+			//		Returns the value of the feature named by name. The feature must have been
+			//		previously added to the cache by has.add.
+
+			return typeof cache[name] == &quot;function&quot; ? (cache[name] = cache[name](global, doc, element)) : cache[name]; // Boolean
+		};
+
+		has.cache = cache;
+
+		has.add = function(name, test, now, force){
+			// summary:
+			//	 	Register a new feature test for some named feature.
+			// name: String|Integer
+			//	 	The name (if a string) or identifier (if an integer) of the feature to test.
+			// test: Function
+			//		 A test function to register. If a function, queued for testing until actually
+			//		 needed. The test function should return a boolean indicating
+			//	 	the presence of a feature or bug.
+			// now: Boolean?
+			//		 Optional. Omit if `test` is not a function. Provides a way to immediately
+			//		 run the test and cache the result.
+			// force: Boolean?
+			//	 	Optional. If the test already exists and force is truthy, then the existing
+			//	 	test will be replaced; otherwise, add does not replace an existing test (that
+			//	 	is, by default, the first test advice wins).
+			// example:
+			//		A redundant test, testFn with immediate execution:
+			//	|	has.add(&quot;javascript&quot;, function(){ return true; }, true);
+			//
+			// example:
+			//		Again with the redundantness. You can do this in your tests, but we should
+			//		not be doing this in any internal has.js tests
+			//	|	has.add(&quot;javascript&quot;, true);
+			//
+			// example:
+			//		Three things are passed to the testFunction. `global`, `document`, and a generic element
+			//		from which to work your test should the need arise.
+			//	|	has.add(&quot;bug-byid&quot;, function(g, d, el){
+			//	|		// g	== global, typically window, yadda yadda
+			//	|		// d	== document object
+			//	|		// el == the generic element. a `has` element.
+			//	|		return false; // fake test, byid-when-form-has-name-matching-an-id is slightly longer
+			//	|	});
+
+			(typeof cache[name]==&quot;undefined&quot; || force) &amp;&amp; (cache[name]= test);
+			return now &amp;&amp; has(name);
+		};
+
+		// since we&#039;re operating under a loader that doesn&#039;t provide a has API, we must explicitly initialize
+		// has as it would have otherwise been initialized by the dojo loader; use has.add to the builder
+		// can optimize these away iff desired
+		has.add(&quot;host-browser&quot;, isBrowser);
+		has.add(&quot;host-node&quot;, (typeof process == &quot;object&quot; &amp;&amp; process.versions &amp;&amp; process.versions.node &amp;&amp; process.versions.v8));
+		has.add(&quot;host-rhino&quot;, (typeof load == &quot;function&quot; &amp;&amp; (typeof Packages == &quot;function&quot; || typeof Packages == &quot;object&quot;)));
+		has.add(&quot;dom&quot;, isBrowser);
+		has.add(&quot;dojo-dom-ready-api&quot;, 1);
+		has.add(&quot;dojo-sniff&quot;, 1);
+	}
+
+	if(has(&quot;host-browser&quot;)){
+		// Common application level tests
+		has.add(&quot;dom-addeventlistener&quot;, !!document.addEventListener);
+
+		// Do the device and browser have touch capability?
+		has.add(&quot;touch&quot;, &quot;ontouchstart&quot; in document
+			|| (&quot;onpointerdown&quot; in document &amp;&amp; navigator.maxTouchPoints &gt; 0)
+			|| window.navigator.msMaxTouchPoints);
+
+		// Touch events support
+		has.add(&quot;touch-events&quot;, &quot;ontouchstart&quot; in document);
+
+		// Pointer Events support
+		has.add(&quot;pointer-events&quot;, &quot;onpointerdown&quot; in document);
+		has.add(&quot;MSPointer&quot;, &quot;msMaxTouchPoints&quot; in navigator); //IE10 (+IE11 preview)
+
+		// I don&#039;t know if any of these tests are really correct, just a rough guess
+		has.add(&quot;device-width&quot;, screen.availWidth || innerWidth);
+
+		// Tests for DOMNode.attributes[] behavior:
+		//	 - dom-attributes-explicit - attributes[] only lists explicitly user specified attributes
+		//	 - dom-attributes-specified-flag (IE8) - need to check attr.specified flag to skip attributes user didn&#039;t specify
+		//	 - Otherwise, in IE6-7. attributes[] will list hundreds of values, so need to do outerHTML to get attrs instead.
+		var form = document.createElement(&quot;form&quot;);
+		has.add(&quot;dom-attributes-explicit&quot;, form.attributes.length == 0); // W3C
+		has.add(&quot;dom-attributes-specified-flag&quot;, form.attributes.length &gt; 0 &amp;&amp; form.attributes.length &lt; 40);	// IE8
+	}
+
+	has.clearElement = function(element){
+		// summary:
+		//	 Deletes the contents of the element passed to test functions.
+		element.innerHTML= &quot;&quot;;
+		return element;
+	};
+
+	has.normalize = function(id, toAbsMid){
+		// summary:
+		//	 Resolves id into a module id based on possibly-nested tenary expression that branches on has feature test value(s).
+		//
+		// toAbsMid: Function
+		//	 Resolves a relative module id into an absolute module id
+		var
+			tokens = id.match(/[\?:]|[^:\?]*/g), i = 0,
+			get = function(skip){
+				var term = tokens[i++];
+				if(term == &quot;:&quot;){
+					// empty string module name, resolves to 0
+					return 0;
+				}else{
+					// postfixed with a ? means it is a feature to branch on, the term is the name of the feature
+					if(tokens[i++] == &quot;?&quot;){
+						if(!skip &amp;&amp; has(term)){
+							// matched the feature, get the first value from the options
+							return get();
+						}else{
+							// did not match, get the second value, passing over the first
+							get(true);
+							return get(skip);
+						}
+					}
+					// a module
+					return term || 0;
+				}
+			};
+		id = get();
+		return id &amp;&amp; toAbsMid(id);
+	};
+
+	has.load = function(id, parentRequire, loaded){
+		// summary:
+		//		Conditional loading of AMD modules based on a has feature test value.
+		// id: String
+		//		Gives the resolved module id to load.
+		// parentRequire: Function
+		//		The loader require function with respect to the module that contained the plugin resource in it&#039;s
+		//		dependency list.
+		// loaded: Function
+		//	 Callback to loader that consumes result of plugin demand.
+
+		if(id){
+			parentRequire([id], loaded);
+		}else{
+			loaded();
+		}
+	};
+
+	return has;
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

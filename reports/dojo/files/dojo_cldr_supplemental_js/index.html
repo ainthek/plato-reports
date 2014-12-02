@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/cldr/supplemental.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/cldr/supplemental.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">32.20</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">127</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">13.61</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">5.53</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([&quot;../_base/lang&quot;, &quot;../i18n&quot;], function(lang, i18n){
+
+// module:
+//		dojo/cldr/supplemental
+
+
+var supplemental = {
+	// summary:
+	//		TODOC
+};
+lang.setObject(&quot;dojo.cldr.supplemental&quot;, supplemental);
+
+supplemental.getFirstDayOfWeek = function(/*String?*/locale){
+	// summary:
+	//		Returns a zero-based index for first day of the week
+	// description:
+	//		Returns a zero-based index for first day of the week, as used by the local (Gregorian) calendar.
+	//		e.g. Sunday (returns 0), or Monday (returns 1)
+
+	// from http://www.unicode.org/cldr/data/common/supplemental/supplementalData.xml:supplementalData/weekData/firstDay
+	var firstDay = {/*default is 1=Monday*/
+		bd:5,mv:5,
+		ae:6,af:6,bh:6,dj:6,dz:6,eg:6,iq:6,ir:6,jo:6,kw:6,
+		ly:6,ma:6,om:6,qa:6,sa:6,sd:6,sy:6,ye:6,
+		ag:0,ar:0,as:0,au:0,br:0,bs:0,bt:0,bw:0,by:0,bz:0,ca:0,cn:0,
+		co:0,dm:0,&#039;do&#039;:0,et:0,gt:0,gu:0,hk:0,hn:0,id:0,ie:0,il:0,&#039;in&#039;:0,
+		jm:0,jp:0,ke:0,kh:0,kr:0,la:0,mh:0,mm:0,mo:0,mt:0,mx:0,mz:0,
+		ni:0,np:0,nz:0,pa:0,pe:0,ph:0,pk:0,pr:0,py:0,sg:0,sv:0,th:0,
+		tn:0,tt:0,tw:0,um:0,us:0,ve:0,vi:0,ws:0,za:0,zw:0
+	};
+
+	var country = supplemental._region(locale);
+	var dow = firstDay[country];
+	return (dow === undefined) ? 1 : dow; /*Number*/
+};
+
+supplemental._region = function(/*String?*/locale){
+	locale = i18n.normalizeLocale(locale);
+	var tags = locale.split(&#039;-&#039;);
+	var region = tags[1];
+	if(!region){
+		// IE often gives language only (#2269)
+		// Arbitrary mappings of language-only locales to a country:
+		region = {
+			aa:&quot;et&quot;, ab:&quot;ge&quot;, af:&quot;za&quot;, ak:&quot;gh&quot;, am:&quot;et&quot;, ar:&quot;eg&quot;, as:&quot;in&quot;, av:&quot;ru&quot;, ay:&quot;bo&quot;, az:&quot;az&quot;, ba:&quot;ru&quot;,
+			be:&quot;by&quot;, bg:&quot;bg&quot;, bi:&quot;vu&quot;, bm:&quot;ml&quot;, bn:&quot;bd&quot;, bo:&quot;cn&quot;, br:&quot;fr&quot;, bs:&quot;ba&quot;, ca:&quot;es&quot;, ce:&quot;ru&quot;, ch:&quot;gu&quot;,
+			co:&quot;fr&quot;, cr:&quot;ca&quot;, cs:&quot;cz&quot;, cv:&quot;ru&quot;, cy:&quot;gb&quot;, da:&quot;dk&quot;, de:&quot;de&quot;, dv:&quot;mv&quot;, dz:&quot;bt&quot;, ee:&quot;gh&quot;, el:&quot;gr&quot;,
+			en:&quot;us&quot;, es:&quot;es&quot;, et:&quot;ee&quot;, eu:&quot;es&quot;, fa:&quot;ir&quot;, ff:&quot;sn&quot;, fi:&quot;fi&quot;, fj:&quot;fj&quot;, fo:&quot;fo&quot;, fr:&quot;fr&quot;, fy:&quot;nl&quot;,
+			ga:&quot;ie&quot;, gd:&quot;gb&quot;, gl:&quot;es&quot;, gn:&quot;py&quot;, gu:&quot;in&quot;, gv:&quot;gb&quot;, ha:&quot;ng&quot;, he:&quot;il&quot;, hi:&quot;in&quot;, ho:&quot;pg&quot;, hr:&quot;hr&quot;,
+			ht:&quot;ht&quot;, hu:&quot;hu&quot;, hy:&quot;am&quot;, ia:&quot;fr&quot;, id:&quot;id&quot;, ig:&quot;ng&quot;, ii:&quot;cn&quot;, ik:&quot;us&quot;, &quot;in&quot;:&quot;id&quot;, is:&quot;is&quot;, it:&quot;it&quot;,
+			iu:&quot;ca&quot;, iw:&quot;il&quot;, ja:&quot;jp&quot;, ji:&quot;ua&quot;, jv:&quot;id&quot;, jw:&quot;id&quot;, ka:&quot;ge&quot;, kg:&quot;cd&quot;, ki:&quot;ke&quot;, kj:&quot;na&quot;, kk:&quot;kz&quot;,
+			kl:&quot;gl&quot;, km:&quot;kh&quot;, kn:&quot;in&quot;, ko:&quot;kr&quot;, ks:&quot;in&quot;, ku:&quot;tr&quot;, kv:&quot;ru&quot;, kw:&quot;gb&quot;, ky:&quot;kg&quot;, la:&quot;va&quot;, lb:&quot;lu&quot;,
+			lg:&quot;ug&quot;, li:&quot;nl&quot;, ln:&quot;cd&quot;, lo:&quot;la&quot;, lt:&quot;lt&quot;, lu:&quot;cd&quot;, lv:&quot;lv&quot;, mg:&quot;mg&quot;, mh:&quot;mh&quot;, mi:&quot;nz&quot;, mk:&quot;mk&quot;,
+			ml:&quot;in&quot;, mn:&quot;mn&quot;, mo:&quot;ro&quot;, mr:&quot;in&quot;, ms:&quot;my&quot;, mt:&quot;mt&quot;, my:&quot;mm&quot;, na:&quot;nr&quot;, nb:&quot;no&quot;, nd:&quot;zw&quot;, ne:&quot;np&quot;,
+			ng:&quot;na&quot;, nl:&quot;nl&quot;, nn:&quot;no&quot;, no:&quot;no&quot;, nr:&quot;za&quot;, nv:&quot;us&quot;, ny:&quot;mw&quot;, oc:&quot;fr&quot;, om:&quot;et&quot;, or:&quot;in&quot;, os:&quot;ge&quot;,
+			pa:&quot;in&quot;, pl:&quot;pl&quot;, ps:&quot;af&quot;, pt:&quot;br&quot;, qu:&quot;pe&quot;, rm:&quot;ch&quot;, rn:&quot;bi&quot;, ro:&quot;ro&quot;, ru:&quot;ru&quot;, rw:&quot;rw&quot;, sa:&quot;in&quot;,
+			sd:&quot;in&quot;, se:&quot;no&quot;, sg:&quot;cf&quot;, si:&quot;lk&quot;, sk:&quot;sk&quot;, sl:&quot;si&quot;, sm:&quot;ws&quot;, sn:&quot;zw&quot;, so:&quot;so&quot;, sq:&quot;al&quot;, sr:&quot;rs&quot;,
+			ss:&quot;za&quot;, st:&quot;za&quot;, su:&quot;id&quot;, sv:&quot;se&quot;, sw:&quot;tz&quot;, ta:&quot;in&quot;, te:&quot;in&quot;, tg:&quot;tj&quot;, th:&quot;th&quot;, ti:&quot;et&quot;, tk:&quot;tm&quot;,
+			tl:&quot;ph&quot;, tn:&quot;za&quot;, to:&quot;to&quot;, tr:&quot;tr&quot;, ts:&quot;za&quot;, tt:&quot;ru&quot;, ty:&quot;pf&quot;, ug:&quot;cn&quot;, uk:&quot;ua&quot;, ur:&quot;pk&quot;, uz:&quot;uz&quot;,
+			ve:&quot;za&quot;, vi:&quot;vn&quot;, wa:&quot;be&quot;, wo:&quot;sn&quot;, xh:&quot;za&quot;, yi:&quot;il&quot;, yo:&quot;ng&quot;, za:&quot;cn&quot;, zh:&quot;cn&quot;, zu:&quot;za&quot;,
+			ace:&quot;id&quot;, ady:&quot;ru&quot;, agq:&quot;cm&quot;, alt:&quot;ru&quot;, amo:&quot;ng&quot;, asa:&quot;tz&quot;, ast:&quot;es&quot;, awa:&quot;in&quot;, bal:&quot;pk&quot;,
+			ban:&quot;id&quot;, bas:&quot;cm&quot;, bax:&quot;cm&quot;, bbc:&quot;id&quot;, bem:&quot;zm&quot;, bez:&quot;tz&quot;, bfq:&quot;in&quot;, bft:&quot;pk&quot;, bfy:&quot;in&quot;,
+			bhb:&quot;in&quot;, bho:&quot;in&quot;, bik:&quot;ph&quot;, bin:&quot;ng&quot;, bjj:&quot;in&quot;, bku:&quot;ph&quot;, bqv:&quot;ci&quot;, bra:&quot;in&quot;, brx:&quot;in&quot;,
+			bss:&quot;cm&quot;, btv:&quot;pk&quot;, bua:&quot;ru&quot;, buc:&quot;yt&quot;, bug:&quot;id&quot;, bya:&quot;id&quot;, byn:&quot;er&quot;, cch:&quot;ng&quot;, ccp:&quot;in&quot;,
+			ceb:&quot;ph&quot;, cgg:&quot;ug&quot;, chk:&quot;fm&quot;, chm:&quot;ru&quot;, chp:&quot;ca&quot;, chr:&quot;us&quot;, cja:&quot;kh&quot;, cjm:&quot;vn&quot;, ckb:&quot;iq&quot;,
+			crk:&quot;ca&quot;, csb:&quot;pl&quot;, dar:&quot;ru&quot;, dav:&quot;ke&quot;, den:&quot;ca&quot;, dgr:&quot;ca&quot;, dje:&quot;ne&quot;, doi:&quot;in&quot;, dsb:&quot;de&quot;,
+			dua:&quot;cm&quot;, dyo:&quot;sn&quot;, dyu:&quot;bf&quot;, ebu:&quot;ke&quot;, efi:&quot;ng&quot;, ewo:&quot;cm&quot;, fan:&quot;gq&quot;, fil:&quot;ph&quot;, fon:&quot;bj&quot;,
+			fur:&quot;it&quot;, gaa:&quot;gh&quot;, gag:&quot;md&quot;, gbm:&quot;in&quot;, gcr:&quot;gf&quot;, gez:&quot;et&quot;, gil:&quot;ki&quot;, gon:&quot;in&quot;, gor:&quot;id&quot;,
+			grt:&quot;in&quot;, gsw:&quot;ch&quot;, guz:&quot;ke&quot;, gwi:&quot;ca&quot;, haw:&quot;us&quot;, hil:&quot;ph&quot;, hne:&quot;in&quot;, hnn:&quot;ph&quot;, hoc:&quot;in&quot;,
+			hoj:&quot;in&quot;, ibb:&quot;ng&quot;, ilo:&quot;ph&quot;, inh:&quot;ru&quot;, jgo:&quot;cm&quot;, jmc:&quot;tz&quot;, kaa:&quot;uz&quot;, kab:&quot;dz&quot;, kaj:&quot;ng&quot;,
+			kam:&quot;ke&quot;, kbd:&quot;ru&quot;, kcg:&quot;ng&quot;, kde:&quot;tz&quot;, kdt:&quot;th&quot;, kea:&quot;cv&quot;, ken:&quot;cm&quot;, kfo:&quot;ci&quot;, kfr:&quot;in&quot;,
+			kha:&quot;in&quot;, khb:&quot;cn&quot;, khq:&quot;ml&quot;, kht:&quot;in&quot;, kkj:&quot;cm&quot;, kln:&quot;ke&quot;, kmb:&quot;ao&quot;, koi:&quot;ru&quot;, kok:&quot;in&quot;,
+			kos:&quot;fm&quot;, kpe:&quot;lr&quot;, krc:&quot;ru&quot;, kri:&quot;sl&quot;, krl:&quot;ru&quot;, kru:&quot;in&quot;, ksb:&quot;tz&quot;, ksf:&quot;cm&quot;, ksh:&quot;de&quot;,
+			kum:&quot;ru&quot;, lag:&quot;tz&quot;, lah:&quot;pk&quot;, lbe:&quot;ru&quot;, lcp:&quot;cn&quot;, lep:&quot;in&quot;, lez:&quot;ru&quot;, lif:&quot;np&quot;, lis:&quot;cn&quot;,
+			lki:&quot;ir&quot;, lmn:&quot;in&quot;, lol:&quot;cd&quot;, lua:&quot;cd&quot;, luo:&quot;ke&quot;, luy:&quot;ke&quot;, lwl:&quot;th&quot;, mad:&quot;id&quot;, mag:&quot;in&quot;,
+			mai:&quot;in&quot;, mak:&quot;id&quot;, man:&quot;gn&quot;, mas:&quot;ke&quot;, mdf:&quot;ru&quot;, mdh:&quot;ph&quot;, mdr:&quot;id&quot;, men:&quot;sl&quot;, mer:&quot;ke&quot;,
+			mfe:&quot;mu&quot;, mgh:&quot;mz&quot;, mgo:&quot;cm&quot;, min:&quot;id&quot;, mni:&quot;in&quot;, mnk:&quot;gm&quot;, mnw:&quot;mm&quot;, mos:&quot;bf&quot;, mua:&quot;cm&quot;,
+			mwr:&quot;in&quot;, myv:&quot;ru&quot;, nap:&quot;it&quot;, naq:&quot;na&quot;, nds:&quot;de&quot;, &quot;new&quot;:&quot;np&quot;, niu:&quot;nu&quot;, nmg:&quot;cm&quot;, nnh:&quot;cm&quot;,
+			nod:&quot;th&quot;, nso:&quot;za&quot;, nus:&quot;sd&quot;, nym:&quot;tz&quot;, nyn:&quot;ug&quot;, pag:&quot;ph&quot;, pam:&quot;ph&quot;, pap:&quot;bq&quot;, pau:&quot;pw&quot;,
+			pon:&quot;fm&quot;, prd:&quot;ir&quot;, raj:&quot;in&quot;, rcf:&quot;re&quot;, rej:&quot;id&quot;, rjs:&quot;np&quot;, rkt:&quot;in&quot;, rof:&quot;tz&quot;, rwk:&quot;tz&quot;,
+			saf:&quot;gh&quot;, sah:&quot;ru&quot;, saq:&quot;ke&quot;, sas:&quot;id&quot;, sat:&quot;in&quot;, saz:&quot;in&quot;, sbp:&quot;tz&quot;, scn:&quot;it&quot;, sco:&quot;gb&quot;,
+			sdh:&quot;ir&quot;, seh:&quot;mz&quot;, ses:&quot;ml&quot;, shi:&quot;ma&quot;, shn:&quot;mm&quot;, sid:&quot;et&quot;, sma:&quot;se&quot;, smj:&quot;se&quot;, smn:&quot;fi&quot;,
+			sms:&quot;fi&quot;, snk:&quot;ml&quot;, srn:&quot;sr&quot;, srr:&quot;sn&quot;, ssy:&quot;er&quot;, suk:&quot;tz&quot;, sus:&quot;gn&quot;, swb:&quot;yt&quot;, swc:&quot;cd&quot;,
+			syl:&quot;bd&quot;, syr:&quot;sy&quot;, tbw:&quot;ph&quot;, tcy:&quot;in&quot;, tdd:&quot;cn&quot;, tem:&quot;sl&quot;, teo:&quot;ug&quot;, tet:&quot;tl&quot;, tig:&quot;er&quot;,
+			tiv:&quot;ng&quot;, tkl:&quot;tk&quot;, tmh:&quot;ne&quot;, tpi:&quot;pg&quot;, trv:&quot;tw&quot;, tsg:&quot;ph&quot;, tts:&quot;th&quot;, tum:&quot;mw&quot;, tvl:&quot;tv&quot;,
+			twq:&quot;ne&quot;, tyv:&quot;ru&quot;, tzm:&quot;ma&quot;, udm:&quot;ru&quot;, uli:&quot;fm&quot;, umb:&quot;ao&quot;, unr:&quot;in&quot;, unx:&quot;in&quot;, vai:&quot;lr&quot;,
+			vun:&quot;tz&quot;, wae:&quot;ch&quot;, wal:&quot;et&quot;, war:&quot;ph&quot;, xog:&quot;ug&quot;, xsr:&quot;np&quot;, yao:&quot;mz&quot;, yap:&quot;fm&quot;, yav:&quot;cm&quot;, zza:&quot;tr&quot;
+		}[tags[0]];
+	}else if(region.length == 4){
+		// The ISO 3166 country code is usually in the second position, unless a
+		// 4-letter script is given. See http://www.ietf.org/rfc/rfc4646.txt
+		region = tags[2];
+	}
+	return region;
+};
+
+supplemental.getWeekend = function(/*String?*/locale){
+	// summary:
+	//		Returns a hash containing the start and end days of the weekend
+	// description:
+	//		Returns a hash containing the start and end days of the weekend according to local custom using locale,
+	//		or by default in the user&#039;s locale.
+	//		e.g. {start:6, end:0}
+
+	// from http://www.unicode.org/cldr/data/common/supplemental/supplementalData.xml:supplementalData/weekData/weekend{Start,End}
+	var weekendStart = {/*default is 6=Saturday*/
+			&#039;in&#039;:0,
+			af:4,dz:4,ir:4,om:4,sa:4,ye:4,
+			ae:5,bh:5,eg:5,il:5,iq:5,jo:5,kw:5,ly:5,ma:5,qa:5,sd:5,sy:5,tn:5
+		},
+
+		weekendEnd = {/*default is 0=Sunday*/
+			af:5,dz:5,ir:5,om:5,sa:5,ye:5,
+			ae:6,bh:5,eg:6,il:6,iq:6,jo:6,kw:6,ly:6,ma:6,qa:6,sd:6,sy:6,tn:6
+		},
+
+		country = supplemental._region(locale),
+		start = weekendStart[country],
+		end = weekendEnd[country];
+
+	if(start === undefined){start=6;}
+	if(end === undefined){end=0;}
+	return {start:start, end:end}; /*Object {start,end}*/
+};
+
+return supplemental;
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

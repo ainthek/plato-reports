@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/_base/Deferred.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/_base/Deferred.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">79.48</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">305</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">42.42</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.45</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">dojo.provide(&quot;dojo.tests._base.Deferred&quot;);
+
+var delay = function(ms){
+	var d = new dojo.Deferred();
+	ms = ms || 20;
+	if(this.setTimeout){
+		setTimeout(function(){
+			d.progress(0.5);
+		},ms/2);
+		setTimeout(function(){
+			d.resolve();
+		},ms);
+	}else{
+		d.progress(0.5);
+		d.resolve();
+	}
+	return d.promise;
+};
+doh.register(&quot;tests._base.Deferred&quot;,
+	[
+
+		function callback(t){
+			var nd = new dojo.Deferred();
+			var cnt = 0;
+			nd.addCallback(function(res){
+				doh.debug(&quot;debug from dojo.Deferred callback&quot;);
+				return res;
+			});
+			nd.addCallback(function(res){
+				// t.debug(&quot;val:&quot;, res);
+				cnt+=res;
+				return cnt;
+			});
+			nd.callback(5);
+			// t.debug(&quot;cnt:&quot;, cnt);
+			t.assertEqual(cnt, 5);
+		},
+
+		function callback_extra_args(t){
+			var nd = new dojo.Deferred();
+			var cnt = 0;
+			nd.addCallback(dojo.global, function(base, res){ cnt+=base; cnt+=res; return cnt; }, 30);
+			nd.callback(5);
+			t.assertEqual(cnt, 35);
+		},
+
+		function errback(t){
+			var nd = new dojo.Deferred();
+			var cnt = 0;
+			nd.addErrback(function(val){
+				return ++cnt;
+			});
+			nd.errback();
+			t.assertEqual(cnt, 1);
+		},
+
+		function callbackTwice(t){
+			var nd = new dojo.Deferred();
+			var cnt = 0;
+			nd.addCallback(function(res){
+				return ++cnt;
+			});
+			nd.callback();
+			t.assertEqual(cnt, 1);
+			var thrown = false;
+			try{
+				nd.callback();
+			}catch(e){
+				thrown = true;
+			}
+			t.assertTrue(thrown);
+		},
+
+		function addBoth(t){
+			var nd = new dojo.Deferred();
+			var cnt = 0;
+			nd.addBoth(function(res){
+				return ++cnt;
+			});
+			nd.callback();
+			t.assertEqual(cnt, 1);
+
+			// nd.callback();
+			// t.debug(cnt);
+			// t.assertEqual(cnt, 1);
+		},
+
+		function callbackNested(t){
+			var nd = new dojo.Deferred();
+			var nestedReturn = &quot;yellow&quot;;
+			nd.addCallback(function(res){
+				nd.addCallback(function(res2){
+					nestedReturn = res2;
+				});
+				return &quot;blue&quot;;
+			});
+			nd.callback(&quot;red&quot;);
+			t.assertEqual(&quot;blue&quot;, nestedReturn);
+		},
+		function simpleThen(t){
+			var td = new doh.Deferred();
+			delay().then(function(){
+				td.callback(true);
+			});
+			return td;
+		},
+		function thenChaining(t){
+			var td = new doh.Deferred();
+			var p = delay();
+			var p2 = p.then(function(){
+				return 1;
+			});
+			p3 = p2.then(function(){
+				return 2;
+			});
+			p3.then(function(){
+				p2.then(function(v){
+					t.assertEqual(v, 1);
+					p3.then(function(v){
+						t.assertEqual(v, 2);
+						td.callback(true);
+					});
+				});
+			});
+			return td;
+		},
+		function simpleWhen(t){
+			var td = new doh.Deferred();
+			dojo.when(delay(), function(){
+				td.callback(true);
+			});
+			return td;
+		},
+		function progress(t){
+			if(dojo.isBrowser){
+				var td = new doh.Deferred();
+				var percentDone;
+				dojo.when(delay(), function(){
+					t.is(percentDone, 0.5);
+					td.callback(true);
+				},function(){},
+				function(completed){
+					percentDone = completed;
+				});
+				return td;
+			}
+			return null;
+		},
+		function cancelThenDerivative(t){
+			var def = new dojo.Deferred();
+			var def2 = def.then();
+			try{
+				def2.cancel();
+				t.t(true); // Didn&#039;t throw an error
+			}catch(e){
+				t.t(false);
+			}
+		},
+		function cancelPromiseValue(t){
+			var cancelledDef;
+			var def = new dojo.Deferred(function(_def){ cancelledDef = _def; });
+			def.promise.cancel();
+			t.is(def, cancelledDef);
+		},
+		function errorResult(t){
+			var def = new dojo.Deferred();
+			var result = new Error(&quot;rejected&quot;);
+			def.reject(result);
+			t.is(def.fired, 1);
+			t.is(def.results[1], result);
+		},
+		function globalLeak(t){
+			var def = new dojo.Deferred();
+			def.then(function(){ return def; });
+			def.resolve(true);
+			t.is(dojo.global.results, undefined, &quot;results is leaking into global&quot;);
+			t.is(dojo.global.fired, undefined, &quot;fired is leaking into global&quot;);
+		},
+		function backAndForthProcess(t){
+			var def = new dojo.Deferred();
+			var retval = &quot;fail&quot;;
+
+			def.addErrback(function(){
+				return &quot;ignore error and throw this good string&quot;;
+			}).addCallback(function(){
+				throw new Error(&quot;error1&quot;);
+			}).addErrback(function(){
+				return &quot;ignore second error and make it good again&quot;;
+			}).addCallback(function(){
+				retval = &quot;succeed&quot;;
+			});
+
+			def.errback(&quot;&quot;);
+
+			t.assertEqual(&quot;succeed&quot;, retval);
+		},
+		function backAndForthProcessThen(t){
+			var def = new dojo.Deferred;
+			var retval = &quot;fail&quot;;
+
+			def.then(null, function(){
+				return &quot;ignore error and throw this good string&quot;;
+			}).then(function(){
+				throw &quot;error1&quot;;
+			}).then(null, function(){
+				return &quot;ignore second error and make it good again&quot;;
+			}).then(function(){
+				retval = &quot;succeed&quot;;
+			});
+
+			def.reject(&quot;&quot;);
+
+			t.assertEqual(&quot;succeed&quot;, retval);
+		},
+		function returnErrorObject(t){
+			var def = new dojo.Deferred();
+			var retval = &quot;fail&quot;;
+
+			def.addCallback(function(){
+				return new Error(&quot;returning an error should work same as throwing&quot;);
+			}).addErrback(function(){
+				retval = &quot;succeed&quot;;
+			});
+
+			def.callback();
+
+			t.assertEqual(&quot;succeed&quot;, retval);
+		},
+		function returnErrorObjectThen(t){
+			var def = new dojo.Deferred();
+			var retval = &quot;fail&quot;;
+
+			def.then(function(){
+				return new Error(&quot;returning an error should NOT work same as throwing&quot;);
+			}).then(function(){
+				retval = &quot;succeed&quot;;
+			});
+
+			def.resolve();
+
+			t.assertEqual(&quot;succeed&quot;, retval);
+		},
+		function errbackWithPromise(t){
+			var def = new dojo.Deferred();
+			var retval;
+
+			def.addCallbacks(function(){}, function(err){
+				return err;
+			});
+			def.promise.then(
+					function(){ retval = &quot;fail&quot;; },
+					function(){ retval = &quot;succeed&quot;; });
+			def.errback(new Error);
+
+			t.assertEqual(&quot;succeed&quot;, retval);
+		},
+		function testDojoPromiseProgressBasic(t){
+			var a = new dojo.Deferred();
+			var b = new dojo.Deferred();
+			var called = false;
+			
+			a.then(function(){
+				b.then(function(){
+					if (!called){
+						console.log(&quot;Boo. ProgressBasic not called&quot;);
+					}
+				}, function(){
+					console.log(&quot;Unexpected&quot;);
+				}, function(){
+					called = true; 
+					console.log(&quot;Yay. ProgressBasic called&quot;);
+				});
+			});
+			
+			a.resolve();
+			b.progress();
+			b.resolve();
+			t.t(called);
+		},
+		
+		function testDojoPromiseProgressChain(t){
+			var a = new dojo.Deferred();
+			var b = new dojo.Deferred();
+			var called = false;
+			
+			a.then(function(){
+				return b;
+			}).then(function(){
+				if (!called){
+					console.log(&quot;Boo. ProgressChain not called&quot;);
+				}
+			}, function(){
+				console.log(&quot;Unexpected&quot;);
+			}, function(){
+				called = true; 
+				console.log(&quot;Yay. ProgressChain called&quot;);
+			});
+			
+			a.resolve();
+			b.progress();
+			b.resolve();
+			t.t(called);
+		}
+ ]
+);</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

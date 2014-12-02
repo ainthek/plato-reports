@@ -1,0 +1,3305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/data/readOnlyItemFileTestTemplates.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/data/readOnlyItemFileTestTemplates.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">61.78</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">3187</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">235.84</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">40.47</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">// FIXME: this test assumes the existence of the global object &quot;tests&quot;
+define([&quot;dojo/main&quot;, &quot;doh/main&quot;, &quot;require&quot;, &quot;dojo/data/api/Read&quot;, &quot;dojo/data/api/Identity&quot;, &quot;dojo/date&quot;, &quot;dojo/date/stamp&quot;], function(dojo, doh, require){
+
+dojo.getObject(&quot;data.readOnlyItemFileTestTemplates&quot;, true, tests);
+
+dojo.declare(&quot;tests.data.Wrapper&quot;, null, {
+	// summary:
+	//		Simple class to use for typeMap in order to	test out
+	//		&#039;falsy&#039; values for _value.
+	_wrapped: null,
+
+	constructor: function(obj){
+		this._wrapped = obj;
+	},
+
+	getValue: function(){
+		return this._wrapped;
+	},
+
+	setValue: function(obj){
+		this._wrapped = obj;
+	},
+
+	toString: function(){
+		 return &quot;WRAPPER: [&quot; + this._wrapped + &quot;]&quot;;
+	}
+});
+
+
+tests.data.readOnlyItemFileTestTemplates.registerTestsForDatastore = function(/* String */ datastoreClassName){
+	// summary:
+	//		Given the name of a datastore class to use, this function creates
+	//		a set of unit tests for that datastore, and registers the new test
+	//		group with the doh test framework.  The new unit tests are based
+	//		on a set of &quot;template&quot; unit tests.
+	var datastoreClass = dojo.getObject(datastoreClassName);
+	var testTemplates = tests.data.readOnlyItemFileTestTemplates.testTemplates;
+	var testsForDatastore = [];
+	var makeNewTestFunction = function(template){
+		return function(t){return template.runTest(datastoreClass, t);};
+	};
+	for(var i = 0; i &lt; testTemplates.length; ++i){
+		var testTemplate = testTemplates[i];
+		var test = {};
+		test.name = testTemplate.name;
+		test.runTest = makeNewTestFunction(testTemplate);
+		testsForDatastore.push(test);
+	}
+	var testGroupName = &quot;IFSCommonTests: &quot; + datastoreClassName;
+	doh.register(testGroupName, testsForDatastore);
+};
+
+
+//-----------------------------------------------------
+// testFile data-sets
+tests.data.readOnlyItemFileTestTemplates.getTestData = function(name){
+	var data = null;
+	if(name === &quot;countries&quot;){
+		if(dojo.isBrowser){
+			data = {url: require.toUrl(&quot;./countries.json&quot;)};
+		}else{
+			data = {data: {
+				identifier:&quot;abbr&quot;,
+				label:&quot;name&quot;,
+				items:[
+					{abbr:&quot;ec&quot;, name:&quot;Ecuador&quot;, capital:&quot;Quito&quot;},
+					{abbr:&#039;eg&#039;, name:&#039;Egypt&#039;, capital:&#039;Cairo&#039;},
+					{abbr:&#039;sv&#039;, name:&#039;El Salvador&#039;, capital:&#039;San Salvador&#039;},
+					{abbr:&#039;gq&#039;, name:&#039;Equatorial Guinea&#039;, capital:&#039;Malabo&#039;},
+					{abbr:&#039;er&#039;, name:&#039;Eritrea&#039;, capital:&#039;Asmara&#039;},
+					{abbr:&#039;ee&#039;, name:&#039;Estonia&#039;, capital:&#039;Tallinn&#039;},
+					{abbr:&#039;et&#039;, name:&#039;Ethiopia&#039;, capital:&#039;Addis Ababa&#039;}
+				]
+			} };
+		}
+	}else if(name === &quot;countries_withNull&quot;){
+		if(dojo.isBrowser){
+			data = {url: require.toUrl(&quot;./countries_withNull.json&quot;)};
+		}else{
+			data = {data: {
+				identifier:&quot;abbr&quot;,
+				items:[
+					{abbr:&quot;ec&quot;, name:null, capital:&quot;Quito&quot;},
+					{abbr:&#039;eg&#039;, name:null, capital:&#039;Cairo&#039;},
+					{abbr:&#039;sv&#039;, name:&#039;El Salvador&#039;, capital:&#039;San Salvador&#039;},
+					{abbr:&#039;gq&#039;, name:&#039;Equatorial Guinea&#039;, capital:&#039;Malabo&#039;},
+					{abbr:&#039;er&#039;, name:&#039;Eritrea&#039;, capital:&#039;Asmara&#039;},
+					{abbr:&#039;ee&#039;, name:null, capital:&#039;Tallinn&#039;},
+					{abbr:&#039;et&#039;, name:&#039;Ethiopia&#039;, capital:&#039;Addis Ababa&#039;}
+				]
+			} };
+		}
+	}else if(name === &quot;countries_withoutid&quot;){
+		if(dojo.isBrowser){
+			data = {url: require.toUrl(&quot;./countries_withoutid.json&quot;)};
+		}else{
+			data = {data: {
+				label: &quot;name&quot;,
+				items:[
+					{abbr:&quot;ec&quot;, name:null, capital:&quot;Quito&quot;},
+					{abbr:&#039;eg&#039;, name:null, capital:&#039;Cairo&#039;},
+					{abbr:&#039;sv&#039;, name:&#039;El Salvador&#039;, capital:&#039;San Salvador&#039;},
+					{abbr:&#039;gq&#039;, name:&#039;Equatorial Guinea&#039;, capital:&#039;Malabo&#039;},
+					{abbr:&#039;er&#039;, name:&#039;Eritrea&#039;, capital:&#039;Asmara&#039;},
+					{abbr:&#039;ee&#039;, name:null, capital:&#039;Tallinn&#039;},
+					{abbr:&#039;et&#039;, name:&#039;Ethiopia&#039;, capital:&#039;Addis Ababa&#039;}
+				]
+			} };
+		}
+	}else if (name === &quot;countries_withBoolean&quot;){
+		if(dojo.isBrowser){
+			data = {url: require.toUrl(&quot;./countries_withBoolean.json&quot;)};
+		}else{
+			data = {data: {
+				identifier:&quot;abbr&quot;,
+				items:[
+					{abbr:&quot;ec&quot;, name:&quot;Ecuador&quot;, capital:&quot;Quito&quot;, real:true},
+					{abbr:&#039;eg&#039;, name:&#039;Egypt&#039;, capital:&#039;Cairo&#039;, real:true},
+					{abbr:&#039;sv&#039;, name:&#039;El Salvador&#039;, capital:&#039;San Salvador&#039;, real:true},
+					{abbr:&#039;gq&#039;, name:&#039;Equatorial Guinea&#039;, capital:&#039;Malabo&#039;, real:true},
+					{abbr:&#039;er&#039;, name:&#039;Eritrea&#039;, capital:&#039;Asmara&#039;, real:true},
+					{abbr:&#039;ee&#039;, name:&#039;Estonia&#039;, capital:&#039;Tallinn&#039;, real:true},
+					{abbr:&#039;et&#039;, name:&#039;Ethiopia&#039;, capital:&#039;Addis Ababa&#039;, real:true},
+					{abbr:&#039;ut&#039;, name:&#039;Utopia&#039;, capital:&#039;Paradise&#039;, real:false}
+				]
+			} };
+		}
+	}else if (name === &quot;countries_withDates&quot;){
+		if(dojo.isBrowser){
+			data = {url: require.toUrl(&quot;./countries_withDates.json&quot;)};
+		}else{
+			data = {data: {
+				identifier:&quot;abbr&quot;,
+				items:[
+					{abbr:&quot;ec&quot;, name:&quot;Ecuador&quot;, capital:&quot;Quito&quot;},
+					{abbr:&#039;eg&#039;, name:&#039;Egypt&#039;, capital:&#039;Cairo&#039;},
+					{abbr:&#039;sv&#039;, name:&#039;El Salvador&#039;, capital:&#039;San Salvador&#039;},
+					{abbr:&#039;gq&#039;, name:&#039;Equatorial Guinea&#039;, capital:&#039;Malabo&#039;},
+					{abbr:&#039;er&#039;, name:&#039;Eritrea&#039;, capital:&#039;Asmara&#039;, independence:{_type:&#039;Date&#039;, _value:&quot;1993-05-24T00:00:00Z&quot;}}, // May 24, 1993,
+					{abbr:&#039;ee&#039;, name:&#039;Estonia&#039;, capital:&#039;Tallinn&#039;, independence:{_type:&#039;Date&#039;, _value:&quot;1991-08-20T00:00:00Z&quot;}}, // August 20, 1991
+					{abbr:&#039;et&#039;, name:&#039;Ethiopia&#039;, capital:&#039;Addis Ababa&#039;}
+				]
+			} };
+		}
+	}else if (name === &quot;geography_hierarchy_small&quot;){
+		if(dojo.isBrowser){
+			data = {url: require.toUrl(&quot;./geography_hierarchy_small.json&quot;)};
+		}else{
+			data = {data: {
+				items:[
+					{ name:&#039;Africa&#039;, countries:[
+						{ name:&#039;Egypt&#039;, capital:&#039;Cairo&#039; },
+						{ name:&#039;Kenya&#039;, capital:&#039;Nairobi&#039; },
+						{ name:&#039;Sudan&#039;, capital:&#039;Khartoum&#039; }]},
+					{ name:&#039;Australia&#039;, capital:&#039;Canberra&#039; },
+					{ name:&#039;North America&#039;, countries:[
+						{ name:&#039;Canada&#039;, population:&#039;33 million&#039;, cities:[
+							{ name:&#039;Toronto&#039;, population:&#039;2.5 million&#039; },
+							{ name:&#039;Alberta&#039;, population:&#039;1 million&#039; }
+							]},
+						{ name: &#039;United States of America&#039;, capital: &#039;Washington DC&#039;, states:[
+							{ name: &#039;Missouri&#039;},
+							{ name: &#039;Arkansas&#039;}
+							]}
+						]}
+				]
+			}};
+		}
+	}else if (name === &quot;data_multitype&quot;){
+		if(dojo.isBrowser){
+			data = {url: require.toUrl(&quot;./data_multitype.json&quot;)};
+		}else{
+			data = {data: {
+							&quot;identifier&quot;: &quot;count&quot;,
+							&quot;label&quot;: &quot;count&quot;,
+							items: [
+								{ count: 1,    value: &quot;true&quot; },
+								{ count: 2,    value: true   },
+								{ count: 3,    value: &quot;false&quot;},
+								{ count: 4,    value: false  },
+								{ count: 5,    value: true   },
+								{ count: 6,    value: true   },
+								{ count: 7,    value: &quot;true&quot; },
+								{ count: 8,    value: &quot;true&quot; },
+								{ count: 9,    value: &quot;false&quot;},
+								{ count: 10,   value: false  },
+								{ count: 11,   value: [false, false]},
+								{ count: &quot;12&quot;, value: [false, &quot;true&quot;]}
+						   ]
+						}
+					};
+		}
+	}else if (name === &quot;countries_references&quot;){
+		if(dojo.isBrowser){
+			data = {url: require.toUrl(&quot;./countries_references.json&quot;)};
+		}else{
+			data = {data: { identifier: &#039;name&#039;,
+							label: &#039;name&#039;,
+							items: [
+								{ name:&#039;Africa&#039;, type:&#039;continent&#039;,
+									children:[{_reference:&#039;Egypt&#039;}, {_reference:&#039;Kenya&#039;}, {_reference:&#039;Sudan&#039;}] },
+								{ name:&#039;Egypt&#039;, type:&#039;country&#039; },
+								{ name:&#039;Kenya&#039;, type:&#039;country&#039;,
+									children:[{_reference:&#039;Nairobi&#039;}, {_reference:&#039;Mombasa&#039;}] },
+								{ name:&#039;Nairobi&#039;, type:&#039;city&#039; },
+								{ name:&#039;Mombasa&#039;, type:&#039;city&#039; },
+								{ name:&#039;Sudan&#039;, type:&#039;country&#039;,
+									children:{_reference:&#039;Khartoum&#039;} },
+								{ name:&#039;Khartoum&#039;, type:&#039;city&#039; },
+								{ name:&#039;Asia&#039;, type:&#039;continent&#039;,
+									children:[{_reference:&#039;China&#039;}, {_reference:&#039;India&#039;}, {_reference:&#039;Russia&#039;}, {_reference:&#039;Mongolia&#039;}] },
+								{ name:&#039;China&#039;, type:&#039;country&#039; },
+								{ name:&#039;India&#039;, type:&#039;country&#039; },
+								{ name:&#039;Russia&#039;, type:&#039;country&#039; },
+								{ name:&#039;Mongolia&#039;, type:&#039;country&#039; },
+								{ name:&#039;Australia&#039;, type:&#039;continent&#039;, population:&#039;21 million&#039;,
+									children:{_reference:&#039;Commonwealth of Australia&#039;}},
+								{ name:&#039;Commonwealth of Australia&#039;, type:&#039;country&#039;, population:&#039;21 million&#039;},
+								{ name:&#039;Europe&#039;, type:&#039;continent&#039;,
+									children:[{_reference:&#039;Germany&#039;}, {_reference:&#039;France&#039;}, {_reference:&#039;Spain&#039;}, {_reference:&#039;Italy&#039;}] },
+								{ name:&#039;Germany&#039;, type:&#039;country&#039; },
+								{ name:&#039;France&#039;, type:&#039;country&#039; },
+								{ name:&#039;Spain&#039;, type:&#039;country&#039; },
+								{ name:&#039;Italy&#039;, type:&#039;country&#039; },
+								{ name:&#039;North America&#039;, type:&#039;continent&#039;,
+									children:[{_reference:&#039;Mexico&#039;}, {_reference:&#039;Canada&#039;}, {_reference:&#039;United States of America&#039;}] },
+								{ name:&#039;Mexico&#039;, type:&#039;country&#039;,  population:&#039;108 million&#039;, area:&#039;1,972,550 sq km&#039;,
+									children:[{_reference:&#039;Mexico City&#039;}, {_reference:&#039;Guadalajara&#039;}] },
+								{ name:&#039;Mexico City&#039;, type:&#039;city&#039;, population:&#039;19 million&#039;, timezone:&#039;-6 UTC&#039;},
+								{ name:&#039;Guadalajara&#039;, type:&#039;city&#039;, population:&#039;4 million&#039;, timezone:&#039;-6 UTC&#039; },
+								{ name:&#039;Canada&#039;, type:&#039;country&#039;,  population:&#039;33 million&#039;, area:&#039;9,984,670 sq km&#039;,
+									children:[{_reference:&#039;Ottawa&#039;}, {_reference:&#039;Toronto&#039;}] },
+								{ name:&#039;Ottawa&#039;, type:&#039;city&#039;, population:&#039;0.9 million&#039;, timezone:&#039;-5 UTC&#039;},
+								{ name:&#039;Toronto&#039;, type:&#039;city&#039;, population:&#039;2.5 million&#039;, timezone:&#039;-5 UTC&#039; },
+								{ name:&#039;United States of America&#039;, type:&#039;country&#039; },
+								{ name:&#039;South America&#039;, type:&#039;continent&#039;,
+									children:[{_reference:&#039;Brazil&#039;}, {_reference:&#039;Argentina&#039;}] },
+								{ name:&#039;Brazil&#039;, type:&#039;country&#039;, population:&#039;186 million&#039; },
+								{ name:&#039;Argentina&#039;, type:&#039;country&#039;, population:&#039;40 million&#039; }
+							]
+						}
+					};
+		}
+	}
+	return data;
+};
+
+//-----------------------------------------------------
+// testTemplates
+tests.data.readOnlyItemFileTestTemplates.testTemplates = [
+	{
+		name: &quot;Identity API: fetchItemByIdentity()&quot;,
+		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of the fetchItemByIdentity function of the store.
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;));
+
+			var d = new doh.Deferred();
+			function onItem(item){
+				t.assertTrue(item !== null);
+				if(item !== null){
+					var name = store.getValue(item,&quot;name&quot;);
+					t.assertEqual(name, &quot;El Salvador&quot;);
+				}
+				d.callback(true);
+			}
+			function onError(errData){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetchItemByIdentity({identity: &quot;sv&quot;, onItem: onItem, onError: onError});
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Identity API: fetchItemByIdentity() preventCache&quot;,
+		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of the fetchItemByIdentity function of the store.
+			var args = tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;);
+			args.urlPreventCache = true;
+			var store = new datastore(args);
+
+			var d = new doh.Deferred();
+			function onItem(item){
+				t.assertTrue(item !== null);
+				if(item !== null){
+					var name = store.getValue(item,&quot;name&quot;);
+					t.assertEqual(name, &quot;El Salvador&quot;);
+				}
+				d.callback(true);
+			}
+			function onError(errData){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetchItemByIdentity({identity: &quot;sv&quot;, onItem: onItem, onError: onError});
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Identity API: fetchItemByIdentity() notFound&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of the fetchItemByIdentity function of the store.
+			// description:
+			//		Simple test of the fetchItemByIdentity function of the store.
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;));
+
+			var d = new doh.Deferred();
+			function onItem(item){
+				t.assertTrue(item === null);
+				d.callback(true);
+			}
+			function onError(errData){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetchItemByIdentity({identity: &quot;sv_not&quot;, onItem: onItem, onError: onError});
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Identity API: getIdentityAttributes()&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of the getIdentityAttributes function.
+			// description:
+			//		Simple test of the getIdentityAttributes function.
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;));
+
+			var d = new doh.Deferred();
+			function onItem(item){
+				t.assertTrue(item !== null);
+				var identifiers = store.getIdentityAttributes(item);
+				t.assertTrue(dojo.isArray(identifiers));
+				t.assertEqual(1, identifiers.length);
+				t.assertEqual(&quot;abbr&quot;, identifiers[0]);
+				d.callback(true);
+			}
+			function onError(errData){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetchItemByIdentity({identity: &quot;sv&quot;, onItem: onItem, onError: onError});
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Identity API: fetchItemByIdentity() commentFilteredJson&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of the fetchItemByIdentity function of the store.
+			// description:
+			//		Simple test of the fetchItemByIdentity function of the store.
+			//		This tests loading a comment-filtered json file so that people using secure
+			//		data with this store can bypass the JavaSceipt hijack noted in Fortify&#039;s
+			//		paper.
+
+			if(dojo.isBrowser){
+                var store = new datastore({url: require.toUrl(&quot;./countries_commentFiltered.json&quot;)});
+
+				var d = new doh.Deferred();
+				function onItem(item){
+					t.assertTrue(item !== null);
+					var name = store.getValue(item,&quot;name&quot;);
+					t.assertEqual(name, &quot;El Salvador&quot;);
+					d.callback(true);
+				}
+				function onError(errData){
+					t.assertTrue(false);
+					d.errback(errData);
+				}
+				store.fetchItemByIdentity({identity: &quot;sv&quot;, onItem: onItem, onError: onError});
+				return d; // Deferred
+			}
+		}
+	},
+	{
+		name: &quot;Identity API: fetchItemByIdentity() nullValue&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of the fetchItemByIdentity function of the store, checling a null value.
+			// description:
+			//		Simple test of the fetchItemByIdentity function of the store, checking a null value.
+			//		This tests handling attributes in json that were defined as null properly.
+			//		Introduced because of tracker: #3153
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries_withNull&quot;));
+
+			var d = new doh.Deferred();
+			function onItem(item){
+				t.assertTrue(item !== null);
+				var name = store.getValue(item,&quot;name&quot;);
+				t.assertEqual(name, null);
+				d.callback(true);
+			}
+			function onError(errData){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetchItemByIdentity({identity: &quot;ec&quot;, onItem: onItem, onError: onError});
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Identity API: fetchItemByIdentity() booleanValue&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of the fetchItemByIdentity function of the store, checking a boolean value.
+			// description:
+			//		Simple test of the fetchItemByIdentity function of the store, checking a boolean value.
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries_withBoolean&quot;));
+
+			var d = new doh.Deferred();
+			function onItem(item){
+				t.assertTrue(item !== null);
+				var name = store.getValue(item,&quot;name&quot;);
+				t.assertEqual(name, &quot;Utopia&quot;);
+				var real = store.getValue(item,&quot;real&quot;);
+				t.assertEqual(real, false);
+				d.callback(true);
+			}
+			function onError(errData){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetchItemByIdentity({identity: &quot;ut&quot;, onItem: onItem, onError: onError});
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Identity API: fetchItemByIdentity() withoutSpecifiedIdInData&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of bug #4691, looking up something by assigned id, not one specified in the JSON data.
+			// description:
+			//		Simple test of bug #4691, looking up something by assigned id, not one specified in the JSON data.
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries_withoutid&quot;));
+
+			var d = new doh.Deferred();
+			function onItem(item){
+				t.assertTrue(item !== null);
+				var name = store.getValue(item,&quot;name&quot;);
+				t.assertEqual(name, &quot;El Salvador&quot;);
+				d.callback(true);
+			}
+			function onError(errData){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetchItemByIdentity({identity: &quot;2&quot;, onItem: onItem, onError: onError});
+			return d; // Deferred
+		}
+	},
+	{
+        name: &quot;Identity API: fetchItemByIdentity() Object.prototype item identifier&quot;,
+        runTest: function(datastore, t){
+			// summary:
+			//		Simple test of bug where store would raise an error
+			//		if the item identifier was the same as an Object property name.
+			var data = {identifier: &#039;id&#039;, items: [{id: &#039;toString&#039;, value: &#039;aha&#039;}]};
+			var store = new datastore({data: data});
+			var d = new doh.Deferred();
+			function onitem(item){
+				t.assertTrue(item.value == &#039;aha&#039;);
+				d.callback(true);
+			}
+			function onError(errData){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetchItemByIdentity({identity: &#039;toString&#039;, onItem: onitem, onError: onError});
+			return d; // Deferred
+		}
+	},
+	{
+        name: &quot;Identity API: fetchItemByIdentity() Object.prototype item identifier 2&quot;,
+        runTest: function(datastore, t){
+			// summary:
+			//		Simple test of bug where store would raise an error
+			//		if the item identifier was the same as an Object property name.
+			var data = {identifier: &#039;id&#039;, items: [{id: &#039;hasOwnProperty&#039;, value: &#039;yep&#039;}]};
+			var store = new datastore({data: data});
+			var d = new doh.Deferred();
+			function onitem(item){
+				t.assertTrue(item.value == &#039;yep&#039;);
+				d.callback(true);
+			}
+			function onError(errData){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetchItemByIdentity({identity: &#039;hasOwnProperty&#039;, onItem: onitem, onError: onError});
+			return d; // Deferred
+		}
+	},
+	{
+        name: &quot;Identity API: fetchItemByIdentity() Object.prototype identity&quot;,
+        runTest: function(datastore, t){
+			// summary:
+			//		Simple test of bug where fetchItemByIdentity would return
+			//		an object property.
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries_withoutid&quot;));
+			var d = new doh.Deferred();
+			function onItem(item){
+				t.assertTrue(item === null);
+				d.callback(true);
+			}
+			function onError(errData){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetchItemByIdentity({identity: &#039;toString&#039;, onItem: onItem, onError: onError});
+			return d; // Deferred
+		}
+	},
+	{
+        name: &quot;Identity API: fetchItemByIdentity() Object.prototype identity 2&quot;,
+        runTest: function(datastore, t){
+			// summary:
+			//		Simple test of bug where fetchItemByIdentity would return
+			//		an object property.
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries_withoutid&quot;));
+			var d = new doh.Deferred();
+			function onItem(item){
+				t.assertTrue(item === null);
+				d.callback(true);
+			}
+			function onError(errData){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetchItemByIdentity({identity: &#039;hasOwnProperty&#039;, onItem: onItem, onError: onError});
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Identity API: getIdentity()&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of the getIdentity function of the store.
+			// description:
+			//		Simple test of the getIdentity function of the store.
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;));
+
+			var d = new doh.Deferred();
+			function onItem(item){
+				t.assertTrue(item !== null);
+				t.assertTrue(store.getIdentity(item) === &quot;sv&quot;);
+				d.callback(true);
+			}
+			function onError(errData){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetchItemByIdentity({identity: &quot;sv&quot;, onItem: onItem, onError: onError});
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Identity API: getIdentity() withoutSpecifiedId&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of the #4691 bug
+			// description:
+			//		Simple test of the #4691 bug
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries_withoutid&quot;));
+
+			var d = new doh.Deferred();
+			function onItem(item, request){
+				t.assertTrue(item !== null);
+				t.assertTrue(store.getIdentity(item) === 2);
+				d.callback(true);
+			}
+			function onError(errData, request){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetch({ query:{abbr: &quot;sv&quot;}, onItem: onItem, onError: onError});
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Read API: fetch() all&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of a basic fetch on ItemFileReadStore.
+			// description:
+			//		Simple test of a basic fetch on ItemFileReadStore.
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;));
+
+			var d = new doh.Deferred();
+			function completedAll(items, request){
+				t.is(7, items.length);
+				d.callback(true);
+			}
+			function error(errData, request){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+
+			//Get everything...
+			store.fetch({ onComplete: completedAll, onError: error});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() all failOk&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of a basic fetch on ItemFileReadStore that fails quietly.
+			// description:
+			//		Simple test of a basic fetch on ItemFileReadStore that fails quietly.
+			if(dojo.isBrowser){
+				var storeParams = {
+					url: &quot;noSuchUrl&quot;,
+					failOk: true
+				};
+				var store = new datastore(storeParams);
+				console.log(store);
+
+				var d = new doh.Deferred();
+				var completedAll = function(items, request){
+					d.errback(new Error(&quot;Should not be here, should have failed load.&quot;));
+				};
+				var error = function(errData, request){
+					d.callback(true);
+				};
+
+				//Get everything...
+				store.fetch({ onComplete: completedAll, onError: error});
+				return d;
+			}
+		}
+	},
+	{
+		name: &quot;Read API: fetch() abort&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of a basic fetch abort on ItemFileReadStore.
+			// description:
+			//		Simple test of a basic fetch abort on ItemFileReadStore.
+			//Can only async abort in a browser, so disable this test from rhino
+			if(dojo.isBrowser){
+				var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;));
+
+				var d = new doh.Deferred();
+				var abortCalled = false;
+				function completedAll(items, request){
+					t.is(7, items.length);
+					if(abortCalled){
+						console.log(&quot;Made it to complete callback and abort was called.  Problem.&quot;);
+						d.errback(new Error(&quot;Should not be here.&quot;));
+					}else{
+						//We beat out calling abort, so this is okay.  Timing.
+						console.log(&quot;in onComplete and abort has not been called.  Timing.  This is okay.&quot;);
+						d.callback(true);
+					}
+				}
+				function error(errData, request){
+					//An abort should throw a cancel error, so we should
+					//reach this.
+					t.assertTrue(true);
+					d.callback(true);
+				}
+
+				//Get everything...
+				var req = store.fetch({ onComplete: completedAll, onError: error});
+				abortCalled=true;
+				console.log(&quot;Calling abort.&quot;);
+				req.abort();
+				return d;
+			}
+		}
+	},
+	{
+		name: &quot;Read API: fetch() all (count === Infinity)&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of a basic fetch on ItemFileReadStore and with a count of Infinity.
+			// description:
+			//		Simple test of a basic fetch on ItemFileReadStore and with a count of Infinity.
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;));
+
+			var d = new doh.Deferred();
+			function completedAll(items, request){
+				t.is(7, items.length);
+				d.callback(true);
+			}
+			function error(errData, request){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+
+			//Get everything...
+			store.fetch({ onComplete: completedAll, onError: error, start: 0, count: Infinity});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() all PreventCache&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of a basic fetch on ItemFileReadStore.
+			// description:
+			//		Simple test of a basic fetch on ItemFileReadStore.
+			var args = tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;);
+			args.urlPreventCache = true;
+			var store = new datastore(args);
+
+			var d = new doh.Deferred();
+			function completedAll(items, request){
+				t.is(7, items.length);
+				d.callback(true);
+			}
+			function error(errData, request){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+
+			//Get everything...
+			store.fetch({ onComplete: completedAll, onError: error});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() one&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of a basic fetch on ItemFileReadStore of a single item.
+			// description:
+			//		Simple test of a basic fetch on ItemFileReadStore of a single item.
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;));
+
+			var d = new doh.Deferred();
+			function onComplete(items, request){
+				t.assertEqual(items.length, 1);
+				d.callback(true);
+			}
+			function onError(errData, request){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetch({ 	query: {abbr: &quot;ec&quot;},
+									onComplete: onComplete,
+									onError: onError
+								});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() shallow&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of a basic fetch on ItemFileReadStore of only toplevel items
+			// description:
+			//		Simple test of a basic fetch on ItemFileReadStore of only toplevel items.
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;geography_hierarchy_small&quot;));
+
+			var d = new doh.Deferred();
+			function onComplete(items, request){
+				t.assertEqual(items.length, 2);
+				d.callback(true);
+			}
+			function onError(errData, request){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			//Find all items starting with A, only toplevel (root) items.
+			store.fetch({ 	query: {name: &quot;A*&quot;},
+									onComplete: onComplete,
+									onError: onError
+								});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() Multiple&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Tests that multiple fetches at the same time queue up properly and do not clobber each other on initial load.
+			// description:
+			//		Tests that multiple fetches at the same time queue up properly and do not clobber each other on initial load.
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;geography_hierarchy_small&quot;));
+
+			var d = new doh.Deferred();
+			var done = [false, false];
+
+			function onCompleteOne(items, request){
+				done[0] = true;
+				t.assertEqual(items.length, 2);
+				if(done[0] &amp;&amp; done[1]){
+					d.callback(true);
+				}
+			}
+			function onCompleteTwo(items, request){
+				done[1] = true;
+				if(done[0] &amp;&amp; done[1]){
+					d.callback(true);
+				}
+			}
+			function onError(errData, request){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			//Find all items starting with A, only toplevel (root) items.
+			store.fetch({ 	query: {name: &quot;A*&quot;},
+									onComplete: onCompleteOne,
+									onError: onError
+								});
+
+			//Find all items starting with A, only toplevel (root) items.
+			store.fetch({ 	query: {name: &quot;N*&quot;},
+									onComplete: onCompleteTwo,
+									onError: onError
+								});
+
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() MultipleMixedFetch&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Tests that multiple fetches at the same time queue up properly and do not clobber each other on initial load.
+			// description:
+			//		Tests that multiple fetches at the same time queue up properly and do not clobber each other on initial load.
+			//		Tests an item fetch and an identity fetch.
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;));
+
+			var d = new doh.Deferred();
+			var done = [false, false];
+
+			function onComplete(items, request){
+				done[0] = true;
+				t.assertEqual(items.length, 1);
+				if(done[0] &amp;&amp; done[1]){
+					d.callback(true);
+				}
+			}
+			function onItem(item){
+				done[1] = true;
+				t.assertTrue(item !== null);
+				var name = store.getValue(item,&quot;name&quot;);
+				t.assertEqual(name, &quot;El Salvador&quot;);
+
+				if(done[0] &amp;&amp; done[1]){
+					d.callback(true);
+				}
+			}
+			function onError(errData){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+
+			//Find all items starting with A, only toplevel (root) items.
+			store.fetch({ 	query: {name: &quot;El*&quot;},
+									onComplete: onComplete,
+									onError: onError
+								});
+
+			store.fetchItemByIdentity({identity: &quot;sv&quot;, onItem: onItem, onError: onError});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() deep&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of a basic fetch on ItemFileReadStore of all items (including children (nested))
+			// description:
+			//		Simple test of a basic fetch on ItemFileReadStore of all items (including children (nested))
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;geography_hierarchy_small&quot;));
+
+			var d = new doh.Deferred();
+			function onComplete(items, request){
+				t.assertEqual(items.length, 4);
+				d.callback(true);
+			}
+			function onError(errData, request){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			//Find all items starting with A, including child (nested) items.
+			store.fetch({ 	query: {name: &quot;A*&quot;},
+									onComplete: onComplete,
+									onError: onError,
+									queryOptions: {deep:true}
+								});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() hierarchy off&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of a basic fetch on ItemFileReadStore of all items with hierarchy disabled
+			//		This should turn off processing child objects as data store items.  It will still process
+			//		references and type maps.
+			// description:
+			//		Simple test of a basic fetch on ItemFileReadStore of all items with hierarchy disabled
+			//		This should turn off processing child objects as data store items.  It will still process
+			//		references and type maps.
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;geography_hierarchy_small&quot;));
+
+			//Set this as hierarchy off before fetch to make sure it traps and configs right.
+			store.hierarchical = false;
+
+			var d = new doh.Deferred();
+			function onComplete(items, request){
+				//With hierarchy off, this should only match 2, as only two data store items
+				//will be quertied
+				t.assertEqual(items.length, 2);
+				var i;
+				var passed = true;
+				for(i = 0; i &lt; items.length; i++){
+					var countries = store.getValues(items[i], &quot;countries&quot;);
+					if(countries){
+						var j;
+						//Make sure none of the child objects were processed into items.
+						for(j = 0; j&lt;countries.length; j++){
+							passed = !store.isItem(countries[j]);
+							if(!passed){
+								break;
+							}
+						}
+					}
+					if(!passed){
+						break;
+					}
+				}
+				if(!passed){
+					d.errback(new Error(&quot;Located a child item with hierarchy off and no references in the data.  Error.&quot;));
+				}else{
+					d.callback(true);
+				}
+			}
+			function onError(errData, request){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			//Find all items starting with A, including child (nested) items.
+			store.fetch({ 	query: {name: &quot;A*&quot;},
+									onComplete: onComplete,
+									onError: onError,
+									queryOptions: {deep:true}
+								});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() hierarchy off refs still parse&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of a basic fetch on ItemFileReadStore of all items with hierarchy disabled
+			//		This should turn off processing child objects as data store items.  It will still process
+			//		references and type maps.
+			// description:
+			//		Simple test of a basic fetch on ItemFileReadStore of all items with hierarchy disabled
+			//		This should turn off processing child objects as data store items.  It will still process
+			//		references and type maps.
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries_references&quot;));
+
+			//Set this as hierarchy off before fetch to make sure it traps and configs right.
+			store.hierarchical = false;
+
+			var d = new doh.Deferred();
+			function onComplete(items, request){
+				//With hierarchy off, this should only match 2, as only two data store items
+				//will be quertied
+				t.assertEqual(items.length, 4);
+				var i;
+				var passed = true;
+				for(i = 0; i &lt; items.length; i++){
+					var countries = store.getValues(items[i], &quot;children&quot;);
+					if(countries){
+						var j;
+						//Make sure none of the child objects were processed into items.
+						for(j = 0; j&lt;countries.length; j++){
+							passed = store.isItem(countries[j]);
+							if(!passed){
+								break;
+							}
+						}
+					}
+					if(!passed){
+						break;
+					}
+				}
+				if(!passed){
+					d.errback(new Error(&quot;Found a non-child item in a reference list in a references based input.  Error.&quot;));
+				}else{
+					d.callback(true);
+				}
+			}
+			function onError(errData, request){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			//Find all items starting with A, including child (nested) items.
+			store.fetch({ 	query: {name: &quot;A*&quot;},
+									onComplete: onComplete,
+									onError: onError,
+									queryOptions: {deep:true}
+								});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() one_commentFilteredJson&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of a basic fetch on ItemFileReadStore of a single item.
+			// description:
+			//		Simple test of a basic fetch on ItemFileReadStore of a single item.
+			//		This tests loading a comment-filtered json file so that people using secure
+			//		data with this store can bypass the JavaSceipt hijack noted in Fortify&#039;s
+			//		paper.
+			if(dojo.isBrowser){
+                var store = new datastore({url: require.toUrl(&quot;./countries_commentFiltered.json&quot;)});
+
+				var d = new doh.Deferred();
+				function onComplete(items, request){
+					t.assertEqual(items.length, 1);
+					d.callback(true);
+				}
+				function onError(errData, request){
+					t.assertTrue(false);
+					d.errback(errData);
+				}
+				store.fetch({ 	query: {abbr: &quot;ec&quot;},
+										onComplete: onComplete,
+										onError: onError
+									});
+				return d;
+			}
+		}
+	},
+	{
+		name: &quot;Read API: fetch() withNull&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of a basic fetch on ItemFileReadStore of a single item where some attributes are null.
+			// description:
+			//		Simple test of a basic fetch on ItemFileReadStore of a single item where some attributes are null.
+			//		Introduced because of tracker: #3153
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries_withNull&quot;));
+
+			var d = new doh.Deferred();
+			function onComplete(items, request){
+				t.assertEqual(4, items.length);
+				d.callback(true);
+			}
+			function onError(errData, request){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetch({ 	query: {name: &quot;E*&quot;},
+									onComplete: onComplete,
+									onError: onError
+								});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() all_streaming&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of a basic fetch on ItemFileReadStore.
+			// description:
+			//		Simple test of a basic fetch on ItemFileReadStore.
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;));
+
+			var d = new doh.Deferred();
+			count = 0;
+
+			function onBegin(size, requestObj){
+				t.assertEqual(size, 7);
+			}
+			function onItem(item, requestObj){
+				t.assertTrue(store.isItem(item));
+				count++;
+			}
+			function onComplete(items, request){
+				t.assertEqual(count, 7);
+				t.assertTrue(items === null);
+				d.callback(true);
+			}
+			function onError(errData, request){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+
+			//Get everything...
+			store.fetch({	onBegin: onBegin,
+									onItem: onItem,
+									onComplete: onComplete,
+									onError: onError
+								});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() paging&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Test of multiple fetches on a single result.  Paging, if you will.
+			// description:
+			//		Test of multiple fetches on a single result.  Paging, if you will.
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;));
+
+			var d = new doh.Deferred();
+			function dumpFirstFetch(items, request){
+				t.assertEqual(items.length, 5);
+				request.start = 3;
+				request.count = 1;
+				request.onComplete = dumpSecondFetch;
+				store.fetch(request);
+			}
+
+			function dumpSecondFetch(items, request){
+				t.assertEqual(items.length, 1);
+				request.start = 0;
+				request.count = 5;
+				request.onComplete = dumpThirdFetch;
+				store.fetch(request);
+			}
+
+			function dumpThirdFetch(items, request){
+				t.assertEqual(items.length, 5);
+				request.start = 2;
+				request.count = 20;
+				request.onComplete = dumpFourthFetch;
+				store.fetch(request);
+			}
+
+			function dumpFourthFetch(items, request){
+				t.assertEqual(items.length, 5);
+				request.start = 9;
+				request.count = 100;
+				request.onComplete = dumpFifthFetch;
+				store.fetch(request);
+			}
+
+			function dumpFifthFetch(items, request){
+				t.assertEqual(items.length, 0);
+				request.start = 2;
+				request.count = 20;
+				request.onComplete = dumpSixthFetch;
+				store.fetch(request);
+			}
+
+			function dumpSixthFetch(items, request){
+				t.assertEqual(items.length, 5);
+				d.callback(true);
+			}
+
+			function completed(items, request){
+				t.assertEqual(items.length, 7);
+				request.start = 1;
+				request.count = 5;
+				request.onComplete = dumpFirstFetch;
+				store.fetch(request);
+			}
+
+			function error(errData, request){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetch({onComplete: completed, onError: error});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() with MultiType Match&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of a basic fetch againct an attribute that has different types for the value across items
+			// description:
+			//		Simple test of a basic fetch againct an attribute that has different types for the value across items
+			//		Introduced because of tracker: #4931
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;data_multitype&quot;));
+
+			var d = new doh.Deferred();
+			function onComplete(items, request){
+				t.assertEqual(4, items.length);
+				d.callback(true);
+			}
+			function onError(errData, request){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetch({ 	query: {count: &quot;1*&quot;},
+									onComplete: onComplete,
+									onError: onError
+								});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() with RegExp Match&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of a basic fetch using a RegExp works with IFRS
+			// description:
+			//		Simple test of a basic fetch using a RegExp works with IFRS
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;data_multitype&quot;));
+
+			var d = new doh.Deferred();
+			function onComplete(items, request){
+				t.assertEqual(4, items.length);
+				d.callback(true);
+			}
+			function onError(errData, request){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetch({ 	query: {count: new RegExp(&quot;^1.*$&quot;, &quot;gi&quot;)},
+									onComplete: onComplete,
+									onError: onError
+								});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() with RegExp Match Inline&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of a basic fetch using a RegExp works with IFRS
+			// description:
+			//		Simple test of a basic fetch using a RegExp works with IFRS
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;data_multitype&quot;));
+
+			var d = new doh.Deferred();
+			function onComplete(items, request){
+				t.assertEqual(4, items.length);
+				d.callback(true);
+			}
+			function onError(errData, request){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetch({ 	query: {count: /^1.*$/gi},
+									onComplete: onComplete,
+									onError: onError
+								});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() with MultiType, MultiValue Match&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of a basic fetch againct an attribute that has different types for the value across items
+			// description:
+			//		Simple test of a basic fetch againct an attribute that has different types for the value across items
+			//		Introduced because of tracker: #4931
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;data_multitype&quot;));
+
+			var d = new doh.Deferred();
+			function onComplete(items, request){
+				t.assertEqual(7, items.length);
+				d.callback(true);
+			}
+			function onError(errData, request){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetch({ 	query: {value: &quot;true&quot;},
+									onComplete: onComplete,
+									onError: onError
+								});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: getLabel()&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of the getLabel function against a store set that has a label defined.
+			// description:
+			//		Simple test of the getLabel function against a store set that has a label defined.
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;));
+
+			var d = new doh.Deferred();
+			function onComplete(items, request){
+				t.assertEqual(items.length, 1);
+				var label = store.getLabel(items[0]);
+				t.assertTrue(label !== null);
+				t.assertEqual(&quot;Ecuador&quot;, label);
+				d.callback(true);
+			}
+			function onError(errData, request){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetch({ 	query: {abbr: &quot;ec&quot;},
+									onComplete: onComplete,
+									onError: onError
+								});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: getLabelAttributes()&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of the getLabelAttributes function against a store set that has a label defined.
+			// description:
+			//		Simple test of the getLabelAttributes function against a store set that has a label defined.
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;));
+
+			var d = new doh.Deferred();
+			function onComplete(items, request){
+				t.assertEqual(items.length, 1);
+				var labelList = store.getLabelAttributes(items[0]);
+				t.assertTrue(dojo.isArray(labelList));
+				t.assertEqual(&quot;name&quot;, labelList[0]);
+				d.callback(true);
+			}
+			function onError(errData, request){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetch({ 	query: {abbr: &quot;ec&quot;},
+									onComplete: onComplete,
+									onError: onError
+								});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: getValue()&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of the getValue function of the store.
+			// description:
+			//		Simple test of the getValue function of the store.
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;));
+
+			var d = new doh.Deferred();
+			function onItem(item){
+				t.assertTrue(item !== null);
+				var name = store.getValue(item,&quot;name&quot;);
+				t.assertTrue(name === &quot;El Salvador&quot;);
+				d.callback(true);
+			}
+			function onError(errData){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetchItemByIdentity({identity: &quot;sv&quot;, onItem: onItem, onError: onError});
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Read API: getValues()&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of the getValues function of the store.
+			// description:
+			//		Simple test of the getValues function of the store.
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;));
+
+			var d = new doh.Deferred();
+			function onItem(item){
+				t.assertTrue(item !== null);
+				var names = store.getValues(item,&quot;name&quot;);
+				t.assertTrue(dojo.isArray(names));
+				t.assertEqual(names.length, 1);
+				t.assertEqual(names[0], &quot;El Salvador&quot;);
+				d.callback(true);
+			}
+			function onError(errData){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetchItemByIdentity({identity: &quot;sv&quot;, onItem: onItem, onError: onError});
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Read API: isItem()&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of the isItem function of the store
+			// description:
+			//		Simple test of the isItem function of the store
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;));
+
+			var d = new doh.Deferred();
+			function onItem(item){
+				t.assertTrue(item !== null);
+				t.assertTrue(store.isItem(item));
+				t.assertTrue(!store.isItem({}));
+				d.callback(true);
+			}
+			function onError(errData){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetchItemByIdentity({identity: &quot;sv&quot;, onItem: onItem, onError: onError});
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Read API: isItem() multistore&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of the isItem function of the store
+			//		to verify two different store instances do not accept
+			//		items from each other.
+			// description:
+			//		Simple test of the isItem function of the store
+			//		to verify two different store instances do not accept
+			//		items from each other.
+
+			// Two different instances, even  if they read from the same URL
+			// should not accept items between each other!
+			var store1 = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;));
+			var store2 = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;));
+
+			var d = new doh.Deferred();
+			function onItem1(item1){
+				t.assertTrue(item1 !== null);
+
+				function onItem2(item2){
+					t.assertTrue(item1 !== null);
+					t.assertTrue(item2 !== null);
+					t.assertTrue(store1.isItem(item1));
+					t.assertTrue(store2.isItem(item2));
+					t.assertTrue(!store1.isItem(item2));
+					t.assertTrue(!store2.isItem(item1));
+					d.callback(true);
+				}
+				store2.fetchItemByIdentity({identity: &quot;sv&quot;, onItem: onItem2, onError: onError});
+
+			}
+			function onError(errData){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store1.fetchItemByIdentity({identity: &quot;sv&quot;, onItem: onItem1, onError: onError});
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Read API: hasAttribute()&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of the hasAttribute function of the store
+			// description:
+			//		Simple test of the hasAttribute function of the store
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;));
+
+			var d = new doh.Deferred();
+			function onItem(item){
+				try{
+					t.assertTrue(item !== null);
+
+					t.assertTrue(store.hasAttribute(item, &quot;abbr&quot;));
+					t.assertTrue(!store.hasAttribute(item, &quot;abbr_not&quot;));
+
+					//Test that null attributes throw an exception
+					var passed = false;
+					try{
+						store.hasAttribute(item, null);
+					}catch (e){
+						passed = true;
+					}
+					t.assertTrue(passed);
+					d.callback(true);
+				}catch(e){
+					d.errback(e);
+				}
+			}
+			function onError(errData){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetchItemByIdentity({identity: &quot;sv&quot;, onItem: onItem, onError: onError});
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Read API: containsValue()&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of the containsValue function of the store
+			// description:
+			//		Simple test of the containsValue function of the store
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;));
+
+			var d = new doh.Deferred();
+			function onItem(item){
+				t.assertTrue(item !== null);
+				t.assertTrue(store.containsValue(item, &quot;abbr&quot;, &quot;sv&quot;));
+				t.assertTrue(!store.containsValue(item, &quot;abbr&quot;, &quot;sv1&quot;));
+				t.assertTrue(!store.containsValue(item, &quot;abbr&quot;, null));
+
+				//Test that null attributes throw an exception
+				var passed = false;
+				try{
+					store.containsValue(item, null, &quot;foo&quot;);
+				}catch (e){
+					passed = true;
+				}
+				t.assertTrue(passed);
+				d.callback(true);
+			}
+			function onError(errData){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetchItemByIdentity({identity: &quot;sv&quot;, onItem: onItem, onError: onError});
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Read API: getAttributes()&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of the getAttributes function of the store
+			// description:
+			//		Simple test of the getAttributes function of the store
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;));
+
+			var d = new doh.Deferred();
+			function onItem(item){
+				t.assertTrue(item !== null);
+				t.assertTrue(store.isItem(item));
+
+				var attributes = store.getAttributes(item);
+				t.assertEqual(attributes.length, 3);
+				for(var i = 0; i &lt; attributes.length; i++){
+					t.assertTrue((attributes[i] === &quot;name&quot; || attributes[i] === &quot;abbr&quot; || attributes[i] === &quot;capital&quot;));
+				}
+				d.callback(true);
+			}
+			function onError(errData){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetchItemByIdentity({identity: &quot;sv&quot;, onItem: onItem, onError: onError});
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Read API: getFeatures()&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of the getFeatures function of the store
+			// description:
+			//		Simple test of the getFeatures function of the store
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;));
+
+			var features = store.getFeatures();
+			t.assertTrue(features[&quot;dojo.data.api.Read&quot;] != null);
+			t.assertTrue(features[&quot;dojo.data.api.Identity&quot;] != null);
+		}
+	},
+	{
+		name: &quot;Read API: fetch() patternMatch0&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test pattern matching of everything starting with lowercase e
+			// description:
+			//		Function to test pattern matching of everything starting with lowercase e
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;));
+
+			var d = new doh.Deferred();
+			function completed(items, request){
+				t.assertEqual(items.length, 5);
+				var passed = true;
+				for(var i = 0; i &lt; items.length; i++){
+					var value = store.getValue(items[i], &quot;abbr&quot;);
+					if(!(value === &quot;ec&quot; || value === &quot;eg&quot; || value === &quot;er&quot; || value === &quot;ee&quot; || value === &quot;et&quot;)){
+						passed=false;
+						break;
+					}
+				}
+				t.assertTrue(passed);
+				if (passed){
+					d.callback(true);
+				}else{
+					d.errback(new Error(&quot;Unexpected abbreviation found, match failure.&quot;));
+				}
+			}
+			function error(error, request){
+				t.assertTrue(false);
+				d.errback(error);
+			}
+			store.fetch({query: {abbr: &quot;e*&quot;}, onComplete: completed, onError: error});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() patternMatch1&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test pattern matching of everything with $ in it.
+			// description:
+			//		Function to test pattern matching of everything with $ in it.
+
+			var store = new datastore({data: { identifier: &quot;uniqueId&quot;,
+											  items: [ {uniqueId: 1, value:&quot;foo*bar&quot;},
+												   {uniqueId: 2, value:&quot;bar*foo&quot;},
+												   {uniqueId: 3, value:&quot;boomBam&quot;},
+												   {uniqueId: 4, value:&quot;bit$Bite&quot;},
+												   {uniqueId: 5, value:&quot;ouagadogou&quot;},
+												   {uniqueId: 6, value:&quot;BaBaMaSaRa***Foo&quot;},
+												   {uniqueId: 7, value:&quot;squawl&quot;},
+												   {uniqueId: 8, value:&quot;seaweed&quot;},
+												   {uniqueId: 9, value:&quot;jfq4@#!$!@Rf14r14i5u&quot;}
+												 ]
+										}
+								 });
+
+			var d = new doh.Deferred();
+			function completed(items, request){
+				t.assertEqual(items.length, 2);
+				var passed = true;
+				for(var i = 0; i &lt; items.length; i++){
+					var value = store.getValue(items[i], &quot;value&quot;);
+					if(!(value === &quot;bit$Bite&quot; || value === &quot;jfq4@#!$!@Rf14r14i5u&quot;)){
+						passed=false;
+						break;
+					}
+				}
+				t.assertTrue(passed);
+				if (passed){
+					d.callback(true);
+				}else{
+					d.errback(new Error(&quot;Unexpected pattern matched.  Filter failure.&quot;));
+				}
+			}
+			function error(error, request){
+				t.assertTrue(false);
+				d.errback(error);
+			}
+			store.fetch({query: {value: &quot;*$*&quot;}, onComplete: completed, onError: error});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() patternMatch2&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test exact pattern match
+			// description:
+			//		Function to test exact pattern match
+
+			var store = new datastore({data: { identifier: &quot;uniqueId&quot;,
+											  items: [ {uniqueId: 1, value:&quot;foo*bar&quot;},
+												   {uniqueId: 2, value:&quot;bar*foo&quot;},
+												   {uniqueId: 3, value:&quot;boomBam&quot;},
+												   {uniqueId: 4, value:&quot;bit$Bite&quot;},
+												   {uniqueId: 5, value:&quot;ouagadogou&quot;},
+												   {uniqueId: 6, value:&quot;BaBaMaSaRa***Foo&quot;},
+												   {uniqueId: 7, value:&quot;squawl&quot;},
+												   {uniqueId: 8, value:&quot;seaweed&quot;},
+												   {uniqueId: 9, value:&quot;jfq4@#!$!@Rf14r14i5u&quot;}
+												 ]
+										}
+								 });
+
+			var d = new doh.Deferred();
+			function completed(items, request){
+				t.assertEqual(items.length, 1);
+				var passed = true;
+				for(var i = 0; i &lt; items.length; i++){
+					var value = store.getValue(items[i], &quot;value&quot;);
+					if(!(value === &quot;bar*foo&quot;)){
+						passed=false;
+						break;
+					}
+				}
+				t.assertTrue(passed);
+				if (passed){
+					d.callback(true);
+				}else{
+					d.errback(new Error(&quot;Unexpected abbreviation found, match failure.&quot;));
+				}
+			}
+			function error(error, request){
+				t.assertTrue(false);
+				d.errback(error);
+			}
+			store.fetch({query: {value: &quot;bar\*foo&quot;}, onComplete: completed, onError: error});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() patternMatch_caseSensitive&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test pattern matching of a pattern case-sensitively
+			// description:
+			//		Function to test pattern matching of a pattern case-sensitively
+
+			var store = new datastore({data: { identifier: &quot;uniqueId&quot;,
+											  items: [ {uniqueId: 1, value:&quot;foo*bar&quot;},
+												   {uniqueId: 2, value:&quot;bar*foo&quot;},
+												   {uniqueId: 3, value:&quot;BAR*foo&quot;},
+												   {uniqueId: 4, value:&quot;BARBananafoo&quot;}
+												 ]
+										}
+								 });
+
+			var d = new doh.Deferred();
+			function completed(items, request){
+				t.assertEqual(1, items.length);
+				var passed = true;
+				for(var i = 0; i &lt; items.length; i++){
+					var value = store.getValue(items[i], &quot;value&quot;);
+					if(!(value === &quot;bar*foo&quot;)){
+						passed=false;
+						break;
+					}
+				}
+				t.assertTrue(passed);
+				if (passed){
+					d.callback(true);
+				}else{
+					d.errback(new Error(&quot;Unexpected pattern matched.  Filter failure.&quot;));
+				}
+			}
+			function error(error, request){
+				t.assertTrue(false);
+				d.errback(error);
+			}
+			store.fetch({query: {value: &quot;bar\\*foo&quot;}, queryOptions: {ignoreCase: false} , onComplete: completed, onError: error});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() patternMatch_caseInsensitive&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test pattern matching of a pattern case-insensitively
+			// description:
+			//		Function to test pattern matching of a pattern case-insensitively
+
+			var store = new datastore({data: { identifier: &quot;uniqueId&quot;,
+											  items: [ {uniqueId: 1, value:&quot;foo*bar&quot;},
+												   {uniqueId: 2, value:&quot;bar*foo&quot;},
+												   {uniqueId: 3, value:&quot;BAR*foo&quot;},
+												   {uniqueId: 4, value:&quot;BARBananafoo&quot;}
+												 ]
+										}
+								 });
+
+			var d = new doh.Deferred();
+			function completed(items, request){
+				t.assertEqual(items.length, 2);
+				var passed = true;
+				for(var i = 0; i &lt; items.length; i++){
+					var value = store.getValue(items[i], &quot;value&quot;);
+					if(!(value === &quot;BAR*foo&quot; || value === &quot;bar*foo&quot;)){
+						passed=false;
+						break;
+					}
+				}
+				t.assertTrue(passed);
+				if (passed){
+					d.callback(true);
+				}else{
+					d.errback(new Error(&quot;Unexpected pattern matched.  Filter failure.&quot;));
+				}
+			}
+			function error(error, request){
+				t.assertTrue(false);
+				d.errback(error);
+			}
+			store.fetch({query: {value: &quot;bar\\*foo&quot;}, queryOptions: {ignoreCase: true}, onComplete: completed, onError: error});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() sortNumeric&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test sorting numerically.
+			// description:
+			//		Function to test sorting numerically.
+
+			var store = new datastore({data: { identifier: &quot;uniqueId&quot;,
+											  items: [ {uniqueId: 0, value:&quot;fo|o*b.ar&quot;},
+												   {uniqueId: 1, value:&quot;ba|r*foo&quot;},
+												   {uniqueId: 2, value:&quot;boomBam&quot;},
+												   {uniqueId: 3, value:&quot;bit$Bite&quot;},
+												   {uniqueId: 4, value:&quot;ouagadogou&quot;},
+												   {uniqueId: 5, value:&quot;jfq4@#!$!@|f1.$4r14i5u&quot;},
+												   {uniqueId: 6, value:&quot;BaB{aMa|SaRa***F}oo&quot;},
+												   {uniqueId: 7, value:&quot;squawl&quot;},
+												   {uniqueId: 9, value:&quot;seaweed&quot;},
+												   {uniqueId: 10, value:&quot;zulu&quot;},
+												   {uniqueId: 8, value:&quot;seaweed&quot;}
+												 ]
+										}
+								 });
+
+			var d = new doh.Deferred();
+			function completed(items, request){
+				t.assertEqual(items.length, 11);
+				var passed = true;
+				for(var i = 0; i &lt; items.length; i++){
+					var value = store.getValue(items[i], &quot;value&quot;);
+					if(!(store.getValue(items[i], &quot;uniqueId&quot;) === i)){
+						passed=false;
+						break;
+					}
+				}
+				t.assertTrue(passed);
+				if (passed){
+					d.callback(true);
+				}else{
+					d.errback(new Error(&quot;Unexpected sorting order found, sort failure.&quot;));
+				}
+			}
+
+			function error(error, request){
+				t.assertTrue(false);
+				d.errback(error);
+			}
+
+			var sortAttributes = [{attribute: &quot;uniqueId&quot;}];
+			store.fetch({onComplete: completed, onError: error, sort: sortAttributes});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() sortNumericDescending&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test sorting numerically.
+			// description:
+			//		Function to test sorting numerically.
+
+			var store = new datastore({data: { identifier: &quot;uniqueId&quot;,
+											  items: [ {uniqueId: 0, value:&quot;fo|o*b.ar&quot;},
+												   {uniqueId: 1, value:&quot;ba|r*foo&quot;},
+												   {uniqueId: 2, value:&quot;boomBam&quot;},
+												   {uniqueId: 3, value:&quot;bit$Bite&quot;},
+												   {uniqueId: 4, value:&quot;ouagadogou&quot;},
+												   {uniqueId: 5, value:&quot;jfq4@#!$!@|f1.$4r14i5u&quot;},
+												   {uniqueId: 6, value:&quot;BaB{aMa|SaRa***F}oo&quot;},
+												   {uniqueId: 7, value:&quot;squawl&quot;},
+												   {uniqueId: 9, value:&quot;seaweed&quot;},
+												   {uniqueId: 10, value:&quot;zulu&quot;},
+												   {uniqueId: 8, value:&quot;seaweed&quot;}
+												 ]
+										}
+								 });
+			var d = new doh.Deferred();
+			function completed(items, request){
+				t.assertEqual(items.length, 11);
+				var passed = true;
+				for(var i = 0; i &lt; items.length; i++){
+					var value = store.getValue(items[i], &quot;value&quot;);
+					if(!((items.length - (store.getValue(items[i], &quot;uniqueId&quot;) + 1)) === i)){
+						passed=false;
+						break;
+					}
+				}
+				t.assertTrue(passed);
+				if (passed){
+					d.callback(true);
+				}else{
+					d.errback(new Error(&quot;Unexpected sorting order found, sort failure.&quot;));
+				}
+			}
+
+			function error(error, request){
+				t.assertTrue(false);
+				d.errback(error);
+			}
+
+			var sortAttributes = [{attribute: &quot;uniqueId&quot;, descending: true}];
+			store.fetch({onComplete: completed, onError: error, sort: sortAttributes});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() sortNumericWithCount&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test sorting numerically in descending order, returning only a specified number of them.
+			// description:
+			//		Function to test sorting numerically in descending order, returning only a specified number of them.
+
+			var store = new datastore({data: { identifier: &quot;uniqueId&quot;,
+											 items: [ {uniqueId: 0, value:&quot;fo|o*b.ar&quot;},
+												  {uniqueId: 1, value:&quot;ba|r*foo&quot;},
+												  {uniqueId: 2, value:&quot;boomBam&quot;},
+												  {uniqueId: 3, value:&quot;bit$Bite&quot;},
+												  {uniqueId: 4, value:&quot;ouagadogou&quot;},
+												  {uniqueId: 5, value:&quot;jfq4@#!$!@|f1.$4r14i5u&quot;},
+												  {uniqueId: 6, value:&quot;BaB{aMa|SaRa***F}oo&quot;},
+												  {uniqueId: 7, value:&quot;squawl&quot;},
+												  {uniqueId: 9, value:&quot;seaweed&quot;},
+												  {uniqueId: 10, value:&quot;zulu&quot;},
+												  {uniqueId: 8, value:&quot;seaweed&quot;}
+												]
+									   }
+								});
+
+			var d = new doh.Deferred();
+			function completed(items, request){
+				t.assertEqual(items.length, 5);
+				var itemId = 10;
+				var passed = true;
+				for(var i = 0; i &lt; items.length; i++){
+					var value = store.getValue(items[i], &quot;value&quot;);
+					if(!(store.getValue(items[i], &quot;uniqueId&quot;) === itemId)){
+						passed=false;
+						break;
+					}
+					itemId--; // Decrement the item id.  We are descending sorted, so it should go 10, 9, 8, etc.
+				}
+				t.assertTrue(passed);
+				if (passed){
+					d.callback(true);
+				}else{
+					d.errback(new Error(&quot;Unexpected sorting order found, sort failure.&quot;));
+				}
+			}
+
+			function error(error, request){
+				t.assertTrue(false);
+				d.errback(error);
+			}
+
+			var sortAttributes = [{attribute: &quot;uniqueId&quot;, descending: true}];
+			store.fetch({onComplete: completed, onError: error, sort: sortAttributes, count: 5});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() sortAlphabetic&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test sorting alphabetic ordering.
+			// description:
+			//		Function to test sorting alphabetic ordering.
+
+			var store = new datastore({data: { identifier: &quot;uniqueId&quot;,
+											 items: [ {uniqueId: 0, value:&quot;abc&quot;},
+												  {uniqueId: 1, value:&quot;bca&quot;},
+												  {uniqueId: 2, value:&quot;abcd&quot;},
+												  {uniqueId: 3, value:&quot;abcdefg&quot;},
+												  {uniqueId: 4, value:&quot;lmnop&quot;},
+												  {uniqueId: 5, value:&quot;foghorn&quot;},
+												  {uniqueId: 6, value:&quot;qberty&quot;},
+												  {uniqueId: 7, value:&quot;qwerty&quot;},
+												  {uniqueId: 8, value:&quot;&quot;},
+												  {uniqueId: 9, value:&quot;seaweed&quot;},
+												  {uniqueId: 10, value:&quot;123abc&quot;}
+
+												]
+									   }
+								});
+
+			var d = new doh.Deferred();
+			function completed(items, request){
+				//Output should be in this order...
+				var orderedArray = [ 	&quot;&quot;,
+										&quot;123abc&quot;,
+										&quot;abc&quot;,
+										&quot;abcd&quot;,
+										&quot;abcdefg&quot;,
+										&quot;bca&quot;,
+										&quot;foghorn&quot;,
+										&quot;lmnop&quot;,
+										&quot;qberty&quot;,
+										&quot;qwerty&quot;,
+										&quot;seaweed&quot;
+					];
+				t.assertEqual(items.length, 11);
+				var passed = true;
+				for(var i = 0; i &lt; items.length; i++){
+					var value = store.getValue(items[i], &quot;value&quot;);
+					if(!(store.getValue(items[i], &quot;value&quot;) === orderedArray[i])){
+						passed=false;
+						break;
+					}
+				}
+				t.assertTrue(passed);
+				if (passed){
+					d.callback(true);
+				}else{
+					d.errback(new Error(&quot;Unexpected sorting order found, sort failure.&quot;));
+				}
+			}
+
+			function error(error, request){
+				t.assertTrue(false);
+				d.errback(error);
+			}
+
+			var sortAttributes = [{attribute: &quot;value&quot;}];
+			store.fetch({onComplete: completed, onError: error, sort: sortAttributes});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() sortAlphabeticDescending&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test sorting alphabetic ordering in descending mode.
+			// description:
+			//		Function to test sorting alphabetic ordering in descending mode.
+
+			var store = new datastore({data: { identifier: &quot;uniqueId&quot;,
+											 items: [ {uniqueId: 0, value:&quot;abc&quot;},
+												  {uniqueId: 1, value:&quot;bca&quot;},
+												  {uniqueId: 2, value:&quot;abcd&quot;},
+												  {uniqueId: 3, value:&quot;abcdefg&quot;},
+												  {uniqueId: 4, value:&quot;lmnop&quot;},
+												  {uniqueId: 5, value:&quot;foghorn&quot;},
+												  {uniqueId: 6, value:&quot;qberty&quot;},
+												  {uniqueId: 7, value:&quot;qwerty&quot;},
+												  {uniqueId: 8, value:&quot;&quot;},
+												  {uniqueId: 9, value:&quot;seaweed&quot;},
+												  {uniqueId: 10, value:&quot;123abc&quot;}
+
+												]
+									   }
+								});
+			var d = new doh.Deferred();
+			function completed(items, request){
+				//Output should be in this order...
+				var orderedArray = [ 	&quot;&quot;,
+										&quot;123abc&quot;,
+										&quot;abc&quot;,
+										&quot;abcd&quot;,
+										&quot;abcdefg&quot;,
+										&quot;bca&quot;,
+										&quot;foghorn&quot;,
+										&quot;lmnop&quot;,
+										&quot;qberty&quot;,
+										&quot;qwerty&quot;,
+										&quot;seaweed&quot;
+					];
+				orderedArray = orderedArray.reverse();
+				t.assertEqual(items.length, 11);
+
+				var passed = true;
+				for(var i = 0; i &lt; items.length; i++){
+					var value = store.getValue(items[i], &quot;value&quot;);
+					if(!(store.getValue(items[i], &quot;value&quot;) === orderedArray[i])){
+						passed=false;
+						break;
+					}
+				}
+				t.assertTrue(passed);
+				if (passed){
+					d.callback(true);
+				}else{
+					d.errback(new Error(&quot;Unexpected sorting order found, sort failure.&quot;));
+				}
+			}
+
+			function error(error, request){
+				t.assertTrue(false);
+				d.errback(error);
+			}
+
+			var sortAttributes = [{attribute: &quot;value&quot;, descending: true}];
+			store.fetch({onComplete: completed, onError: error, sort: sortAttributes});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() sortDate&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test sorting date.
+			// description:
+			//		Function to test sorting date.
+
+			var store = new datastore({data: { identifier: &quot;uniqueId&quot;,
+											 items: [ {uniqueId: 0, value: new Date(0)},
+												  {uniqueId: 1, value: new Date(100)},
+												  {uniqueId: 2, value:new Date(1000)},
+												  {uniqueId: 3, value:new Date(2000)},
+												  {uniqueId: 4, value:new Date(3000)},
+												  {uniqueId: 5, value:new Date(4000)},
+												  {uniqueId: 6, value:new Date(5000)},
+												  {uniqueId: 7, value:new Date(6000)},
+												  {uniqueId: 8, value:new Date(7000)},
+												  {uniqueId: 9, value:new Date(8000)},
+												  {uniqueId: 10, value:new Date(9000)}
+
+												]
+									   }
+								});
+
+			var d = new doh.Deferred();
+			function completed(items,request){
+				var orderedArray =	[0,100,1000,2000,3000,4000,5000,6000,7000,8000,9000];
+				t.assertEqual(items.length, 11);
+				var passed = true;
+				for(var i = 0; i &lt; items.length; i++){
+					var value = store.getValue(items[i], &quot;value&quot;);
+					if(!(store.getValue(items[i], &quot;value&quot;).getTime() === orderedArray[i])){
+						passed=false;
+						break;
+					}
+				}
+				t.assertTrue(passed);
+				if (passed){
+					d.callback(true);
+				}else{
+					d.errback(new Error(&quot;Unexpected sorting order found, sort failure.&quot;));
+				}
+			}
+
+			function error(error, request){
+				t.assertTrue(false);
+				d.errback(error);
+			}
+
+			var sortAttributes = [{attribute: &quot;value&quot;}];
+			store.fetch({onComplete: completed, onError: error, sort: sortAttributes});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() sortDateDescending&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test sorting date in descending order.
+			// description:
+			//		Function to test sorting date in descending order.
+
+			var store = new datastore({data: { identifier: &quot;uniqueId&quot;,
+											 items: [ {uniqueId: 0, value: new Date(0)},
+												  {uniqueId: 1, value: new Date(100)},
+												  {uniqueId: 2, value:new Date(1000)},
+												  {uniqueId: 3, value:new Date(2000)},
+												  {uniqueId: 4, value:new Date(3000)},
+												  {uniqueId: 5, value:new Date(4000)},
+												  {uniqueId: 6, value:new Date(5000)},
+												  {uniqueId: 7, value:new Date(6000)},
+												  {uniqueId: 8, value:new Date(7000)},
+												  {uniqueId: 9, value:new Date(8000)},
+												  {uniqueId: 10, value:new Date(9000)}
+
+												]
+									   }
+								});
+
+			var d = new doh.Deferred();
+			function completed(items,request){
+				var orderedArray =	[0,100,1000,2000,3000,4000,5000,6000,7000,8000,9000];
+				orderedArray = orderedArray.reverse();
+				t.assertEqual(items.length, 11);
+				var passed = true;
+				for(var i = 0; i &lt; items.length; i++){
+					var value = store.getValue(items[i], &quot;value&quot;);
+					if(!(store.getValue(items[i], &quot;value&quot;).getTime() === orderedArray[i])){
+						passed=false;
+						break;
+					}
+				}
+				t.assertTrue(passed);
+				if (passed){
+					d.callback(true);
+				}else{
+					d.errback(new Error(&quot;Unexpected sorting order found, sort failure.&quot;));
+				}
+			}
+
+			function error(error, request){
+				t.assertTrue(false);
+				d.errback(error);
+			}
+
+			var sortAttributes = [{attribute: &quot;value&quot;, descending: true}];
+			store.fetch({onComplete: completed, onError: error, sort: sortAttributes});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() sortMultiple&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test sorting on multiple attributes.
+			// description:
+			//		Function to test sorting on multiple attributes.
+
+			var store = new datastore({data: { identifier: &quot;uniqueId&quot;,
+											 items: [ {uniqueId: 1, value:&quot;fo|o*b.ar&quot;},
+												  {uniqueId: 2, value:&quot;ba|r*foo&quot;},
+												  {uniqueId: 3, value:&quot;boomBam&quot;},
+												  {uniqueId: 4, value:&quot;bit$Bite&quot;},
+												  {uniqueId: 5, value:&quot;ouagadogou&quot;},
+												  {uniqueId: 6, value:&quot;jfq4@#!$!@|f1.$4r14i5u&quot;},
+												  {uniqueId: 7, value:&quot;BaB{aMa|SaRa***F}oo&quot;},
+												  {uniqueId: 8, value:&quot;squawl&quot;},
+												  {uniqueId: 10, value:&quot;seaweed&quot;},
+												  {uniqueId: 12, value:&quot;seaweed&quot;},
+												  {uniqueId: 11, value:&quot;zulu&quot;},
+												  {uniqueId: 9, value:&quot;seaweed&quot;}
+												]
+									   }
+								});
+
+			var d = new doh.Deferred();
+			function completed(items, request){
+				var orderedArray0 = [7,2,4,3,1,6,5,12,10,9,8,11];
+				var orderedArray1 = [	&quot;BaB{aMa|SaRa***F}oo&quot;,
+										&quot;ba|r*foo&quot;,
+										&quot;bit$Bite&quot;,
+										&quot;boomBam&quot;,
+										&quot;fo|o*b.ar&quot;,
+										&quot;jfq4@#!$!@|f1.$4r14i5u&quot;,
+										&quot;ouagadogou&quot;,
+										&quot;seaweed&quot;,
+										&quot;seaweed&quot;,
+										&quot;seaweed&quot;,
+										&quot;squawl&quot;,
+										&quot;zulu&quot;
+									];
+				var passed = true;
+				for(var i = 0; i &lt; items.length; i++){
+					var value = store.getValue(items[i], &quot;value&quot;);
+					if(!(	(store.getValue(items[i], &quot;uniqueId&quot;) === orderedArray0[i])&amp;&amp;
+							(store.getValue(items[i], &quot;value&quot;) === orderedArray1[i]))
+						){
+						passed=false;
+						break;
+					}
+				}
+				t.assertTrue(passed);
+				if (passed){
+					d.callback(true);
+				}else{
+					d.errback(new Error(&quot;Unexpected sorting order found, sort failure.&quot;));
+				}
+			}
+
+			function error(error, request){
+				t.assertTrue(false);
+				d.errback(error);
+			}
+
+			var sortAttributes = [{ attribute: &quot;value&quot;}, { attribute: &quot;uniqueId&quot;, descending: true}];
+			store.fetch({onComplete: completed, onError: error, sort: sortAttributes});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() sortMultipleSpecialComparator&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test sorting on multiple attributes with a custom comparator.
+			// description:
+			//		Function to test sorting on multiple attributes with a custom comparator.
+
+			var store = new datastore({data: { identifier: &quot;uniqueId&quot;,
+											 items: [ {uniqueId: 1, status:&quot;CLOSED&quot;},
+												  {uniqueId: 2,  status:&quot;OPEN&quot;},
+												  {uniqueId: 3,  status:&quot;PENDING&quot;},
+												  {uniqueId: 4,  status:&quot;BLOCKED&quot;},
+												  {uniqueId: 5,  status:&quot;CLOSED&quot;},
+												  {uniqueId: 6,  status:&quot;OPEN&quot;},
+												  {uniqueId: 7,  status:&quot;PENDING&quot;},
+												  {uniqueId: 8,  status:&quot;PENDING&quot;},
+												  {uniqueId: 10, status:&quot;BLOCKED&quot;},
+												  {uniqueId: 12, status:&quot;BLOCKED&quot;},
+												  {uniqueId: 11, status:&quot;OPEN&quot;},
+												  {uniqueId: 9,  status:&quot;CLOSED&quot;}
+												]
+									   }
+								});
+
+
+			store.comparatorMap = {};
+			store.comparatorMap[&quot;status&quot;] = function(a,b){
+				var ret = 0;
+				// We want to map these by what the priority of these items are, not by alphabetical.
+				// So, custom comparator.
+				var enumMap = { OPEN: 3, BLOCKED: 2, PENDING: 1, CLOSED: 0};
+				if (enumMap[a] &gt; enumMap[b]){
+					ret = 1;
+				}
+				if (enumMap[a] &lt; enumMap[b]){
+					ret = -1;
+				}
+				return ret;
+			};
+
+			var sortAttributes = [{attribute: &quot;status&quot;, descending: true}, { attribute: &quot;uniqueId&quot;, descending: true}];
+
+			var d = new doh.Deferred();
+			function completed(items, findResult){
+				var orderedArray = [11,6,2,12,10,4,8,7,3,9,5,1];
+				var passed = true;
+				for(var i = 0; i &lt; items.length; i++){
+					var value = store.getValue(items[i], &quot;value&quot;);
+					if(!(store.getValue(items[i], &quot;uniqueId&quot;) === orderedArray[i])){
+						passed=false;
+						break;
+					}
+				}
+				t.assertTrue(passed);
+				if (passed){
+					d.callback(true);
+				}else{
+					d.errback(new Error(&quot;Unexpected sorting order found, sort failure.&quot;));
+				}
+			}
+
+			function error(errData, request){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetch({onComplete: completed, onError: error, sort: sortAttributes});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: fetch() sortAlphabeticWithUndefined&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test sorting alphabetic ordering.
+			// description:
+			//		Function to test sorting alphabetic ordering.
+
+			var store = new datastore({data: { identifier: &quot;uniqueId&quot;,
+											 items: [ {uniqueId: 0, value:&quot;abc&quot;},
+												  {uniqueId: 1, value:&quot;bca&quot;},
+												  {uniqueId: 2, value:&quot;abcd&quot;},
+												  {uniqueId: 3, value:&quot;abcdefg&quot;},
+												  {uniqueId: 4, value:&quot;lmnop&quot;},
+												  {uniqueId: 5, value:&quot;foghorn&quot;},
+												  {uniqueId: 6, value:&quot;qberty&quot;},
+												  {uniqueId: 7, value:&quot;qwerty&quot;},
+												  {uniqueId: 8 },  //Deliberate undefined value
+												  {uniqueId: 9, value:&quot;seaweed&quot;},
+												  {uniqueId: 10, value:&quot;123abc&quot;}
+
+												]
+									   }
+								});
+
+			var d = new doh.Deferred();
+			function completed(items, request){
+				//Output should be in this order...
+				var orderedArray = [10,0,2,3,1,5,4,6,7,9,8];
+				t.assertEqual(items.length, 11);
+				var passed = true;
+				for(var i = 0; i &lt; items.length; i++){
+					if(!(store.getValue(items[i], &quot;uniqueId&quot;) === orderedArray[i])){
+						passed=false;
+						break;
+					}
+				}
+				t.assertTrue(passed);
+				if (passed){
+					d.callback(true);
+				}else{
+					d.errback(new Error(&quot;Unexpected sorting order found, sort failure.&quot;));
+				}
+			}
+
+			function error(error, request){
+				t.assertTrue(false);
+				d.errback(error);
+			}
+
+			var sortAttributes = [{attribute: &quot;value&quot;}];
+			store.fetch({onComplete: completed, onError: error, sort: sortAttributes});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: errorCondition_idCollision_inMemory&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of the errors thrown when there is an id collision in the data.
+			//		Added because of tracker: #2546
+			// description:
+			//		Simple test of the errors thrown when there is an id collision in the data.
+			//		Added because of tracker: #2546
+
+			var store = new datastore({	data: { identifier: &quot;uniqueId&quot;,
+																items: [{uniqueId: 12345, value:&quot;foo&quot;},
+																		{uniqueId: 123456, value:&quot;bar&quot;},
+																		{uniqueId: 12345, value:&quot;boom&quot;},
+																		{uniqueId: 123457, value:&quot;bit&quot;}
+																	]
+																}
+															});
+			var d = new doh.Deferred();
+			function onComplete(items, request){
+				//This is bad if this fires, this case should fail and not call onComplete.
+				t.assertTrue(false);
+				d.callback(false);
+			}
+
+			function reportError(errData, request){
+				//This is good if this fires, it is expected.
+				t.assertTrue(true);
+				d.callback(true);
+			}
+			store.fetch({onComplete: onComplete, onError: reportError});
+			return d;
+		}
+	},
+	{
+		name: &quot;Read API: errorCondition_idCollision_xhr&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test of the errors thrown when there is an id collision in the data.
+			//		Added because of tracker: #2546
+			// description:
+			//		Simple test of the errors thrown when there is an id collision in the data.
+			//		Added because of tracker: #2546
+
+			if(dojo.isBrowser){
+				var store = new datastore({url: require.toUrl(&quot;./countries_idcollision.json&quot;)});
+				var d = new doh.Deferred();
+				function onComplete(items, request){
+					//This is bad if this fires, this case should fail and not call onComplete.
+					t.assertTrue(false);
+					d.callback(false);
+				}
+
+				function reportError(errData, request){
+					//This is good if this fires, it is expected.
+					t.assertTrue(true);
+					d.callback(true);
+				}
+				store.fetch({onComplete: onComplete, onError: reportError});
+				return d;
+			}
+		}
+	},
+	{
+		name: &quot;Read API: Date_datatype&quot;,
+ 		runTest: function(datastore, t){
+			//var store = new datastore(tests.data.readOnlyItemFileTestTemplates.testFile[&quot;countries_withDates&quot;]);
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries_withDates&quot;));
+
+			var d = new doh.Deferred();
+			function onItem(item){
+				t.assertTrue(item !== null);
+				var independenceDate = store.getValue(item, &quot;independence&quot;);
+				t.assertTrue(independenceDate instanceof Date);
+				//Check to see if the value was deserialized properly.  Since the store stores in UTC/GMT, it
+				//should also be compared in the UTC/GMT mode
+				t.assertTrue(dojo.date.stamp.toISOString(independenceDate, {zulu:true}) === &quot;1993-05-24T00:00:00Z&quot;);
+				d.callback(true);
+			}
+			function onError(errData){
+				t.assertTrue(false);
+				d.errback(errData);
+			}
+			store.fetchItemByIdentity({identity:&quot;er&quot;, onItem:onItem, onError:onError});
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Read API: custom_datatype_Color_SimpleMapping&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test using literal values with custom datatypes
+			var dataset = {
+				identifier:&#039;name&#039;,
+				items: [
+					{ name:&#039;Kermit&#039;, species:&#039;frog&#039;, color:{_type:&#039;Color&#039;, _value:&#039;green&#039;} },
+					{ name:&#039;Beaker&#039;, hairColor:{_type:&#039;Color&#039;, _value:&#039;red&#039;} }
+				]
+			};
+			var store = new datastore({
+					data:dataset,
+					typeMap:{&#039;Color&#039;: dojo.Color}
+			});
+			var d = new doh.Deferred();
+			function onItem(item){
+				t.assertTrue(item !== null);
+				var beaker = item;
+				var hairColor = store.getValue(beaker, &quot;hairColor&quot;);
+				t.assertTrue(hairColor instanceof dojo.Color);
+				t.assertTrue(hairColor.toHex() == &quot;#ff0000&quot;);
+				d.callback(true);
+			}
+			function onError(errData){
+				d.errback(errData);
+			}
+			store.fetchItemByIdentity({identity:&quot;Beaker&quot;, onItem:onItem, onError:onError});
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Read API: custom_datatype_Color_GeneralMapping&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test using literal values with custom datatypes
+			var dataset = {
+				identifier:&#039;name&#039;,
+				items: [
+					{ name:&#039;Kermit&#039;, species:&#039;frog&#039;, color:{_type:&#039;Color&#039;, _value:&#039;green&#039;} },
+					{ name:&#039;Beaker&#039;, hairColor:{_type:&#039;Color&#039;, _value:&#039;red&#039;} }
+				]
+			};
+			var store = new datastore({
+					data:dataset,
+					typeMap:{&#039;Color&#039;: 	{
+											type: dojo.Color,
+											deserialize: function(value){
+												return new dojo.Color(value);
+											}
+										}
+							}
+			});
+			var d = new doh.Deferred();
+			function onItem(item){
+				t.assertTrue(item !== null);
+				var beaker = item;
+				var hairColor = store.getValue(beaker, &quot;hairColor&quot;);
+				t.assertTrue(hairColor instanceof dojo.Color);
+				t.assertTrue(hairColor.toHex() == &quot;#ff0000&quot;);
+				d.callback(true);
+			}
+			function onError(errData){
+				d.errback(errData);
+			}
+			store.fetchItemByIdentity({identity:&quot;Beaker&quot;, onItem:onItem, onError:onError});
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Read API: custom_datatype_CustomObject 0 (False) value&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test type mapping and _values that are false-like
+			var dataset = {
+				identifier:&#039;name&#039;,
+				items: [
+					{ name:&#039;Bob&#039;, species:&#039;human&#039;, age: {_type:&#039;tests.data.Wrapper&#039;, _value:0} },
+					{ name:&#039;Nancy&#039;, species:&#039;human&#039;, age: {_type:&#039;tests.data.Wrapper&#039;, _value:32} }
+				]
+			};
+			var store = new datastore({
+					data:dataset,
+					typeMap:{&#039;tests.data.Wrapper&#039;: 	{
+											type: tests.data.Wrapper,
+											deserialize: function(value){
+												return new tests.data.Wrapper(value);
+											}
+										}
+							}
+			});
+			var d = new doh.Deferred();
+			function onItem(item){
+				t.assertTrue(item !== null);
+				var bob = item;
+				var age = store.getValue(item, &quot;age&quot;);
+				t.assertTrue(age instanceof tests.data.Wrapper);
+				t.assertTrue(age.toString() == &quot;WRAPPER: [0]&quot;);
+				d.callback(true);
+			}
+			function onError(errData){
+				d.errback(errData);
+			}
+			store.fetchItemByIdentity({identity:&quot;Bob&quot;, onItem:onItem, onError:onError});
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Read API: custom_datatype_CustomObject Boolean False values&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test type mapping and _values that are false-like
+			var dataset = {
+				identifier:&#039;name&#039;,
+				items: [
+					{ name:&#039;Bob&#039;, isHuman: {_type:&#039;tests.data.Wrapper&#039;, _value:false} },
+					{ name:&#039;Nancy&#039;, isHuman: {_type:&#039;tests.data.Wrapper&#039;, _value: true} }
+				]
+			};
+			var store = new datastore({
+					data:dataset,
+					typeMap:{&#039;tests.data.Wrapper&#039;: 	{
+											type: tests.data.Wrapper,
+											deserialize: function(value){
+												return new tests.data.Wrapper(value);
+											}
+										}
+							}
+			});
+			var d = new doh.Deferred();
+			function onItem(item){
+				t.assertTrue(item !== null);
+				var bob = item;
+				var isHuman = store.getValue(item, &quot;isHuman&quot;);
+				t.assertTrue(isHuman instanceof tests.data.Wrapper);
+				t.assertTrue(isHuman.toString() == &quot;WRAPPER: [false]&quot;);
+				d.callback(true);
+			}
+			function onError(errData){
+				d.errback(errData);
+			}
+			store.fetchItemByIdentity({identity:&quot;Bob&quot;, onItem:onItem, onError:onError});
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Read API: custom_datatype_CustomObject Empty String values&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test type mapping and _values that are false-like
+			var dataset = {
+				identifier:&#039;name&#039;,
+				items: [
+					{ name:&#039;Bob&#039;, lastName: {_type:&#039;tests.data.Wrapper&#039;, _value:&quot;&quot;} },
+					{ name:&#039;Nancy&#039;, lastName: {_type:&#039;tests.data.Wrapper&#039;, _value: &quot;Doe&quot;} }
+				]
+			};
+			var store = new datastore({
+					data:dataset,
+					typeMap:{&#039;tests.data.Wrapper&#039;: 	{
+											type: tests.data.Wrapper,
+											deserialize: function(value){
+												return new tests.data.Wrapper(value);
+											}
+										}
+							}
+			});
+			var d = new doh.Deferred();
+			function onItem(item){
+				t.assertTrue(item !== null);
+				var bob = item;
+				var lastName = store.getValue(item, &quot;lastName&quot;);
+				t.assertTrue(lastName instanceof tests.data.Wrapper);
+				t.assertTrue(lastName.toString() == &quot;WRAPPER: []&quot;);
+				d.callback(true);
+			}
+			function onError(errData){
+				d.errback(errData);
+			}
+			store.fetchItemByIdentity({identity:&quot;Bob&quot;, onItem:onItem, onError:onError});
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Read API: custom_datatype_CustomObject explicit null values&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test type mapping and _values that are false-like
+			var dataset = {
+				identifier:&#039;name&#039;,
+				items: [
+					{ name:&#039;Bob&#039;, lastName: {_type:&#039;tests.data.Wrapper&#039;, _value:null} },
+					{ name:&#039;Nancy&#039;, lastName: {_type:&#039;tests.data.Wrapper&#039;, _value: &quot;Doe&quot;} }
+				]
+			};
+			var store = new datastore({
+					data:dataset,
+					typeMap:{&#039;tests.data.Wrapper&#039;: 	{
+											type: tests.data.Wrapper,
+											deserialize: function(value){
+												return new tests.data.Wrapper(value);
+											}
+										}
+							}
+			});
+			var d = new doh.Deferred();
+			function onItem(item){
+				t.assertTrue(item !== null);
+				var bob = item;
+				var lastName = store.getValue(item, &quot;lastName&quot;);
+				t.assertTrue(lastName instanceof tests.data.Wrapper);
+				t.assertTrue(lastName.toString() == &quot;WRAPPER: [null]&quot;);
+				d.callback(true);
+			}
+			function onError(errData){
+				d.errback(errData);
+			}
+			store.fetchItemByIdentity({identity:&quot;Bob&quot;, onItem:onItem, onError:onError});
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Read API: custom_datatype_CustomObject explicit undefined value&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test type mapping and _values that are false-like
+			var dataset = {
+				identifier:&#039;name&#039;,
+				items: [
+					{ name:&#039;Bob&#039;, lastName: {_type:&#039;tests.data.Wrapper&#039;, _value: undefined} },
+					{ name:&#039;Nancy&#039;, lastName: {_type:&#039;tests.data.Wrapper&#039;, _value: &quot;Doe&quot;} }
+				]
+			};
+			var store = new datastore({
+					data:dataset,
+					typeMap:{&#039;tests.data.Wrapper&#039;: 	{
+											type: tests.data.Wrapper,
+											deserialize: function(value){
+												return new tests.data.Wrapper(value);
+											}
+										}
+							}
+			});
+			var d = new doh.Deferred();
+			function onItem(item){
+				t.assertTrue(item !== null);
+				var bob = item;
+				var lastName = store.getValue(item, &quot;lastName&quot;);
+				t.assertTrue(lastName instanceof tests.data.Wrapper);
+				t.assertTrue(lastName.toString() == &quot;WRAPPER: [undefined]&quot;);
+				d.callback(true);
+			}
+			function onError(errData){
+				d.errback(errData);
+			}
+			store.fetchItemByIdentity({identity:&quot;Bob&quot;, onItem:onItem, onError:onError});
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Read API: hierarchical_data&quot;,
+ 		runTest: function(datastore, t){
+			//var store = new datastore(tests.data.readOnlyItemFileTestTemplates.testFile[&quot;geography_hierarchy_small&quot;]);
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;geography_hierarchy_small&quot;));
+			var d = new doh.Deferred();
+			function onComplete(items, request){
+				t.assertEqual(items.length, 1);
+				var northAmerica = items[0];
+				var canada = store.getValue(northAmerica, &quot;countries&quot;);
+				var toronto = store.getValue(canada, &quot;cities&quot;);
+				t.assertEqual(store.getValue(canada, &quot;name&quot;), &quot;Canada&quot;);
+				t.assertEqual(store.getValue(toronto, &quot;name&quot;), &quot;Toronto&quot;);
+				d.callback(true);
+			}
+			function onError(errData){
+				d.errback(errData);
+			}
+			store.fetch({
+				query: {name: &quot;North America&quot;},
+				onComplete: onComplete,
+				onError: onError
+			});
+
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Read API: close (clearOnClose: true)&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test the close api properly clears the store for reload when clearOnClose is set.
+			if (dojo.isBrowser){
+				var params = tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;);
+				params.clearOnClose = true;
+				params.urlPreventCache = true;
+				var store = new datastore(params);
+
+				var d = new doh.Deferred();
+				function onItem(item){
+					var error = null;
+					try {
+						t.assertTrue(item !== null);
+						var ec = item;
+						var val = store.getValue(ec, &quot;name&quot;);
+						t.assertEqual(&quot;Ecuador&quot;, val);
+
+						store.close();
+						//Check some internals here.  Do not normally access these!
+						t.assertTrue(store._arrayOfAllItems.length === 0);
+						t.assertTrue(store._loadFinished === false);
+					}catch (e){
+						error = e;
+					}
+					if (error){
+						d.errback(error);
+					}else{
+						d.callback(true);
+					}
+				}
+				function onError(errData){
+					d.errback(errData);
+				}
+				store.fetchItemByIdentity({identity:&quot;ec&quot;, onItem:onItem, onError:onError});
+				return d; // Deferred
+			}
+		}
+	},
+	{
+		name: &quot;Read API: close (clearOnClose: true, reset url.)&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test the close api properly clears the store for reload when clearOnClose is set.
+			if (dojo.isBrowser){
+				var params = tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;);
+				params.clearOnClose = true;
+				params.urlPreventCache = true;
+				var store = new datastore(params);
+
+				var d = new doh.Deferred();
+				function onItem(item){
+					var error = null;
+					try {
+						t.assertTrue(item !== null);
+						var ec = item;
+						var val = store.getValue(ec, &quot;name&quot;);
+						t.assertEqual(&quot;Ecuador&quot;, val);
+
+						store.close();
+						//Check some internals here.  Do not normally access these!
+						t.assertTrue(store._arrayOfAllItems.length === 0);
+						t.assertTrue(store._loadFinished === false);
+
+						store.url = require.toUrl(&quot;./countries_withNull.json&quot;);
+						function onItem2 (item){
+							var err;
+							try{
+								t.assertTrue(item !== null);
+                                var val = store.getValue(item, &quot;name&quot;);
+								t.assertEqual(null, val);
+							}catch(e){
+								err = e;
+							}
+							if(err){
+								d.errback(err);
+							}else{
+								d.callback(true);
+							}
+						}
+						store.fetchItemByIdentity({identity:&quot;ec&quot;, onItem:onItem2, onError:onError});
+					}catch (e){
+						error = e;
+					}
+					if (error){
+						d.errback(error);
+					}
+				}
+				function onError(errData){
+					d.errback(errData);
+				}
+				store.fetchItemByIdentity({identity:&quot;ec&quot;, onItem:onItem, onError:onError});
+				return d; // Deferred
+			}
+		}
+	},
+	{
+		name: &quot;Read API: fetch, close (clearOnClose: true, reset url.)&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test the close api properly clears the store for reload when clearOnClose is set.
+			if (dojo.isBrowser){
+				var params = tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;);
+				params.clearOnClose = true;
+				params.urlPreventCache = true;
+				var store = new datastore(params);
+
+				var d = new doh.Deferred();
+				function onItem(item){
+					var error = null;
+					try {
+						t.assertTrue(item !== null);
+						var ec = item;
+						var val = store.getValue(ec, &quot;name&quot;);
+						t.assertEqual(&quot;Ecuador&quot;, val);
+
+						store.close();
+						//Check some internals here.  Do not normally access these!
+						t.assertTrue(store._arrayOfAllItems.length === 0);
+						t.assertTrue(store._loadFinished === false);
+
+						store.url = require.toUrl(&quot;./countries_withNull.json&quot;);
+						function onComplete (items){
+                            var err;
+							try{
+								t.assertEqual(1, items.length);
+								var item = items[0];
+								t.assertTrue(item !== null);
+                                var val = store.getValue(item, &quot;name&quot;);
+								t.assertEqual(null, val);
+							}catch(e){
+								err = e;
+							}
+							if(err){
+								d.errback(err);
+							}else{
+								d.callback(true);
+							}
+						}
+						store.fetch({query: {abbr:&quot;ec&quot;}, onComplete:onComplete, onError:onError});
+					}catch (e){
+						error = e;
+					}
+					if (error){
+						d.errback(error);
+					}
+				}
+				function onError(errData){
+					d.errback(errData);
+				}
+				store.fetchItemByIdentity({identity:&quot;ec&quot;, onItem:onItem, onError:onError});
+				return d; // Deferred
+			}
+		}
+	},
+	{
+		name: &quot;Read API: close (clearOnClose: true, reset _jsonFileUrl.)&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test the close api properly clears the store for reload when clearOnClose is set.
+			if (dojo.isBrowser){
+				var params = tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;);
+				params.clearOnClose = true;
+				params.urlPreventCache = true;
+				var store = new datastore(params);
+
+				var d = new doh.Deferred();
+				function onItem(item){
+					var error = null;
+					try {
+						t.assertTrue(item !== null);
+						var ec = item;
+						var val = store.getValue(ec, &quot;name&quot;);
+						t.assertEqual(&quot;Ecuador&quot;, val);
+
+						store.close();
+						//Check some internals here.  Do not normally access these!
+						t.assertTrue(store._arrayOfAllItems.length === 0);
+						t.assertTrue(store._loadFinished === false);
+
+						store._jsonFileUrl = require.toUrl(&quot;./countries_withNull.json&quot;);
+						function onItem2 (item){
+							var err;
+							try{
+								t.assertTrue(item !== null);
+                                var val = store.getValue(item, &quot;name&quot;);
+								t.assertEqual(null, val);
+							}catch(e){
+								err = e;
+							}
+							if(err){
+								d.errback(err);
+							}else{
+								d.callback(true);
+							}
+						}
+						store.fetchItemByIdentity({identity:&quot;ec&quot;, onItem:onItem2, onError:onError});
+					}catch (e){
+						error = e;
+					}
+					if (error){
+						d.errback(error);
+					}
+				}
+				function onError(errData){
+					d.errback(errData);
+				}
+				store.fetchItemByIdentity({identity:&quot;ec&quot;, onItem:onItem, onError:onError});
+				return d; // Deferred
+			}
+		}
+	},
+	{
+		name: &quot;Read API: close (clearOnClose: false)&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test the close api properly clears the store for reload when clearOnClose is set.
+			if (dojo.isBrowser){
+				var params = tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;);
+				params.urlPreventCache = true;
+				var store = new datastore(params);
+
+				var d = new doh.Deferred();
+				function onItem(item){
+					var error = null;
+					try {
+						t.assertTrue(item !== null);
+						var ec = item;
+						var val = store.getValue(ec, &quot;name&quot;);
+						t.assertEqual(&quot;Ecuador&quot;, val);
+
+						store.close();
+						//Check some internals here.  Do not normally access these!
+						t.assertTrue(store._arrayOfAllItems.length !== 0);
+						t.assertTrue(store._loadFinished === true);
+					}catch (e){
+						error = e;
+					}
+					if (error){
+						d.errback(error);
+					}else{
+						d.callback(true);
+					}
+				}
+				function onError(errData){
+					d.errback(errData);
+				}
+				store.fetchItemByIdentity({identity:&quot;ec&quot;, onItem:onItem, onError:onError});
+				return d; // Deferred
+			}
+		}
+	},
+	{
+		name: &quot;Read API: close (clearOnClose: true, reset data.)&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Function to test that clear on close and reset of data works.
+			// description:
+			//		Function to test that clear on close and reset of data works.
+			var store = new datastore({data: { identifier: &quot;uniqueId&quot;,
+											  items: [ {uniqueId: 1, value:&quot;foo*bar&quot;},
+												   {uniqueId: 2, value:&quot;bar*foo&quot;},
+												   {uniqueId: 3, value:&quot;boomBam&quot;},
+												   {uniqueId: 4, value:&quot;bit$Bite&quot;},
+												   {uniqueId: 5, value:&quot;ouagadogou&quot;},
+												   {uniqueId: 6, value:&quot;BaBaMaSaRa***Foo&quot;},
+												   {uniqueId: 7, value:&quot;squawl&quot;},
+												   {uniqueId: 8, value:&quot;seaweed&quot;},
+												   {uniqueId: 9, value:&quot;jfq4@#!$!@Rf14r14i5u&quot;}
+												 ]
+										}
+								 });
+
+			var d = new doh.Deferred();
+			var firstComplete = function(items, request){
+				t.assertEqual(items.length, 1);
+				var firstItem = items[0];
+
+				//Set the store clearing options and the new data
+				store.clearOnClose = true;
+				store.data = { identifier: &quot;uniqueId&quot;,
+					items: [
+						{uniqueId: 1, value:&quot;foo*bar&quot;},
+						{uniqueId: 2, value:&quot;bar*foo&quot;},
+						{uniqueId: 3, value:&quot;boomBam&quot;},
+						{uniqueId: 4, value:&quot;bit$Bite&quot;},
+						{uniqueId: 5, value:&quot;ouagadogou&quot;},
+						{uniqueId: 6, value:&quot;BaBaMaSaRa***Foo&quot;},
+						{uniqueId: 7, value:&quot;squawl&quot;},
+						{uniqueId: 8, value:&quot;seaweed&quot;},
+						{uniqueId: 9, value:&quot;jfq4@#!$!@Rf14r14i5u&quot;}
+					]
+				};
+				store.close();
+
+				//Do the next fetch and verify that the next item you get is not
+				//a reference to the same item (data cleared and reloaded.
+				var secondComplete = function(items, request){
+					try{
+						t.assertEqual(items.length, 1);
+						var secondItem = items[0];
+						t.assertTrue(firstItem != null);
+						t.assertTrue(secondItem != null);
+						t.assertTrue(firstItem != secondItem);
+						d.callback(true);
+					}catch(e){
+						d.errback(e);
+					}
+				};
+				store.fetch({query: {value: &quot;bar\*foo&quot;}, onComplete: secondComplete, onError: error});
+			};
+			function error(error, request){
+				t.assertTrue(false);
+				d.errback(error);
+			}
+			store.fetch({query: {value: &quot;bar\*foo&quot;}, onComplete: firstComplete, onError: error});
+			return d;
+		}
+	},
+	{
+		name: &quot;Identity API: no_identifier_specified&quot;,
+ 		runTest: function(datastore, t){
+			var arrayOfItems = [
+				{name:&quot;Kermit&quot;, color:&quot;green&quot;},
+				{name:&quot;Miss Piggy&quot;, likes:&quot;Kermit&quot;},
+				{name:&quot;Beaker&quot;, hairColor:&quot;red&quot;}
+			];
+			var store = new datastore({data:{items:arrayOfItems}});
+			var d = new doh.Deferred();
+			function onComplete(items, request){
+				var features = store.getFeatures();
+				var hasIdentityFeature = Boolean(features[&#039;dojo.data.api.Identity&#039;]);
+				t.assertTrue(hasIdentityFeature);
+				for(var i = 0; i &lt; items.length; ++i){
+					var item = items[i];
+					var identifier = store.getIdentityAttributes(item);
+					t.assertTrue(identifier === null);
+					var identity = store.getIdentity(item);
+					t.assertTrue(typeof identity == &quot;number&quot;);
+				}
+				d.callback(true);
+			}
+			function reportError(errData, request){
+				d.errback(true);
+			}
+			store.fetch({onComplete: onComplete, onError: reportError});
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Identity API: hierarchical_data&quot;,
+ 		runTest: function(datastore, t){
+			var store = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;geography_hierarchy_small&quot;));
+			var d = new doh.Deferred();
+			function onComplete(items, request){
+				var features = store.getFeatures();
+				var hasIdentityFeature = Boolean(features[&#039;dojo.data.api.Identity&#039;]);
+				t.assertTrue(hasIdentityFeature);
+				for(var i = 0; i &lt; items.length; ++i){
+					var item = items[i];
+					var identifier = store.getIdentityAttributes(item);
+					t.assertTrue(identifier === null);
+					var identity = store.getIdentity(item);
+					t.assertTrue(typeof identity == &quot;number&quot;);
+				}
+				d.callback(true);
+			}
+			function reportError(errData, request){
+				d.errback(true);
+			}
+			store.fetch({onComplete: onComplete, onError: reportError});
+			return d; // Deferred
+		}
+	},
+	{
+		name: &quot;Read API: functionConformance&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test read API conformance.  Checks to see all declared functions are actual functions on the instances.
+			// description:
+			//		Simple test read API conformance.  Checks to see all declared functions are actual functions on the instances.
+			var testStore = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;));
+			var readApi = new dojo.data.api.Read();
+			var passed = true;
+
+			for(i in readApi){
+				if(i.toString().charAt(0) !== &#039;_&#039;)
+				{
+					var member = readApi[i];
+					//Check that all the &#039;Read&#039; defined functions exist on the test store.
+					if(typeof member === &quot;function&quot;){
+						var testStoreMember = testStore[i];
+						if(!(typeof testStoreMember === &quot;function&quot;)){
+							passed = false;
+							break;
+						}
+					}
+				}
+			}
+			t.assertTrue(passed);
+		}
+	},
+	{
+		name: &quot;Identity API: functionConformance&quot;,
+ 		runTest: function(datastore, t){
+			// summary:
+			//		Simple test identity API conformance.  Checks to see all declared functions are actual functions on the instances.
+			// description:
+			//		Simple test identity API conformance.  Checks to see all declared functions are actual functions on the instances.
+			var testStore = new datastore(tests.data.readOnlyItemFileTestTemplates.getTestData(&quot;countries&quot;));
+			var identityApi = new dojo.data.api.Identity();
+			var passed = true;
+
+			for(i in identityApi){
+
+				if(i.toString().charAt(0) !== &#039;_&#039;)
+				{
+					var member = identityApi[i];
+					//Check that all the &#039;Read&#039; defined functions exist on the test store.
+					if(typeof member === &quot;function&quot;){
+						var testStoreMember = testStore[i];
+						if(!(typeof testStoreMember === &quot;function&quot;)){
+							passed = false;
+							break;
+						}
+					}
+				}
+			}
+			t.assertTrue(passed);
+		}
+	}
+];
+
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>
