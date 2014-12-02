@@ -4,6 +4,7 @@
   "description": "all cujo js modules",
   "keywords": [],
   "dependencies": {
-    "wire": "~0.10.9"
+    "wire": "~0.10.9",
+    "when": "~3.2.3"
   }
 }
