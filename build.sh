@@ -6,6 +6,8 @@ dojo
 plato
 async
 request
+poly
+msgs
 END)
 
 build_reports(){

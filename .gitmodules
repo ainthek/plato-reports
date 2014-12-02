@@ -13,3 +13,6 @@
 [submodule "src/request"]
 	path = src/request
 	url = https://github.com/request/request.git
+[submodule "src/poly"]
+	path = src/poly
+	url = https://github.com/cujojs/poly
