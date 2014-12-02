@@ -34,7 +34,8 @@ build_stats_md(){
 		#desc=$(npm view $module_name description)
 		version_desc=$(cat $module_path/package.json | jsontool -d "|" -a version description | tr "\n" " ")
 		popularity=$(npm_stats $module_name) # could be faster with xargs
-		echo "| $module_name | $popularity | $rep | $version_desc | [report]($(link_report $module_name)), [npm]($(link_npm $module_name)) |"
+		echo "| $module_name | $popularity | $rep | $version_desc | [report]($(link_report $module_name)), [npm]($(link_npm $module_name)) |" |\
+		md-escape-emphasis
 	done | sort -t"|" -k3,3nr
 
 	popd >/dev/null
