@@ -8,6 +8,9 @@ async
 request
 poly
 msgs
+ampersand
+ampersand-state
+ampersand-view
 END)
 
 build_reports(){

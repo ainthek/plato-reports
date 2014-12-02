@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - msgs/test/aggregators/batching-test.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>msgs/test/aggregators/batching-test.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">67.90</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">174</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">48.10</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.70</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/*
+ * Copyright 2012-2013 the original author or authors
+ * @license MIT, see LICENSE.txt for details
+ *
+ * @author Scott Andrews
+ */
+
+(function (buster, define) {
+	&#039;use strict&#039;;
+
+	var assert, refute, fail;
+
+	assert = buster.assert;
+	refute = buster.refute;
+	fail = buster.assertions.fail;
+
+	define(&#039;msgs/aggregators/batching-test&#039;, function (require) {
+
+		var msgs, bus;
+
+		msgs = require(&#039;msgs/aggregators/batching&#039;);
+		require(&#039;msgs/channels/direct&#039;);
+
+		buster.testCase(&#039;msgs/aggregators/batching&#039;, {
+			setUp: function () {
+				bus = msgs.bus();
+			},
+			tearDown: function () {
+				bus.destroy();
+			},
+
+			&#039;should batch every two messages, abandoning the last message&#039;: function (done) {
+				var spy = this.spy(function (message) {
+					assert.equals([&#039;msg&#039;, &#039;msg&#039;], message);
+				});
+
+				bus.directChannel(&#039;in&#039;, &#039;agg&#039;);
+				bus.batchingAggregator(&#039;agg&#039;, { batch: 2, output: &#039;out&#039; });
+				bus.directChannel(&#039;out&#039;, bus.outboundAdapter(spy));
+
+				bus.send(&#039;in&#039;, &#039;msg&#039;);
+				assert.same(0, spy.callCount);
+				bus.send(&#039;in&#039;, &#039;msg&#039;);
+				assert.same(1, spy.callCount);
+				bus.send(&#039;in&#039;, &#039;msg&#039;);
+				assert.same(1, spy.callCount);
+				bus.send(&#039;in&#039;, &#039;msg&#039;);
+				assert.same(2, spy.callCount);
+				bus.send(&#039;in&#039;, &#039;lost in the ether&#039;);
+
+				setTimeout(function () {
+					assert.same(2, spy.callCount);
+
+					done();
+				}, 10);
+			},
+
+			&#039;should batch every two messages or 10ms&#039;: function (done) {
+				var spy = this.spy(function (message) {
+					message.forEach(function (msg) {
+						assert.same(&#039;msg&#039;, msg);
+					});
+				});
+
+				bus.directChannel(&#039;in&#039;, &#039;agg&#039;);
+				bus.batchingAggregator(&#039;agg&#039;, { batch: 2, timeout: 10, output: &#039;out&#039; });
+				bus.directChannel(&#039;out&#039;, bus.outboundAdapter(spy));
+
+				bus.send(&#039;in&#039;, &#039;msg&#039;);
+				assert.same(0, spy.callCount);
+				bus.send(&#039;in&#039;, &#039;msg&#039;);
+				assert.same(1, spy.callCount);
+				bus.send(&#039;in&#039;, &#039;msg&#039;);
+				assert.same(1, spy.callCount);
+
+				assert.same(1, spy.callCount);
+
+				setTimeout(function () {
+					assert.same(2, spy.callCount);
+
+					assert.same(2, spy.getCall(0).args[0].length);
+					assert.same(1, spy.getCall(1).args[0].length);
+
+					done();
+				}, 10);
+			},
+			&#039;should batch every 10ms regardless of buffer size&#039;: function (done) {
+				var spy = this.spy(function (message) {
+					message.forEach(function (msg) {
+						assert.same(&#039;msg&#039;, msg);
+					});
+				});
+
+				bus.directChannel(&#039;in&#039;, &#039;agg&#039;);
+				bus.batchingAggregator(&#039;agg&#039;, { timeout: 10, output: &#039;out&#039; });
+				bus.directChannel(&#039;out&#039;, bus.outboundAdapter(spy));
+
+				bus.send(&#039;in&#039;, &#039;msg&#039;);
+				bus.send(&#039;in&#039;, &#039;msg&#039;);
+				bus.send(&#039;in&#039;, &#039;msg&#039;);
+				bus.send(&#039;in&#039;, &#039;msg&#039;);
+				bus.send(&#039;in&#039;, &#039;msg&#039;);
+
+				assert.same(0, spy.callCount);
+
+				setTimeout(function () {
+					assert.same(1, spy.callCount);
+				}, 50);
+
+				setTimeout(function () {
+					assert.same(1, spy.callCount);
+
+					bus.send(&#039;in&#039;, &#039;msg&#039;);
+					bus.send(&#039;in&#039;, &#039;msg&#039;);
+					bus.send(&#039;in&#039;, &#039;msg&#039;);
+				}, 100);
+
+				setTimeout(function () {
+					assert.same(2, spy.callCount);
+
+					assert.same(5, spy.getCall(0).args[0].length);
+					assert.same(3, spy.getCall(1).args[0].length);
+
+					done();
+				}, 150);
+			},
+			&#039;should assert a valid configuration for an aggregator&#039;: function () {
+				bus.batchingAggregator({ batch: 10, timeout: 10 });
+				bus.batchingAggregator(&#039;agg1&#039;, { batch: 10, timeout: 10 });
+				bus.batchingAggregator(&#039;agg2&#039;, { timeout: 10 });
+				bus.batchingAggregator(&#039;agg3&#039;, { batch: 10 });
+				bus.batchingAggregator(&#039;agg4&#039;, { batch: 0, timeout: 10 });
+				bus.batchingAggregator(&#039;agg5&#039;, { batch: 10, timeout: 0 });
+
+				try {
+					bus.batchingAggregator(&#039;agg6&#039;, {});
+					fail(&#039;Exception expected&#039;);
+				}
+				catch (e) {
+					assert(e);
+				}
+
+				try {
+					bus.batchingAggregator(&#039;agg7&#039;, { timeout: 0 });
+					fail(&#039;Exception expected&#039;);
+				}
+				catch (e) {
+					assert(e);
+				}
+
+				try {
+					bus.batchingAggregator(&#039;agg8&#039;, { batch: 0 });
+					fail(&#039;Exception expected&#039;);
+				}
+				catch (e) {
+					assert(e);
+				}
+
+				try {
+					bus.batchingAggregator(&#039;agg9&#039;, { timeout: 0, batch: 0 });
+					fail(&#039;Exception expected&#039;);
+				}
+				catch (e) {
+					assert(e);
+				}
+			}
+		});
+
+	});
+
+}(
+	this.buster || require(&#039;buster&#039;),
+	typeof define === &#039;function&#039; &amp;&amp; define.amd ? define : function (id, factory) {
+		var packageName = id.split(/[\/\-]/)[0], pathToRoot = id.replace(/[^\/]+/g, &#039;..&#039;);
+		pathToRoot = pathToRoot.length &gt; 2 ? pathToRoot.substr(3) : pathToRoot;
+		factory(function (moduleId) {
+			return require(moduleId.indexOf(packageName) === 0 ? pathToRoot + moduleId.substr(packageName.length) : moduleId);
+		});
+	}
+	// Boilerplate for AMD and Node
+));</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

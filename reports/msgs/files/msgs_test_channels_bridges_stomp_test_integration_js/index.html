@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - msgs/test/channels/bridges/stomp-test-integration.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>msgs/test/channels/bridges/stomp-test-integration.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">70.44</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">121</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">25.07</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.30</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/*
+ * Copyright 2013 the original author or authors
+ * @license MIT, see LICENSE.txt for details
+ *
+ * @author Scott Andrews
+ */
+
+(function (buster, define) {
+	&#039;use strict&#039;;
+
+	var assert, refute, fail, undef;
+
+	assert = buster.assert;
+	refute = buster.refute;
+	fail = buster.assertions.fail;
+
+	define(&#039;msgs/channels/bridges/stomp-test&#039;, function (require) {
+
+		var msgs, sjsc, when, bus, socket, controlBus;
+
+		msgs = require(&#039;msgs/channels/bridges/stomp&#039;);
+		sjsc = require(&#039;sockjs-client&#039;);
+		when = require(&#039;when&#039;);
+		require(&#039;msgs/adapters/stream&#039;);
+
+		// experimental, may make a first class citizen
+		msgs.prototype.next = function next(channel) {
+			var d, handler;
+			d = when.defer();
+			handler = this._handler(undef, function (message) {
+				this.unsubscribe(channel, handler);
+				d.resolve(message.payload);
+			}, this.noopChannel, channel);
+			return d.promise;
+		};
+
+		buster.testCase(&#039;msgs/channels/bridges/stomp-integration&#039;, {
+			setUp: function (done) {
+				bus = msgs.bus();
+
+				socket = sjsc.create(&#039;http://localhost:15674/stomp&#039;);
+				socket.on(&#039;connection&#039;, function () {
+					controlBus = bus.stompStreamBridge(&#039;stomp&#039;, socket, { login: &#039;guest&#039;, passcode: &#039;guest&#039; }).controlBus;
+					controlBus.on(&#039;connected&#039;, done);
+
+//					controlBus.logger({ tap: &#039;toServer&#039;, prefix: &#039;toServer:&#039; });
+//					controlBus.logger({ tap: &#039;fromServer&#039;, prefix: &#039;fromServer:&#039; });
+				});
+			},
+			tearDown: function () {
+				socket.close();
+				bus.destroy();
+			},
+
+			&#039;echo a message via a server&#039;: function (done) {
+				bus.on(&#039;stomp!/topic/greeting&#039;, function (message) {
+					assert.equals(&#039;hello&#039;, message);
+					done();
+				});
+				controlBus.on(&#039;subscribed!/topic/greeting&#039;, function () {
+					bus.send(&#039;stomp!/topic/greeting&#039;, &#039;hello&#039;);
+				});
+			},
+			&#039;topic based subscriptions&#039;: function () {
+				var spys = {}, subscriptions, received;
+
+				subscriptions = [
+					controlBus.next(&#039;subscribed!/exchange/amq.topic/greeting.en.us&#039;),
+					controlBus.next(&#039;subscribed!/exchange/amq.topic/greeting.en.gb&#039;),
+					controlBus.next(&#039;subscribed!/exchange/amq.topic/greeting.en.#&#039;),
+					controlBus.next(&#039;subscribed!/exchange/amq.topic/greeting.es.#&#039;),
+					controlBus.next(&#039;subscribed!/exchange/amq.topic/greeting.#&#039;)
+				];
+				received = [
+					bus.next(&#039;stomp!/exchange/amq.topic/greeting.en.us&#039;),
+					bus.next(&#039;stomp!/exchange/amq.topic/greeting.en.gb&#039;),
+					bus.next(&#039;stomp!/exchange/amq.topic/greeting.en.#&#039;),
+					bus.next(&#039;stomp!/exchange/amq.topic/greeting.es.#&#039;),
+					bus.next(&#039;stomp!/exchange/amq.topic/greeting.#&#039;)
+				];
+
+				bus.on(&#039;stomp!/exchange/amq.topic/greeting.en.us&#039;, spys.us = this.spy());
+				bus.on(&#039;stomp!/exchange/amq.topic/greeting.en.gb&#039;, spys.gb = this.spy());
+				bus.on(&#039;stomp!/exchange/amq.topic/greeting.en.#&#039;, spys.en = this.spy());
+				bus.on(&#039;stomp!/exchange/amq.topic/greeting.es.#&#039;, spys.es = this.spy());
+				bus.on(&#039;stomp!/exchange/amq.topic/greeting.#&#039;, spys.all = this.spy());
+
+				return when.all(subscriptions).then(function () {
+					bus.send(&#039;stomp!/exchange/amq.topic/greeting.en.us&#039;, &#039;hey&#039;);
+					bus.send(&#039;stomp!/exchange/amq.topic/greeting.en.gb&#039;, &#039;hello&#039;);
+					bus.send(&#039;stomp!/exchange/amq.topic/greeting.es&#039;, &#039;hola&#039;);
+
+					return when.all(received).then(function () {
+						assert.calledOnce(spys.us);
+						assert.calledWith(spys.us, &#039;hey&#039;);
+
+						assert.calledOnce(spys.gb);
+						assert.calledWith(spys.gb, &#039;hello&#039;);
+
+						assert.calledOnce(spys.es);
+						assert.calledWith(spys.es, &#039;hola&#039;);
+
+						assert.calledTwice(spys.en);
+						assert.calledWith(spys.en, &#039;hey&#039;);
+						assert.calledWith(spys.en, &#039;hello&#039;);
+
+						assert.calledThrice(spys.all);
+						assert.calledWith(spys.all, &#039;hey&#039;);
+						assert.calledWith(spys.all, &#039;hello&#039;);
+						assert.calledWith(spys.all, &#039;hola&#039;);
+					});
+				});
+			}
+		});
+
+	});
+
+}(
+	this.buster || require(&#039;buster&#039;),
+	typeof define === &#039;function&#039; &amp;&amp; define.amd ? define : function (id, factory) {
+		var packageName = id.split(/[\/\-]/)[0], pathToRoot = id.replace(/[^\/]+/g, &#039;..&#039;);
+		pathToRoot = pathToRoot.length &gt; 2 ? pathToRoot.substr(3) : pathToRoot;
+		factory(function (moduleId) {
+			return require(moduleId.indexOf(packageName) === 0 ? pathToRoot + moduleId.substr(packageName.length) : moduleId);
+		});
+	}
+	// Boilerplate for AMD and Node
+));</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>
