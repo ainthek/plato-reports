@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/sniff.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/sniff.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">43.00</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">81</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">24.40</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.99</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([&quot;./has&quot;], function(has){
+	// module:
+	//		dojo/sniff
+
+	/*=====
+	return function(){
+		// summary:
+		//		This module sets has() flags based on the current browser.
+		//		It returns the has() function.
+	};
+	=====*/
+
+	if(has(&quot;host-browser&quot;)){
+		var n = navigator,
+			dua = n.userAgent,
+			dav = n.appVersion,
+			tv = parseFloat(dav);
+
+		has.add(&quot;air&quot;, dua.indexOf(&quot;AdobeAIR&quot;) &gt;= 0);
+		has.add(&quot;msapp&quot;, parseFloat(dua.split(&quot;MSAppHost/&quot;)[1]) || undefined);
+		has.add(&quot;khtml&quot;, dav.indexOf(&quot;Konqueror&quot;) &gt;= 0 ? tv : undefined);
+		has.add(&quot;webkit&quot;, parseFloat(dua.split(&quot;WebKit/&quot;)[1]) || undefined);
+		has.add(&quot;chrome&quot;, parseFloat(dua.split(&quot;Chrome/&quot;)[1]) || undefined);
+		has.add(&quot;safari&quot;, dav.indexOf(&quot;Safari&quot;)&gt;=0 &amp;&amp; !has(&quot;chrome&quot;) ? parseFloat(dav.split(&quot;Version/&quot;)[1]) : undefined);
+		has.add(&quot;mac&quot;, dav.indexOf(&quot;Macintosh&quot;) &gt;= 0);
+		has.add(&quot;quirks&quot;, document.compatMode == &quot;BackCompat&quot;);
+		if(dua.match(/(iPhone|iPod|iPad)/)){
+			var p = RegExp.$1.replace(/P/, &quot;p&quot;);
+			var v = dua.match(/OS ([\d_]+)/) ? RegExp.$1 : &quot;1&quot;;
+			var os = parseFloat(v.replace(/_/, &quot;.&quot;).replace(/_/g, &quot;&quot;));
+			has.add(p, os);		// &quot;iphone&quot;, &quot;ipad&quot; or &quot;ipod&quot;
+			has.add(&quot;ios&quot;, os);
+		}
+		has.add(&quot;android&quot;, parseFloat(dua.split(&quot;Android &quot;)[1]) || undefined);
+		has.add(&quot;bb&quot;, (dua.indexOf(&quot;BlackBerry&quot;) &gt;= 0 || dua.indexOf(&quot;BB10&quot;) &gt;= 0) &amp;&amp; parseFloat(dua.split(&quot;Version/&quot;)[1]) || undefined);
+		has.add(&quot;trident&quot;, parseFloat(dav.split(&quot;Trident/&quot;)[1]) || undefined);
+
+		has.add(&quot;svg&quot;, typeof SVGAngle !== &quot;undefined&quot;);
+
+		if(!has(&quot;webkit&quot;)){
+			// Opera
+			if(dua.indexOf(&quot;Opera&quot;) &gt;= 0){
+				// see http://dev.opera.com/articles/view/opera-ua-string-changes and http://www.useragentstring.com/pages/Opera/
+				// 9.8 has both styles; &lt;9.8, 9.9 only old style
+				has.add(&quot;opera&quot;, tv &gt;= 9.8 ? parseFloat(dua.split(&quot;Version/&quot;)[1]) || tv : tv);
+			}
+
+			// Mozilla and firefox
+			if(dua.indexOf(&quot;Gecko&quot;) &gt;= 0 &amp;&amp; !has(&quot;khtml&quot;) &amp;&amp; !has(&quot;webkit&quot;) &amp;&amp; !has(&quot;trident&quot;)){
+				has.add(&quot;mozilla&quot;, tv);
+			}
+			if(has(&quot;mozilla&quot;)){
+				//We really need to get away from this. Consider a sane isGecko approach for the future.
+				has.add(&quot;ff&quot;, parseFloat(dua.split(&quot;Firefox/&quot;)[1] || dua.split(&quot;Minefield/&quot;)[1]) || undefined);
+			}
+
+			// IE
+			if(document.all &amp;&amp; !has(&quot;opera&quot;)){
+				var isIE = parseFloat(dav.split(&quot;MSIE &quot;)[1]) || undefined;
+
+				//In cases where the page has an HTTP header or META tag with
+				//X-UA-Compatible, then it is in emulation mode.
+				//Make sure isIE reflects the desired version.
+				//document.documentMode of 5 means quirks mode.
+				//Only switch the value if documentMode&#039;s major version
+				//is different from isIE&#039;s major version.
+				var mode = document.documentMode;
+				if(mode &amp;&amp; mode != 5 &amp;&amp; Math.floor(isIE) != mode){
+					isIE = mode;
+				}
+
+				has.add(&quot;ie&quot;, isIE);
+			}
+
+			// Wii
+			has.add(&quot;wii&quot;, typeof opera != &quot;undefined&quot; &amp;&amp; opera.wiiremote);
+		}
+	}
+
+	return has;
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

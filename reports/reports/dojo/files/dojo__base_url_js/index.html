@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/_base/url.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/_base/url.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">48.54</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">109</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">55.63</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.07</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([&quot;./kernel&quot;], function(dojo){
+	// module:
+	//		dojo/url
+
+	var
+		ore = new RegExp(&quot;^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?$&quot;),
+		ire = new RegExp(&quot;^((([^\\[:]+):)?([^@]+)@)?(\\[([^\\]]+)\\]|([^\\[:]*))(:([0-9]+))?$&quot;),
+		_Url = function(){
+			var n = null,
+				_a = arguments,
+				uri = [_a[0]];
+			// resolve uri components relative to each other
+			for(var i = 1; i&lt;_a.length; i++){
+				if(!_a[i]){ continue; }
+
+				// Safari doesn&#039;t support this.constructor so we have to be explicit
+				// FIXME: Tracked (and fixed) in Webkit bug 3537.
+				//		http://bugs.webkit.org/show_bug.cgi?id=3537
+				var relobj = new _Url(_a[i]+&quot;&quot;),
+					uriobj = new _Url(uri[0]+&quot;&quot;);
+
+				if(
+					relobj.path == &quot;&quot; &amp;&amp;
+					!relobj.scheme &amp;&amp;
+					!relobj.authority &amp;&amp;
+					!relobj.query
+				){
+					if(relobj.fragment != n){
+						uriobj.fragment = relobj.fragment;
+					}
+					relobj = uriobj;
+				}else if(!relobj.scheme){
+					relobj.scheme = uriobj.scheme;
+
+					if(!relobj.authority){
+						relobj.authority = uriobj.authority;
+
+						if(relobj.path.charAt(0) != &quot;/&quot;){
+							var path = uriobj.path.substring(0,
+								uriobj.path.lastIndexOf(&quot;/&quot;) + 1) + relobj.path;
+
+							var segs = path.split(&quot;/&quot;);
+							for(var j = 0; j &lt; segs.length; j++){
+								if(segs[j] == &quot;.&quot;){
+									// flatten &quot;./&quot; references
+									if(j == segs.length - 1){
+										segs[j] = &quot;&quot;;
+									}else{
+										segs.splice(j, 1);
+										j--;
+									}
+								}else if(j &gt; 0 &amp;&amp; !(j == 1 &amp;&amp; segs[0] == &quot;&quot;) &amp;&amp;
+									segs[j] == &quot;..&quot; &amp;&amp; segs[j-1] != &quot;..&quot;){
+									// flatten &quot;../&quot; references
+									if(j == (segs.length - 1)){
+										segs.splice(j, 1);
+										segs[j - 1] = &quot;&quot;;
+									}else{
+										segs.splice(j - 1, 2);
+										j -= 2;
+									}
+								}
+							}
+							relobj.path = segs.join(&quot;/&quot;);
+						}
+					}
+				}
+
+				uri = [];
+				if(relobj.scheme){
+					uri.push(relobj.scheme, &quot;:&quot;);
+				}
+				if(relobj.authority){
+					uri.push(&quot;//&quot;, relobj.authority);
+				}
+				uri.push(relobj.path);
+				if(relobj.query){
+					uri.push(&quot;?&quot;, relobj.query);
+				}
+				if(relobj.fragment){
+					uri.push(&quot;#&quot;, relobj.fragment);
+				}
+			}
+
+			this.uri = uri.join(&quot;&quot;);
+
+			// break the uri into its main components
+			var r = this.uri.match(ore);
+
+			this.scheme = r[2] || (r[1] ? &quot;&quot; : n);
+			this.authority = r[4] || (r[3] ? &quot;&quot; : n);
+			this.path = r[5]; // can never be undefined
+			this.query = r[7] || (r[6] ? &quot;&quot; : n);
+			this.fragment	 = r[9] || (r[8] ? &quot;&quot; : n);
+
+			if(this.authority != n){
+				// server based naming authority
+				r = this.authority.match(ire);
+
+				this.user = r[3] || n;
+				this.password = r[4] || n;
+				this.host = r[6] || r[7]; // ipv6 || ipv4
+				this.port = r[9] || n;
+			}
+		};
+	_Url.prototype.toString = function(){ return this.uri; };
+
+	return dojo._Url = _Url;
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

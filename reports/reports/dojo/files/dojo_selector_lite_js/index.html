@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/selector/lite.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/selector/lite.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">67.29</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">287</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">62.29</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.76</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([&quot;../has&quot;, &quot;../_base/kernel&quot;], function(has, dojo){
+&quot;use strict&quot;;
+
+var testDiv = document.createElement(&quot;div&quot;);
+var matchesSelector = testDiv.matches || testDiv.webkitMatchesSelector || testDiv.mozMatchesSelector || testDiv.msMatchesSelector || testDiv.oMatchesSelector;
+var querySelectorAll = testDiv.querySelectorAll;
+var unionSplit = /([^\s,](?:&quot;(?:\\.|[^&quot;])+&quot;|&#039;(?:\\.|[^&#039;])+&#039;|[^,])*)/g;
+has.add(&quot;dom-matches-selector&quot;, !!matchesSelector);
+has.add(&quot;dom-qsa&quot;, !!querySelectorAll); 
+
+// this is a simple query engine. It has handles basic selectors, and for simple
+// common selectors is extremely fast
+var liteEngine = function(selector, root){
+	// summary:
+	//		A small lightweight query selector engine that implements CSS2.1 selectors
+	//		minus pseudo-classes and the sibling combinator, plus CSS3 attribute selectors
+
+	if(combine &amp;&amp; selector.indexOf(&#039;,&#039;) &gt; -1){
+		return combine(selector, root);
+	}
+	// use the root&#039;s ownerDocument if provided, otherwise try to use dojo.doc. Note 
+	// that we don&#039;t use dojo/_base/window&#039;s doc to reduce dependencies, and 
+	// fallback to plain document if dojo.doc hasn&#039;t been defined (by dojo/_base/window).
+	// presumably we will have a better way to do this in 2.0 
+	var doc = root ? root.ownerDocument || root : dojo.doc || document, 
+		match = (querySelectorAll ? 
+			/^([\w]*)#([\w\-]+$)|^(\.)([\w\-\*]+$)|^(\w+$)/ : // this one only matches on simple queries where we can beat qSA with specific methods
+			/^([\w]*)#([\w\-]+)(?:\s+(.*))?$|(?:^|(&gt;|.+\s+))([\w\-\*]+)(\S*$)/) // this one matches parts of the query that we can use to speed up manual filtering
+			.exec(selector);
+	root = root || doc;
+	if(match){
+		var isInsideDomTree = has(&#039;ie&#039;) === 8 &amp;&amp; has(&#039;quirks&#039;)?
+			root.nodeType === doc.nodeType:
+			root.parentNode !== null &amp;&amp; root.nodeType !== 9 &amp;&amp; root.parentNode === doc;
+
+		// fast path regardless of whether or not querySelectorAll exists
+		if(match[2] &amp;&amp; isInsideDomTree){
+			// an #id
+			// use dojo.byId if available as it fixes the id retrieval in IE, note that we can&#039;t use the dojo namespace in 2.0, but if there is a conditional module use, we will use that
+			var found = dojo.byId ? dojo.byId(match[2], doc) : doc.getElementById(match[2]);
+			if(!found || (match[1] &amp;&amp; match[1] != found.tagName.toLowerCase())){
+				// if there is a tag qualifer and it doesn&#039;t match, no matches
+				return [];
+			}
+			if(root != doc){
+				// there is a root element, make sure we are a child of it
+				var parent = found;
+				while(parent != root){
+					parent = parent.parentNode;
+					if(!parent){
+						return [];
+					}
+				}
+			}
+			return match[3] ?
+					liteEngine(match[3], found) 
+					: [found];
+		}
+		if(match[3] &amp;&amp; root.getElementsByClassName){
+			// a .class
+			return root.getElementsByClassName(match[4]);
+		}
+		var found;
+		if(match[5]){
+			// a tag
+			found = root.getElementsByTagName(match[5]);
+			if(match[4] || match[6]){
+				selector = (match[4] || &quot;&quot;) + match[6];
+			}else{
+				// that was the entirety of the query, return results
+				return found;
+			}
+		}
+	}
+	if(querySelectorAll){
+		// qSA works strangely on Element-rooted queries
+		// We can work around this by specifying an extra ID on the root
+		// and working up from there (Thanks to Andrew Dupont for the technique)
+		// IE 8 doesn&#039;t work on object elements
+		if (root.nodeType === 1 &amp;&amp; root.nodeName.toLowerCase() !== &quot;object&quot;){				
+			return useRoot(root, selector, root.querySelectorAll);
+		}else{
+			// we can use the native qSA
+			return root.querySelectorAll(selector);
+		}
+	}else if(!found){
+		// search all children and then filter
+		found = root.getElementsByTagName(&quot;*&quot;);
+	}
+	// now we filter the nodes that were found using the matchesSelector
+	var results = [];
+	for(var i = 0, l = found.length; i &lt; l; i++){
+		var node = found[i];
+		if(node.nodeType == 1 &amp;&amp; jsMatchesSelector(node, selector, root)){
+			// keep the nodes that match the selector
+			results.push(node);
+		}
+	}
+	return results;
+};
+var useRoot = function(context, query, method){
+	// this function creates a temporary id so we can do rooted qSA queries, this is taken from sizzle
+	var oldContext = context,
+		old = context.getAttribute(&quot;id&quot;),
+		nid = old || &quot;__dojo__&quot;,
+		hasParent = context.parentNode,
+		relativeHierarchySelector = /^\s*[+~]/.test(query);
+
+	if(relativeHierarchySelector &amp;&amp; !hasParent){
+		return [];
+	}
+	if(!old){
+		context.setAttribute(&quot;id&quot;, nid);
+	}else{
+		nid = nid.replace(/&#039;/g, &quot;\\$&amp;&quot;);
+	}
+	if(relativeHierarchySelector &amp;&amp; hasParent){
+		context = context.parentNode;
+	}
+	var selectors = query.match(unionSplit);
+	for(var i = 0; i &lt; selectors.length; i++){
+		selectors[i] = &quot;[id=&#039;&quot; + nid + &quot;&#039;] &quot; + selectors[i];
+	}
+	query = selectors.join(&quot;,&quot;);
+
+	try{
+		return method.call(context, query);
+	}finally{
+		if(!old){
+			oldContext.removeAttribute(&quot;id&quot;);
+		}
+	}
+};
+
+if(!has(&quot;dom-matches-selector&quot;)){
+	var jsMatchesSelector = (function(){
+		// a JS implementation of CSS selector matching, first we start with the various handlers
+		var caseFix = testDiv.tagName == &quot;div&quot; ? &quot;toLowerCase&quot; : &quot;toUpperCase&quot;;
+		var selectorTypes = {
+			&quot;&quot;: function(tagName){
+				tagName = tagName[caseFix]();
+				return function(node){
+					return node.tagName == tagName;
+				};
+			},
+			&quot;.&quot;: function(className){
+				var classNameSpaced = &#039; &#039; + className + &#039; &#039;;
+				return function(node){
+					return node.className.indexOf(className) &gt; -1 &amp;&amp; (&#039; &#039; + node.className + &#039; &#039;).indexOf(classNameSpaced) &gt; -1;
+				};
+			},
+			&quot;#&quot;: function(id){
+				return function(node){
+					return node.id == id;
+				};
+			}
+		};
+		var attrComparators = {
+			&quot;^=&quot;: function(attrValue, value){
+				return attrValue.indexOf(value) == 0;
+			},
+			&quot;*=&quot;: function(attrValue, value){
+				return attrValue.indexOf(value) &gt; -1;
+			},
+			&quot;$=&quot;: function(attrValue, value){
+				return attrValue.substring(attrValue.length - value.length, attrValue.length) == value;
+			},
+			&quot;~=&quot;: function(attrValue, value){
+				return (&#039; &#039; + attrValue + &#039; &#039;).indexOf(&#039; &#039; + value + &#039; &#039;) &gt; -1;
+			},
+			&quot;|=&quot;: function(attrValue, value){
+				return (attrValue + &#039;-&#039;).indexOf(value + &#039;-&#039;) == 0;
+			},
+			&quot;=&quot;: function(attrValue, value){
+				return attrValue == value;
+			},
+			&quot;&quot;: function(attrValue, value){
+				return true;
+			}
+		};
+		function attr(name, value, type){
+			var firstChar = value.charAt(0);
+			if(firstChar == &#039;&quot;&#039; || firstChar == &quot;&#039;&quot;){
+				// it is quoted, remove the quotes
+				value = value.slice(1, -1);
+			}
+			value = value.replace(/\\/g,&#039;&#039;);
+			var comparator = attrComparators[type || &quot;&quot;];
+			return function(node){
+				var attrValue = node.getAttribute(name);
+				return attrValue &amp;&amp; comparator(attrValue, value);
+			};
+		}
+		function ancestor(matcher){
+			return function(node, root){
+				while((node = node.parentNode) != root){
+					if(matcher(node, root)){
+						return true;
+					}
+				}
+			};
+		}
+		function parent(matcher){
+			return function(node, root){
+				node = node.parentNode;
+				return matcher ? 
+					node != root &amp;&amp; matcher(node, root)
+					: node == root;
+			};
+		}
+		var cache = {};
+		function and(matcher, next){
+			return matcher ?
+				function(node, root){
+					return next(node) &amp;&amp; matcher(node, root);
+				}
+				: next;
+		}
+		return function(node, selector, root){
+			// this returns true or false based on if the node matches the selector (optionally within the given root)
+			var matcher = cache[selector]; // check to see if we have created a matcher function for the given selector
+			if(!matcher){
+				// create a matcher function for the given selector
+				// parse the selectors
+				if(selector.replace(/(?:\s*([&gt; ])\s*)|(#|\.)?((?:\\.|[\w-])+)|\[\s*([\w-]+)\s*(.?=)?\s*(&quot;(?:\\.|[^&quot;])+&quot;|&#039;(?:\\.|[^&#039;])+&#039;|(?:\\.|[^\]])*)\s*\]/g, function(t, combinator, type, value, attrName, attrType, attrValue){
+					if(value){
+						matcher = and(matcher, selectorTypes[type || &quot;&quot;](value.replace(/\\/g, &#039;&#039;)));
+					}
+					else if(combinator){
+						matcher = (combinator == &quot; &quot; ? ancestor : parent)(matcher);
+					}
+					else if(attrName){
+						matcher = and(matcher, attr(attrName, attrValue, attrType));
+					}
+					return &quot;&quot;;
+				})){
+					throw new Error(&quot;Syntax error in query&quot;);
+				}
+				if(!matcher){
+					return true;
+				}
+				cache[selector] = matcher;
+			}
+			// now run the matcher function on the node
+			return matcher(node, root);
+		};
+	})();
+}
+if(!has(&quot;dom-qsa&quot;)){
+	var combine = function(selector, root){
+		// combined queries
+		var selectors = selector.match(unionSplit);
+		var indexed = [];
+		// add all results and keep unique ones, this only runs in IE, so we take advantage 
+		// of known IE features, particularly sourceIndex which is unique and allows us to 
+		// order the results 
+		for(var i = 0; i &lt; selectors.length; i++){
+			selector = new String(selectors[i].replace(/\s*$/,&#039;&#039;));
+			selector.indexOf = escape; // keep it from recursively entering combine
+			var results = liteEngine(selector, root);
+			for(var j = 0, l = results.length; j &lt; l; j++){
+				var node = results[j];
+				indexed[node.sourceIndex] = node;
+			}
+		}
+		// now convert from a sparse array to a dense array
+		var totalResults = [];
+		for(i in indexed){
+			totalResults.push(indexed[i]);
+		}
+		return totalResults;
+	};
+}
+
+liteEngine.match = matchesSelector ? function(node, selector, root){
+	if(root &amp;&amp; root.nodeType != 9){
+		// doesn&#039;t support three args, use rooted id trick
+		return useRoot(root, selector, function(query){
+			return matchesSelector.call(node, query);
+		});
+	}
+	// we have a native matchesSelector, use that
+	return matchesSelector.call(node, selector);
+} : jsMatchesSelector; // otherwise use the JS matches impl
+
+return liteEngine;
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

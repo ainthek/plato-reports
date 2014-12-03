@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - ampersand/template/shared/test/spacemonkey/spacemonkey.demo.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>ampersand/template/shared/test/spacemonkey/spacemonkey.demo.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">76.06</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">240</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">46.18</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.64</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/*global monkey jQuery QUnit socket*/
+monkey.extend(&#039;keyDown&#039;, function (id, key, callback) {
+    var e = jQuery.Event(&#039;keydown&#039;);
+    e.which = key;
+    this.$(id).trigger(e);
+    callback();
+});
+
+monkey.extend(&#039;keyUp&#039;, function (id, key, callback) {
+    var e = jQuery.Event(&#039;keyup&#039;);
+    e.which = key;
+    this.$(id).trigger(e);
+    callback();
+});
+
+monkey.extend(&#039;setValue&#039;, function (id, value, callback) {
+    var cb;
+    if (typeof(id) === &#039;object&#039;) {
+        cb = value;
+        for (var item in id) {
+            this.$(item).val(id[item]).focus().blur();
+        }
+    } else {
+        cb = callback;
+        this.$(id).val(value).focus().blur();
+    }
+    cb();
+});
+
+monkey.extend(&#039;clearValue&#039;, function (id, callback) {
+    var selectors = $.isArray(id) ? id : [id],
+        i = 0;
+    for (i; i &lt; id; i++) {
+        this.$(id[i]).val(&#039;&#039;);
+    }
+    callback();
+});
+
+monkey.extend(&#039;clearAllValues&#039;, function (callback) {
+    $(&#039;:input&#039;, this.window).val(&#039;&#039;);
+    callback();
+});
+
+monkey.extend(&#039;omniboxCommand&#039;, function (value, callback) {
+    var e = jQuery.Event(&#039;keyup&#039;);
+    e.which = 13;
+    this.$(&#039;#awesomeSauce&#039;).val(value).trigger(e);
+    callback();
+});
+
+monkey.extend(&#039;waitForSocketEvent&#039;, function (type, howMany, callback) {
+    this.expect(howMany);
+    var socket = this.window.socket,
+       handler = function (message) {
+            if (message.event === type) {
+                QUnit.ok(true, &#039;socket got &#039; + type + &#039; event&#039;);
+                callback();
+            }
+        };
+
+    socket.on(&#039;message&#039;, handler);
+});
+
+monkey.extend(&#039;pause&#039;, function (ms, callback) {
+    setTimeout(callback, ms);
+});
+
+monkey.extend(&#039;waitForClass&#039;, function (selector, className, callback) {
+    var self = this;
+    self.expect(1);
+
+    var intervalId = setInterval(function () {
+        var element = self.window.$(selector);
+        if (element.hasClass(className)) {
+            QUnit.ok(true, selector + &#039; has class \&#039;&#039; + className + &#039;\&#039;&#039;);
+            clearTimeout(intervalId);
+            callback();
+        }
+    }, 100);
+});
+
+monkey.extend(&#039;waitForAttribute&#039;, function (selector, attribute, value, callback) {
+    var self = this;
+    self.expect(1);
+
+    var intervalId = setInterval(function () {
+        var element = self.window.$(selector);
+        if (element.attr(attribute) == value) {
+            QUnit.ok(true, selector + &#039;\&#039;s \&#039;&#039; + attribute + &#039;\&#039; attribute is \&#039;&#039; + value + &#039;\&#039;&#039;);
+            clearTimeout(intervalId);
+            callback();
+        }
+    }, 100);
+});
+
+monkey.extend(&#039;waitForContent&#039;, function (selector, content, callback) {
+    var self = this;
+    self.expect(1);
+
+    var intervalId = setInterval(function () {
+        var element = self.window.$(selector);
+        if (element.text() == content) {
+            QUnit.ok(true, selector + &#039;\&#039;s text content is \&#039;&#039; + content + &#039;\&#039;&#039;);
+            clearTimeout(intervalId);
+            callback();
+        }
+    }, 100);
+});
+
+monkey.extend(&#039;open&#039;, function (url, callback) {
+    var newUrl = &#039;//&#039; + this.window.location.host + url;
+    function waitForPage(self, page, callback) {
+        self.expect(1);
+
+        var intervalId = setInterval(function () {
+            if (self.window &amp;&amp; self.window.location.href.indexOf(page) &gt;= 0) {
+                QUnit.ok(true, page + &#039; loaded&#039;);
+                clearTimeout(intervalId);
+                callback();
+            }
+        }, 100);
+    }
+    this.window.location = newUrl;
+    waitForPage(this, newUrl, callback);
+});
+
+monkey.extend(&#039;waitForVisible&#039;, function (selector, callback) {
+    var self = this;
+    self.expect(1);
+
+    var intervalId = setInterval(function () {
+        var element = (self.window.$) ? $(selector, self.window.document)[0] : self.window.document.querySelector(selector);
+
+        if ($(element).is(&#039;:visible&#039;)) {
+            QUnit.ok(true, selector + &#039; is visible&#039;);
+            clearTimeout(intervalId);
+            callback();
+        }
+    }, 100);
+});
+
+monkey.extend(&#039;assertNumberVisible&#039;, function (selector, howMany, callback) {
+    var self = this;
+    self.expect(1);
+
+    var intervalId = setInterval(function () {
+        var el = $(selector, self.window.document);
+
+        if (el.is(&#039;:visible&#039;)) {
+            QUnit.equal(el.length, howMany, howMany + &#039; elements that matched &#039; + selector + &#039; are visible&#039;);
+            clearTimeout(intervalId);
+            callback();
+        }
+    }, 100);
+});
+
+monkey.extend(&#039;click&#039;, function (selector, callback) {
+    this.$(selector).trigger(&#039;click&#039;);
+    callback();
+});
+
+monkey.extend(&#039;goToPage&#039;, function (page, callback) {
+    var self = this,
+        selector,
+        intervalId;
+    this.window.app.navigate(page);
+    self.expect(1);
+
+    self.log(&#039;loading page: &#039; + page);
+
+    intervalId = setInterval(function () {
+        var element = $(self.window.app.currentPage.el);
+        if (element.hasClass(&#039;active&#039;)) {
+            QUnit.ok(true, &#039;went to page \&#039;&#039; + page + &#039;\&#039;&#039;);
+            clearTimeout(intervalId);
+            setTimeout(callback, 0);
+        }
+    }, 100);
+});
+
+monkey.extend(&#039;waitForNotVisible&#039;, function (selector, callback) {
+    var self = this;
+    self.expect(1);
+
+    var intervalId = setInterval(function () {
+        if (!$(selector, self.window.document).is(&#039;:visible&#039;)) {
+            QUnit.ok(true, selector + &#039; is not visible&#039;);
+            clearTimeout(intervalId);
+            callback();
+        }
+    }, 100);
+});
+
+monkey.extend(&#039;waitForEmpty&#039;, function (container, callback) {
+    var self = this;
+    this.expect(1);
+    var intervalId = setInterval(function () {
+        var element = self.window.$(container);
+
+        if (element.children().length === 0) {
+            QUnit.ok(true, container + &#039; is empty&#039;);
+            clearTimeout(intervalId);
+            callback();
+        }
+    }, 100);
+});
+
+monkey.extend(&#039;clearChat&#039;, function (callback) {
+    monkey.window.team.groupChat.messages.each(function (m) {m.deleteServer(); });
+    callback();
+});
+
+monkey.extend(&#039;clearTasks&#039;, function (userSlug, callback) {
+    monkey.window.team.getUser(userSlug).tasks.each(function (m) {m.deleteServer(); });
+    callback();
+});
+
+monkey.extend(&#039;postChat&#039;, function (team, value, callback) {
+    //console.log(&#039;called&#039;);
+    this.window.app.api.sendChat(team, value, function () {
+        callback &amp;&amp; callback();
+    });
+});
+
+
+monkey.extend(&#039;mainInput&#039;, function (value, callback) {
+    this.$(&#039;.mainPageInput&#039;).val(value);
+    callback();
+});
+
+monkey.extend(&#039;login&#039;, function (un, pw, callback) {
+    monkey.open(&#039;/login&#039;)
+    .waitForVisible(&#039;#login&#039;)
+    .setValue({
+        &#039;#username&#039;: un,
+        &#039;#password&#039;: pw
+    })
+    .pause(200)
+    .click(&#039;#loginButton&#039;)
+    .waitForVisible(&#039;#pages&#039;);
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

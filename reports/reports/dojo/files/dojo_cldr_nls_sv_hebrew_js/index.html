@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/cldr/nls/sv/hebrew.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/cldr/nls/sv/hebrew.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">38.61</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">243</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">2.54</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.15</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define(
+//begin v1.x content
+{
+	&quot;days-standAlone-short&quot;: [
+		&quot;Sö&quot;,
+		&quot;Må&quot;,
+		&quot;Ti&quot;,
+		&quot;On&quot;,
+		&quot;To&quot;,
+		&quot;Fr&quot;,
+		&quot;Lö&quot;
+	],
+	&quot;field-second-relative+0&quot;: &quot;nu&quot;,
+	&quot;field-weekday&quot;: &quot;Veckodag&quot;,
+	&quot;field-wed-relative+0&quot;: &quot;onsdag denna vecka&quot;,
+	&quot;field-wed-relative+1&quot;: &quot;onsdag nästa vecka&quot;,
+	&quot;dateFormatItem-GyMMMEd&quot;: &quot;E d MMM y G&quot;,
+	&quot;dateFormatItem-MMMEd&quot;: &quot;E d MMM&quot;,
+	&quot;field-tue-relative+-1&quot;: &quot;tisdag förra veckan&quot;,
+	&quot;days-format-short&quot;: [
+		&quot;sö&quot;,
+		&quot;må&quot;,
+		&quot;ti&quot;,
+		&quot;on&quot;,
+		&quot;to&quot;,
+		&quot;fr&quot;,
+		&quot;lö&quot;
+	],
+	&quot;dateFormat-long&quot;: &quot;d MMMM y G&quot;,
+	&quot;field-fri-relative+-1&quot;: &quot;fredag förra veckan&quot;,
+	&quot;field-wed-relative+-1&quot;: &quot;onsdag förra veckan&quot;,
+	&quot;months-format-wide&quot;: [
+		&quot;tishrí&quot;,
+		&quot;heshván&quot;,
+		&quot;kislév&quot;,
+		&quot;tevét&quot;,
+		&quot;shevát&quot;,
+		&quot;adár I&quot;,
+		&quot;adár&quot;,
+		&quot;nisán&quot;,
+		&quot;ijjár&quot;,
+		&quot;siván&quot;,
+		&quot;tammúz&quot;,
+		&quot;ab&quot;,
+		&quot;elúl&quot;
+	],
+	&quot;dayPeriods-format-wide-pm&quot;: &quot;em&quot;,
+	&quot;dateFormat-full&quot;: &quot;EEEE d MMMM y G&quot;,
+	&quot;dateFormatItem-yyyyMEd&quot;: &quot;E, y-MM-dd G&quot;,
+	&quot;field-thu-relative+-1&quot;: &quot;torsdag förra veckan&quot;,
+	&quot;dateFormatItem-Md&quot;: &quot;d/M&quot;,
+	&quot;dayPeriods-format-abbr-am&quot;: &quot;FM&quot;,
+	&quot;field-era&quot;: &quot;Era&quot;,
+	&quot;months-standAlone-wide&quot;: [
+		&quot;Tishrí&quot;,
+		&quot;Heshván&quot;,
+		&quot;Kislév&quot;,
+		&quot;Tevét&quot;,
+		&quot;Shevát&quot;,
+		&quot;Adár I&quot;,
+		&quot;Adár&quot;,
+		&quot;Nisán&quot;,
+		&quot;Ijjár&quot;,
+		&quot;Siván&quot;,
+		&quot;Tammúz&quot;,
+		&quot;Ab&quot;,
+		&quot;Elúl&quot;
+	],
+	&quot;quarters-format-wide&quot;: [
+		&quot;1:a kvartalet&quot;,
+		&quot;2:a kvartalet&quot;,
+		&quot;3:e kvartalet&quot;,
+		&quot;4:e kvartalet&quot;
+	],
+	&quot;field-year&quot;: &quot;År&quot;,
+	&quot;field-hour&quot;: &quot;timme&quot;,
+	&quot;months-format-abbr&quot;: [
+		&quot;tishrí&quot;,
+		&quot;heshván&quot;,
+		&quot;kislév&quot;,
+		&quot;tevét&quot;,
+		&quot;shevát&quot;,
+		&quot;adár I&quot;,
+		&quot;adár&quot;,
+		&quot;nisán&quot;,
+		&quot;ijjár&quot;,
+		&quot;siván&quot;,
+		&quot;tammúz&quot;,
+		&quot;ab&quot;,
+		&quot;elúl&quot;
+	],
+	&quot;field-sat-relative+0&quot;: &quot;lördag denna vecka&quot;,
+	&quot;field-sat-relative+1&quot;: &quot;lördag nästa vecka&quot;,
+	&quot;timeFormat-full&quot;: &quot;&#039;kl&#039;. HH:mm:ss zzzz&quot;,
+	&quot;field-day-relative+0&quot;: &quot;i dag&quot;,
+	&quot;field-thu-relative+0&quot;: &quot;torsdag denna vecka&quot;,
+	&quot;field-day-relative+1&quot;: &quot;i morgon&quot;,
+	&quot;field-thu-relative+1&quot;: &quot;torsdag nästa vecka&quot;,
+	&quot;dateFormatItem-GyMMMd&quot;: &quot;d MMM y G&quot;,
+	&quot;field-day-relative+2&quot;: &quot;i övermorgon&quot;,
+	&quot;months-standAlone-abbr&quot;: [
+		&quot;Tishrí&quot;,
+		&quot;Heshván&quot;,
+		&quot;Kislév&quot;,
+		&quot;Tevét&quot;,
+		&quot;Shevát&quot;,
+		&quot;Adár I&quot;,
+		&quot;Adár&quot;,
+		&quot;Nisán&quot;,
+		&quot;Ijjár&quot;,
+		&quot;Siván&quot;,
+		&quot;Tammúz&quot;,
+		&quot;Ab&quot;,
+		&quot;Elúl&quot;
+	],
+	&quot;quarters-format-abbr&quot;: [
+		&quot;K1&quot;,
+		&quot;K2&quot;,
+		&quot;K3&quot;,
+		&quot;K4&quot;
+	],
+	&quot;quarters-standAlone-wide&quot;: [
+		&quot;1:a kvartalet&quot;,
+		&quot;2:a kvartalet&quot;,
+		&quot;3:e kvartalet&quot;,
+		&quot;4:e kvartalet&quot;
+	],
+	&quot;dateFormatItem-Gy&quot;: &quot;y G&quot;,
+	&quot;dateFormatItem-yyyyMMMEd&quot;: &quot;E d MMM y G&quot;,
+	&quot;days-standAlone-wide&quot;: [
+		&quot;Söndag&quot;,
+		&quot;Måndag&quot;,
+		&quot;Tisdag&quot;,
+		&quot;Onsdag&quot;,
+		&quot;Torsdag&quot;,
+		&quot;Fredag&quot;,
+		&quot;Lördag&quot;
+	],
+	&quot;dateFormatItem-yyyyMMM&quot;: &quot;MMM y G&quot;,
+	&quot;dateFormatItem-yyyyMMMd&quot;: &quot;d MMM y G&quot;,
+	&quot;months-standAlone-wide-leap&quot;: &quot;Adár II&quot;,
+	&quot;field-sun-relative+0&quot;: &quot;söndag denna vecka&quot;,
+	&quot;field-sun-relative+1&quot;: &quot;söndag nästa vecka&quot;,
+	&quot;quarters-standAlone-abbr&quot;: [
+		&quot;K1&quot;,
+		&quot;K2&quot;,
+		&quot;K3&quot;,
+		&quot;K4&quot;
+	],
+	&quot;eraAbbr&quot;: [
+		&quot;AM&quot;
+	],
+	&quot;field-minute&quot;: &quot;Minut&quot;,
+	&quot;field-dayperiod&quot;: &quot;fm/em&quot;,
+	&quot;days-standAlone-abbr&quot;: [
+		&quot;Sön&quot;,
+		&quot;Mån&quot;,
+		&quot;Tis&quot;,
+		&quot;Ons&quot;,
+		&quot;Tor&quot;,
+		&quot;Fre&quot;,
+		&quot;Lör&quot;
+	],
+	&quot;field-day-relative+-1&quot;: &quot;i går&quot;,
+	&quot;dayPeriods-format-narrow-am&quot;: &quot;f&quot;,
+	&quot;field-day-relative+-2&quot;: &quot;i förrgår&quot;,
+	&quot;dateFormatItem-MMMd&quot;: &quot;d MMM&quot;,
+	&quot;dateFormatItem-MEd&quot;: &quot;E d/M&quot;,
+	&quot;field-fri-relative+0&quot;: &quot;fredag denna vecka&quot;,
+	&quot;field-fri-relative+1&quot;: &quot;fredag nästa vecka&quot;,
+	&quot;field-day&quot;: &quot;Dag&quot;,
+	&quot;days-format-wide&quot;: [
+		&quot;söndag&quot;,
+		&quot;måndag&quot;,
+		&quot;tisdag&quot;,
+		&quot;onsdag&quot;,
+		&quot;torsdag&quot;,
+		&quot;fredag&quot;,
+		&quot;lördag&quot;
+	],
+	&quot;field-zone&quot;: &quot;Tidszon&quot;,
+	&quot;months-standAlone-abbr-leap&quot;: &quot;Adár II&quot;,
+	&quot;dateFormatItem-y&quot;: &quot;y G&quot;,
+	&quot;field-year-relative+-1&quot;: &quot;i fjol&quot;,
+	&quot;field-month-relative+-1&quot;: &quot;förra månaden&quot;,
+	&quot;dayPeriods-format-abbr-pm&quot;: &quot;EM&quot;,
+	&quot;days-format-abbr&quot;: [
+		&quot;sön&quot;,
+		&quot;mån&quot;,
+		&quot;tis&quot;,
+		&quot;ons&quot;,
+		&quot;tors&quot;,
+		&quot;fre&quot;,
+		&quot;lör&quot;
+	],
+	&quot;days-format-narrow&quot;: [
+		&quot;S&quot;,
+		&quot;M&quot;,
+		&quot;T&quot;,
+		&quot;O&quot;,
+		&quot;T&quot;,
+		&quot;F&quot;,
+		&quot;L&quot;
+	],
+	&quot;dateFormatItem-yyyyMd&quot;: &quot;G y-MM-dd&quot;,
+	&quot;field-month&quot;: &quot;Månad&quot;,
+	&quot;days-standAlone-narrow&quot;: [
+		&quot;S&quot;,
+		&quot;M&quot;,
+		&quot;T&quot;,
+		&quot;O&quot;,
+		&quot;T&quot;,
+		&quot;F&quot;,
+		&quot;L&quot;
+	],
+	&quot;field-tue-relative+0&quot;: &quot;tisdag denna vecka&quot;,
+	&quot;field-tue-relative+1&quot;: &quot;tisdag nästa vecka&quot;,
+	&quot;dayPeriods-format-wide-am&quot;: &quot;fm&quot;,
+	&quot;field-mon-relative+0&quot;: &quot;måndag denna vecka&quot;,
+	&quot;field-mon-relative+1&quot;: &quot;måndag nästa vecka&quot;,
+	&quot;dateFormat-short&quot;: &quot;G y-MM-dd&quot;,
+	&quot;field-second&quot;: &quot;Sekund&quot;,
+	&quot;field-sat-relative+-1&quot;: &quot;lördag förra veckan&quot;,
+	&quot;field-sun-relative+-1&quot;: &quot;söndag förra veckan&quot;,
+	&quot;field-month-relative+0&quot;: &quot;denna månad&quot;,
+	&quot;field-month-relative+1&quot;: &quot;nästa månad&quot;,
+	&quot;dateFormatItem-Ed&quot;: &quot;E d&quot;,
+	&quot;field-week&quot;: &quot;Vecka&quot;,
+	&quot;dateFormat-medium&quot;: &quot;d MMM y G&quot;,
+	&quot;field-year-relative+0&quot;: &quot;i år&quot;,
+	&quot;field-week-relative+-1&quot;: &quot;förra veckan&quot;,
+	&quot;dateFormatItem-yyyyM&quot;: &quot;G y-MM&quot;,
+	&quot;field-year-relative+1&quot;: &quot;nästa år&quot;,
+	&quot;dayPeriods-format-narrow-pm&quot;: &quot;e&quot;,
+	&quot;months-format-wide-leap&quot;: &quot;adár II&quot;,
+	&quot;dateFormatItem-GyMMM&quot;: &quot;MMM y G&quot;,
+	&quot;field-mon-relative+-1&quot;: &quot;måndag förra veckan&quot;,
+	&quot;dateFormatItem-yyyy&quot;: &quot;y G&quot;,
+	&quot;field-week-relative+0&quot;: &quot;denna vecka&quot;,
+	&quot;field-week-relative+1&quot;: &quot;nästa vecka&quot;
+}
+//end v1.x content
+);</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

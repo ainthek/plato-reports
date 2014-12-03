@@ -1,7 +1,7 @@
 # private use ;-) not met to be run by someone else, somewhere else
 # super slow. will optimize and polish, sorry for cats...;-)
 
-R="../../ainthek.github.io/plato-reports"
+R="../reports"
 build_reports(){
 
 	pushd src >/dev/null	

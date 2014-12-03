@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/nls/ro/colors.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/nls/ro/colors.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">35.32</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">156</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">1.54</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.22</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define(
+({
+// local representation of all CSS3 named colors, companion to dojo.colors.  To be used where descriptive information
+// is required for each color, such as a palette widget, and not for specifying color programatically.
+	//Note: due to the SVG 1.0 spec additions, some of these are alternate spellings for the same color (e.g. gray / grey).
+	//TODO: should we be using unique rgb values as keys instead and avoid these duplicates, or rely on the caller to do the reverse mapping?
+	aliceblue: &quot;alice blue&quot;,
+	antiquewhite: &quot;antique white&quot;,
+	aqua: &quot;aqua&quot;,
+	aquamarine: &quot;aquamarine&quot;,
+	azure: &quot;azuriu&quot;,
+	beige: &quot;bej&quot;,
+	bisque: &quot;bisque&quot;,
+	black: &quot;negru&quot;,
+	blanchedalmond: &quot;blanched almond&quot;,
+	blue: &quot;albastru&quot;,
+	blueviolet: &quot;albastru-violet&quot;,
+	brown: &quot;brun&quot;,
+	burlywood: &quot;burlywood&quot;,
+	cadetblue: &quot;albastru cadet&quot;,
+	chartreuse: &quot;chartreuse&quot;,
+	chocolate: &quot;ciocolată&quot;,
+	coral: &quot;coral&quot;,
+	cornflowerblue: &quot;cornflower blue&quot;,
+	cornsilk: &quot;cornsilk&quot;,
+	crimson: &quot;stacojiu&quot;,
+	cyan: &quot;cyan&quot;,
+	darkblue: &quot;albastru închis&quot;,
+	darkcyan: &quot;cyan închis&quot;,
+	darkgoldenrod: &quot;goldenrod închis&quot;,
+	darkgray: &quot;gri închis&quot;,
+	darkgreen: &quot;verde închis&quot;,
+	darkgrey: &quot;gri închis&quot;, // same as darkgray
+	darkkhaki: &quot;kaki închis&quot;,
+	darkmagenta: &quot;magenta închis&quot;,
+	darkolivegreen: &quot;verde măslină închis&quot;,
+	darkorange: &quot;portocaliu închis&quot;,
+	darkorchid: &quot;orchid închis&quot;,
+	darkred: &quot;roşu închis&quot;,
+	darksalmon: &quot;somon închis&quot;,
+	darkseagreen: &quot;verde marin închis&quot;,
+	darkslateblue: &quot;albastru ardezie închis&quot;,
+	darkslategray: &quot;gri ardezie închis&quot;,
+	darkslategrey: &quot;gri ardezie închis&quot;, // same as darkslategray
+	darkturquoise: &quot;turcoaz închis&quot;,
+	darkviolet: &quot;violet închis&quot;,
+	deeppink: &quot;roz profund&quot;,
+	deepskyblue: &quot;albastru cer profund&quot;,
+	dimgray: &quot;dim gray&quot;,
+	dimgrey: &quot;dim gray&quot;, // same as dimgray
+	dodgerblue: &quot;dodger blue&quot;,
+	firebrick: &quot;cărămiziu aprins&quot;,
+	floralwhite: &quot;floral white&quot;,
+	forestgreen: &quot;forest green&quot;,
+	fuchsia: &quot;fuchsia&quot;,
+	gainsboro: &quot;gainsboro&quot;,
+	ghostwhite: &quot;ghost white&quot;,
+	gold: &quot;auriu&quot;,
+	goldenrod: &quot;goldenrod&quot;,
+	gray: &quot;gri&quot;,
+	green: &quot;verde&quot;,
+	greenyellow: &quot;verde-gălbui&quot;,
+	grey: &quot;gri&quot;, // same as gray
+	honeydew: &quot;honeydew&quot;,
+	hotpink: &quot;roz aprins&quot;,
+	indianred: &quot;roşu indian&quot;,
+	indigo: &quot;indigo&quot;,
+	ivory: &quot;ivoriu&quot;,
+	khaki: &quot;kaki&quot;,
+	lavender: &quot;lavandă&quot;,
+	lavenderblush: &quot;lavender blush&quot;,
+	lawngreen: &quot;lawn green&quot;,
+	lemonchiffon: &quot;lemon chiffon&quot;,
+	lightblue: &quot;albastru deschis&quot;,
+	lightcoral: &quot;coral deschis&quot;,
+	lightcyan: &quot;cyan deschis&quot;,
+	lightgoldenrodyellow: &quot;goldenrod gălbui deschis&quot;,
+	lightgray: &quot;gri deschis&quot;,
+	lightgreen: &quot;verde dschis&quot;,
+	lightgrey: &quot;gri deschis&quot;, // same as lightgray
+	lightpink: &quot;roz deschis&quot;,
+	lightsalmon: &quot;somon deschis&quot;,
+	lightseagreen: &quot;verde marin deschis&quot;,
+	lightskyblue: &quot;albastru cer deschis&quot;,
+	lightslategray: &quot;gri ardezie deschis&quot;,
+	lightslategrey: &quot;gri ardezie deschis&quot;, // same as lightslategray
+	lightsteelblue: &quot;albastru metalic deschis&quot;,
+	lightyellow: &quot;galben deschis&quot;,
+	lime: &quot;lime&quot;,
+	limegreen: &quot;verde lime&quot;,
+	linen: &quot;linen&quot;,
+	magenta: &quot;magenta&quot;,
+	maroon: &quot;maro&quot;,
+	mediumaquamarine: &quot;aquamarin mediu&quot;,
+	mediumblue: &quot;albastru mediu&quot;,
+	mediumorchid: &quot;orchid mediu&quot;,
+	mediumpurple: &quot;purpuriu mediu&quot;,
+	mediumseagreen: &quot;verde marin mediu&quot;,
+	mediumslateblue: &quot;albastru ardezie mediu&quot;,
+	mediumspringgreen: &quot;verde primăvară mediu&quot;,
+	mediumturquoise: &quot;turcoaz mediu&quot;,
+	mediumvioletred: &quot;roşu-violet mediu&quot;,
+	midnightblue: &quot;midnight blue&quot;,
+	mintcream: &quot;mint cream&quot;,
+	mistyrose: &quot;misty rose&quot;,
+	moccasin: &quot;moccasin&quot;,
+	navajowhite: &quot;navajo white&quot;,
+	navy: &quot;navy&quot;,
+	oldlace: &quot;old lace&quot;,
+	olive: &quot;oliv&quot;,
+	olivedrab: &quot;oliv şters&quot;,
+	orange: &quot;portocaliu&quot;,
+	orangered: &quot;roşu portocaliu&quot;,
+	orchid: &quot;orchid&quot;,
+	palegoldenrod: &quot;goldenrod pal&quot;,
+	palegreen: &quot;verde pal&quot;,
+	paleturquoise: &quot;turcoaz pal&quot;,
+	palevioletred: &quot;roşu-violet pal&quot;,
+	papayawhip: &quot;papaya whip&quot;,
+	peachpuff: &quot;peach puff&quot;,
+	peru: &quot;peru&quot;,
+	pink: &quot;roz&quot;,
+	plum: &quot;plum&quot;,
+	powderblue: &quot;powder blue&quot;,
+	purple: &quot;purpuriu&quot;,
+	red: &quot;roşu&quot;,
+	rosybrown: &quot;rosy brown&quot;,
+	royalblue: &quot;albastru regal&quot;,
+	saddlebrown: &quot;saddle brown&quot;,
+	salmon: &quot;somon&quot;,
+	sandybrown: &quot;sandy brown&quot;,
+	seagreen: &quot;verde marin&quot;,
+	seashell: &quot;seashell&quot;,
+	sienna: &quot;sienna&quot;,
+	silver: &quot;argintiu&quot;,
+	skyblue: &quot;albastru cer&quot;,
+	slateblue: &quot;albastru ardezie&quot;,
+	slategray: &quot;gri ardezie&quot;,
+	slategrey: &quot;gri ardezie&quot;, // same as slategray
+	snow: &quot;zăpadă&quot;,
+	springgreen: &quot;verde primăvară&quot;,
+	steelblue: &quot;albastru metalic&quot;,
+	tan: &quot;tan&quot;,
+	teal: &quot;teal&quot;,
+	thistle: &quot;thistle&quot;,
+	tomato: &quot;tomato&quot;,
+	transparent: &quot;transparent&quot;,
+	turquoise: &quot;turcoaz&quot;,
+	violet: &quot;violet&quot;,
+	wheat: &quot;wheat&quot;,
+	white: &quot;alb&quot;,
+	whitesmoke: &quot;white smoke&quot;,
+	yellow: &quot;galben&quot;,
+	yellowgreen: &quot;verde gălbui&quot;
+})
+);</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>
