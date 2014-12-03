@@ -1,12 +1,10 @@
 # private use ;-) not met to be run by someone else, somewhere else
 # super slow. will optimize and polish, sorry for cats...;-)
 
+R="../../ainthek.github.io/plato-reports"
 build_reports(){
 
 	pushd src >/dev/null	
-
-	local R="../../ainthek.github.io/plato-reports"
-	
 	plato -r -d $R/reports/dojo 				dojo
 	# this one is TS not compilable on OSX with latest tsc
 	#plato -r -d $R/reports/dojo2 -l  sitepen-jshintrc/.jshintrc 	dojo2-core
@@ -84,19 +82,22 @@ build_reports(){
 build_stats_md(){
 	pushd src >/dev/null	
 
-	echo "|package|downloads|avg.maint|total.sloc|version|description|links|"
-	echo "|-------|--------:|--------:|---------:|-------|-----------|-----|"
+	echo "|package|downloads|avg.maint|total.sloc|version|description|"
+	echo "|-------|--------:|--------:|---------:|-------|-----------|"
 	ls -1 -d node_modules/* |\
-	#head -n 10|\
+	#head -n 2|\
 	while read module_path
 	do
 		module_name=$(basename $module_path)
-		rep=$(cat "../reports/$module_name/report.json" | jsontool -d "|" -a summary.average.maintainability summary.total.sloc)
+		rep=$(cat "$R/reports/$module_name/report.json" | jsontool -d "|" -a summary.average.maintainability summary.total.sloc)
+		rep_m=$(cut -d"|" -f1 <<< "$rep") #TODO: split
+		rep_s=$(cut -d"|" -f2 <<< "$rep")
 		#desc=$(npm view $module_name description)
 		version_desc=$(cat $module_path/package.json | jsontool -d "|" -a version description | tr "\n" " ")
 		popularity=$(npm_stats $module_name) # could be faster with xargs
-		echo "| $module_name | $popularity | $R/ep | $version_desc | [report]($(link_report $module_name)), [npm]($(link_npm $module_name)) |" |\
+		echo "| [$module_name]($(link_npm $module_name))| $popularity | [$rep_m]($(link_report $module_name))| [$rep_s]($(link_report $module_name))| $version_desc |" |\
 		md-escape-emphasis
+		echo "Done with $module_name" 1>&2
 	done | sort -t"|" -k3,3nr
 
 	popd >/dev/null
@@ -145,6 +146,6 @@ npm_stats(){
 
 build_reports
 
-#build_readme_md > README.md
+build_readme_md > README.md
 
 
