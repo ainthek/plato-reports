@@ -71,13 +71,13 @@ echo "
 
 Also some other frameworks analyzed:
 
-- [dojo](http://ainthek.github.io/plato-repo/reports/dojo/index.html)
+- [dojo](http://ainthek.github.io/plato-reports/reports/dojo/index.html)
 
 "
 }
 
 link_report(){
-	echo "http://ainthek.github.io/plato-repo/reports/$1/index.html"
+	echo "http://ainthek.github.io/plato-reports/reports/$1/index.html"
 }
 link_npm(){
 	echo "https://www.npmjs.org/package/$1"
