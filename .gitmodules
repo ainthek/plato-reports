@@ -16,3 +16,15 @@
 [submodule "src/poly"]
 	path = src/poly
 	url = https://github.com/cujojs/poly
+[submodule "src/ampersand-state"]
+	path = src/ampersand-state
+	url = https://github.com/AmpersandJS/ampersand-state.git
+[submodule "src/ampersand-view"]
+	path = src/ampersand-view
+	url = https://github.com/AmpersandJS/ampersand-view.git
+[submodule "src/ampersand"]
+	path = src/ampersand
+	url = https://github.com/AmpersandJS/ampersand.git
+[submodule "src/msgs"]
+	path = src/msgs
+	url = https://github.com/cujojs/msgs
