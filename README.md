@@ -85,3 +85,18 @@ Also some other frameworks analyzed:
 - [dojo](http://ainthek.github.io/plato-reports/reports/dojo/index.html)
 
 
+# Lint/Hint/ESHint
+
+Modules with . jshintrc
+
+- ampersand-state
+- ampersand-view
+- fixtures
+- msgs
+- open
+- plato
+- plato-ainthek
+- tough-cookie
+- wire
+
+
