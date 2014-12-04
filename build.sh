@@ -125,6 +125,16 @@ Also some other frameworks analyzed:
 
 - [dojo](http://ainthek.github.io/plato-reports/reports/dojo/index.html)
 
+
+# Lint/Hint/ESHint
+
+Modules with . jshintrc
+
+$(
+find src -name ".jshintrc" -maxdepth 4 | awk-dirname | sed "s;/$;;" | awk-basename | sort | uniq \
+| md-ul
+)
+
 "
 }
 
