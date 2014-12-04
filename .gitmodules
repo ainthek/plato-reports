@@ -31,3 +31,6 @@
 [submodule "src/json"]
 	path = src/json
 	url = https://github.com/trentm/json.git
+[submodule "src/JSON-js"]
+	path = src/JSON-js
+	url = https://github.com/douglascrockford/JSON-js
