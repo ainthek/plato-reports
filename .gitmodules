@@ -28,3 +28,6 @@
 [submodule "src/msgs"]
 	path = src/msgs
 	url = https://github.com/cujojs/msgs
+[submodule "src/json"]
+	path = src/json
+	url = https://github.com/trentm/json.git
