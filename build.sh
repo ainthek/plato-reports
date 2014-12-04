@@ -48,7 +48,7 @@ build_reports(){
 	plato -r -d $R/isarray 				-x isarray/node_modules/ node_modules/isarray
 	plato -r -d $R/jsdom 				-x jsdom/node_modules/ node_modules/jsdom
 	plato -r -d $R/jshint 				-x jshint/node_modules/ node_modules/jshint
-	plato -r -d $R/json 				-x json/node_modules/ node_modules/json
+	plato -r -d $R/json 				-x json/node_modules/ json
 	plato -r -d $R/json-diff 			-x json-diff/node_modules/ node_modules/json-diff
 	plato -r -d $R/json-diff-patch 		-x json-diff-patch/node_modules/ node_modules/json-diff-patch
 	plato -r -d $R/jsonparse 			-x jsonparse/node_modules/ node_modules/jsonparse
