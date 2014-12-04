@@ -5,7 +5,10 @@ R="../reports"
 build_reports(){
 
 	pushd src >/dev/null	
+	# dojo
 	plato -r -d $R/dojo 				dojo
+	# crockord
+	plato -r -d $R/JSON-js 				JSON-js
 	# this one is TS not compilable on OSX with latest tsc
 	#plato -r -d $R/dojo2 -l  sitepen-jshintrc/.jshintrc 	dojo2-core
 	plato -r -d $R/plato 				-x plato/node_modules/ plato
