@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - poly/test/curl/plugin/js.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>poly/test/curl/plugin/js.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">69.07</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">158</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">35.43</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.97</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/** MIT License (c) copyright B Cavalier &amp; J Hann */
+
+/**
+ * curl js! plugin
+ *
+ * Licensed under the MIT License at:
+ * 		http://www.opensource.org/licenses/mit-license.php
+ *
+ */
+
+/**
+ * usage:
+ *  require([&#039;ModuleA&#039;, &#039;js!myNonAMDFile.js!order&#039;, &#039;js!anotherFile.js!order], function (ModuleA) {
+ * 		var a = new ModuleA();
+ * 		document.body.appendChild(a.domNode);
+ * 	});
+ *
+ * Specify the !order suffix for files that must be evaluated in order.
+ * Using the !order option and requiring js files more than once doesn&#039;t make
+ * much sense since files are loaded exactly once.
+ *
+ * Specify the !exports=someGlobalVar option to return a global variable to
+ * the module depending on the javascript file. Using this option also allows
+ * positive error feedback to the loader since it can now detect if the
+ * javascript file failed to load correctly.
+ *
+ * Async=false rules learned from @getify&#039;s LABjs!
+ * http://wiki.whatwg.org/wiki/Dynamic_Script_Execution_Order
+ *
+ */
+(function (global, doc) {
+define(/*==&#039;js&#039;,==*/ [&#039;curl/_privileged&#039;], function (priv) {
+&quot;use strict&quot;;
+	var cache = {},
+		queue = [],
+		supportsAsyncFalse = doc &amp;&amp; doc.createElement(&#039;script&#039;).async == true,
+		waitForOrderedScript,
+		undef;
+
+	function nameWithExt (name, defaultExt) {
+		return name.lastIndexOf(&#039;.&#039;) &lt;= name.lastIndexOf(&#039;/&#039;) ?
+			name + &#039;.&#039; + defaultExt : name;
+	}
+
+	function loadScript (def, success, failure) {
+		// script processing rules learned from RequireJS
+
+		var deadline, completed;
+
+		// default deadline is very far in the future (5 min)
+		// devs should set something reasonable if they want to use it
+		deadline = new Date().valueOf() + (def.timeoutMsec || 300000);
+
+		// initial script processing
+		function process () {
+			completed = true;
+			if (def.exports) def.resolved = testGlobalVar(def.exports);
+			if (!def.exports || def.resolved) {
+				success();
+			}
+			else {
+				failure();
+			}
+		}
+
+		function fail (ex) {
+			// Exception is squashed by curl.js unfortunately
+			completed = true;
+			failure(ex);
+		}
+
+		// some browsers (Opera and IE6-8) don&#039;t support onerror and don&#039;t fire
+		// readystatechange if the script fails to load so we need to poll.
+		// this poller only runs if def.exports is specified and failure callback
+		// is defined (see below)
+		function poller () {
+			// if the script loaded
+			if (!completed) {
+				// if neither process or fail as run and our deadline is in the past
+				if (deadline &lt; new Date()) {
+					failure();
+				}
+				else {
+					setTimeout(poller, 10);
+				}
+			}
+		}
+		if (failure &amp;&amp; def.exports) setTimeout(poller, 10);
+
+		priv.core.loadScript(def, process, fail);
+
+	}
+
+	function fetch (def, promise) {
+
+		loadScript(def,
+			function () {
+				// if there&#039;s another queued script
+				var next = queue.shift();
+				waitForOrderedScript = queue.length &gt; 0;
+				if (next) {
+					// go get it (from cache hopefully)
+					fetch.apply(null, next);
+				}
+				promise[&#039;resolve&#039;](def.resolved || true);
+			},
+			function (ex) {
+				promise[&#039;reject&#039;](ex);
+			}
+		);
+
+	}
+
+	function testGlobalVar (varName) {
+		try {
+			return eval(&#039;global.&#039; + varName);
+		}
+		catch (ex) {
+			return undef;
+		}
+	}
+
+	return {
+
+		// the !options force us to cache ids in the plugin
+		&#039;dynamic&#039;: true,
+
+		&#039;load&#039;: function (name, require, callback, config) {
+
+			var order, exportsPos, exports, prefetch, def, promise;
+
+			order = name.indexOf(&#039;!order&#039;) &gt; 0; // can&#039;t be zero
+			exportsPos = name.indexOf(&#039;!exports=&#039;);
+			exports = exportsPos &gt; 0 &amp;&amp; name.substr(exportsPos + 9); // must be last option!
+			prefetch = &#039;prefetch&#039; in config ? config[&#039;prefetch&#039;] : true;
+			name = order || exportsPos &gt; 0 ? name.substr(0, name.indexOf(&#039;!&#039;)) : name;
+
+			// if we&#039;ve already fetched this resource, get it out of the cache
+			if (name in cache) {
+				callback(cache[name]);
+			}
+			else {
+				cache[name] = undef;
+				def = {
+					name: name,
+					url: require[&#039;toUrl&#039;](nameWithExt(name, &#039;js&#039;)),
+					order: order,
+					exports: exports,
+					timeoutMsec: config[&#039;timeout&#039;]
+				};
+				promise = {
+					&#039;resolve&#039;: function (o) {
+						cache[name] = o;
+						(callback[&#039;resolve&#039;] || callback)(o);
+					},
+					&#039;reject&#039;: callback[&#039;reject&#039;] || function (ex) { throw ex; }
+				};
+
+				// if this script has to wait for another
+				// or if we&#039;re loading, but not executing it
+				if (order &amp;&amp; !supportsAsyncFalse &amp;&amp; waitForOrderedScript) {
+					// push onto the stack of scripts that will be fetched
+					// from cache. do this before fetch in case IE has file cached.
+					queue.push([def, promise]);
+					// if we&#039;re prefetching
+					if (prefetch) {
+						// go get the file under an unknown mime type
+						def.mimetype = &#039;text/cache&#039;;
+						loadScript(def,
+							// remove the fake script when loaded
+							function (el) { el.parentNode.removeChild(el); },
+							function () {}
+						);
+						def.mimetype = &#039;&#039;;
+					}
+				}
+				// otherwise, just go get it
+				else {
+					waitForOrderedScript = waitForOrderedScript || order;
+					fetch(def, promise);
+				}
+			}
+
+		}
+
+	};
+});
+}(this, this.document));</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/nls/zh/colors.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/nls/zh/colors.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">35.27</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">156</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">1.59</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.22</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define(
+({
+// local representation of all CSS3 named colors, companion to dojo.colors.  To be used where descriptive information
+// is required for each color, such as a palette widget, and not for specifying color programatically.
+	//Note: due to the SVG 1.0 spec additions, some of these are alternate spellings for the same color (e.g. gray / grey).
+	//TODO: should we be using unique rgb values as keys instead and avoid these duplicates, or rely on the caller to do the reverse mapping?
+	aliceblue: &quot;爱丽丝蓝&quot;,
+	antiquewhite: &quot;古董白&quot;,
+	aqua: &quot;浅绿色&quot;,
+	aquamarine: &quot;碧绿色&quot;,
+	azure: &quot;天蓝色&quot;,
+	beige: &quot;米色&quot;,
+	bisque: &quot;桔黄色&quot;,
+	black: &quot;黑色&quot;,
+	blanchedalmond: &quot;白杏色&quot;,
+	blue: &quot;蓝色&quot;,
+	blueviolet: &quot;蓝紫色&quot;,
+	brown: &quot;棕色&quot;,
+	burlywood: &quot;实木色&quot;,
+	cadetblue: &quot;灰蓝色&quot;,
+	chartreuse: &quot;黄绿色&quot;,
+	chocolate: &quot;巧克力色&quot;,
+	coral: &quot;珊瑚色&quot;,
+	cornflowerblue: &quot;浅蓝色&quot;,
+	cornsilk: &quot;米绸色&quot;,
+	crimson: &quot;绯红色&quot;,
+	cyan: &quot;青蓝色&quot;,
+	darkblue: &quot;深蓝&quot;,
+	darkcyan: &quot;深青绿&quot;,
+	darkgoldenrod: &quot;深金黄&quot;,
+	darkgray: &quot;深灰色&quot;,
+	darkgreen: &quot;深绿色&quot;,
+	darkgrey: &quot;深灰色&quot;, // same as darkgray
+	darkkhaki: &quot;深卡其色&quot;,
+	darkmagenta: &quot;深洋红色&quot;,
+	darkolivegreen: &quot;深橄榄绿&quot;,
+	darkorange: &quot;深橙色&quot;,
+	darkorchid: &quot;深紫色&quot;,
+	darkred: &quot;深红色&quot;,
+	darksalmon: &quot;深橙红&quot;,
+	darkseagreen: &quot;深海藻绿&quot;,
+	darkslateblue: &quot;深青蓝&quot;,
+	darkslategray: &quot;深青灰&quot;,
+	darkslategrey: &quot;深青灰&quot;, // same as darkslategray
+	darkturquoise: &quot;深粉蓝&quot;,
+	darkviolet: &quot;深紫色&quot;,
+	deeppink: &quot;深粉红色&quot;,
+	deepskyblue: &quot;深天蓝色&quot;,
+	dimgray: &quot;暗灰色&quot;,
+	dimgrey: &quot;暗灰色&quot;, // same as dimgray
+	dodgerblue: &quot;闪蓝色&quot;,
+	firebrick: &quot;砖红&quot;,
+	floralwhite: &quot;花白色&quot;,
+	forestgreen: &quot;森林绿&quot;,
+	fuchsia: &quot;紫红色&quot;,
+	gainsboro: &quot;淡灰色&quot;,
+	ghostwhite: &quot;苍白&quot;,
+	gold: &quot;金黄色&quot;,
+	goldenrod: &quot;金麒麟色&quot;,
+	gray: &quot;灰色&quot;,
+	green: &quot;绿色&quot;,
+	greenyellow: &quot;绿黄色&quot;,
+	grey: &quot;灰色&quot;, // same as gray
+	honeydew: &quot;蜜汁色&quot;,
+	hotpink: &quot;深粉红&quot;,
+	indianred: &quot;印度红&quot;,
+	indigo: &quot;靛青&quot;,
+	ivory: &quot;象牙色&quot;,
+	khaki: &quot;卡其色&quot;,
+	lavender: &quot;淡紫色&quot;,
+	lavenderblush: &quot;淡紫红&quot;,
+	lawngreen: &quot;草绿色&quot;,
+	lemonchiffon: &quot;柠檬绸色&quot;,
+	lightblue: &quot;淡蓝色&quot;,
+	lightcoral: &quot;浅珊瑚色&quot;,
+	lightcyan: &quot;浅青色&quot;,
+	lightgoldenrodyellow: &quot;浅金黄色&quot;,
+	lightgray: &quot;浅灰色&quot;,
+	lightgreen: &quot;浅绿色&quot;,
+	lightgrey: &quot;浅灰色&quot;, // same as lightgray
+	lightpink: &quot;浅粉红色&quot;,
+	lightsalmon: &quot;淡橙色&quot;,
+	lightseagreen: &quot;浅海藻绿&quot;,
+	lightskyblue: &quot;浅天蓝色&quot;,
+	lightslategray: &quot;浅青灰&quot;,
+	lightslategrey: &quot;浅青灰&quot;, // same as lightslategray
+	lightsteelblue: &quot;浅钢蓝色&quot;,
+	lightyellow: &quot;浅黄色&quot;,
+	lime: &quot;淡黄绿色&quot;,
+	limegreen: &quot;橙绿色&quot;,
+	linen: &quot;亚麻色&quot;,
+	magenta: &quot;洋红色&quot;,
+	maroon: &quot;栗色&quot;,
+	mediumaquamarine: &quot;间绿色&quot;,
+	mediumblue: &quot;间蓝色&quot;,
+	mediumorchid: &quot;间紫色&quot;,
+	mediumpurple: &quot;间紫色&quot;,
+	mediumseagreen: &quot;间海蓝色&quot;,
+	mediumslateblue: &quot;间暗蓝色&quot;,
+	mediumspringgreen: &quot;间春绿色&quot;,
+	mediumturquoise: &quot;间绿宝石色&quot;,
+	mediumvioletred: &quot;间紫罗兰色&quot;,
+	midnightblue: &quot;深蓝色&quot;,
+	mintcream: &quot;薄荷色&quot;,
+	mistyrose: &quot;浅玫瑰色&quot;,
+	moccasin: &quot;鹿皮色&quot;,
+	navajowhite: &quot;纳瓦白&quot;,
+	navy: &quot;藏青色&quot;,
+	oldlace: &quot;老白色&quot;,
+	olive: &quot;橄榄绿&quot;,
+	olivedrab: &quot;草绿色&quot;,
+	orange: &quot;橙色&quot;,
+	orangered: &quot;橙红色&quot;,
+	orchid: &quot;紫色&quot;,
+	palegoldenrod: &quot;淡金黄色&quot;,
+	palegreen: &quot;淡绿色&quot;,
+	paleturquoise: &quot;苍绿色&quot;,
+	palevioletred: &quot;苍紫罗兰色&quot;,
+	papayawhip: &quot;木瓜色&quot;,
+	peachpuff: &quot;桃色&quot;,
+	peru: &quot;秘鲁色&quot;,
+	pink: &quot;粉红色&quot;,
+	plum: &quot;杨李色&quot;,
+	powderblue: &quot;铁蓝&quot;,
+	purple: &quot;紫色&quot;,
+	red: &quot;红色&quot;,
+	rosybrown: &quot;褐玫瑰红&quot;,
+	royalblue: &quot;品蓝&quot;,
+	saddlebrown: &quot;重褐色&quot;,
+	salmon: &quot;橙红&quot;,
+	sandybrown: &quot;沙褐色&quot;,
+	seagreen: &quot;海绿色&quot;,
+	seashell: &quot;海贝色&quot;,
+	sienna: &quot;赭色&quot;,
+	silver: &quot;银白色&quot;,
+	skyblue: &quot;天蓝色&quot;,
+	slateblue: &quot;石蓝色&quot;,
+	slategray: &quot;灰石色&quot;,
+	slategrey: &quot;灰石色&quot;, // same as slategray
+	snow: &quot;雪白色&quot;,
+	springgreen: &quot;春绿色&quot;,
+	steelblue: &quot;钢蓝色&quot;,
+	tan: &quot;棕褐色&quot;,
+	teal: &quot;水鸭色&quot;,
+	thistle: &quot;蓟色&quot;,
+	tomato: &quot;西红柿色&quot;,
+	transparent: &quot;透明的&quot;,
+	turquoise: &quot;绿宝石色&quot;,
+	violet: &quot;紫色&quot;,
+	wheat: &quot;浅黄色&quot;,
+	white: &quot;白色&quot;,
+	whitesmoke: &quot;烟白色&quot;,
+	yellow: &quot;黄色&quot;,
+	yellowgreen: &quot;黄绿色&quot;
+})
+);</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

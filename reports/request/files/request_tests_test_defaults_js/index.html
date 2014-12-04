@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - request/tests/test-defaults.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>request/tests/test-defaults.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">73.76</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">259</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">43.84</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">3.21</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">&#039;use strict&#039;
+
+var server = require(&#039;./server&#039;)
+  , assert = require(&#039;assert&#039;)
+  , request = require(&#039;../index&#039;)
+  , tape = require(&#039;tape&#039;)
+
+var s = server.createServer()
+
+tape(&#039;setup&#039;, function(t) {
+  s.listen(s.port, function() {
+    s.on(&#039;/get&#039;, function(req, resp) {
+      assert.equal(req.headers.foo, &#039;bar&#039;)
+      assert.equal(req.method, &#039;GET&#039;)
+      resp.writeHead(200, {&#039;Content-Type&#039;: &#039;text/plain&#039;})
+      resp.end(&#039;TESTING!&#039;)
+    })
+
+    s.on(&#039;/merge-headers&#039;, function (req, resp) {
+      assert.equal(req.headers.foo, &#039;bar&#039;)
+      assert.equal(req.headers.merged, &#039;yes&#039;)
+      resp.writeHead(200)
+      resp.end()
+    })
+
+    s.on(&#039;/post&#039;, function (req, resp) {
+      assert.equal(req.headers.foo, &#039;bar&#039;)
+      assert.equal(req.headers[&#039;content-type&#039;], null)
+      assert.equal(req.method, &#039;POST&#039;)
+      resp.writeHead(200, {&#039;Content-Type&#039;: &#039;application/json&#039;})
+      resp.end(JSON.stringify({foo:&#039;bar&#039;}))
+    })
+
+    s.on(&#039;/patch&#039;, function (req, resp) {
+      assert.equal(req.headers.foo, &#039;bar&#039;)
+      assert.equal(req.headers[&#039;content-type&#039;], null)
+      assert.equal(req.method, &#039;PATCH&#039;)
+      resp.writeHead(200, {&#039;Content-Type&#039;: &#039;application/json&#039;})
+      resp.end(JSON.stringify({foo:&#039;bar&#039;}))
+    })
+
+    s.on(&#039;/post-body&#039;, function (req, resp) {
+      assert.equal(req.headers.foo, &#039;bar&#039;)
+      assert.equal(req.headers[&#039;content-type&#039;], &#039;application/json&#039;)
+      assert.equal(req.method, &#039;POST&#039;)
+      resp.writeHead(200, {&#039;Content-Type&#039;: &#039;application/json&#039;})
+      resp.end(JSON.stringify({foo:&#039;bar&#039;}))
+    })
+
+    s.on(&#039;/del&#039;, function (req, resp) {
+      assert.equal(req.headers.foo, &#039;bar&#039;)
+      assert.equal(req.method, &#039;DELETE&#039;)
+      resp.writeHead(200, {&#039;Content-Type&#039;: &#039;application/json&#039;})
+      resp.end(JSON.stringify({foo:&#039;bar&#039;}))
+    })
+
+    s.on(&#039;/head&#039;, function (req, resp) {
+      assert.equal(req.headers.foo, &#039;bar&#039;)
+      assert.equal(req.method, &#039;HEAD&#039;)
+      resp.writeHead(200, {&#039;Content-Type&#039;: &#039;text/plain&#039;})
+      resp.end()
+    })
+
+    s.on(&#039;/get_recursive1&#039;, function (req, resp) {
+      assert.equal(req.headers.foo, &#039;bar1&#039;)
+      assert.equal(req.method, &#039;GET&#039;)
+      resp.writeHead(200, {&#039;Content-Type&#039;: &#039;text/plain&#039;})
+      resp.end(&#039;TESTING!&#039;)
+    })
+
+    s.on(&#039;/get_recursive2&#039;, function (req, resp) {
+      assert.equal(req.headers.foo, &#039;bar1&#039;)
+      assert.equal(req.headers.baz, &#039;bar2&#039;)
+      assert.equal(req.method, &#039;GET&#039;)
+      resp.writeHead(200, {&#039;Content-Type&#039;: &#039;text/plain&#039;})
+      resp.end(&#039;TESTING!&#039;)
+    })
+
+    s.on(&#039;/get_recursive3&#039;, function (req, resp) {
+      assert.equal(req.headers.foo, &#039;bar3&#039;)
+      assert.equal(req.headers.baz, &#039;bar2&#039;)
+      assert.equal(req.method, &#039;GET&#039;)
+      resp.writeHead(200, {&#039;Content-Type&#039;: &#039;text/plain&#039;})
+      resp.end(&#039;TESTING!&#039;)
+    })
+
+    s.on(&#039;/get_custom&#039;, function(req, resp) {
+      assert.equal(req.headers.foo, &#039;bar&#039;)
+      assert.equal(req.headers.x, &#039;y&#039;)
+      resp.writeHead(200, {&#039;Content-Type&#039;: &#039;text/plain&#039;})
+      resp.end()
+    })
+
+    s.on(&#039;/set-undefined&#039;, function (req, resp) {
+      assert.equal(req.method, &#039;POST&#039;)
+      assert.equal(req.headers[&#039;content-type&#039;], &#039;application/json&#039;)
+      assert.equal(req.headers[&#039;x-foo&#039;], &#039;baz&#039;)
+      var data = &#039;&#039;
+      req.on(&#039;data&#039;, function(d) {
+        data += d
+      })
+      req.on(&#039;end&#039;, function() {
+        resp.writeHead(200, {&#039;Content-Type&#039;: &#039;application/json&#039;})
+        resp.end(data)
+      })
+    })
+
+    t.end()
+  })
+})
+
+tape(&#039;get(string, function)&#039;, function(t) {
+  request.defaults({
+    headers: { foo: &#039;bar&#039; }
+  })(s.url + &#039;/get&#039;, function (e, r, b) {
+    t.equal(e, null)
+    t.equal(b, &#039;TESTING!&#039;)
+    t.end()
+  })
+})
+
+tape(&#039;merge headers&#039;, function(t) {
+  request.defaults({
+    headers: { foo: &#039;bar&#039;, merged: &#039;no&#039; }
+  })(s.url + &#039;/merge-headers&#039;, {
+    headers: { merged: &#039;yes&#039; }
+  }, function (e, r, b) {
+    t.equal(e, null)
+    t.equal(r.statusCode, 200)
+    t.end()
+  })
+})
+
+tape(&#039;post(string, object, function)&#039;, function(t) {
+  request.defaults({
+    headers: { foo: &#039;bar&#039; }
+  }).post(s.url + &#039;/post&#039;, { json: true }, function (e, r, b) {
+    t.equal(e, null)
+    t.equal(b.foo, &#039;bar&#039;)
+    t.end()
+  })
+})
+
+tape(&#039;patch(string, object, function)&#039;, function(t) {
+  request.defaults({
+    headers: { foo: &#039;bar&#039; }
+  }).patch(s.url + &#039;/patch&#039;, { json: true }, function (e, r, b) {
+    t.equal(e, null)
+    t.equal(b.foo, &#039;bar&#039;)
+    t.end()
+  })
+})
+
+tape(&#039;post(string, object, function) with body&#039;, function(t) {
+  request.defaults({
+    headers: { foo: &#039;bar&#039; }
+  }).post(s.url + &#039;/post-body&#039;, {
+    json: true,
+    body: { bar: &#039;baz&#039; }
+  }, function (e, r, b) {
+    t.equal(e, null)
+    t.equal(b.foo, &#039;bar&#039;)
+    t.end()
+  })
+})
+
+tape(&#039;del(string, function)&#039;, function(t) {
+  request.defaults({
+    headers: {foo: &#039;bar&#039;},
+    json: true
+  }).del(s.url + &#039;/del&#039;, function (e, r, b) {
+    t.equal(e, null)
+    t.equal(b.foo, &#039;bar&#039;)
+    t.end()
+  })
+})
+
+tape(&#039;head(object, function)&#039;, function(t) {
+  request.defaults({
+    headers: { foo: &#039;bar&#039; }
+  }).head({ uri: s.url + &#039;/head&#039; }, function (e, r, b) {
+    t.equal(e, null)
+    t.end()
+  })
+})
+
+tape(&#039;recursive defaults&#039;, function(t) {
+  t.plan(6)
+
+  var defaultsOne = request.defaults({ headers: { foo: &#039;bar1&#039; } })
+    , defaultsTwo = defaultsOne.defaults({ headers: { baz: &#039;bar2&#039; } })
+    , defaultsThree = defaultsTwo.defaults({}, function(options, callback) {
+      options.headers = {
+        foo: &#039;bar3&#039;
+      }
+      defaultsTwo(options, callback)
+    })
+
+  defaultsOne(s.url + &#039;/get_recursive1&#039;, function (e, r, b) {
+    t.equal(e, null)
+    t.equal(b, &#039;TESTING!&#039;)
+  })
+
+  defaultsTwo(s.url + &#039;/get_recursive2&#039;, function (e, r, b) {
+    t.equal(e, null)
+    t.equal(b, &#039;TESTING!&#039;)
+  })
+
+  // requester function on recursive defaults
+  defaultsThree(s.url + &#039;/get_recursive3&#039;, function (e, r, b) {
+    t.equal(e, null)
+    t.equal(b, &#039;TESTING!&#039;)
+  })
+})
+
+tape(&#039;test custom request handler function&#039;, function(t) {
+  t.plan(2)
+
+  var requestWithCustomHandler = request.defaults({
+    headers: { foo: &#039;bar&#039; },
+    body: &#039;TESTING!&#039;
+  }, function(uri, options, callback) {
+    var params = request.initParams(uri, options, callback)
+    options = params.options
+    options.headers.x = &#039;y&#039;
+    return request(params.uri, params.options, params.callback)
+  })
+
+  t.throws(function() {
+    requestWithCustomHandler.head(s.url + &#039;/get_custom&#039;, function(e, r, b) {
+      throw new Error(&#039;We should never get here&#039;)
+    })
+  }, /HTTP HEAD requests MUST NOT include a request body/)
+
+  requestWithCustomHandler.get(s.url + &#039;/get_custom&#039;, function(e, r, b) {
+    t.equal(e, null)
+  })
+})
+
+tape(&#039;test only setting undefined properties&#039;, function(t) {
+  request.defaults({
+    method: &#039;post&#039;,
+    json: true,
+    headers: { &#039;x-foo&#039;: &#039;bar&#039; }
+  })({
+    uri: s.url + &#039;/set-undefined&#039;,
+    json: {foo: &#039;bar&#039;},
+    headers: {&#039;x-foo&#039;: &#039;baz&#039;}
+  }, function (e, r, b) {
+    t.equal(e, null)
+    t.deepEqual(b, { foo: &#039;bar&#039; })
+    t.end()
+  })
+})
+
+tape(&#039;cleanup&#039;, function(t) {
+  s.close()
+  t.end()
+})</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

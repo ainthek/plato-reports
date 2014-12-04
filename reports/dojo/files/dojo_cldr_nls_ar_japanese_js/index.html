@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/cldr/nls/ar/japanese.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/cldr/nls/ar/japanese.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">45.57</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">291</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">2.01</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.08</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define(
+//begin v1.x content
+{
+	&quot;field-sat-relative+0&quot;: &quot;السبت الحالي&quot;,
+	&quot;field-sat-relative+1&quot;: &quot;السبت التالي&quot;,
+	&quot;field-dayperiod&quot;: &quot;ص/م&quot;,
+	&quot;field-sun-relative+-1&quot;: &quot;الأحد الماضي&quot;,
+	&quot;field-mon-relative+-1&quot;: &quot;الاثنين الماضي&quot;,
+	&quot;field-minute&quot;: &quot;الدقائق&quot;,
+	&quot;field-day-relative+-1&quot;: &quot;أمس&quot;,
+	&quot;field-weekday&quot;: &quot;اليوم&quot;,
+	&quot;field-day-relative+-2&quot;: &quot;أول أمس&quot;,
+	&quot;field-era&quot;: &quot;العصر&quot;,
+	&quot;field-hour&quot;: &quot;الساعات&quot;,
+	&quot;field-sun-relative+0&quot;: &quot;الأحد الحالي&quot;,
+	&quot;field-sun-relative+1&quot;: &quot;الأحد التالي&quot;,
+	&quot;field-wed-relative+-1&quot;: &quot;الأربعاء الماضي&quot;,
+	&quot;field-day-relative+0&quot;: &quot;اليوم&quot;,
+	&quot;field-day-relative+1&quot;: &quot;غدًا&quot;,
+	&quot;eraAbbr&quot;: [
+		&quot;تيكا&quot;,
+		&quot;هاكتشي&quot;,
+		&quot;هاكهو&quot;,
+		&quot;شتشو&quot;,
+		&quot;تيهو&quot;,
+		&quot;كيين&quot;,
+		&quot;وادو&quot;,
+		&quot;رييكي&quot;,
+		&quot;يورو&quot;,
+		&quot;جينكي&quot;,
+		&quot;تمبيو&quot;,
+		&quot;تمبيو-كامبو&quot;,
+		&quot;تمبيو-شوهو&quot;,
+		&quot;تمبيو-هوجي&quot;,
+		&quot;تمفو-جينجو&quot;,
+		&quot;جينجو-كيين&quot;,
+		&quot;هوكي&quot;,
+		&quot;تن-أو&quot;,
+		&quot;إنرياكو&quot;,
+		&quot;ديدو&quot;,
+		&quot;كونين&quot;,
+		&quot;تنتشو&quot;,
+		&quot;شووا (٨٣٤–٨٤٨)‏&quot;,
+		&quot;كاجو&quot;,
+		&quot;نينجو&quot;,
+		&quot;سيكو&quot;,
+		&quot;تنان&quot;,
+		&quot;جوجان&quot;,
+		&quot;جينكيي&quot;,
+		&quot;نينا&quot;,
+		&quot;كامبيو&quot;,
+		&quot;شوتاي&quot;,
+		&quot;انجي&quot;,
+		&quot;انتشو&quot;,
+		&quot;شوهيي&quot;,
+		&quot;تنجيو&quot;,
+		&quot;تنرياكو&quot;,
+		&quot;تنتوكو&quot;,
+		&quot;أووا&quot;,
+		&quot;كوهو&quot;,
+		&quot;آنا&quot;,
+		&quot;تينروكو&quot;,
+		&quot;تن-نن&quot;,
+		&quot;جوجن&quot;,
+		&quot;تنجن&quot;,
+		&quot;إيكان&quot;,
+		&quot;كانا&quot;,
+		&quot;اي-ان&quot;,
+		&quot;ايسو&quot;,
+		&quot;شورياكو (٩٩٠–٩٩٥)‏&quot;,
+		&quot;تشوتوكو&quot;,
+		&quot;تشوهو&quot;,
+		&quot;كانكو&quot;,
+		&quot;تشووا&quot;,
+		&quot;كانين&quot;,
+		&quot;جاين&quot;,
+		&quot;مانجو&quot;,
+		&quot;تشوجين&quot;,
+		&quot;تشورياكو&quot;,
+		&quot;تشوكيو (١٠٤٠–١٠٤٤)‏&quot;,
+		&quot;كانتوكو&quot;,
+		&quot;ايشو (١٠٤٦–١٠٥٣)‏&quot;,
+		&quot;تينجي&quot;,
+		&quot;كوهيي&quot;,
+		&quot;جيرياكو&quot;,
+		&quot;انكيو (١٠٦٩–١٠٧٤)‏&quot;,
+		&quot;شوهو (١٠٧٤–١٠٧٧)‏&quot;,
+		&quot;شورياكو (١٠٧٧–١٠٨١)‏&quot;,
+		&quot;ايهو&quot;,
+		&quot;أوتوكو&quot;,
+		&quot;كانجي&quot;,
+		&quot;كاهو&quot;,
+		&quot;ايتشو&quot;,
+		&quot;شوتوكو&quot;,
+		&quot;كووا (١٠٩٩–١١٠٤)‏&quot;,
+		&quot;تشوجي&quot;,
+		&quot;كاشو&quot;,
+		&quot;تنين&quot;,
+		&quot;تن-اي&quot;,
+		&quot;ايكيو (١١١٣–١١١٨)‏&quot;,
+		&quot;جن-اي&quot;,
+		&quot;هوان&quot;,
+		&quot;تنجي&quot;,
+		&quot;ديجي&quot;,
+		&quot;تنشو (١١٣١–١١٣٢)‏&quot;,
+		&quot;تشوشو&quot;,
+		&quot;هوين&quot;,
+		&quot;ايجي&quot;,
+		&quot;كوجي (١١٤٢–١١٤٤)‏&quot;,
+		&quot;تنيو&quot;,
+		&quot;كيوان&quot;,
+		&quot;نينبيي&quot;,
+		&quot;كيوجو&quot;,
+		&quot;هجين&quot;,
+		&quot;هيجي&quot;,
+		&quot;ايرياكو&quot;,
+		&quot;أوهو&quot;,
+		&quot;تشوكان&quot;,
+		&quot;ايمان&quot;,
+		&quot;نين-ان&quot;,
+		&quot;كاو&quot;,
+		&quot;شون&quot;,
+		&quot;أنجين&quot;,
+		&quot;جيشو&quot;,
+		&quot;يووا&quot;,
+		&quot;جيي&quot;,
+		&quot;جنريوكو&quot;,
+		&quot;بنجي&quot;,
+		&quot;كنكيو&quot;,
+		&quot;شوجي&quot;,
+		&quot;كنين&quot;,
+		&quot;جنكيو (١٢٠٤–١٢٠٦)‏&quot;,
+		&quot;كن-اي&quot;,
+		&quot;شوجن (١٢٠٧–١٢١١)‏&quot;,
+		&quot;كنرياكو&quot;,
+		&quot;كنبو (١٢١٣–١٢١٩)‏&quot;,
+		&quot;شوكيو&quot;,
+		&quot;جو&quot;,
+		&quot;جيننين&quot;,
+		&quot;كروكو&quot;,
+		&quot;أنتيي&quot;,
+		&quot;كنكي&quot;,
+		&quot;جويي&quot;,
+		&quot;تمبكو&quot;,
+		&quot;بنرياكو&quot;,
+		&quot;كاتيي&quot;,
+		&quot;رياكنين&quot;,
+		&quot;ان-أو&quot;,
+		&quot;نينجي&quot;,
+		&quot;كنجين&quot;,
+		&quot;هوجي&quot;,
+		&quot;كنتشو&quot;,
+		&quot;كوجن&quot;,
+		&quot;شوكا&quot;,
+		&quot;شوجن (١٢٥٩–١٢٦٠)‏&quot;,
+		&quot;بن-أو&quot;,
+		&quot;كوتشو&quot;,
+		&quot;بن-اي&quot;,
+		&quot;كنجي&quot;,
+		&quot;كوان&quot;,
+		&quot;شوو (١٢٨٨–١٢٩٣)‏&quot;,
+		&quot;اينين&quot;,
+		&quot;شوان&quot;,
+		&quot;كنجن&quot;,
+		&quot;كجن&quot;,
+		&quot;توكجي&quot;,
+		&quot;انكي&quot;,
+		&quot;أوتشو&quot;,
+		&quot;شووا (١٣١٢–١٣١٧)‏&quot;,
+		&quot;بنبو&quot;,
+		&quot;جنو&quot;,
+		&quot;جنكيو (١٣٢١–١٣٢٤)‏&quot;,
+		&quot;شوتشو (١٣٢٤–١٣٢٦)‏&quot;,
+		&quot;كريكي&quot;,
+		&quot;جنتكو&quot;,
+		&quot;جنكو&quot;,
+		&quot;كمو&quot;,
+		&quot;إنجن&quot;,
+		&quot;كوككو&quot;,
+		&quot;شوهي&quot;,
+		&quot;كنتكو&quot;,
+		&quot;بنتشو&quot;,
+		&quot;تنجو&quot;,
+		&quot;كورياكو&quot;,
+		&quot;كووا (١٣٨١–١٣٨٤)‏&quot;,
+		&quot;جنتشو&quot;,
+		&quot;مييتكو (١٣٨٤–١٣٨٧)‏&quot;,
+		&quot;كاكي&quot;,
+		&quot;كو&quot;,
+		&quot;مييتكو (١٣٩٠–١٣٩٤)‏&quot;,
+		&quot;أويي&quot;,
+		&quot;شوتشو (١٤٢٨–١٤٢٩)‏&quot;,
+		&quot;ايكيو (١٤٢٩–١٤٤١)‏&quot;,
+		&quot;ككيتسو&quot;,
+		&quot;بن-أن&quot;,
+		&quot;هوتكو&quot;,
+		&quot;كيوتكو&quot;,
+		&quot;كوشو&quot;,
+		&quot;تشوركو&quot;,
+		&quot;كنشو&quot;,
+		&quot;بنشو&quot;,
+		&quot;أونين&quot;,
+		&quot;بنمي&quot;,
+		&quot;تشوكيو (١٤٨٧–١٤٨٩)‏&quot;,
+		&quot;انتكو&quot;,
+		&quot;ميو&quot;,
+		&quot;بنكي&quot;,
+		&quot;ايشو (١٥٠٤–١٥٢١)‏&quot;,
+		&quot;تييي&quot;,
+		&quot;كيوركو&quot;,
+		&quot;تنمن&quot;,
+		&quot;كوجي (١٥٥٥–١٥٥٨)‏&quot;,
+		&quot;ايركو&quot;,
+		&quot;جنكي&quot;,
+		&quot;تنشو (١٥٧٣–١٥٩٢)‏&quot;,
+		&quot;بنركو&quot;,
+		&quot;كيتشو&quot;,
+		&quot;جنوا&quot;,
+		&quot;كان-اي&quot;,
+		&quot;شوهو (١٦٤٤–١٦٤٨)‏&quot;,
+		&quot;كيان&quot;,
+		&quot;شوو (١٦٥٢–١٦٥٥)‏&quot;,
+		&quot;ميرياكو&quot;,
+		&quot;منجي&quot;,
+		&quot;كنبن&quot;,
+		&quot;انبو&quot;,
+		&quot;تنوا&quot;,
+		&quot;جوكيو&quot;,
+		&quot;جنركو&quot;,
+		&quot;هويي&quot;,
+		&quot;شوتكو&quot;,
+		&quot;كيوهو&quot;,
+		&quot;جنبن&quot;,
+		&quot;كنبو (١٧٤١–١٧٤٤)‏&quot;,
+		&quot;انكيو (١٧٤٤–١٧٤٨)‏&quot;,
+		&quot;كان-ان&quot;,
+		&quot;هورياكو&quot;,
+		&quot;مييوا&quot;,
+		&quot;ان-اي&quot;,
+		&quot;تنمي&quot;,
+		&quot;كنسي&quot;,
+		&quot;كيووا&quot;,
+		&quot;بنكا&quot;,
+		&quot;بنسي&quot;,
+		&quot;تنبو&quot;,
+		&quot;كوكا&quot;,
+		&quot;كاي&quot;,
+		&quot;أنسي&quot;,
+		&quot;من-ان&quot;,
+		&quot;بنكيو&quot;,
+		&quot;جنجي&quot;,
+		&quot;كيو&quot;,
+		&quot;ميجي&quot;,
+		&quot;تيشو&quot;,
+		&quot;شووا&quot;,
+		&quot;هيسي&quot;
+	],
+	&quot;field-day-relative+2&quot;: &quot;بعد الغد&quot;,
+	&quot;field-tue-relative+0&quot;: &quot;الثلاثاء الحالي&quot;,
+	&quot;field-zone&quot;: &quot;التوقيت&quot;,
+	&quot;field-tue-relative+1&quot;: &quot;الثلاثاء التالي&quot;,
+	&quot;field-week-relative+-1&quot;: &quot;الأسبوع الماضي&quot;,
+	&quot;field-year-relative+0&quot;: &quot;هذه السنة&quot;,
+	&quot;field-year-relative+1&quot;: &quot;السنة التالية&quot;,
+	&quot;field-sat-relative+-1&quot;: &quot;السبت الماضي&quot;,
+	&quot;field-year-relative+-1&quot;: &quot;السنة الماضية&quot;,
+	&quot;field-year&quot;: &quot;السنة&quot;,
+	&quot;field-fri-relative+0&quot;: &quot;الجمعة الحالية&quot;,
+	&quot;field-fri-relative+1&quot;: &quot;الجمعة التالية&quot;,
+	&quot;field-week&quot;: &quot;الأسبوع&quot;,
+	&quot;field-week-relative+0&quot;: &quot;هذا الأسبوع&quot;,
+	&quot;field-week-relative+1&quot;: &quot;الأسبوع التالي&quot;,
+	&quot;field-month-relative+0&quot;: &quot;هذا الشهر&quot;,
+	&quot;field-month&quot;: &quot;الشهر&quot;,
+	&quot;field-month-relative+1&quot;: &quot;الشهر التالي&quot;,
+	&quot;field-fri-relative+-1&quot;: &quot;الجمعة الماضية&quot;,
+	&quot;field-second&quot;: &quot;الثواني&quot;,
+	&quot;field-tue-relative+-1&quot;: &quot;الثلاثاء الماضي&quot;,
+	&quot;field-day&quot;: &quot;يوم&quot;,
+	&quot;field-mon-relative+0&quot;: &quot;الاثنين الحالي&quot;,
+	&quot;field-mon-relative+1&quot;: &quot;الاثنين التالي&quot;,
+	&quot;field-thu-relative+0&quot;: &quot;الخميس الحالي&quot;,
+	&quot;field-second-relative+0&quot;: &quot;الآن&quot;,
+	&quot;field-thu-relative+1&quot;: &quot;الخميس التالي&quot;,
+	&quot;field-wed-relative+0&quot;: &quot;الأربعاء الحالي&quot;,
+	&quot;field-wed-relative+1&quot;: &quot;الأربعاء التالي&quot;,
+	&quot;field-month-relative+-1&quot;: &quot;الشهر الماضي&quot;,
+	&quot;field-thu-relative+-1&quot;: &quot;الخميس الماضي&quot;
+}
+//end v1.x content
+);</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

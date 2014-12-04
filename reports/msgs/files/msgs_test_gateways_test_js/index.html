@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - msgs/test/gateways-test.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>msgs/test/gateways-test.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">75.73</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">145</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">30.62</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.42</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/*
+ * Copyright 2012-2014 the original author or authors
+ * @license MIT, see LICENSE.txt for details
+ *
+ * @author Scott Andrews
+ */
+
+(function (buster, define) {
+	&#039;use strict&#039;;
+
+	var assert, refute, fail;
+
+	assert = buster.assert;
+	refute = buster.refute;
+	fail = buster.assertions.fail;
+
+	define(&#039;msgs/gateways-test&#039;, function (require) {
+
+		var msgs, bus, when;
+
+		msgs = require(&#039;msgs/gateways&#039;);
+		when = require(&#039;when&#039;);
+
+		buster.testCase(&#039;msgs/gateways&#039;, {
+			setUp: function () {
+				bus = msgs.bus();
+			},
+			tearDown: function () {
+				bus.destroy();
+			},
+
+			&#039;should resolve the gateway promise when there is no more work to do&#039;: function () {
+				bus.channel(&#039;target&#039;).subscribe(bus.transformer(function (payload) {
+					return &#039;Knock, knock? &#039; + payload;
+				}));
+				return bus.inboundGateway(&#039;target&#039;)(&#039;Who\&#039;s there?&#039;).then(function (response) {
+					assert.same(&#039;Knock, knock? Who\&#039;s there?&#039;, response);
+				}).otherwise(fail);
+			},
+			&#039;should reject the gateway promise when an error is encountered&#039;: function () {
+				bus.channel(&#039;target&#039;).subscribe(bus.transformer(function (/* payload */) {
+					throw new Error();
+				}));
+				return bus.inboundGateway(&#039;target&#039;)(&#039;Who\&#039;s there?&#039;).then(
+					fail,
+					function (/* response */) {
+						assert(true);
+					}
+				);
+			},
+			&#039;should apply a sequence number to gateway messages&#039;: function () {
+				var handler, gateway;
+				handler = {
+					handle: this.spy(function () { return true; })
+				};
+				gateway = bus.inboundGateway(bus.directChannel(handler));
+
+				gateway(&#039;hello&#039;);
+				gateway(&#039;world&#039;);
+
+				assert.same(2, handler.handle.callCount);
+				assert.same(0, handler.handle.getCall(0).args[0].headers.sequenceNumber);
+				assert.same(1, handler.handle.getCall(1).args[0].headers.sequenceNumber);
+			},
+			&#039;should post a reply message from an outbound gateway to the output channel&#039;: function (done) {
+				var spy = this.spy(function (message) {
+					assert.same(&#039;HELLO SERVICE&#039;, message);
+					done();
+				});
+
+				bus.channel(&#039;in&#039;);
+
+				bus.outboundGateway(&#039;service&#039;, function (message) {
+					var d = when.defer();
+					setTimeout(function () {
+						d.resolve(message.toUpperCase());
+					}, 10);
+					return d.promise;
+				}, { input: &#039;in&#039;, output: &#039;out&#039;, error: &#039;err&#039; });
+
+				bus.directChannel(&#039;err&#039;, bus.outboundAdapter(function () {
+					fail(&#039;A message should not have been received on the error channel&#039;);
+					done();
+				}));
+
+				bus.directChannel(&#039;out&#039;, bus.outboundAdapter(spy));
+
+				bus.send(&#039;in&#039;, &#039;Hello Service&#039;);
+				refute(spy.called);
+			},
+			&#039;should post a rejected promise from an outbound gateway to the error channel&#039;: function (done) {
+				var spy = this.spy(function (message) {
+					assert.same(&#039;HELLO SERVICE&#039;, message);
+					done();
+				});
+
+				bus.channel(&#039;in&#039;);
+
+				bus.outboundGateway(&#039;service&#039;, function (message) {
+					var d = when.defer();
+					setTimeout(function () {
+						d.reject(message.toUpperCase());
+					}, 10);
+					return d.promise;
+				}, { input: &#039;in&#039;, output: &#039;out&#039;, error: &#039;err&#039; });
+
+				bus.directChannel(&#039;out&#039;, bus.outboundAdapter(function () {
+					fail(&#039;A message should not have been received on the output channel&#039;);
+					done();
+				}));
+
+				bus.directChannel(&#039;err&#039;, bus.outboundAdapter(spy));
+
+				bus.send(&#039;in&#039;, &#039;Hello Service&#039;);
+				refute(spy.called);
+			},
+			&#039;should post a throw error from an outbound gateway to the error channel&#039;: function (done) {
+				var spy = this.spy(function (message) {
+					assert.same(&#039;Hello Service&#039;, message);
+					done();
+				});
+
+				bus.channel(&#039;in&#039;);
+
+				bus.outboundGateway(&#039;service&#039;, function (message) {
+					throw message.toUpperCase();
+				}, { input: &#039;in&#039;, output: &#039;out&#039;, error: &#039;err&#039; });
+
+				bus.directChannel(&#039;out&#039;, bus.outboundAdapter(function () {
+					fail(&#039;A message should not have been received on the output channel&#039;);
+					done();
+				}));
+
+				bus.directChannel(&#039;err&#039;, bus.outboundAdapter(spy));
+
+				bus.send(&#039;in&#039;, &#039;Hello Service&#039;);
+			}
+		});
+
+	});
+
+}(
+	this.buster || require(&#039;buster&#039;),
+	typeof define === &#039;function&#039; &amp;&amp; define.amd ? define : function (id, factory) {
+		var packageName = id.split(/[\/\-]/)[0], pathToRoot = id.replace(/[^\/]+/g, &#039;..&#039;);
+		pathToRoot = pathToRoot.length &gt; 2 ? pathToRoot.substr(3) : pathToRoot;
+		factory(function (moduleId) {
+			return require(moduleId.indexOf(packageName) === 0 ? pathToRoot + moduleId.substr(packageName.length) : moduleId);
+		});
+	}
+	// Boilerplate for AMD and Node
+));</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

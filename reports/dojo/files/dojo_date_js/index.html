@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/date.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/date.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">48.72</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">346</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">69.79</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.15</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([&quot;./has&quot;, &quot;./_base/lang&quot;], function(has, lang){
+// module:
+//		dojo/date
+
+var date = {
+	// summary:
+	//		Date manipulation utilities
+};
+
+date.getDaysInMonth = function(/*Date*/dateObject){
+	// summary:
+	//		Returns the number of days in the month used by dateObject
+	var month = dateObject.getMonth();
+	var days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+	if(month == 1 &amp;&amp; date.isLeapYear(dateObject)){ return 29; } // Number
+	return days[month]; // Number
+};
+
+date.isLeapYear = function(/*Date*/dateObject){
+	// summary:
+	//		Determines if the year of the dateObject is a leap year
+	// description:
+	//		Leap years are years with an additional day YYYY-02-29, where the
+	//		year number is a multiple of four with the following exception: If
+	//		a year is a multiple of 100, then it is only a leap year if it is
+	//		also a multiple of 400. For example, 1900 was not a leap year, but
+	//		2000 is one.
+
+	var year = dateObject.getFullYear();
+	return !(year%400) || (!(year%4) &amp;&amp; !!(year%100)); // Boolean
+};
+
+// FIXME: This is not localized
+date.getTimezoneName = function(/*Date*/dateObject){
+	// summary:
+	//		Get the user&#039;s time zone as provided by the browser
+	// dateObject:
+	//		Needed because the timezone may vary with time (daylight savings)
+	// description:
+	//		Try to get time zone info from toString or toLocaleString method of
+	//		the Date object -- UTC offset is not a time zone.  See
+	//		http://www.twinsun.com/tz/tz-link.htm Note: results may be
+	//		inconsistent across browsers.
+
+	var str = dateObject.toString(); // Start looking in toString
+	var tz = &#039;&#039;; // The result -- return empty string if nothing found
+	var match;
+
+	// First look for something in parentheses -- fast lookup, no regex
+	var pos = str.indexOf(&#039;(&#039;);
+	if(pos &gt; -1){
+		tz = str.substring(++pos, str.indexOf(&#039;)&#039;));
+	}else{
+		// If at first you don&#039;t succeed ...
+		// If IE knows about the TZ, it appears before the year
+		// Capital letters or slash before a 4-digit year
+		// at the end of string
+		var pat = /([A-Z\/]+) \d{4}$/;
+		if((match = str.match(pat))){
+			tz = match[1];
+		}else{
+		// Some browsers (e.g. Safari) glue the TZ on the end
+		// of toLocaleString instead of putting it in toString
+			str = dateObject.toLocaleString();
+			// Capital letters or slash -- end of string,
+			// after space
+			pat = / ([A-Z\/]+)$/;
+			if((match = str.match(pat))){
+				tz = match[1];
+			}
+		}
+	}
+
+	// Make sure it doesn&#039;t somehow end up return AM or PM
+	return (tz == &#039;AM&#039; || tz == &#039;PM&#039;) ? &#039;&#039; : tz; // String
+};
+
+// Utility methods to do arithmetic calculations with Dates
+
+date.compare = function(/*Date*/date1, /*Date?*/date2, /*String?*/portion){
+	// summary:
+	//		Compare two date objects by date, time, or both.
+	// description:
+	//		Returns 0 if equal, positive if a &gt; b, else negative.
+	// date1:
+	//		Date object
+	// date2:
+	//		Date object.  If not specified, the current Date is used.
+	// portion:
+	//		A string indicating the &quot;date&quot; or &quot;time&quot; portion of a Date object.
+	//		Compares both &quot;date&quot; and &quot;time&quot; by default.  One of the following:
+	//		&quot;date&quot;, &quot;time&quot;, &quot;datetime&quot;
+
+	// Extra step required in copy for IE - see #3112
+	date1 = new Date(+date1);
+	date2 = new Date(+(date2 || new Date()));
+
+	if(portion == &quot;date&quot;){
+		// Ignore times and compare dates.
+		date1.setHours(0, 0, 0, 0);
+		date2.setHours(0, 0, 0, 0);
+	}else if(portion == &quot;time&quot;){
+		// Ignore dates and compare times.
+		date1.setFullYear(0, 0, 0);
+		date2.setFullYear(0, 0, 0);
+	}
+
+	if(date1 &gt; date2){ return 1; } // int
+	if(date1 &lt; date2){ return -1; } // int
+	return 0; // int
+};
+
+date.add = function(/*Date*/date, /*String*/interval, /*int*/amount){
+	// summary:
+	//		Add to a Date in intervals of different size, from milliseconds to years
+	// date: Date
+	//		Date object to start with
+	// interval:
+	//		A string representing the interval.  One of the following:
+	//		&quot;year&quot;, &quot;month&quot;, &quot;day&quot;, &quot;hour&quot;, &quot;minute&quot;, &quot;second&quot;,
+	//		&quot;millisecond&quot;, &quot;quarter&quot;, &quot;week&quot;, &quot;weekday&quot;
+	// amount:
+	//		How much to add to the date.
+
+	var sum = new Date(+date); // convert to Number before copying to accommodate IE (#3112)
+	var fixOvershoot = false;
+	var property = &quot;Date&quot;;
+
+	switch(interval){
+		case &quot;day&quot;:
+			break;
+		case &quot;weekday&quot;:
+			//i18n FIXME: assumes Saturday/Sunday weekend, but this is not always true.  see dojo/cldr/supplemental
+
+			// Divide the increment time span into weekspans plus leftover days
+			// e.g., 8 days is one 5-day weekspan / and two leftover days
+			// Can&#039;t have zero leftover days, so numbers divisible by 5 get
+			// a days value of 5, and the remaining days make up the number of weeks
+			var days, weeks;
+			var mod = amount % 5;
+			if(!mod){
+				days = (amount &gt; 0) ? 5 : -5;
+				weeks = (amount &gt; 0) ? ((amount-5)/5) : ((amount+5)/5);
+			}else{
+				days = mod;
+				weeks = parseInt(amount/5);
+			}
+			// Get weekday value for orig date param
+			var strt = date.getDay();
+			// Orig date is Sat / positive incrementer
+			// Jump over Sun
+			var adj = 0;
+			if(strt == 6 &amp;&amp; amount &gt; 0){
+				adj = 1;
+			}else if(strt == 0 &amp;&amp; amount &lt; 0){
+			// Orig date is Sun / negative incrementer
+			// Jump back over Sat
+				adj = -1;
+			}
+			// Get weekday val for the new date
+			var trgt = strt + days;
+			// New date is on Sat or Sun
+			if(trgt == 0 || trgt == 6){
+				adj = (amount &gt; 0) ? 2 : -2;
+			}
+			// Increment by number of weeks plus leftover days plus
+			// weekend adjustments
+			amount = (7 * weeks) + days + adj;
+			break;
+		case &quot;year&quot;:
+			property = &quot;FullYear&quot;;
+			// Keep increment/decrement from 2/29 out of March
+			fixOvershoot = true;
+			break;
+		case &quot;week&quot;:
+			amount *= 7;
+			break;
+		case &quot;quarter&quot;:
+			// Naive quarter is just three months
+			amount *= 3;
+			// fallthrough...
+		case &quot;month&quot;:
+			// Reset to last day of month if you overshoot
+			fixOvershoot = true;
+			property = &quot;Month&quot;;
+			break;
+//		case &quot;hour&quot;:
+//		case &quot;minute&quot;:
+//		case &quot;second&quot;:
+//		case &quot;millisecond&quot;:
+		default:
+			property = &quot;UTC&quot;+interval.charAt(0).toUpperCase() + interval.substring(1) + &quot;s&quot;;
+	}
+
+	if(property){
+		sum[&quot;set&quot;+property](sum[&quot;get&quot;+property]()+amount);
+	}
+
+	if(fixOvershoot &amp;&amp; (sum.getDate() &lt; date.getDate())){
+		sum.setDate(0);
+	}
+
+	return sum; // Date
+};
+
+date.difference = function(/*Date*/date1, /*Date?*/date2, /*String?*/interval){
+	// summary:
+	//		Get the difference in a specific unit of time (e.g., number of
+	//		months, weeks, days, etc.) between two dates, rounded to the
+	//		nearest integer.
+	// date1:
+	//		Date object
+	// date2:
+	//		Date object.  If not specified, the current Date is used.
+	// interval:
+	//		A string representing the interval.  One of the following:
+	//		&quot;year&quot;, &quot;month&quot;, &quot;day&quot;, &quot;hour&quot;, &quot;minute&quot;, &quot;second&quot;,
+	//		&quot;millisecond&quot;, &quot;quarter&quot;, &quot;week&quot;, &quot;weekday&quot;
+	//
+	//		Defaults to &quot;day&quot;.
+
+	date2 = date2 || new Date();
+	interval = interval || &quot;day&quot;;
+	var yearDiff = date2.getFullYear() - date1.getFullYear();
+	var delta = 1; // Integer return value
+
+	switch(interval){
+		case &quot;quarter&quot;:
+			var m1 = date1.getMonth();
+			var m2 = date2.getMonth();
+			// Figure out which quarter the months are in
+			var q1 = Math.floor(m1/3) + 1;
+			var q2 = Math.floor(m2/3) + 1;
+			// Add quarters for any year difference between the dates
+			q2 += (yearDiff * 4);
+			delta = q2 - q1;
+			break;
+		case &quot;weekday&quot;:
+			var days = Math.round(date.difference(date1, date2, &quot;day&quot;));
+			var weeks = parseInt(date.difference(date1, date2, &quot;week&quot;));
+			var mod = days % 7;
+
+			// Even number of weeks
+			if(mod == 0){
+				days = weeks*5;
+			}else{
+				// Weeks plus spare change (&lt; 7 days)
+				var adj = 0;
+				var aDay = date1.getDay();
+				var bDay = date2.getDay();
+
+				weeks = parseInt(days/7);
+				mod = days % 7;
+				// Mark the date advanced by the number of
+				// round weeks (may be zero)
+				var dtMark = new Date(date1);
+				dtMark.setDate(dtMark.getDate()+(weeks*7));
+				var dayMark = dtMark.getDay();
+
+				// Spare change days -- 6 or less
+				if(days &gt; 0){
+					switch(true){
+						// Range starts on Sat
+						case aDay == 6:
+							adj = -1;
+							break;
+						// Range starts on Sun
+						case aDay == 0:
+							adj = 0;
+							break;
+						// Range ends on Sat
+						case bDay == 6:
+							adj = -1;
+							break;
+						// Range ends on Sun
+						case bDay == 0:
+							adj = -2;
+							break;
+						// Range contains weekend
+						case (dayMark + mod) &gt; 5:
+							adj = -2;
+					}
+				}else if(days &lt; 0){
+					switch(true){
+						// Range starts on Sat
+						case aDay == 6:
+							adj = 0;
+							break;
+						// Range starts on Sun
+						case aDay == 0:
+							adj = 1;
+							break;
+						// Range ends on Sat
+						case bDay == 6:
+							adj = 2;
+							break;
+						// Range ends on Sun
+						case bDay == 0:
+							adj = 1;
+							break;
+						// Range contains weekend
+						case (dayMark + mod) &lt; 0:
+							adj = 2;
+					}
+				}
+				days += adj;
+				days -= (weeks*2);
+			}
+			delta = days;
+			break;
+		case &quot;year&quot;:
+			delta = yearDiff;
+			break;
+		case &quot;month&quot;:
+			delta = (date2.getMonth() - date1.getMonth()) + (yearDiff * 12);
+			break;
+		case &quot;week&quot;:
+			// Truncate instead of rounding
+			// Don&#039;t use Math.floor -- value may be negative
+			delta = parseInt(date.difference(date1, date2, &quot;day&quot;)/7);
+			break;
+		case &quot;day&quot;:
+			delta /= 24;
+			// fallthrough
+		case &quot;hour&quot;:
+			delta /= 60;
+			// fallthrough
+		case &quot;minute&quot;:
+			delta /= 60;
+			// fallthrough
+		case &quot;second&quot;:
+			delta /= 1000;
+			// fallthrough
+		case &quot;millisecond&quot;:
+			delta *= date2.getTime() - date1.getTime();
+	}
+
+	// Round for fractional values and DST leaps
+	return Math.round(delta); // Number (integer)
+};
+
+// Don&#039;t use setObject() because it may overwrite dojo/date/stamp (if that has already been loaded)
+has(&quot;extend-dojo&quot;) &amp;&amp; lang.mixin(lang.getObject(&quot;dojo.date&quot;, true), date);
+
+return date;
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

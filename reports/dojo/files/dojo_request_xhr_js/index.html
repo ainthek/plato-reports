@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/request/xhr.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/request/xhr.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">66.02</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">352</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">46.30</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.20</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+	&#039;../errors/RequestError&#039;,
+	&#039;./watch&#039;,
+	&#039;./handlers&#039;,
+	&#039;./util&#039;,
+	&#039;../has&#039;/*=====,
+	&#039;../request&#039;,
+	&#039;../_base/declare&#039; =====*/
+], function(RequestError, watch, handlers, util, has/*=====, request, declare =====*/){
+	has.add(&#039;native-xhr&#039;, function(){
+		// if true, the environment has a native XHR implementation
+		return typeof XMLHttpRequest !== &#039;undefined&#039;;
+	});
+	has.add(&#039;dojo-force-activex-xhr&#039;, function(){
+		return has(&#039;activex&#039;) &amp;&amp; !document.addEventListener &amp;&amp; window.location.protocol === &#039;file:&#039;;
+	});
+
+	has.add(&#039;native-xhr2&#039;, function(){
+		if(!has(&#039;native-xhr&#039;)){ return; }
+		var x = new XMLHttpRequest();
+		return typeof x[&#039;addEventListener&#039;] !== &#039;undefined&#039; &amp;&amp;
+			(typeof opera === &#039;undefined&#039; || typeof x[&#039;upload&#039;] !== &#039;undefined&#039;);
+	});
+
+	has.add(&#039;native-formdata&#039;, function(){
+		// if true, the environment has a native FormData implementation
+		return typeof FormData !== &#039;undefined&#039;;
+	});
+
+	has.add(&#039;native-response-type&#039;, function(){
+		return has(&#039;native-xhr&#039;) &amp;&amp; typeof new XMLHttpRequest().responseType !== &#039;undefined&#039;;
+	});
+
+	has.add(&#039;native-xhr2-blob&#039;, function(){
+		if(!has(&#039;native-response-type&#039;)){ return; }
+		var x = new XMLHttpRequest();
+		x.open(&#039;GET&#039;, &#039;/&#039;, true);
+		x.responseType = &#039;blob&#039;;
+		// will not be set if unsupported
+		var responseType = x.responseType;
+		x.abort();
+		return responseType === &#039;blob&#039;;
+	});
+
+	// Google Chrome doesn&#039;t support &quot;json&quot; response type
+	// up to version 30, so it&#039;s intentionally not included here
+	var nativeResponseTypes = {
+		&#039;blob&#039;: has(&#039;native-xhr2-blob&#039;) ? &#039;blob&#039; : &#039;arraybuffer&#039;,
+		&#039;document&#039;: &#039;document&#039;,
+		&#039;arraybuffer&#039;: &#039;arraybuffer&#039;
+	};
+
+	function handleResponse(response, error){
+		var _xhr = response.xhr;
+		response.status = response.xhr.status;
+
+		try {
+			// Firefox throws an error when trying to access
+			// xhr.responseText if response isn&#039;t text
+			response.text = _xhr.responseText;
+		} catch (e) {}
+
+		if(response.options.handleAs === &#039;xml&#039;){
+			response.data = _xhr.responseXML;
+		}
+
+		if(!error){
+			try{
+				handlers(response);
+			}catch(e){
+				error = e;
+			}
+		}
+
+		if(error){
+			this.reject(error);
+		}else if(util.checkStatus(_xhr.status)){
+			this.resolve(response);
+		}else{
+			error = new RequestError(&#039;Unable to load &#039; + response.url + &#039; status: &#039; + _xhr.status, response);
+
+			this.reject(error);
+		}
+	}
+
+	var isValid, isReady, addListeners, cancel;
+	if(has(&#039;native-xhr2&#039;)){
+		// Any platform with XHR2 will only use the watch mechanism for timeout.
+
+		isValid = function(response){
+			// summary:
+			//		Check to see if the request should be taken out of the watch queue
+			return !this.isFulfilled();
+		};
+		cancel = function(dfd, response){
+			// summary:
+			//		Canceler for deferred
+			response.xhr.abort();
+		};
+		addListeners = function(_xhr, dfd, response){
+			// summary:
+			//		Adds event listeners to the XMLHttpRequest object
+			function onLoad(evt){
+				dfd.handleResponse(response);
+			}
+			function onError(evt){
+				var _xhr = evt.target;
+				var error = new RequestError(&#039;Unable to load &#039; + response.url + &#039; status: &#039; + _xhr.status, response);
+				dfd.handleResponse(response, error);
+			}
+
+			function onProgress(evt){
+				if(evt.lengthComputable){
+					response.loaded = evt.loaded;
+					response.total = evt.total;
+					dfd.progress(response);
+				} else if(response.xhr.readyState === 3){
+					response.loaded = evt.position;
+					dfd.progress(response);
+				}
+			}
+
+			_xhr.addEventListener(&#039;load&#039;, onLoad, false);
+			_xhr.addEventListener(&#039;error&#039;, onError, false);
+			_xhr.addEventListener(&#039;progress&#039;, onProgress, false);
+
+			return function(){
+				_xhr.removeEventListener(&#039;load&#039;, onLoad, false);
+				_xhr.removeEventListener(&#039;error&#039;, onError, false);
+				_xhr.removeEventListener(&#039;progress&#039;, onProgress, false);
+				_xhr = null;
+			};
+		};
+	}else{
+		isValid = function(response){
+			return response.xhr.readyState; //boolean
+		};
+		isReady = function(response){
+			return 4 === response.xhr.readyState; //boolean
+		};
+		cancel = function(dfd, response){
+			// summary:
+			//		canceller function for util.deferred call.
+			var xhr = response.xhr;
+			var _at = typeof xhr.abort;
+			if(_at === &#039;function&#039; || _at === &#039;object&#039; || _at === &#039;unknown&#039;){
+				xhr.abort();
+			}
+		};
+	}
+
+	function getHeader(headerName){
+		return this.xhr.getResponseHeader(headerName);
+	}
+
+	var undefined,
+		defaultOptions = {
+			data: null,
+			query: null,
+			sync: false,
+			method: &#039;GET&#039;
+		};
+	function xhr(url, options, returnDeferred){
+		var isFormData = has(&#039;native-formdata&#039;) &amp;&amp; options &amp;&amp; options.data &amp;&amp; options.data instanceof FormData;
+		var response = util.parseArgs(
+			url,
+			util.deepCreate(defaultOptions, options),
+			isFormData
+		);
+		url = response.url;
+		options = response.options;
+
+		var remover,
+			last = function(){
+				remover &amp;&amp; remover();
+			};
+
+		//Make the Deferred object for this xhr request.
+		var dfd = util.deferred(
+			response,
+			cancel,
+			isValid,
+			isReady,
+			handleResponse,
+			last
+		);
+		var _xhr = response.xhr = xhr._create();
+
+		if(!_xhr){
+			// If XHR factory somehow returns nothings,
+			// cancel the deferred.
+			dfd.cancel(new RequestError(&#039;XHR was not created&#039;));
+			return returnDeferred ? dfd : dfd.promise;
+		}
+
+		response.getHeader = getHeader;
+
+		if(addListeners){
+			remover = addListeners(_xhr, dfd, response);
+		}
+
+		var data = options.data,
+			async = !options.sync,
+			method = options.method;
+
+		try{
+			// IE6 won&#039;t let you call apply() on the native function.
+			_xhr.open(method, url, async, options.user || undefined, options.password || undefined);
+
+			if(options.withCredentials){
+				_xhr.withCredentials = options.withCredentials;
+			}
+
+			if(has(&#039;native-response-type&#039;) &amp;&amp; options.handleAs in nativeResponseTypes) {
+				_xhr.responseType = nativeResponseTypes[options.handleAs];
+			}
+
+			var headers = options.headers,
+				contentType = isFormData ? false : &#039;application/x-www-form-urlencoded&#039;;
+			if(headers){
+				for(var hdr in headers){
+					if(hdr.toLowerCase() === &#039;content-type&#039;){
+						contentType = headers[hdr];
+					}else if(headers[hdr]){
+						//Only add header if it has a value. This allows for instance, skipping
+						//insertion of X-Requested-With by specifying empty value.
+						_xhr.setRequestHeader(hdr, headers[hdr]);
+					}
+				}
+			}
+
+			if(contentType &amp;&amp; contentType !== false){
+				_xhr.setRequestHeader(&#039;Content-Type&#039;, contentType);
+			}
+			if(!headers || !(&#039;X-Requested-With&#039; in headers)){
+				_xhr.setRequestHeader(&#039;X-Requested-With&#039;, &#039;XMLHttpRequest&#039;);
+			}
+
+			if(util.notify){
+				util.notify.emit(&#039;send&#039;, response, dfd.promise.cancel);
+			}
+			_xhr.send(data);
+		}catch(e){
+			dfd.reject(e);
+		}
+
+		watch(dfd);
+		_xhr = null;
+
+		return returnDeferred ? dfd : dfd.promise;
+	}
+
+	/*=====
+	xhr = function(url, options){
+		// summary:
+		//		Sends a request using XMLHttpRequest with the given URL and options.
+		// url: String
+		//		URL to request
+		// options: dojo/request/xhr.__Options?
+		//		Options for the request.
+		// returns: dojo/request.__Promise
+	};
+	xhr.__BaseOptions = declare(request.__BaseOptions, {
+		// sync: Boolean?
+		//		Whether to make a synchronous request or not. Default
+		//		is `false` (asynchronous).
+		// data: String|Object|FormData?
+		//		Data to transfer. This is ignored for GET and DELETE
+		//		requests.
+		// headers: Object?
+		//		Headers to use for the request.
+		// user: String?
+		//		Username to use during the request.
+		// password: String?
+		//		Password to use during the request.
+		// withCredentials: Boolean?
+		//		For cross-site requests, whether to send credentials
+		//		or not.
+	});
+	xhr.__MethodOptions = declare(null, {
+		// method: String?
+		//		The HTTP method to use to make the request. Must be
+		//		uppercase. Default is `&quot;GET&quot;`.
+	});
+	xhr.__Options = declare([xhr.__BaseOptions, xhr.__MethodOptions]);
+
+	xhr.get = function(url, options){
+		// summary:
+		//		Send an HTTP GET request using XMLHttpRequest with the given URL and options.
+		// url: String
+		//		URL to request
+		// options: dojo/request/xhr.__BaseOptions?
+		//		Options for the request.
+		// returns: dojo/request.__Promise
+	};
+	xhr.post = function(url, options){
+		// summary:
+		//		Send an HTTP POST request using XMLHttpRequest with the given URL and options.
+		// url: String
+		//		URL to request
+		// options: dojo/request/xhr.__BaseOptions?
+		//		Options for the request.
+		// returns: dojo/request.__Promise
+	};
+	xhr.put = function(url, options){
+		// summary:
+		//		Send an HTTP PUT request using XMLHttpRequest with the given URL and options.
+		// url: String
+		//		URL to request
+		// options: dojo/request/xhr.__BaseOptions?
+		//		Options for the request.
+		// returns: dojo/request.__Promise
+	};
+	xhr.del = function(url, options){
+		// summary:
+		//		Send an HTTP DELETE request using XMLHttpRequest with the given URL and options.
+		// url: String
+		//		URL to request
+		// options: dojo/request/xhr.__BaseOptions?
+		//		Options for the request.
+		// returns: dojo/request.__Promise
+	};
+	=====*/
+	xhr._create = function(){
+		// summary:
+		//		does the work of portably generating a new XMLHTTPRequest object.
+		throw new Error(&#039;XMLHTTP not available&#039;);
+	};
+	if(has(&#039;native-xhr&#039;) &amp;&amp; !has(&#039;dojo-force-activex-xhr&#039;)){
+		xhr._create = function(){
+			return new XMLHttpRequest();
+		};
+	}else if(has(&#039;activex&#039;)){
+		try{
+			new ActiveXObject(&#039;Msxml2.XMLHTTP&#039;);
+			xhr._create = function(){
+				return new ActiveXObject(&#039;Msxml2.XMLHTTP&#039;);
+			};
+		}catch(e){
+			try{
+				new ActiveXObject(&#039;Microsoft.XMLHTTP&#039;);
+				xhr._create = function(){
+					return new ActiveXObject(&#039;Microsoft.XMLHTTP&#039;);
+				};
+			}catch(e){}
+		}
+	}
+
+	util.addCommonMethods(xhr);
+
+	return xhr;
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

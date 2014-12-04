@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/nls/th/colors.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/nls/th/colors.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">35.28</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">157</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">1.57</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.22</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define(
+({
+// local representation of all CSS3 named colors, companion to dojo.colors.  To be used where descriptive information
+// is required for each color, such as a palette widget, and not for specifying color programatically.
+
+//Note: due to the SVG 1.0 spec additions, some of these are alternate spellings for the same color (e.g. gray / grey).
+//TODO: should we be using unique rgb values as keys instead and avoid these duplicates, or rely on the caller to do the reverse mapping?
+aliceblue: &quot;ฟ้าจาง&quot;,
+antiquewhite: &quot;สีเนื้อ&quot;,
+aqua: &quot;ฟ้าน้ำทะเล&quot;,
+aquamarine: &quot;อะความารีน&quot;,
+azure: &quot;น้ำเงินฟ้า&quot;,
+beige: &quot;น้ำตาลเบจ&quot;,
+bisque: &quot;ขาวข้าวสาร&quot;,
+black: &quot;ดำ&quot;,
+blanchedalmond: &quot;เนื้ออ่อน&quot;,
+blue: &quot;น้ำเงิน&quot;,
+blueviolet: &quot;น้ำเงินม่วง&quot;,
+brown: &quot;น้ำตาล&quot;,
+burlywood: &quot;น้ำตาลอ่อน&quot;,
+cadetblue: &quot;เขียวน้ำเงินหม่น&quot;,
+chartreuse: &quot;เขียวสะท้อนแสง&quot;,
+chocolate: &quot;ช็อกโกแลต&quot;,
+coral: &quot;แสดเข้มนวล&quot;,
+cornflowerblue: &quot;สีคอร์นฟลาวเวอร์บลู&quot;,
+cornsilk: &quot;cornsilk&quot;,
+crimson: &quot;แดงเลือดหมู&quot;,
+cyan: &quot;เขียวแกมน้ำเงิน&quot;,
+darkblue: &quot;น้ำเงินเข้ม&quot;,
+darkcyan: &quot;เขียวแกมน้ำเงินเข้ม&quot;,
+darkgoldenrod: &quot;ทองเหลืองเข้ม&quot;,
+darkgray: &quot;เทาเข้ม&quot;,
+darkgreen: &quot;เขียวเข้ม&quot;,
+darkgrey: &quot;เทาเข้ม&quot;, // same as darkgray
+darkkhaki: &quot;กากีเข้ม&quot;,
+darkmagenta: &quot;แดงแกมม่วงเข้ม&quot;,
+darkolivegreen: &quot;เขียวโอลีฟเข้ม&quot;,
+darkorange: &quot;ส้มเข้ม&quot;,
+darkorchid: &quot;สีม่วงกล้วยไม้เข้ม&quot;,
+darkred: &quot;แดงเข้ม&quot;,
+darksalmon: &quot;ส้มเข้ม&quot;,
+darkseagreen: &quot;เขียวทะเลเข้ม&quot;,
+darkslateblue: &quot;น้ำเงินนวลเข้ม&quot;,
+darkslategray: &quot;เทานวลเข้ม&quot;,
+darkslategrey: &quot;เทานวลเข้ม&quot;, // same as darkslategray
+darkturquoise: &quot;ฟ้าขี้นกการเวกเข้ม&quot;,
+darkviolet: &quot;ม่วงเข้ม&quot;,
+deeppink: &quot;ชมพูเข้ม&quot;,
+deepskyblue: &quot;ฟ้าสด&quot;,
+dimgray: &quot;เทาทึม&quot;,
+dimgrey: &quot;เทาทึม&quot;, // same as dimgray
+dodgerblue: &quot;ฟ้าสะท้อนแสง&quot;,
+firebrick: &quot;สีอิฐ&quot;,
+floralwhite: &quot;ขาวแกมชมพู&quot;,
+forestgreen: &quot;หยก&quot;,
+fuchsia: &quot;บานเย็น&quot;,
+gainsboro: &quot;เทานวล&quot;,
+ghostwhite: &quot;น้ำข้าว&quot;,
+gold: &quot;ทอง&quot;,
+goldenrod: &quot;ทองเหลือง&quot;,
+gray: &quot;เทา&quot;,
+green: &quot;เขียว&quot;,
+greenyellow: &quot;เขียวแกมเหลือง&quot;,
+grey: &quot;เทา&quot;, // same as gray
+honeydew: &quot;ขาวแกมเขียว&quot;,
+hotpink: &quot;ชมพูจัด&quot;,
+indianred: &quot;แดงอมเหลือง&quot;,
+indigo: &quot;คราม&quot;,
+ivory: &quot;งาช้าง&quot;,
+khaki: &quot;กากี&quot;,
+lavender: &quot;ม่วงลาเวนเดอร์&quot;,
+lavenderblush: &quot;นมเย็น&quot;,
+lawngreen: &quot;เขียวหญ้าอ่อน&quot;,
+lemonchiffon: &quot;lemon chiffon&quot;,
+lightblue: &quot;น้ำเงินอ่อน&quot;,
+lightcoral: &quot;ชมพูอมแดง&quot;,
+lightcyan: &quot;เขียวแกมน้ำเงินอ่อน&quot;,
+lightgoldenrodyellow: &quot;ทองเหลืองอ่อน&quot;,
+lightgray: &quot;เทาอ่อน&quot;,
+lightgreen: &quot;เขียวอ่อน&quot;,
+lightgrey: &quot;เทาอ่อน&quot;, // same as lightgray
+lightpink: &quot;ชมพูอ่อน&quot;,
+lightsalmon: &quot;ส้มจาง&quot;,
+lightseagreen: &quot;เขียวทะเลอ่อน&quot;,
+lightskyblue: &quot;ฟ้าอ่อน&quot;,
+lightslategray: &quot;เทานวลอ่อน&quot;,
+lightslategrey: &quot;เทานวลอ่อน&quot;, // same as lightslategray
+lightsteelblue: &quot;น้ำเงินนวลอ่อน&quot;,
+lightyellow: &quot;เหลืองอ่อน&quot;,
+lime: &quot;เหลืองมะนาว&quot;,
+limegreen: &quot;เขียวมะนาว&quot;,
+linen: &quot;ลินนิน&quot;,
+magenta: &quot;แดงแกมม่วง&quot;,
+maroon: &quot;น้ำตาลแดง&quot;,
+mediumaquamarine: &quot;อะความารีนกลางๆ&quot;,
+mediumblue: &quot;น้ำเงินกลางๆ&quot;,
+mediumorchid: &quot;ม่วงกล้วยไม้กลางๆ&quot;,
+mediumpurple: &quot;ม่วงอัญชัญ&quot;,
+mediumseagreen: &quot; เขียวทะเลกลางๆ&quot;,
+mediumslateblue: &quot;น้ำเงินนวลกลางๆ&quot;,
+mediumspringgreen: &quot;สีเขียวนวลกลางๆ&quot;,
+mediumturquoise: &quot;ฟ้าขี้นกการเวกกลางๆ&quot;,
+mediumvioletred: &quot;แดงอมม่วงกลางๆ&quot;,
+midnightblue: &quot;น้ำเงินทึบ&quot;,
+mintcream: &quot;ขาวกะทิ&quot;,
+mistyrose: &quot;ชมพูหม่น&quot;,
+moccasin: &quot;ม็อคค่า&quot;,
+navajowhite: &quot;ส้มหนังกลับ&quot;,
+navy: &quot;น้ำเงินเข้ม&quot;,
+oldlace: &quot;ขาวนวล&quot;,
+olive: &quot;โอลีฟ&quot;,
+olivedrab: &quot;เขียวมะกอกแก่&quot;,
+orange: &quot;ส้ม&quot;,
+orangered: &quot;ส้มแกมแดง&quot;,
+orchid: &quot;สีกล้วยไม้&quot;,
+palegoldenrod: &quot;ทองเหลืองจาง&quot;,
+palegreen: &quot;เขียวจาง&quot;,
+paleturquoise: &quot;ฟ้าขี้นกการเวกจาง&quot;,
+palevioletred: &quot;แดงอมม่วงจาง&quot;,
+papayawhip: &quot;ชมพูจาง&quot;,
+peachpuff: &quot; สีพีช&quot;,
+peru: &quot;ส้มดินเผา&quot;,
+pink: &quot;ชมพู&quot;,
+plum: &quot;ม่วงอ่อน&quot;,
+powderblue: &quot;ฟ้าหม่น&quot;,
+purple: &quot;ม่วง&quot;,
+red: &quot;แดง&quot;,
+rosybrown: &quot;กะปิ&quot;,
+royalblue: &quot;น้ำเงินเข้ม&quot;,
+saddlebrown: &quot;น้ำตาล&quot;,
+salmon: &quot;ส้มอ่อน&quot;,
+sandybrown: &quot;น้ำตาลลูกรัง&quot;,
+seagreen: &quot;เขียวทะเล&quot;,
+seashell: &quot;สีขาวหอยทะเล&quot;,
+sienna: &quot;น้ำตาลอมแดง&quot;,
+silver: &quot;เงิน&quot;,
+skyblue: &quot;ฟ้า&quot;,
+slateblue: &quot;น้ำเงินนวล&quot;,
+slategray: &quot;เทาอมน้ำเงินนวล&quot;,
+slategrey: &quot;เทาอมน้ำเงินนวล&quot;, // same as slategray
+snow: &quot;ขาวหิมะ&quot;,
+springgreen: &quot;เขียว&quot;,
+steelblue: &quot;น้ำเงินด้าน&quot;,
+tan: &quot;แทน&quot;,
+teal: &quot;เขียวหัวเป็ด&quot;,
+thistle: &quot;ม่วงจาง&quot;,
+tomato: &quot;แสด&quot;,
+transparent: &quot;สีใส&quot;,
+turquoise: &quot;ฟ้าขี้นกการเวก&quot;,
+violet: &quot;ม่วง&quot;,
+wheat: &quot;เหลืองรำข้าว&quot;,
+white: &quot;ขาว&quot;,
+whitesmoke: &quot;ขาวควัน&quot;,
+yellow: &quot;เหลือง&quot;,
+yellowgreen: &quot;เหลืองแกมเขียว&quot;
+})
+);</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

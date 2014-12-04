@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/nls/az/colors.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/nls/az/colors.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">35.32</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">151</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">1.61</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.20</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define(
+({
+	&quot;lightsteelblue&quot;:&quot;açıq metal mavi&quot;,
+	&quot;orangered&quot; :&quot;narıncı qırmızı&quot;,
+	&quot;midnightblue&quot; :&quot;gecə mavisi&quot;,
+	&quot;cadetblue&quot; :&quot;dəniz mavisi&quot; ,
+	&quot;seashell&quot; :&quot;dəniz səthi&quot;,
+	&quot;slategrey&quot; :&quot;boz şifer rəngi&quot;,
+	&quot;coral&quot; :&quot;mərcan&quot;,
+	&quot;darkturquoise&quot; :&quot;tünd firuzəyi&quot;,
+	&quot;antiquewhite&quot; :&quot;antik ağ&quot;,
+	&quot;mediumspringgreen&quot; :&quot;orta bahar yaşılı&quot;,
+	&quot;salmon&quot; :&quot;somon&quot;,
+	&quot;darkgrey&quot; :&quot;tünd boz&quot;,
+	&quot;ivory&quot; :&quot;fil dişi&quot;,
+	&quot;greenyellow&quot; :&quot;yaşıl-sarı&quot;,
+	&quot;mistyrose&quot; :&quot;gül qurusu&quot;,
+	&quot;lightsalmon&quot; :&quot;açıq somon&quot;,
+	&quot;silver&quot; :&quot;gümüşü&quot;,
+	&quot;dimgrey&quot; :&quot;açıq boz&quot;,
+	&quot;orange&quot; :&quot;narıncı&quot;,
+	&quot;white&quot; :&quot;ağ&quot;,
+	&quot;navajowhite&quot; :&quot;navajo ağı&quot;,
+	&quot;royalblue&quot; :&quot;parlaq tünd mavi&quot; ,
+	&quot;deeppink&quot; :&quot;tünd çəhrayı&quot;,
+	&quot;lime&quot; :&quot;lomon yaşılı&quot;,
+	&quot;oldlace&quot; :&quot;köhnə krujeva&quot;,
+	&quot;chartreuse&quot; :&quot;chartreuse&quot;,
+	&quot;darkcyan&quot; :&quot;tünd firuzəyi&quot;,
+	&quot;yellow&quot; :&quot;sarı&quot;,
+	&quot;linen&quot; :&quot;kətan&quot;,
+	&quot;olive&quot; :&quot;zeytun&quot;,
+	&quot;gold&quot; :&quot;qızıl&quot;,
+	&quot;lawngreen&quot; :&quot;çəmən yaşılı&quot;,
+	&quot;lightyellow&quot; :&quot;açıq sarı&quot;,
+	&quot;tan&quot; :&quot;günəş yanığı&quot;,
+	&quot;darkviolet&quot; :&quot;tünd bənövşəyi&quot;,
+	&quot;lightslategrey&quot; :&quot;tünd şifer bozu&quot;,
+	&quot;grey&quot; :&quot;boz&quot;,
+	&quot;darkkhaki&quot; :&quot;tünd haki&quot;,
+	&quot;green&quot; :&quot;yaşıl&quot;,
+	&quot;deepskyblue&quot; :&quot;tünd səma mavisi&quot;,
+	&quot;aqua&quot; :&quot;dəniz mavisi&quot;,
+	&quot;sienna&quot; :&quot;tünd qəhvəyi&quot;,
+	&quot;mintcream&quot; :&quot;nanəli krem&quot;,
+	&quot;rosybrown&quot; :&quot;çəhrayımsı qəhvəyi&quot;,
+	&quot;mediumslateblue&quot; :&quot;orta şıfer bozu&quot;,
+	&quot;magenta&quot; :&quot;magenta&quot;,
+	&quot;lightseagreen&quot; :&quot;açıq dəniz yaşılı&quot;,
+	&quot;cyan&quot; :&quot;firuzəyi&quot;,
+	&quot;olivedrab&quot; :&quot;əsgər yaşılı&quot;,
+	&quot;darkgoldenrod&quot; :&quot;tünd sarı&quot;,
+	&quot;slateblue&quot; :&quot;şifer mavisi&quot;,
+	&quot;mediumaquamarine&quot; :&quot;orta akvamarin&quot;,
+	&quot;lavender&quot; :&quot;lavanta&quot;,
+	&quot;mediumseagreen&quot; :&quot;orta dəniz yaşılı&quot;,
+	&quot;maroon&quot; :&quot;tünd qırmızı&quot;,
+	&quot;darkslategray&quot; :&quot;tünd şifer bozu&quot;,
+	&quot;mediumturquoise&quot; :&quot;orta firuzəyi&quot;,
+	&quot;ghostwhite&quot; :&quot;ala&quot;,
+	&quot;darkblue&quot; :&quot;tünd mavi&quot;,
+	&quot;mediumvioletred&quot; :&quot;orta bənövşəyi-qırmızı&quot;,
+	&quot;brown&quot; :&quot;qəhvəyi&quot;,
+	&quot;lightgray&quot; :&quot;açıq boz&quot;,
+	&quot;sandybrown&quot; :&quot;qum rəngi&quot;,
+	&quot;pink&quot; :&quot;çəhrayı&quot;,
+	&quot;firebrick&quot; :&quot;yanmış kərpic rəngi&quot;,
+	&quot;indigo&quot; :&quot;indigo&quot;,
+	&quot;snow&quot; :&quot;qar&quot;,
+	&quot;darkorchid&quot; :&quot;tünd orkide&quot;,
+	&quot;turquoise&quot; :&quot;firuzəyi&quot;,
+	&quot;chocolate&quot; :&quot;şokolad&quot;,
+	&quot;springgreen&quot; :&quot;bahar yaşılı&quot;,
+	&quot;moccasin&quot; :&quot;mokosen&quot;,
+	&quot;navy&quot; :&quot;tünd göy&quot;,
+	&quot;lemonchiffon&quot; :&quot;limon rəngi&quot;,
+	&quot;teal&quot; :&quot;teal mavi&quot;,
+	&quot;floralwhite&quot; :&quot;çiçək ağı&quot;,
+	&quot;cornflowerblue&quot; :&quot;peyğəmbər çiçək mavisi&quot;,
+	&quot;paleturquoise&quot; :&quot;solğun firuzəyi&quot;,
+	&quot;purple&quot; :&quot;tünd qırmızı&quot;,
+	&quot;gainsboro&quot; :&quot;gainsboro&quot;,
+	&quot;plum&quot; :&quot;gavalı&quot;,
+	&quot;red&quot; :&quot;qırmızı&quot;,
+	&quot;blue&quot; :&quot;göy&quot;,
+	&quot;forestgreen&quot; :&quot;tünd dəniz yaşılı&quot;,
+	&quot;darkgreen&quot; :&quot;tünd yaşıl&quot;,
+	&quot;honeydew&quot; :&quot;bal saqqızı&quot;,
+	&quot;darkseagreen&quot; :&quot;tünd dəniz yaşılı&quot;,
+	&quot;lightcoral&quot; :&quot;açıq mərcan&quot;,
+	&quot;palevioletred&quot; :&quot;solğun bənövşəyi-qırmızı&quot;,
+	&quot;mediumpurple&quot; :&quot;orta tünd qırmızı&quot;,
+	&quot;saddlebrown&quot; :&quot;açıq qəhvəyi&quot;,
+	&quot;darkmagenta&quot; :&quot;tünd magenta&quot;,
+	&quot;thistle&quot; :&quot;dəvə tikanı&quot;,
+	&quot;whitesmoke&quot; :&quot;ağ duman&quot;,
+	&quot;wheat&quot; :&quot;buğdayı&quot;,
+	&quot;violet&quot; :&quot;bənövşəyi&quot;,
+	&quot;lightskyblue&quot; :&quot;açıq səma mavisi&quot; ,
+	&quot;goldenrod&quot; :&quot;sapsarı&quot;,
+	&quot;mediumblue&quot; :&quot;orta göy&quot;,
+	&quot;skyblue&quot; :&quot;göy mavisi&quot;,
+	&quot;crimson&quot; :&quot;crimson&quot;,
+	&quot;darksalmon&quot; :&quot;tünd somon&quot;,
+	&quot;darkred&quot; :&quot;tünd qırmızı&quot;,
+	&quot;darkslategrey&quot; :&quot;tünd şifer bozu&quot;,
+	&quot;peru&quot; :&quot;peru&quot;,
+	&quot;lightgrey&quot; :&quot;açıq boz&quot;,
+	&quot;lightgoldenrodyellow&quot; :&quot;açıq qızılı&quot;,
+	&quot;blanchedalmond&quot; :&quot;solğun badamı&quot;,
+	&quot;aliceblue&quot; :&quot;alice mavisi&quot;,
+	&quot;bisque&quot; :&quot;biskvit&quot;,
+	&quot;slategray&quot; :&quot;şifer bozu&quot;,
+	&quot;palegoldenrod&quot; :&quot;açıq qızılı&quot;,
+	&quot;darkorange&quot; :&quot;tünd narıncı&quot;,
+	&quot;aquamarine&quot; :&quot;akvamarin&quot;,
+	&quot;lightgreen&quot; :&quot;açıq yaşıl&quot;,
+	&quot;burlywood&quot; :&quot;sarımsı qəhvə rəngi&quot;,
+	&quot;dodgerblue&quot; :&quot;toz mavisi&quot;,
+	&quot;darkgray&quot; :&quot;tünd boz&quot;,
+	&quot;lightcyan&quot; :&quot;açıq firuzəyi&quot;,
+	&quot;powderblue&quot; :&quot;pudra mavisi&quot;,
+	&quot;blueviolet&quot; :&quot;mavi-bənövşəyi&quot;,
+	&quot;orchid&quot; :&quot;orkide&quot;,
+	&quot;dimgray&quot; :&quot;solğun boz&quot;,
+	&quot;beige&quot; :&quot;bej&quot;,
+	&quot;fuchsia&quot; :&quot;fuşya&quot;,
+	&quot;lavenderblush&quot; :&quot;lavanta tünd qırmızısı&quot;,
+	&quot;hotpink&quot; :&quot;tünd çəhrayı&quot;,
+	&quot;steelblue&quot; :&quot;metal mavisi&quot;,
+	&quot;tomato&quot; :&quot;pomidor&quot;,
+	&quot;lightpink&quot; :&quot;açıq çəhrayı&quot;,
+	&quot;limegreen&quot; :&quot;əhəng yaşılı&quot;,
+	&quot;indianred&quot; :&quot;qızıldərili qırmızısı&quot;,
+	&quot;papayawhip&quot; :&quot;papaya qamçısı&quot;,
+	&quot;lightslategray&quot; :&quot;açıq şifer bozu&quot;,
+	&quot;gray&quot; :&quot;boz&quot;,
+	&quot;mediumorchid&quot; :&quot;orta orkide&quot;,
+	&quot;cornsilk&quot; :&quot;qarğıdalı rəngi&quot;,
+	&quot;black&quot; :&quot;qara&quot;,
+	&quot;seagreen&quot; :&quot;dəniz yaşılı&quot;,
+	&quot;darkslateblue&quot; :&quot;tünd şifer bozu&quot;,
+	&quot;khaki&quot; :&quot;haki&quot;,
+	&quot;lightblue&quot; :&quot;açıq mavi&quot;,
+	&quot;palegreen&quot; :&quot;solğun yaşıl&quot;,
+	&quot;azure&quot; :&quot;azur mavisi&quot;,
+	&quot;peachpuff&quot; :&quot;açıq şaftalı&quot;,
+	&quot;darkolivegreen&quot; :&quot;tünd zeytun yaşılı&quot;,
+	&quot;yellowgreen&quot; :&quot;sarı-yaşıl&quot;
+})
+);</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

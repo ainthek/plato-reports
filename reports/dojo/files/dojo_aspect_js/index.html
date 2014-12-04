@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/aspect.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/aspect.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">63.05</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">223</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">71.50</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.84</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([], function(){
+
+	// module:
+	//		dojo/aspect
+
+	&quot;use strict&quot;;
+	var undefined, nextId = 0;
+	function advise(dispatcher, type, advice, receiveArguments){
+		var previous = dispatcher[type];
+		var around = type == &quot;around&quot;;
+		var signal;
+		if(around){
+			var advised = advice(function(){
+				return previous.advice(this, arguments);
+			});
+			signal = {
+				remove: function(){
+					if(advised){
+						advised = dispatcher = advice = null;
+					}
+				},
+				advice: function(target, args){
+					return advised ?
+						advised.apply(target, args) :  // called the advised function
+						previous.advice(target, args); // cancelled, skip to next one
+				}
+			};
+		}else{
+			// create the remove handler
+			signal = {
+				remove: function(){
+					if(signal.advice){
+						var previous = signal.previous;
+						var next = signal.next;
+						if(!next &amp;&amp; !previous){
+							delete dispatcher[type];
+						}else{
+							if(previous){
+								previous.next = next;
+							}else{
+								dispatcher[type] = next;
+							}
+							if(next){
+								next.previous = previous;
+							}
+						}
+
+						// remove the advice to signal that this signal has been removed
+						dispatcher = advice = signal.advice = null;
+					}
+				},
+				id: nextId++,
+				advice: advice,
+				receiveArguments: receiveArguments
+			};
+		}
+		if(previous &amp;&amp; !around){
+			if(type == &quot;after&quot;){
+				// add the listener to the end of the list
+				// note that we had to change this loop a little bit to workaround a bizarre IE10 JIT bug
+				while(previous.next &amp;&amp; (previous = previous.next)){}
+				previous.next = signal;
+				signal.previous = previous;
+			}else if(type == &quot;before&quot;){
+				// add to beginning
+				dispatcher[type] = signal;
+				signal.next = previous;
+				previous.previous = signal;
+			}
+		}else{
+			// around or first one just replaces
+			dispatcher[type] = signal;
+		}
+		return signal;
+	}
+	function aspect(type){
+		return function(target, methodName, advice, receiveArguments){
+			var existing = target[methodName], dispatcher;
+			if(!existing || existing.target != target){
+				// no dispatcher in place
+				target[methodName] = dispatcher = function(){
+					var executionId = nextId;
+					// before advice
+					var args = arguments;
+					var before = dispatcher.before;
+					while(before){
+						args = before.advice.apply(this, args) || args;
+						before = before.next;
+					}
+					// around advice
+					if(dispatcher.around){
+						var results = dispatcher.around.advice(this, args);
+					}
+					// after advice
+					var after = dispatcher.after;
+					while(after &amp;&amp; after.id &lt; executionId){
+						if(after.receiveArguments){
+							var newResults = after.advice.apply(this, args);
+							// change the return value only if a new value was returned
+							results = newResults === undefined ? results : newResults;
+						}else{
+							results = after.advice.call(this, results, args);
+						}
+						after = after.next;
+					}
+					return results;
+				};
+				if(existing){
+					dispatcher.around = {advice: function(target, args){
+						return existing.apply(target, args);
+					}};
+				}
+				dispatcher.target = target;
+			}
+			var results = advise((dispatcher || existing), type, advice, receiveArguments);
+			advice = null;
+			return results;
+		};
+	}
+
+	// TODOC: after/before/around return object
+
+	var after = aspect(&quot;after&quot;);
+	/*=====
+	after = function(target, methodName, advice, receiveArguments){
+		// summary:
+		//		The &quot;after&quot; export of the aspect module is a function that can be used to attach
+		//		&quot;after&quot; advice to a method. This function will be executed after the original method
+		//		is executed. By default the function will be called with a single argument, the return
+		//		value of the original method, or the the return value of the last executed advice (if a previous one exists).
+		//		The fourth (optional) argument can be set to true to so the function receives the original
+		//		arguments (from when the original method was called) rather than the return value.
+		//		If there are multiple &quot;after&quot; advisors, they are executed in the order they were registered.
+		// target: Object
+		//		This is the target object
+		// methodName: String
+		//		This is the name of the method to attach to.
+		// advice: Function
+		//		This is function to be called after the original method
+		// receiveArguments: Boolean?
+		//		If this is set to true, the advice function receives the original arguments (from when the original mehtod
+		//		was called) rather than the return value of the original/previous method.
+		// returns:
+		//		A signal object that can be used to cancel the advice. If remove() is called on this signal object, it will
+		//		stop the advice function from being executed.
+	};
+	=====*/
+
+	var before = aspect(&quot;before&quot;);
+	/*=====
+	before = function(target, methodName, advice){
+		// summary:
+		//		The &quot;before&quot; export of the aspect module is a function that can be used to attach
+		//		&quot;before&quot; advice to a method. This function will be executed before the original method
+		//		is executed. This function will be called with the arguments used to call the method.
+		//		This function may optionally return an array as the new arguments to use to call
+		//		the original method (or the previous, next-to-execute before advice, if one exists).
+		//		If the before method doesn&#039;t return anything (returns undefined) the original arguments
+		//		will be preserved.
+		//		If there are multiple &quot;before&quot; advisors, they are executed in the reverse order they were registered.
+		// target: Object
+		//		This is the target object
+		// methodName: String
+		//		This is the name of the method to attach to.
+		// advice: Function
+		//		This is function to be called before the original method
+	};
+	=====*/
+
+	var around = aspect(&quot;around&quot;);
+	/*=====
+	 around = function(target, methodName, advice){
+		// summary:
+		//		The &quot;around&quot; export of the aspect module is a function that can be used to attach
+		//		&quot;around&quot; advice to a method. The advisor function is immediately executed when
+		//		the around() is called, is passed a single argument that is a function that can be
+		//		called to continue execution of the original method (or the next around advisor).
+		//		The advisor function should return a function, and this function will be called whenever
+		//		the method is called. It will be called with the arguments used to call the method.
+		//		Whatever this function returns will be returned as the result of the method call (unless after advise changes it).
+		// example:
+		//		If there are multiple &quot;around&quot; advisors, the most recent one is executed first,
+		//		which can then delegate to the next one and so on. For example:
+		//		|	around(obj, &quot;foo&quot;, function(originalFoo){
+		//		|		return function(){
+		//		|			var start = new Date().getTime();
+		//		|			var results = originalFoo.apply(this, arguments); // call the original
+		//		|			var end = new Date().getTime();
+		//		|			console.log(&quot;foo execution took &quot; + (end - start) + &quot; ms&quot;);
+		//		|			return results;
+		//		|		};
+		//		|	});
+		// target: Object
+		//		This is the target object
+		// methodName: String
+		//		This is the name of the method to attach to.
+		// advice: Function
+		//		This is function to be called around the original method
+	};
+	=====*/
+
+	return {
+		// summary:
+		//		provides aspect oriented programming functionality, allowing for
+		//		one to add before, around, or after advice on existing methods.
+		// example:
+		//	|	define([&quot;dojo/aspect&quot;], function(aspect){
+		//	|		var signal = aspect.after(targetObject, &quot;methodName&quot;, function(someArgument){
+		//	|			this will be called when targetObject.methodName() is called, after the original function is called
+		//	|		});
+		//
+		// example:
+		//	The returned signal object can be used to cancel the advice.
+		//	|	signal.remove(); // this will stop the advice from being executed anymore
+		//	|	aspect.before(targetObject, &quot;methodName&quot;, function(someArgument){
+		//	|		// this will be called when targetObject.methodName() is called, before the original function is called
+		//	|	 });
+
+		before: before,
+		around: around,
+		after: after
+	};
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

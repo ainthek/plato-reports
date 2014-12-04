@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/dom-construct.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/dom-construct.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">59.32</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">376</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">51.31</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.86</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([&quot;exports&quot;, &quot;./_base/kernel&quot;, &quot;./sniff&quot;, &quot;./_base/window&quot;, &quot;./dom&quot;, &quot;./dom-attr&quot;],
+		function(exports, dojo, has, win, dom, attr){
+	// module:
+	//		dojo/dom-construct
+	// summary:
+	//		This module defines the core dojo DOM construction API.
+
+	// TODOC: summary not showing up in output, see https://github.com/csnover/js-doc-parse/issues/42
+
+	// support stuff for toDom()
+	var tagWrap = {
+			option: [&quot;select&quot;],
+			tbody: [&quot;table&quot;],
+			thead: [&quot;table&quot;],
+			tfoot: [&quot;table&quot;],
+			tr: [&quot;table&quot;, &quot;tbody&quot;],
+			td: [&quot;table&quot;, &quot;tbody&quot;, &quot;tr&quot;],
+			th: [&quot;table&quot;, &quot;thead&quot;, &quot;tr&quot;],
+			legend: [&quot;fieldset&quot;],
+			caption: [&quot;table&quot;],
+			colgroup: [&quot;table&quot;],
+			col: [&quot;table&quot;, &quot;colgroup&quot;],
+			li: [&quot;ul&quot;]
+		},
+		reTag = /&lt;\s*([\w\:]+)/,
+		masterNode = {}, masterNum = 0,
+		masterName = &quot;__&quot; + dojo._scopeName + &quot;ToDomId&quot;;
+
+	// generate start/end tag strings to use
+	// for the injection for each special tag wrap case.
+	for(var param in tagWrap){
+		if(tagWrap.hasOwnProperty(param)){
+			var tw = tagWrap[param];
+			tw.pre = param == &quot;option&quot; ? &#039;&lt;select multiple=&quot;multiple&quot;&gt;&#039; : &quot;&lt;&quot; + tw.join(&quot;&gt;&lt;&quot;) + &quot;&gt;&quot;;
+			tw.post = &quot;&lt;/&quot; + tw.reverse().join(&quot;&gt;&lt;/&quot;) + &quot;&gt;&quot;;
+			// the last line is destructive: it reverses the array,
+			// but we don&#039;t care at this point
+		}
+	}
+
+	var html5domfix;
+	if(has(&quot;ie&quot;) &lt;= 8){
+		html5domfix = function(doc){
+			doc.__dojo_html5_tested = &quot;yes&quot;;
+			var div = create(&#039;div&#039;, {innerHTML: &quot;&lt;nav&gt;a&lt;/nav&gt;&quot;, style: {visibility: &quot;hidden&quot;}}, doc.body);
+			if(div.childNodes.length !== 1){
+				(&#039;abbr article aside audio canvas details figcaption figure footer header &#039; +
+				&#039;hgroup mark meter nav output progress section summary time video&#039;).replace(
+					/\b\w+\b/g, function(n){
+						doc.createElement(n);
+					}
+				);
+			}
+			destroy(div);
+		}
+	}
+
+	function _insertBefore(/*DomNode*/ node, /*DomNode*/ ref){
+		var parent = ref.parentNode;
+		if(parent){
+			parent.insertBefore(node, ref);
+		}
+	}
+
+	function _insertAfter(/*DomNode*/ node, /*DomNode*/ ref){
+		// summary:
+		//		Try to insert node after ref
+		var parent = ref.parentNode;
+		if(parent){
+			if(parent.lastChild == ref){
+				parent.appendChild(node);
+			}else{
+				parent.insertBefore(node, ref.nextSibling);
+			}
+		}
+	}
+
+	exports.toDom = function toDom(frag, doc){
+		// summary:
+		//		instantiates an HTML fragment returning the corresponding DOM.
+		// frag: String
+		//		the HTML fragment
+		// doc: DocumentNode?
+		//		optional document to use when creating DOM nodes, defaults to
+		//		dojo/_base/window.doc if not specified.
+		// returns:
+		//		Document fragment, unless it&#039;s a single node in which case it returns the node itself
+		// example:
+		//		Create a table row:
+		//	|	require([&quot;dojo/dom-construct&quot;], function(domConstruct){
+		//	|		var tr = domConstruct.toDom(&quot;&lt;tr&gt;&lt;td&gt;First!&lt;/td&gt;&lt;/tr&gt;&quot;);
+		//	|	});
+
+		doc = doc || win.doc;
+		var masterId = doc[masterName];
+		if(!masterId){
+			doc[masterName] = masterId = ++masterNum + &quot;&quot;;
+			masterNode[masterId] = doc.createElement(&quot;div&quot;);
+		}
+
+		if(has(&quot;ie&quot;) &lt;= 8){
+			if(!doc.__dojo_html5_tested &amp;&amp; doc.body){
+				html5domfix(doc);
+			}
+		}
+
+		// make sure the frag is a string.
+		frag += &quot;&quot;;
+
+		// find the starting tag, and get node wrapper
+		var match = frag.match(reTag),
+			tag = match ? match[1].toLowerCase() : &quot;&quot;,
+			master = masterNode[masterId],
+			wrap, i, fc, df;
+		if(match &amp;&amp; tagWrap[tag]){
+			wrap = tagWrap[tag];
+			master.innerHTML = wrap.pre + frag + wrap.post;
+			for(i = wrap.length; i; --i){
+				master = master.firstChild;
+			}
+		}else{
+			master.innerHTML = frag;
+		}
+
+		// one node shortcut =&gt; return the node itself
+		if(master.childNodes.length == 1){
+			return master.removeChild(master.firstChild); // DOMNode
+		}
+
+		// return multiple nodes as a document fragment
+		df = doc.createDocumentFragment();
+		while((fc = master.firstChild)){ // intentional assignment
+			df.appendChild(fc);
+		}
+		return df; // DocumentFragment
+	};
+
+	exports.place = function place(node, refNode, position){
+		// summary:
+		//		Attempt to insert node into the DOM, choosing from various positioning options.
+		//		Returns the first argument resolved to a DOM node.
+		// node: DOMNode|DocumentFragment|String
+		//		id or node reference, or HTML fragment starting with &quot;&lt;&quot; to place relative to refNode
+		// refNode: DOMNode|String
+		//		id or node reference to use as basis for placement
+		// position: String|Number?
+		//		string noting the position of node relative to refNode or a
+		//		number indicating the location in the childNodes collection of refNode.
+		//		Accepted string values are:
+		//
+		//		- before
+		//		- after
+		//		- replace
+		//		- only
+		//		- first
+		//		- last
+		//
+		//		&quot;first&quot; and &quot;last&quot; indicate positions as children of refNode, &quot;replace&quot; replaces refNode,
+		//		&quot;only&quot; replaces all children.  position defaults to &quot;last&quot; if not specified
+		// returns: DOMNode
+		//		Returned values is the first argument resolved to a DOM node.
+		//
+		//		.place() is also a method of `dojo/NodeList`, allowing `dojo/query` node lookups.
+		// example:
+		//		Place a node by string id as the last child of another node by string id:
+		//	|	require([&quot;dojo/dom-construct&quot;], function(domConstruct){
+		//	|		domConstruct.place(&quot;someNode&quot;, &quot;anotherNode&quot;);
+		//	|	});
+		// example:
+		//		Place a node by string id before another node by string id
+		//	|	require([&quot;dojo/dom-construct&quot;], function(domConstruct){
+		//	|		domConstruct.place(&quot;someNode&quot;, &quot;anotherNode&quot;, &quot;before&quot;);
+		//	|	});
+		// example:
+		//		Create a Node, and place it in the body element (last child):
+		//	|	require([&quot;dojo/dom-construct&quot;, &quot;dojo/_base/window&quot;
+		//	|	], function(domConstruct, win){
+		//	|		domConstruct.place(&quot;&lt;div&gt;&lt;/div&gt;&quot;, win.body());
+		//	|	});
+		// example:
+		//		Put a new LI as the first child of a list by id:
+		//	|	require([&quot;dojo/dom-construct&quot;], function(domConstruct){
+		//	|		domConstruct.place(&quot;&lt;li&gt;&lt;/li&gt;&quot;, &quot;someUl&quot;, &quot;first&quot;);
+		//	|	});
+
+		refNode = dom.byId(refNode);
+		if(typeof node == &quot;string&quot;){ // inline&#039;d type check
+			node = /^\s*&lt;/.test(node) ? exports.toDom(node, refNode.ownerDocument) : dom.byId(node);
+		}
+		if(typeof position == &quot;number&quot;){ // inline&#039;d type check
+			var cn = refNode.childNodes;
+			if(!cn.length || cn.length &lt;= position){
+				refNode.appendChild(node);
+			}else{
+				_insertBefore(node, cn[position &lt; 0 ? 0 : position]);
+			}
+		}else{
+			switch(position){
+				case &quot;before&quot;:
+					_insertBefore(node, refNode);
+					break;
+				case &quot;after&quot;:
+					_insertAfter(node, refNode);
+					break;
+				case &quot;replace&quot;:
+					refNode.parentNode.replaceChild(node, refNode);
+					break;
+				case &quot;only&quot;:
+					exports.empty(refNode);
+					refNode.appendChild(node);
+					break;
+				case &quot;first&quot;:
+					if(refNode.firstChild){
+						_insertBefore(node, refNode.firstChild);
+						break;
+					}
+					// else fallthrough...
+				default: // aka: last
+					refNode.appendChild(node);
+			}
+		}
+		return node; // DomNode
+	};
+
+	var create = exports.create = function create(/*DOMNode|String*/ tag, /*Object*/ attrs, /*DOMNode|String?*/ refNode, /*String?*/ pos){
+		// summary:
+		//		Create an element, allowing for optional attribute decoration
+		//		and placement.
+		// description:
+		//		A DOM Element creation function. A shorthand method for creating a node or
+		//		a fragment, and allowing for a convenient optional attribute setting step,
+		//		as well as an optional DOM placement reference.
+		//
+		//		Attributes are set by passing the optional object through `dojo/dom-attr.set`.
+		//		See `dojo/dom-attr.set` for noted caveats and nuances, and API if applicable.
+		//
+		//		Placement is done via `dojo/dom-construct.place`, assuming the new node to be
+		//		the action node, passing along the optional reference node and position.
+		// tag: DOMNode|String
+		//		A string of the element to create (eg: &quot;div&quot;, &quot;a&quot;, &quot;p&quot;, &quot;li&quot;, &quot;script&quot;, &quot;br&quot;),
+		//		or an existing DOM node to process.
+		// attrs: Object
+		//		An object-hash of attributes to set on the newly created node.
+		//		Can be null, if you don&#039;t want to set any attributes/styles.
+		//		See: `dojo/dom-attr.set` for a description of available attributes.
+		// refNode: DOMNode|String?
+		//		Optional reference node. Used by `dojo/dom-construct.place` to place the newly created
+		//		node somewhere in the dom relative to refNode. Can be a DomNode reference
+		//		or String ID of a node.
+		// pos: String?
+		//		Optional positional reference. Defaults to &quot;last&quot; by way of `dojo/domConstruct.place`,
+		//		though can be set to &quot;first&quot;,&quot;after&quot;,&quot;before&quot;,&quot;last&quot;, &quot;replace&quot; or &quot;only&quot;
+		//		to further control the placement of the new node relative to the refNode.
+		//		&#039;refNode&#039; is required if a &#039;pos&#039; is specified.
+		// example:
+		//		Create a DIV:
+		//	|	require([&quot;dojo/dom-construct&quot;], function(domConstruct){
+		//	|		var n = domConstruct.create(&quot;div&quot;);
+		//	|	});
+		//
+		// example:
+		//		Create a DIV with content:
+		//	|	require([&quot;dojo/dom-construct&quot;], function(domConstruct){
+		//	|		var n = domConstruct.create(&quot;div&quot;, { innerHTML:&quot;&lt;p&gt;hi&lt;/p&gt;&quot; });
+		//	|	});
+		//
+		// example:
+		//		Place a new DIV in the BODY, with no attributes set
+		//	|	require([&quot;dojo/dom-construct&quot;, &quot;dojo/_base/window&quot;], function(domConstruct, win){
+		//	|		var n = domConstruct.create(&quot;div&quot;, null, win.body());
+		//	|	});
+		//
+		// example:
+		//		Create an UL, and populate it with LI&#039;s. Place the list as the first-child of a
+		//		node with id=&quot;someId&quot;:
+		//	|	require([&quot;dojo/dom-construct&quot;, &quot;dojo/_base/array&quot;],
+		//	|	function(domConstruct, arrayUtil){
+		//	|		var ul = domConstruct.create(&quot;ul&quot;, null, &quot;someId&quot;, &quot;first&quot;);
+		//	|		var items = [&quot;one&quot;, &quot;two&quot;, &quot;three&quot;, &quot;four&quot;];
+		//	|		arrayUtil.forEach(items, function(data){
+		//	|			domConstruct.create(&quot;li&quot;, { innerHTML: data }, ul);
+		//	|		});
+		//	|	});
+		//
+		// example:
+		//		Create an anchor, with an href. Place in BODY:
+		//	|	require([&quot;dojo/dom-construct&quot;, &quot;dojo/_base/window&quot;], function(domConstruct, win){
+		//	|		domConstruct.create(&quot;a&quot;, { href:&quot;foo.html&quot;, title:&quot;Goto FOO!&quot; }, win.body());
+		//	|	});
+
+		var doc = win.doc;
+		if(refNode){
+			refNode = dom.byId(refNode);
+			doc = refNode.ownerDocument;
+		}
+		if(typeof tag == &quot;string&quot;){ // inline&#039;d type check
+			tag = doc.createElement(tag);
+		}
+		if(attrs){ attr.set(tag, attrs); }
+		if(refNode){ exports.place(tag, refNode, pos); }
+		return tag; // DomNode
+	};
+
+	function _empty(/*DomNode*/ node){
+		// TODO: remove this if() block in 2.0 when we no longer have to worry about IE memory leaks,
+		// and then uncomment the emptyGrandchildren() test case from html.html.
+		// Note that besides fixing #16957, using removeChild() is actually faster than setting node.innerHTML,
+		// see http://jsperf.com/clear-dom-node.
+		if(&quot;innerHTML&quot; in node){
+			try{
+				// fast path
+				node.innerHTML = &quot;&quot;;
+				return;
+			}catch(e){
+				// innerHTML is readOnly (e.g. TABLE (sub)elements in quirks mode)
+				// Fall through (saves bytes)
+			}
+		}
+
+		// SVG/strict elements don&#039;t support innerHTML
+		for(var c; c = node.lastChild;){ // intentional assignment
+			node.removeChild(c);
+		}
+	}
+
+	exports.empty = function empty(/*DOMNode|String*/ node){
+		// summary:
+		//		safely removes all children of the node.
+		// node: DOMNode|String
+		//		a reference to a DOM node or an id.
+		// example:
+		//		Destroy node&#039;s children byId:
+		//	|	require([&quot;dojo/dom-construct&quot;], function(domConstruct){
+		//	|		domConstruct.empty(&quot;someId&quot;);
+		//	|	});
+
+		_empty(dom.byId(node));
+	};
+
+
+	function _destroy(/*DomNode*/ node, /*DomNode*/ parent){
+		// in IE quirks, node.canHaveChildren can be false but firstChild can be non-null (OBJECT/APPLET)
+		if(node.firstChild){
+			_empty(node);
+		}
+		if(parent){
+			// removeNode(false) doesn&#039;t leak in IE 6+, but removeChild() and removeNode(true) are known to leak under IE 8- while 9+ is TBD.
+			// In IE quirks mode, PARAM nodes as children of OBJECT/APPLET nodes have a removeNode method that does nothing and
+			// the parent node has canHaveChildren=false even though removeChild correctly removes the PARAM children.
+			// In IE, SVG/strict nodes don&#039;t have a removeNode method nor a canHaveChildren boolean.
+			has(&quot;ie&quot;) &amp;&amp; parent.canHaveChildren &amp;&amp; &quot;removeNode&quot; in node ? node.removeNode(false) : parent.removeChild(node);
+		}
+	}
+	var destroy = exports.destroy = function destroy(/*DOMNode|String*/ node){
+		// summary:
+		//		Removes a node from its parent, clobbering it and all of its
+		//		children.
+		//
+		// description:
+		//		Removes a node from its parent, clobbering it and all of its
+		//		children. Function only works with DomNodes, and returns nothing.
+		//
+		// node: DOMNode|String
+		//		A String ID or DomNode reference of the element to be destroyed
+		//
+		// example:
+		//		Destroy a node byId:
+		//	|	require([&quot;dojo/dom-construct&quot;], function(domConstruct){
+		//	|		domConstruct.destroy(&quot;someId&quot;);
+		//	|	});
+
+		node = dom.byId(node);
+		if(!node){ return; }
+		_destroy(node, node.parentNode);
+	};
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

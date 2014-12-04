@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - ampersand-state/test/basics.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>ampersand-state/test/basics.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">65.45</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">986</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">127.59</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">13.15</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/*jshint expr: true*/
+
+var test = require(&#039;tape&#039;);
+var State = require(&#039;../ampersand-state&#039;);
+
+var Person = State.extend({
+    props: {
+        name: &#039;string&#039;
+    }
+});
+
+test(&#039;init with nothing should be okay&#039;, function (t) {
+    var EmptyModel = State.extend();
+    var something = new EmptyModel();
+    something.foo = &#039;bar&#039;;
+    t.ok(something);
+    t.equal(something.foo, &#039;bar&#039;);
+    t.end();
+});
+
+test(&#039;init with values&#039;, function (t) {
+    var person = new Person({name: &#039;henrik&#039;});
+    t.ok(person);
+    t.equal(person.name, &#039;henrik&#039;);
+    t.end();
+});
+
+test(&#039;after initialized change should be empty until a set op&#039;, function (t) {
+    var person = new Person({name: &#039;phil&#039;});
+    t.deepEqual(person._changed, {});
+    t.notOk(person.changedAttributes());
+    t.end();
+});
+
+test(&#039;extended object maintains existing props&#039;, function (t) {
+    var AwesomePerson = Person.extend({
+        props: {
+            awesomeness: &#039;number&#039;
+        }
+    });
+
+    var awesome = new AwesomePerson({
+        name: &#039;Captain Awesome&#039;,
+        awesomeness: 11
+    });
+
+    t.equals(awesome.name, &#039;Captain Awesome&#039;);
+    t.equals(awesome.awesomeness, 11);
+    t.end();
+});
+
+test(&#039;extended object maintains existing methods&#039;, function (t) {
+    var NewPerson = State.extend({
+        props: {
+            awesomeness: &#039;number&#039;
+        },
+        isTrulyAwesome: function () {
+            if (this.awesomeness &gt; 10) return true;
+        }
+    });
+    var AwesomePerson = NewPerson.extend({});
+    var awesome = new AwesomePerson({
+        awesomeness: 11
+    });
+    t.ok(awesome.isTrulyAwesome());
+    t.end();
+});
+
+test(&#039;cached derived properties are calculated once per change&#039;, function (t) {
+    var count = 0;
+    var NewPerson = Person.extend({
+        derived: {
+            greeting: {
+                deps: [&#039;name&#039;],
+                fn: function () {
+                    count++;
+                    return &#039;hi, &#039; + this.name + &#039;!&#039;;
+                }
+            }
+        }
+    });
+    var person = new NewPerson({name: &#039;henrik&#039;});
+    t.equal(person.greeting, &#039;hi, henrik!&#039;);
+
+    // use again, should not increment counter
+    person.greeting;
+    t.equal(count, 1);
+
+    person.name = &#039;something&#039;;
+    t.equal(person.greeting, &#039;hi, something!&#039;);
+    // reference again
+    person.greeting;
+    t.equal(count, 2);
+
+    t.end();
+});
+
+test(&#039;cached derived properties fire events on dependency change&#039;, function (t) {
+    var NewPerson = Person.extend({
+        derived: {
+            greeting: {
+                deps: [&#039;name&#039;],
+                fn: function () {
+                    return &#039;hi, &#039; + this.name + &#039;!&#039;;
+                }
+            }
+        }
+    });
+    var person = new NewPerson({name: &#039;henrik&#039;});
+    person.on(&#039;change:greeting&#039;, function (model, value) {
+        t.equal(value, &#039;hi, something!&#039;, &quot;shouldn&#039;t fire if value is unchanged same value&quot;);
+        t.end();
+    });
+    person.name = &#039;something&#039;;
+});
+
+test(&#039;cached derived properties fire events if result is different&#039;, function (t) {
+    t.plan(1);
+    var NewPerson = Person.extend({
+        derived: {
+            greeting: {
+                deps: [&#039;name&#039;],
+                fn: function () {
+                    return &#039;hi, &#039; + this.name + &#039;!&#039;;
+                }
+            }
+        }
+    });
+    var person = new NewPerson({name: &#039;henrik&#039;});
+    person.on(&#039;change:greeting&#039;, function (model, value) {
+        t.ok(false, &quot;shouldn&#039;t fire if value if derived value is unchanged&quot;);
+    });
+    person.name = &#039;henrik&#039;;
+    t.equal(person.name, &#039;henrik&#039;);
+    t.end();
+});
+
+test(&#039;uncached derived properties always fire events on dependency change&#039;, function (t) {
+    t.plan(1);
+    var NewPerson = Person.extend({
+        derived: {
+            greeting: {
+                deps: [&#039;name&#039;],
+                cache: false,
+                fn: function () {
+                    return &#039;hello!&#039;;
+                }
+            }
+        }
+    });
+    var person = new NewPerson({name: &#039;henrik&#039;});
+    person.on(&#039;change:greeting&#039;, function (model, value) {
+        t.equal(value, &#039;hello!&#039;, &quot;Fires despite being same value&quot;);
+        t.end();
+    });
+    person.name = &#039;different&#039;;
+});
+
+test(&#039;everything should work with a property called `type`. Issue #6.&#039;, function (t) {
+    var Model = State.extend({
+        props: {
+            id: &#039;string&#039;,
+            type: &#039;string&#039;
+        }
+    });
+    var model = new Model({id: &#039;50&#039;, type: &#039;hello&#039;});
+    t.equal(model.type, &#039;hello&#039;);
+    model.type = &#039;wat?&#039;;
+    t.equal(model.type, &#039;wat?&#039;);
+    t.end();
+});
+
+test(&#039;should have cid&#039;, function (t) {
+    var Model = State.extend({
+        props: {
+            id: &#039;string&#039;,
+            type: &#039;string&#039;
+        }
+    });
+    var m = new Model();
+    t.ok(m.cid);
+    t.end();
+});
+
+test(&#039;instanceof checks should pass for all parents in the chain&#039;, function (t) {
+    var P1 = Person.extend({});
+    var P2 = P1.extend({});
+    var P3 = P2.extend({});
+    var p1 = new P1();
+    var p2 = new P2();
+    var p3 = new P3();
+    t.ok(p1 instanceof Person);
+    t.ok(p2 instanceof Person);
+    t.ok(p3 instanceof Person);
+    t.notOk(p1 instanceof P2);
+    t.ok(p2 instanceof P2);
+    t.ok(p3 instanceof P2);
+    t.notOk(p2 instanceof P3);
+    t.ok(p3 instanceof P3);
+
+    // all of them should have the isState flag too
+    t.ok(p1.isState);
+    t.ok(p2.isState);
+    t.ok(p3.isState);
+
+    // shouldn&#039;t be possible to change
+    p1.isState = false;
+    p2.isState = false;
+    p3.isState = false;
+    t.ok(p1.isState);
+    t.ok(p2.isState);
+    t.ok(p3.isState);
+
+    t.end();
+});
+
+test(&#039;custom id and namespace attributes&#039;, function (t) {
+    var NewPerson = State.extend({
+        props: {
+            name: &#039;string&#039;,
+            _id: &#039;number&#039;,
+            ns: &#039;string&#039;
+        },
+        idAttribute: &#039;_id&#039;,
+        namespaceAttribute: &#039;ns&#039;
+    });
+    var person = new NewPerson({name: &#039;henrik&#039;, ns: &#039;group1&#039;, _id: 47});
+    t.equal(person.getId(), 47);
+    t.equal(person.getNamespace(), &#039;group1&#039;);
+    t.end();
+});
+
+test(&#039;customizable `type` attribute&#039;, function (t) {
+    var FirstModel = State.extend({
+        type: &#039;hello&#039;,
+        typeAttribute: &#039;type&#039;
+    });
+    var SecondModel = State.extend({
+        modelType: &#039;second&#039;
+    });
+    var first = new FirstModel();
+    var second = new SecondModel();
+    t.equal(first.getType(), &#039;hello&#039;);
+    t.equal(second.getType(), &#039;second&#039;);
+    t.end();
+});
+
+test(&#039;constructor should be defined&#039;, function (t) {
+    var Foo = State.extend({
+        props: { name: &#039;string&#039; }
+    });
+    var foo = new Foo();
+
+    t.ok(foo.constructor);
+    t.end();
+});
+
+test(&#039;isValid is a thing&#039;, function (t) {
+    var Foo = State.extend({
+        props: { name: [&#039;string&#039;, true] },
+        validate: function (attrs) {
+            if (attrs.name.length &lt; 2) {
+                return &quot;can&#039;t be too short&quot;;
+            }
+        }
+    });
+
+    var foo = new Foo();
+    t.notOk(foo.isValid());
+    foo.name = &#039;thing&#039;;
+    t.ok(foo.isValid());
+    t.end();
+});
+
+test(&quot;isNew&quot;, function (t) {
+    var Foo = State.extend({
+        props: {
+            id: &#039;number&#039;,
+            foo: &#039;number&#039;,
+            bar: &#039;number&#039;,
+            baz: &#039;number&#039;
+        }
+    });
+    var a = new Foo({ &#039;foo&#039;: 1, &#039;bar&#039;: 2, &#039;baz&#039;: 3});
+    t.ok(a.isNew(), &quot;it should be new&quot;);
+    a = new Foo({ &#039;foo&#039;: 1, &#039;bar&#039;: 2, &#039;baz&#039;: 3, &#039;id&#039;: -5 });
+    t.ok(!a.isNew(), &quot;any defined ID is legal, negative or positive&quot;);
+    a = new Foo({ &#039;foo&#039;: 1, &#039;bar&#039;: 2, &#039;baz&#039;: 3, &#039;id&#039;: 0 });
+    t.ok(!a.isNew(), &quot;any defined ID is legal, including zero&quot;);
+    t.ok(new Foo({}).isNew(), &quot;is true when there is no id&quot;);
+    t.ok(!new Foo({&#039;id&#039;: 2}).isNew(), &quot;is false for a positive integer&quot;);
+    t.ok(!new Foo({&#039;id&#039;: -5}).isNew(), &quot;is false for a negative integer&quot;);
+    t.end();
+});
+
+test(&quot;escape&quot;, function (t) {
+    var Doc = State.extend({
+        props: {
+            id: &#039;string&#039;,
+            title: &#039;string&#039;,
+            author: &#039;string&#039;,
+            length: &#039;number&#039;,
+            audience: &#039;string&#039;
+        }
+    });
+    var doc = new Doc({
+        id: &#039;1-the-tempest&#039;,
+        title: &quot;The Tempest&quot;,
+        author: &quot;Bill Shakespeare&quot;,
+        length: 123
+    });
+
+    t.equal(doc.escape(&#039;title&#039;), &#039;The Tempest&#039;);
+    doc.set({audience: &#039;Bill &amp; Bob&#039;});
+    t.equal(doc.escape(&#039;audience&#039;), &#039;Bill &amp;amp; Bob&#039;);
+    doc.set({audience: &#039;Tim &gt; Joan&#039;});
+    t.equal(doc.escape(&#039;audience&#039;), &#039;Tim &amp;gt; Joan&#039;);
+    doc.unset(&#039;audience&#039;);
+    t.equal(doc.escape(&#039;audience&#039;), &#039;&#039;);
+    t.end();
+});
+
+test(&quot;set an empty string&quot;, function (t) {
+    var Model = State.extend({
+        props: {
+            name: &#039;string&#039;
+        }
+    });
+    var model = new Model({name : &quot;Model&quot;});
+    model.set({name : &#039;&#039;});
+    t.equal(model.get(&#039;name&#039;), &#039;&#039;);
+    t.end();
+});
+
+test(&quot;setting an object&quot;, function (t) {
+    var Model = State.extend({
+        props: {
+            custom: &#039;object&#039;
+        }
+    });
+    var model = new Model({
+        custom: {foo: 1}
+    });
+    model.on(&#039;change&#039;, function () {
+        t.equal(model.custom.foo, 2);
+        t.end();
+    });
+    model.set({
+        custom: {foo: 1} // no change should be fired
+    });
+    model.set({
+        custom: {foo: 2} // change event should be fired
+    });
+});
+
+test(&quot;clear&quot;, function (t) {
+    var Model = State.extend({
+        props: {
+            name: &#039;string&#039;,
+            id: &#039;number&#039;,
+            length: &#039;number&#039;
+        }
+    });
+    var changed;
+    var model = new Model({id: 1, name : &quot;Model&quot;, length: 1});
+    model.on(&quot;change:name&quot;, function () { changed = true; });
+    model.clear();
+    t.equal(changed, true);
+    t.equal(model.get(&#039;name&#039;), undefined);
+    t.end();
+});
+
+test(&quot;changedAttributes&quot;, function (t) {
+    var Model = State.extend({
+        props: {
+            a: &#039;string&#039;,
+            b: &#039;string&#039;
+        }
+    });
+    var model = new Model({a: &#039;a&#039;, b: &#039;b&#039;});
+    t.deepEqual(model.changedAttributes(), false);
+    t.equal(model.changedAttributes({a: &#039;a&#039;}), false);
+    t.equal(model.changedAttributes({a: &#039;b&#039;}).a, &#039;b&#039;);
+    t.end();
+});
+
+test(&quot;change with options&quot;, function (t) {
+    var value;
+    var Model = State.extend({
+        props: {
+            name: &#039;string&#039;
+        }
+    });
+    var model = new Model({name: &#039;Rob&#039;});
+    model.on(&#039;change&#039;, function (model, options) {
+        value = options.prefix + model.get(&#039;name&#039;);
+    });
+    model.set({name: &#039;Bob&#039;}, {prefix: &#039;Mr. &#039;});
+    t.equal(value, &#039;Mr. Bob&#039;);
+    model.set({name: &#039;Sue&#039;}, {prefix: &#039;Ms. &#039;});
+    t.equal(value, &#039;Ms. Sue&#039;);
+    t.end();
+});
+
+test(&quot;change after initialize&quot;, function (t) {
+    var changed = 0;
+    var Model = State.extend({
+        props: {
+            id: &#039;number&#039;,
+            label: &#039;string&#039;
+        }
+    });
+    var attrs = {id: 1, label: &#039;c&#039;};
+    var obj = new Model(attrs);
+    obj.on(&#039;change&#039;, function () { changed += 1; });
+    obj.set(attrs);
+    t.equal(changed, 0);
+    t.end();
+});
+
+
+test(&quot;set triggers changes in the correct order&quot;, function (t) {
+    var value = null;
+    var M = State.extend({});
+    var model = new M();
+    model.on(&#039;last&#039;, function () { value = &#039;last&#039;; });
+    model.on(&#039;first&#039;, function () { value = &#039;first&#039;; });
+    model.trigger(&#039;first&#039;);
+    model.trigger(&#039;last&#039;);
+    t.equal(value, &#039;last&#039;);
+    t.end();
+});
+
+test(&quot;multiple unsets&quot;, function (t) {
+    var i = 0;
+    var counter = function () { i++; };
+    var Model = State.extend({
+        props: {
+            a: &#039;string&#039;
+        }
+    });
+    var model = new Model({a: &#039;a&#039;});
+    model.on(&quot;change:a&quot;, counter);
+    model.set({a: &#039;b&#039;});
+    model.unset(&#039;a&#039;);
+    model.unset(&#039;a&#039;);
+    t.equal(i, 2, &#039;Unset does not fire an event for missing attributes.&#039;);
+    t.end();
+});
+
+
+test(&quot;unset and changedAttributes&quot;, function (t) {
+    var Model = State.extend({
+        props: {
+            a: &#039;number&#039;
+        }
+    });
+    var model = new Model({a: 1});
+    model.on(&#039;change&#039;, function () {
+        t.ok(&#039;a&#039; in model.changedAttributes(), &#039;changedAttributes should contain unset properties&#039;);
+        t.end();
+    });
+    model.unset(&#039;a&#039;);
+});
+
+
+test(&quot;change, hasChanged, changedAttributes, previous, previousAttributes&quot;, function (t) {
+    var Model = State.extend({
+        props: {
+            name: &#039;string&#039;,
+            age: &#039;number&#039;
+        }
+    });
+    var model = new Model({name: &quot;Tim&quot;, age: 10});
+    t.deepEqual(model.changedAttributes(), false);
+    model.on(&#039;change&#039;, function () {
+        t.ok(model.hasChanged(&#039;name&#039;), &#039;name changed&#039;);
+        t.ok(!model.hasChanged(&#039;age&#039;), &#039;age did not&#039;);
+        t.deepEqual(model.changedAttributes(), {name : &#039;Rob&#039;}, &#039;changedAttributes returns the changed attrs&#039;);
+        t.equal(model.previous(&#039;name&#039;), &#039;Tim&#039;);
+        t.deepEqual(model.previousAttributes(), {name : &quot;Tim&quot;, age : 10}, &#039;previousAttributes is correct&#039;);
+        t.end();
+    });
+    t.equal(model.hasChanged(), false);
+    t.equal(model.hasChanged(undefined), false);
+    model.set({name : &#039;Rob&#039;});
+    t.equal(model.get(&#039;name&#039;), &#039;Rob&#039;);
+});
+
+test(&quot;validate on unset and clear&quot;, function (t) {
+    var error;
+    var Model = State.extend({
+        props: {
+            name: &#039;string&#039;
+        }
+    });
+    var model = new Model({name: &quot;One&quot;});
+    model.validate = function (attrs) {
+        if (!attrs.name) {
+            error = true;
+            return &quot;No thanks.&quot;;
+        }
+    };
+    model.set({name: &quot;Two&quot;});
+    t.equal(model.get(&#039;name&#039;), &#039;Two&#039;);
+    t.equal(error, undefined);
+    model.unset(&#039;name&#039;, {validate: true});
+    t.equal(error, true);
+    t.equal(model.get(&#039;name&#039;), &#039;Two&#039;);
+    model.clear({validate: true});
+    t.equal(model.get(&#039;name&#039;), &#039;Two&#039;);
+    delete model.validate;
+    model.clear();
+    t.equal(model.get(&#039;name&#039;), undefined);
+    t.end();
+});
+
+
+test(&quot;validate with error callback&quot;, function (t) {
+    var lastError, boundError;
+    var Model = State.extend({
+        props: {
+            a: &#039;number&#039;,
+            admin: &#039;boolean&#039;
+        }
+    });
+    var model = new Model();
+    model.validate = function (attrs) {
+        if (attrs.admin) return &quot;Can&#039;t change admin status.&quot;;
+    };
+    model.on(&#039;invalid&#039;, function (model, error) {
+        boundError = true;
+    });
+    var result = model.set({a: 100}, {validate: true});
+    t.equal(result, model);
+    t.equal(model.get(&#039;a&#039;), 100);
+    t.equal(model.validationError, null);
+    t.equal(boundError, undefined);
+    result = model.set({a: 200, admin: true}, {validate: true});
+    t.equal(result, false);
+    t.equal(model.get(&#039;a&#039;), 100);
+    t.equal(model.validationError, &quot;Can&#039;t change admin status.&quot;);
+    t.equal(boundError, true);
+    t.end();
+});
+
+test(&quot;Nested change events don&#039;t clobber previous attributes&quot;, function (t) {
+    new (State.extend({props: {state: &#039;string&#039;, other: &#039;string&#039;}}))()
+        .on(&#039;change:state&#039;, function (model, newState) {
+            t.equal(model.previous(&#039;state&#039;), undefined);
+            t.equal(newState, &#039;hello&#039;);
+            // Fire a nested change event.
+            model.set({other: &#039;whatever&#039;});
+        })
+        .on(&#039;change:state&#039;, function (model, newState) {
+            t.equal(model.previous(&#039;state&#039;), undefined);
+            t.equal(newState, &#039;hello&#039;);
+            t.end();
+        })
+        .set({state: &#039;hello&#039;});
+});
+
+test(&quot;hasChanged/set should use same comparison&quot;, function (t) {
+    var changed = 0;
+    var Model = State.extend({
+        props: {
+            a: &#039;string&#039;
+        }
+    });
+    var model = new Model({a: &#039;something&#039;});
+    model.on(&#039;change&#039;, function () {
+            t.ok(this.hasChanged(&#039;a&#039;));
+        })
+        .on(&#039;change:a&#039;, function () {
+            changed++;
+        })
+        .set({a: &#039;else&#039;});
+    t.equal(changed, 1);
+    t.end();
+});
+
+
+test(&quot;#582, #425, change:attribute callbacks should fire after all changes have occurred&quot;, 9, function (t) {
+    var Model = State.extend({
+        props: {
+            a: &#039;string&#039;,
+            b: &#039;string&#039;,
+            c: &#039;string&#039;
+        }
+    });
+    var model = new Model();
+
+    var assertion = function () {
+        t.equal(model.get(&#039;a&#039;), &#039;a&#039;);
+        t.equal(model.get(&#039;b&#039;), &#039;b&#039;);
+        t.equal(model.get(&#039;c&#039;), &#039;c&#039;);
+    };
+
+    model.on(&#039;change:a&#039;, assertion);
+    model.on(&#039;change:b&#039;, assertion);
+    model.on(&#039;change:c&#039;, assertion);
+
+    model.set({a: &#039;a&#039;, b: &#039;b&#039;, c: &#039;c&#039;});
+    t.end();
+});
+
+
+test(&quot;set same value does not trigger change&quot;, function (t) {
+    var Model = State.extend({
+        props: {
+            x: &#039;number&#039;
+        }
+    });
+    var model = new Model({x: 1});
+    model.on(&#039;change change:x&#039;, function () { t.ok(false); });
+    model.set({x: 1});
+    model.set({x: 1});
+    t.end();
+});
+
+test(&quot;unset does not fire a change for undefined attributes&quot;, 0, function (t) {
+    var Model = State.extend({
+        props: {
+            x: &#039;number&#039;
+        }
+    });
+    var model = new Model({x: undefined});
+    model.on(&#039;change:x&#039;, function () { t.ok(false); });
+    model.unset(&#039;x&#039;);
+    t.end();
+});
+
+test(&quot;hasChanged works outside of change events, and true within&quot;, 6, function (t) {
+    var Model = State.extend({
+        props: {
+            x: &#039;number&#039;
+        }
+    });
+    var model = new Model({x: 1});
+    model.on(&#039;change:x&#039;, function () {
+        t.ok(model.hasChanged(&#039;x&#039;));
+        t.equal(model.get(&#039;x&#039;), 1);
+    });
+    model.set({x: 2}, {silent: true});
+    t.ok(model.hasChanged());
+    t.equal(model.hasChanged(&#039;x&#039;), true);
+    model.set({x: 1});
+    t.ok(model.hasChanged());
+    t.equal(model.hasChanged(&#039;x&#039;), true);
+    t.end();
+});
+
+test(&quot;hasChanged gets cleared on the following set&quot;, function (t) {
+    var Model = State.extend({
+        props: {
+            x: &#039;number&#039;
+        }
+    });
+    var model = new Model();
+    model.set({x: 1});
+    t.ok(model.hasChanged());
+    model.set({x: 1});
+    t.ok(!model.hasChanged());
+    model.set({x: 2});
+    t.ok(model.hasChanged());
+    model.set({});
+    t.ok(!model.hasChanged());
+    t.end();
+});
+
+test(&quot;`hasChanged` for falsey keys&quot;, function (t) {
+    var Model = State.extend({
+        props: {
+            x: &#039;boolean&#039;
+        }
+    });
+    var model = new Model();
+    model.set({x: true}, {silent: true});
+    t.ok(!model.hasChanged(0));
+    t.ok(!model.hasChanged(&#039;&#039;));
+    t.end();
+});
+
+test(&quot;`previous` for falsey keys&quot;, function (t) {
+    var Model = State.extend({
+        props: {
+            0: &#039;boolean&#039;,
+            &#039;&#039;: &#039;boolean&#039;
+        }
+    });
+    var model = new Model({0: true, &#039;&#039;: true});
+    model.set({0: false, &#039;&#039;: false}, {silent: true});
+    t.equal(model.previous(0), true);
+    t.equal(model.previous(&#039;&#039;), true);
+    t.end();
+});
+
+test(&quot;validate&quot;, function (t) {
+    var lastError;
+    var Model = State.extend({
+        props: {
+            admin: [&#039;boolean&#039;, true, true],
+            a: &#039;number&#039;
+        }
+    });
+    var model = new Model();
+    model.validate = function (attrs) {
+        if (attrs.admin != this.get(&#039;admin&#039;)) return &quot;Can&#039;t change admin status.&quot;;
+    };
+    model.on(&#039;invalid&#039;, function (model, error) {
+        lastError = error;
+    });
+    var result = model.set({a: 100});
+    t.equal(result, model);
+    t.equal(model.get(&#039;a&#039;), 100);
+    t.equal(lastError, undefined);
+    result = model.set({admin: true});
+    t.equal(model.get(&#039;admin&#039;), true);
+    result = model.set({a: 200, admin: false}, {validate: true});
+    t.equal(lastError, &quot;Can&#039;t change admin status.&quot;);
+    t.equal(result, false);
+    t.equal(model.get(&#039;a&#039;), 100);
+    t.end();
+});
+
+test(&quot;set and unset&quot;, function (t) {
+    var Model = State.extend({
+        props: {
+            id: &#039;string&#039;,
+            foo: &#039;number&#039;,
+            bar: &#039;number&#039;,
+            baz: &#039;number&#039;,
+            extra: &#039;string&#039;
+        }
+    });
+    var a = new Model({id: &#039;id&#039;, foo: 1, bar: 2, baz: 3});
+    var changeCount = 0;
+    a.on(&quot;change:foo&quot;, function () { changeCount += 1; });
+    a.set({&#039;foo&#039;: 2});
+    t.ok(a.get(&#039;foo&#039;) == 2, &quot;Foo should have changed.&quot;);
+    t.ok(changeCount == 1, &quot;Change count should have incremented.&quot;);
+    a.set({&#039;foo&#039;: 2}); // set with value that is not new shouldn&#039;t fire change event
+    t.ok(a.get(&#039;foo&#039;) == 2, &quot;Foo should NOT have changed, still 2&quot;);
+    t.ok(changeCount == 1, &quot;Change count should NOT have incremented.&quot;);
+
+    a.validate = function (attrs) {
+        t.equal(attrs.foo, void 0, &quot;validate: true passed while unsetting&quot;);
+    };
+    a.unset(&#039;foo&#039;, {validate: true});
+    t.equal(a.get(&#039;foo&#039;), void 0, &quot;Foo should have changed&quot;);
+    delete a.validate;
+    t.ok(changeCount == 2, &quot;Change count should have incremented for unset.&quot;);
+
+    a.unset(&#039;id&#039;);
+    t.equal(a.id, undefined, &quot;Unsetting the id should remove the id property.&quot;);
+    t.end();
+});
+
+test(&quot;unset even if value has been specified&quot;, function (t) {
+    var Model = State.extend({
+        props: {
+            foo: &#039;string&#039;
+        }
+    });
+    var model = new Model({ foo: &#039;bar&#039; });
+    model.on(&#039;change:foo&#039;, function () {
+        t.equal(model.get(&#039;foo&#039;), undefined);
+    });
+    model.set({ foo: &#039;baz&#039; }, { unset: true });
+    t.equal(model.get(&#039;foo&#039;), undefined);
+    t.end();
+});
+
+test(&quot;nested `set` during `&#039;change:attr&#039;`&quot;, function (t) {
+    var events = [];
+    var Model = State.extend({
+        props: {
+            x: &#039;boolean&#039;,
+            y: &#039;boolean&#039;,
+            z: &#039;boolean&#039;
+        }
+    });
+    var model = new Model();
+    model.on(&#039;all&#039;, function (event) { events.push(event); });
+    model.on(&#039;change&#039;, function () {
+        model.set({z: true}, {silent: true});
+    });
+    model.on(&#039;change:x&#039;, function () {
+        model.set({y: true});
+    });
+    model.set({x: true});
+    t.deepEqual(events, [&#039;change:y&#039;, &#039;change:x&#039;, &#039;change&#039;]);
+    events = [];
+    model.set({z: true});
+    t.deepEqual(events, []);
+    t.end();
+});
+
+
+
+test(&quot;nested `change` only fires once&quot;, function (t) {
+    t.plan(1);
+    var model = new (State.extend({props: {x: &#039;boolean&#039;}}))();
+    model.on(&#039;change&#039;, function () {
+        t.ok(true);
+        model.set({x: true});
+    });
+    model.set({x: true});
+});
+
+test(&quot;nested `set` during `&#039;change&#039;`&quot;, function (t) {
+    var count = 0;
+    var Model = State.extend({
+        props: {
+            x: &#039;boolean&#039;,
+            y: &#039;boolean&#039;,
+            z: &#039;boolean&#039;
+        }
+    });
+    var model = new Model();
+    model.on(&#039;change&#039;, function () {
+        switch (count++) {
+        case 0:
+            t.deepEqual(this.changedAttributes(), {x: true});
+            t.equal(model.previous(&#039;x&#039;), undefined);
+            model.set({y: true});
+            break;
+        case 1:
+            t.deepEqual(this.changedAttributes(), {x: true, y: true});
+            t.equal(model.previous(&#039;x&#039;), undefined);
+            model.set({z: true});
+            break;
+        case 2:
+            t.deepEqual(this.changedAttributes(), {x: true, y: true, z: true});
+            t.equal(model.previous(&#039;y&#039;), undefined);
+            break;
+        default:
+            t.ok(false);
+        }
+    });
+    model.set({x: true});
+    t.end();
+});
+
+
+test(&quot;nested `change` with silent&quot;, function (t) {
+    var count = 0;
+    var Model = State.extend({
+        props: {
+            x: &#039;boolean&#039;,
+            y: &#039;boolean&#039;,
+            z: &#039;boolean&#039;
+        }
+    });
+    var model = new Model();
+    model.on(&#039;change:y&#039;, function () { t.ok(false); });
+    model.on(&#039;change&#039;, function () {
+        switch (count++) {
+        case 0:
+            t.deepEqual(this.changedAttributes(), {x: true});
+            model.set({y: true}, {silent: true});
+            model.set({z: true});
+            break;
+        case 1:
+            t.deepEqual(this.changedAttributes(), {x: true, y: true, z: true});
+            break;
+        case 2:
+            t.deepEqual(this.changedAttributes(), {z: false});
+            break;
+        default:
+            t.ok(false);
+        }
+    });
+    model.set({x: true});
+    model.set({z: false});
+    t.end();
+});
+
+
+test(&quot;nested `change:attr` with silent&quot;, function (t) {
+    var Model = State.extend({
+        props: {
+            x: &#039;boolean&#039;,
+            y: &#039;boolean&#039;,
+            z: &#039;boolean&#039;
+        }
+    });
+    var model = new Model();
+    model.on(&#039;change:y&#039;, function () { t.ok(false); });
+    model.on(&#039;change&#039;, function () {
+        model.set({y: true}, {silent: true});
+        model.set({z: true});
+    });
+    model.set({x: true});
+    t.end();
+});
+
+test(&quot;multiple nested changes with silent&quot;, function (t) {
+    var Model = State.extend({
+        props: {
+            x: &#039;boolean&#039;,
+            y: &#039;number&#039;
+        }
+    });
+    var model = new Model();
+    model.on(&#039;change:x&#039;, function () {
+        model.set({y: 1}, {silent: true});
+        model.set({y: 2});
+    });
+    model.on(&#039;change:y&#039;, function (model, val) {
+        t.equal(val, 2);
+    });
+    model.set({x: true});
+    t.end();
+});
+
+
+test(&quot;multiple nested changes with silent&quot;, function (t) {
+    var changes = [];
+    var Model = State.extend({
+        props: {
+            b: &#039;number&#039;
+        }
+    });
+    var model = new Model();
+    model.on(&#039;change:b&#039;, function (model, val) { changes.push(val); });
+    model.on(&#039;change&#039;, function () {
+        model.set({b: 1});
+    });
+    model.set({b: 0});
+    t.deepEqual(changes, [0, 1]);
+    t.end();
+});
+
+test(&quot;basic silent change semantics&quot;, function (t) {
+    var Model = State.extend({
+        props: {
+            x: &#039;number&#039;
+        }
+    });
+    var model = new Model();
+    model.set({x: 1});
+    model.on(&#039;change&#039;, function () { t.ok(true); });
+    model.set({x: 2}, {silent: true});
+    model.set({x: 1});
+    t.end();
+});
+
+test(&quot;nested set multiple times&quot;, function (t) {
+    var Model = State.extend({
+        props: {
+            a: &#039;boolean&#039;,
+            b: &#039;boolean&#039;
+        }
+    });
+    var model = new Model();
+    model.on(&#039;change:b&#039;, function () {
+        t.ok(true);
+    });
+    model.on(&#039;change:a&#039;, function () {
+        model.set({b: true});
+        model.set({b: true});
+    });
+    model.set({a: true});
+    t.end();
+});
+
+
+test(&quot;#1122 - clear does not alter options.&quot;, function (t) {
+    var model = new (State.extend({}))();
+    var options = {};
+    model.clear(options);
+    t.ok(!options.unset);
+    t.end();
+});
+
+test(&quot;#1122 - unset does not alter options.&quot;, function (t) {
+    var Model = State.extend({
+        props: {
+            x: &#039;number&#039;
+        }
+    });
+    var model = new Model();
+    var options = {};
+    model.unset(&#039;x&#039;, options);
+    t.ok(!options.unset);
+    t.end();
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

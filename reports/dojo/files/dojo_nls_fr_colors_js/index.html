@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/nls/fr/colors.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/nls/fr/colors.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">35.32</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">156</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">1.54</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.22</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define(
+({
+// local representation of all CSS3 named colors, companion to dojo.colors.  To be used where descriptive information
+// is required for each color, such as a palette widget, and not for specifying color programatically.
+	//Note: due to the SVG 1.0 spec additions, some of these are alternate spellings for the same color (e.g. gray / grey).
+	//TODO: should we be using unique rgb values as keys instead and avoid these duplicates, or rely on the caller to do the reverse mapping?
+	aliceblue: &quot;bleu gris&quot;,
+	antiquewhite: &quot;blanc antique&quot;,
+	aqua: &quot;bleu-vert&quot;,
+	aquamarine: &quot;aigue-marine&quot;,
+	azure: &quot;bleu azur&quot;,
+	beige: &quot;beige&quot;,
+	bisque: &quot;beige rosé&quot;,
+	black: &quot;noir&quot;,
+	blanchedalmond: &quot;coquille d&#039;œuf&quot;,
+	blue: &quot;bleu&quot;,
+	blueviolet: &quot;bleu-violet&quot;,
+	brown: &quot;brun&quot;,
+	burlywood: &quot;bois précieux&quot;,
+	cadetblue: &quot;bleu pétrole&quot;,
+	chartreuse: &quot;vert vif&quot;,
+	chocolate: &quot;chocolat&quot;,
+	coral: &quot;corail&quot;,
+	cornflowerblue: &quot;bleuet&quot;,
+	cornsilk: &quot;vanille&quot;,
+	crimson: &quot;cramoisi&quot;,
+	cyan: &quot;cyan&quot;,
+	darkblue: &quot;bleu foncé&quot;,
+	darkcyan: &quot;cyan foncé&quot;,
+	darkgoldenrod: &quot;jaune paille foncé&quot;,
+	darkgray: &quot;gris foncé&quot;,
+	darkgreen: &quot;vert foncé&quot;,
+	darkgrey: &quot;gris foncé&quot;, // same as darkgray
+	darkkhaki: &quot;kaki foncé&quot;,
+	darkmagenta: &quot;magenta foncé&quot;,
+	darkolivegreen: &quot;olive foncé&quot;,
+	darkorange: &quot;orange foncé&quot;,
+	darkorchid: &quot;lilas foncé&quot;,
+	darkred: &quot;rouge foncé&quot;,
+	darksalmon: &quot;saumon foncé&quot;,
+	darkseagreen: &quot;vert d&#039;eau foncé&quot;,
+	darkslateblue: &quot;bleu ardoise foncé&quot;,
+	darkslategray: &quot;gris ardoise foncé&quot;,
+	darkslategrey: &quot;gris ardoise foncé&quot;, // same as darkslategray
+	darkturquoise: &quot;turquoise foncé&quot;,
+	darkviolet: &quot;violet foncé&quot;,
+	deeppink: &quot;rose soutenu&quot;,
+	deepskyblue: &quot;bleu ciel soutenu&quot;,
+	dimgray: &quot;gris soutenu&quot;,
+	dimgrey: &quot;gris soutenu&quot;, // same as dimgray
+	dodgerblue: &quot;bleu France&quot;,
+	firebrick: &quot;rouge brique&quot;,
+	floralwhite: &quot;lys&quot;,
+	forestgreen: &quot;vert sapin&quot;,
+	fuchsia: &quot;fuchsia&quot;,
+	gainsboro: &quot;gris souris&quot;,
+	ghostwhite: &quot;blanc laiteux&quot;,
+	gold: &quot;or&quot;,
+	goldenrod: &quot;jaune paille&quot;,
+	gray: &quot;gris&quot;,
+	green: &quot;vert&quot;,
+	greenyellow: &quot;vert-jaune&quot;,
+	grey: &quot;gris&quot;, // same as gray
+	honeydew: &quot;opalin&quot;,
+	hotpink: &quot;rose intense&quot;,
+	indianred: &quot;rose indien&quot;,
+	indigo: &quot;indigo&quot;,
+	ivory: &quot;ivoire&quot;,
+	khaki: &quot;kaki&quot;,
+	lavender: &quot;lavande&quot;,
+	lavenderblush: &quot;lavandin&quot;,
+	lawngreen: &quot;vert prairie&quot;,
+	lemonchiffon: &quot;mousse de citron&quot;,
+	lightblue: &quot;bleu clair&quot;,
+	lightcoral: &quot;corail clair&quot;,
+	lightcyan: &quot;cyan clair&quot;,
+	lightgoldenrodyellow: &quot;jaune paille clair&quot;,
+	lightgray: &quot;gris clair&quot;,
+	lightgreen: &quot;vert clair&quot;,
+	lightgrey: &quot;gris clair&quot;, // same as lightgray
+	lightpink: &quot;rose clair&quot;,
+	lightsalmon: &quot;saumon clair&quot;,
+	lightseagreen: &quot;vert d&#039;eau clair&quot;,
+	lightskyblue: &quot;bleu ciel clair&quot;,
+	lightslategray: &quot;gris ardoise clair&quot;,
+	lightslategrey: &quot;gris ardoise clair&quot;, // same as lightslategray
+	lightsteelblue: &quot;bleu acier clair&quot;,
+	lightyellow: &quot;jaune clair&quot;,
+	lime: &quot;vert citron&quot;,
+	limegreen: &quot;citron vert&quot;,
+	linen: &quot;écru&quot;,
+	magenta: &quot;magenta&quot;,
+	maroon: &quot;marron&quot;,
+	mediumaquamarine: &quot;aigue-marine moyen&quot;,
+	mediumblue: &quot;bleu moyen&quot;,
+	mediumorchid: &quot;lilas moyen&quot;,
+	mediumpurple: &quot;pourpre moyen&quot;,
+	mediumseagreen: &quot;vert d&#039;eau moyen&quot;,
+	mediumslateblue: &quot;bleu ardoise moyen&quot;,
+	mediumspringgreen: &quot;vert printemps moyen&quot;,
+	mediumturquoise: &quot;turquoise moyen&quot;,
+	mediumvioletred: &quot;rouge violacé moyen&quot;,
+	midnightblue: &quot;bleu nuit&quot;,
+	mintcream: &quot;crème de menthe&quot;,
+	mistyrose: &quot;rose pâle&quot;,
+	moccasin: &quot;chamois&quot;,
+	navajowhite: &quot;chair&quot;,
+	navy: &quot;bleu marine&quot;,
+	oldlace: &quot;blanc cassé&quot;,
+	olive: &quot;olive&quot;,
+	olivedrab: &quot;brun verdâtre&quot;,
+	orange: &quot;orange&quot;,
+	orangered: &quot;rouge orangé&quot;,
+	orchid: &quot;lilas&quot;,
+	palegoldenrod: &quot;jaune paille pâle&quot;,
+	palegreen: &quot;vert pâle&quot;,
+	paleturquoise: &quot;turquoise pâle&quot;,
+	palevioletred: &quot;rouge violacé pâle&quot;,
+	papayawhip: &quot;crème de papaye&quot;,
+	peachpuff: &quot;pêche&quot;,
+	peru: &quot;caramel&quot;,
+	pink: &quot;rose&quot;,
+	plum: &quot;prune&quot;,
+	powderblue: &quot;bleu de smalt&quot;,
+	purple: &quot;pourpre&quot;,
+	red: &quot;rouge&quot;,
+	rosybrown: &quot;vieux rose&quot;,
+	royalblue: &quot;bleu roi&quot;,
+	saddlebrown: &quot;brun cuir&quot;,
+	salmon: &quot;saumon&quot;,
+	sandybrown: &quot;sable&quot;,
+	seagreen: &quot;vert d&#039;eau&quot;,
+	seashell: &quot;coquillage&quot;,
+	sienna: &quot;terre de sienne&quot;,
+	silver: &quot;argent&quot;,
+	skyblue: &quot;bleu ciel&quot;,
+	slateblue: &quot;bleu ardoise&quot;,
+	slategray: &quot;gris ardoise&quot;,
+	slategrey: &quot;gris ardoise&quot;, // same as slategray
+	snow: &quot;neige&quot;,
+	springgreen: &quot;vert printemps&quot;,
+	steelblue: &quot;bleu acier&quot;,
+	tan: &quot;grège&quot;,
+	teal: &quot;sarcelle&quot;,
+	thistle: &quot;chardon&quot;,
+	tomato: &quot;tomate&quot;,
+	transparent: &quot;transparent&quot;,
+	turquoise: &quot;turquoise&quot;,
+	violet: &quot;violet&quot;,
+	wheat: &quot;blé&quot;,
+	white: &quot;blanc&quot;,
+	whitesmoke: &quot;blanc cendré&quot;,
+	yellow: &quot;jaune&quot;,
+	yellowgreen: &quot;vert jaunâtre&quot;
+})
+);</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

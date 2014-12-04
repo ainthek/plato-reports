@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/number.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/number.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">57.36</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">1134</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">83.37</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">12.26</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([&quot;doh/main&quot;, &quot;../_base/array&quot;, &quot;../number&quot;, &quot;../i18n&quot;], function(doh, array, number, i18n){
+var tests= {number:{}};
+/**
+ * Refer to ICU4J&#039;s NumberFormatTest.expect(...)
+ */
+tests.number.check=function(t,options,sourceInput,expectResult){
+	tests.number.checkFormatParseCycle(t, t,options,sourceInput,expectResult,false);
+	tests.number.checkParse(t, t,options,expectResult,sourceInput);
+};
+
+/**
+ * Perform a single formatting check or a backward check
+ * backward check:number1 -(formatted)-&gt; string1 -(parsed)-&gt; number2 -(formated)-&gt; string2
+ * then number should == number2; string1 should == string2
+ */
+tests.number.checkFormatParseCycle=function(t,options,sourceInput,expectResult,
+		 backwardCheck/*boolean,indicates whether need a backward chain check,like formate-&gt;parse-&gt;format*/){
+	if(null != options){
+		var pattern = options.pattern;
+		var locale = options.locale;
+		//TODO: add more fields
+	}
+
+	//print(&quot;\n&quot;);
+	var str = null==pattern?&quot;default&quot;:pattern;
+	//print(&quot;pattern:&quot; + str + &quot;| locale:&quot; + locale);
+	//print(&quot;input:&quot; + sourceInput);
+	var result = number.format(sourceInput,options);
+	//print(&quot;result:&quot; + result);
+	if(null != expectResult){
+	    t.is(expectResult,result);
+	}
+	if(backwardCheck){
+		var resultParsed = number.parse(result,options);
+		//print(&quot;resultParsed:&quot; + resultParsed);
+		if(!tests.number._decimalNumberDiff(sourceInput,resultParsed)){
+		    t.is(sourceInput,resultParsed);
+		}
+		var resultParsedReformatted = number.format(resultParsed,options);
+		//print(&quot;resultParsedReformatted:&quot; + resultParsedReformatted);
+	    if(!tests.number._decimalNumberDiff(result,resultParsedReformatted)){
+			t.is(result,resultParsedReformatted);
+		}
+	}
+};
+
+/**
+ * Perform a single parsing check
+ */
+tests.number.checkParse=function(t,options,sourceInput,expectResult){
+	var str = &quot;default&quot;;
+	if(null != options &amp;&amp; null != options.pattern){
+		str = options.pattern;
+	}
+	//print(&quot;input:&quot; + sourceInput);
+	var result = number.parse(sourceInput,options);
+	//print(&quot;result :&quot; + result);
+	if(null != expectResult){
+	    t.is(expectResult,result);
+	}
+};
+
+/**
+ * //TODO:Round a given number
+ */
+tests.number.rounding = function(t,num,maxFractionDigits,expected){
+	var pattern=&quot;#0.&quot;;
+	for(var i=0; i&lt;maxFractionDigits; i++){pattern += &quot;#&quot;;}
+	var result = number.format(num,{locale:tests.number.locale, pattern:pattern});
+	t.is(expected,result);
+};
+
+/**
+ * Run a batch parsing
+ */
+function runBatchParse(options,dataArray/*array*/,pass/*boolean*/){
+	var exception = null;
+	var result;
+	var i=0;
+	var str = (null==options.pattern)?&quot;default&quot;:options.pattern;
+
+	//print(&quot;\n&quot;);
+	for(; i&lt;dataArray.length; i++){
+		try{
+			//print(&quot;[&quot;+i+&quot;]&quot;+&quot;input:&quot;+dataArray[i]);
+			result = number.parse(dataArray[i],options);
+			if(isNaN(result)){
+				throw &quot;\&quot;&quot; + dataArray[i] + &quot;\&quot; is parsed to NaN with pattern &quot; + str;
+			}
+			//print(&quot;[&quot;+i+&quot;]&quot;+&quot;output:&quot;+result);
+		}catch(e){
+			exception = e;
+			break;
+		}
+	}
+
+	if(!pass &amp;&amp; (exception == null)){
+		throw &quot;runBatchParse() - stric parse failed, no exception when parsing illegal data&quot;;
+	}else if(exception != null){
+		if(!pass &amp;&amp; i == 0){
+			//strict parsing should fail for all the dataArray elements as expected
+			//pass condition for strict parsing
+			return;
+		}
+		throw &quot;runBatchParse() failed: &quot; + exception;
+	}
+}
+
+/**
+ * Check whether the given two numbers differ under the decimal bound
+ *
+ */
+tests.number._decimalNumberDiff = function(num1,num2){
+	//TODO: should be more accurate when dojo.number finish rounding in the future
+	var diffBound = 1e-3;
+	var diff = num1 - num2;
+	//print(&quot;Math.abs(diff) &quot; + Math.abs(diff));
+	if(Math.abs(diff) &lt; diffBound ){
+		return true;
+	}else if(isNaN(Math.abs(diff))){
+		var s = num1.toString().split(num2);
+		s[1] = s[1].replace(&quot;,&quot;,&quot;0&quot;);
+		s[1] = s[1].replace(&#039;\u066b&#039;,&#039;0&#039;);
+		return (new Number(s[1])&lt; diffBound);
+	}
+	return false;
+};
+
+doh.register(&quot;tests.number&quot;,
+	[
+		{
+			// Test formatting and parsing of currencies in various locales pre-built in dojo.cldr
+			// NOTE: we can&#039;t set djConfig.extraLocale before bootstrapping unit tests, so directly
+			// load resources here for specific locales:
+
+			name: &quot;number&quot;,
+			runTest: function(t){
+				var partLocaleList = [&quot;en-us&quot;, &quot;fr-fr&quot;, &quot;de-de&quot;];
+				tests.number.locale = &quot;en-us&quot;;
+				if(require.async){
+					var
+						def = new doh.Deferred(),
+						deps = [];
+					array.forEach(partLocaleList, function(locale){
+						deps.push(dojo.getL10nName(&quot;dojo/cldr&quot;, &quot;number&quot;, locale));
+					});
+					require(deps, function(){
+						def.callback(true);
+					});
+					return def;
+				}else{ // tests for the v1.x loader/i18n machinery
+					for(var i = 0 ; i &lt; partLocaleList.length; i ++){
+						i18n.getLocalization(&quot;dojo.cldr&quot;,&quot;number&quot;,partLocaleList[i]);
+					}
+				}
+			}
+		},
+		{
+			name: &quot;invalid&quot;,
+			runTest: function(t){
+				t.t(null === number.format(NaN));
+				t.t(null === number.format(Number.NaN));
+				t.t(null === number.format(Infinity));
+				t.t(null === number.format(-Infinity));
+			}
+		},
+		{
+			name: &quot;round&quot;,
+			runTest: function(t){
+				t.is(0, number.round(0));
+				t.is(1, number.round(0.5));
+				t.is(-1, number.round(-0.5));
+				t.is(0.1, number.round(0.05, 1));
+				t.is(0.1, number.round(0.09, 1));
+				t.is(0.0, number.round(0.04999999, 1));
+				t.is(0.1, number.round(0.09499999, 1));
+				t.is(0.1, number.round(0.095, 1));
+				t.is(0.1, number.round(0.09999999, 1));
+				t.is(-0.1, number.round(-0.05, 1));
+				t.is(1.1, number.round(1.05, 1));
+				t.is(-1.1, number.round(-1.05, 1));
+//				t.is(-162.29, number.round(-162.295, 2)); // see ticket #7930, dojox.math.round
+//				t.is(162.29, number.round(162.295, 2)); // ibid
+			}
+		},
+		{
+			name: &quot;round_multiple&quot;,
+			runTest: function(t){
+				t.is(&quot;123.455&quot;, number.round(123.4525, 2, 5));
+				t.is(&quot;123.45&quot;, number.round(123.452, 2, 5));
+				t.is(&quot;123.455&quot;, number.round(123.454, 2, 5));
+				t.is(&quot;123.455&quot;, number.round(123.456, 2, 5));
+				t.is(&quot;-123.45&quot;, number.round(-123.452, 2, 5));
+				t.is(&quot;-123.455&quot;, number.round(-123.4525, 2, 5));
+				t.is(&quot;-123.455&quot;, number.round(-123.454, 2, 5));
+				t.is(&quot;-123.455&quot;, number.round(-123.456, 2, 5));
+			}
+		},
+		{
+			name: &quot;round_speleotrove&quot;,
+			runTest: function(t){
+				// submitted Mike Cowlishaw (IBM, CCLA), see http://speleotrove.com/decimal/#testcases
+				t.is(12345, number.round(12345 + -0.1), &quot;radx200&quot;);
+				t.is(12345, number.round(12345 + -0.01), &quot;radx201&quot;);
+				t.is(12345, number.round(12345 + -0.001), &quot;radx202&quot;);
+				t.is(12345, number.round(12345 + -0.00001), &quot;radx203&quot;);
+				t.is(12345, number.round(12345 + -0.000001), &quot;radx204&quot;);
+				t.is(12345, number.round(12345 + -0.0000001), &quot;radx205&quot;);
+				t.is(12345, number.round(12345 +  0), &quot;radx206&quot;);
+				t.is(12345, number.round(12345 +  0.0000001), &quot;radx207&quot;);
+				t.is(12345, number.round(12345 +  0.000001), &quot;radx208&quot;);
+				t.is(12345, number.round(12345 +  0.00001), &quot;radx209&quot;);
+				t.is(12345, number.round(12345 +  0.0001), &quot;radx210&quot;);
+				t.is(12345, number.round(12345 +  0.001), &quot;radx211&quot;);
+				t.is(12345, number.round(12345 +  0.01), &quot;radx212&quot;);
+				t.is(12345, number.round(12345 +  0.1), &quot;radx213&quot;);
+
+				t.is(12346, number.round(12346 +  0.49999), &quot;radx215&quot;);
+				t.is(12347, number.round(12346 +  0.5), &quot;radx216&quot;);
+				t.is(12347, number.round(12346 +  0.50001), &quot;radx217&quot;);
+
+				t.is(12345, number.round(12345 +  0.4), &quot;radx220&quot;);
+				t.is(12345, number.round(12345 +  0.49), &quot;radx221&quot;);
+				t.is(12345, number.round(12345 +  0.499), &quot;radx222&quot;);
+				t.is(12345, number.round(12345 +  0.49999), &quot;radx223&quot;);
+				t.is(12346, number.round(12345 +  0.5), &quot;radx224&quot;);
+				t.is(12346, number.round(12345 +  0.50001), &quot;radx225&quot;);
+				t.is(12346, number.round(12345 +  0.5001), &quot;radx226&quot;);
+				t.is(12346, number.round(12345 +  0.501), &quot;radx227&quot;);
+				t.is(12346, number.round(12345 +  0.51), &quot;radx228&quot;);
+				t.is(12346, number.round(12345 +  0.6), &quot;radx229&quot;);
+
+				//negatives
+				t.is(-12345, number.round(-12345 + -0.1), &quot;rsux200&quot;);
+				t.is(-12345, number.round(-12345 + -0.01), &quot;rsux201&quot;);
+				t.is(-12345, number.round(-12345 + -0.001), &quot;rsux202&quot;);
+				t.is(-12345, number.round(-12345 + -0.00001), &quot;rsux203&quot;);
+				t.is(-12345, number.round(-12345 + -0.000001), &quot;rsux204&quot;);
+				t.is(-12345, number.round(-12345 + -0.0000001), &quot;rsux205&quot;);
+				t.is(-12345, number.round(-12345 +  0), &quot;rsux206&quot;);
+				t.is(-12345, number.round(-12345 +  0.0000001), &quot;rsux207&quot;);
+				t.is(-12345, number.round(-12345 +  0.000001), &quot;rsux208&quot;);
+				t.is(-12345, number.round(-12345 +  0.00001), &quot;rsux209&quot;);
+				t.is(-12345, number.round(-12345 +  0.0001), &quot;rsux210&quot;);
+				t.is(-12345, number.round(-12345 +  0.001), &quot;rsux211&quot;);
+				t.is(-12345, number.round(-12345 +  0.01), &quot;rsux212&quot;);
+				t.is(-12345, number.round(-12345 +  0.1), &quot;rsux213&quot;);
+
+				t.is(-12346, number.round(-12346 +  0.49999), &quot;rsux215&quot;);
+				t.is(-12346, number.round(-12346 +  0.5), &quot;rsux216&quot;);
+				t.is(-12345, number.round(-12346 +  0.50001   ), &quot;rsux217&quot;);
+
+				t.is(-12345, number.round(-12345 +  0.4), &quot;rsux220&quot;);
+				t.is(-12345, number.round(-12345 +  0.49), &quot;rsux221&quot;);
+				t.is(-12345, number.round(-12345 +  0.499), &quot;rsux222&quot;);
+				t.is(-12345, number.round(-12345 +  0.49999), &quot;rsux223&quot;);
+				t.is(-12345, number.round(-12345 +  0.5), &quot;rsux224&quot;);
+				t.is(-12344, number.round(-12345 +  0.50001), &quot;rsux225&quot;);
+				t.is(-12344, number.round(-12345 +  0.5001), &quot;rsux226&quot;);
+				t.is(-12344, number.round(-12345 +  0.501), &quot;rsux227&quot;);
+				t.is(-12344, number.round(-12345 +  0.51), &quot;rsux228&quot;);
+				t.is(-12344, number.round(-12345 +  0.6), &quot;rsux229&quot;);
+
+				t.is(12345, number.round(  12345 /  1), &quot;rdvx401&quot;);
+				t.is(12344, number.round(  12345 /  1.0001), &quot;rdvx402&quot;);
+				t.is(12333, number.round(  12345 /  1.001), &quot;rdvx403&quot;);
+				t.is(12223, number.round(  12345 /  1.01), &quot;rdvx404&quot;);
+				t.is(11223, number.round(  12345 /  1.1), &quot;rdvx405&quot;);
+
+				t.is(3088.8, number.round( 12355 /  4, 1), &quot;rdvx406&quot;);
+				t.is(3086.3, number.round( 12345 /  4, 1), &quot;rdvx407&quot;);
+				t.is(3088.7, number.round( 12355 /  4.0001, 1), &quot;rdvx408&quot;);
+				t.is(3086.2, number.round( 12345 /  4.0001, 1), &quot;rdvx409&quot;);
+				t.is(2519.4, number.round( 12345 /  4.9, 1), &quot;rdvx410&quot;);
+				t.is(2473.9, number.round( 12345 /  4.99, 1), &quot;rdvx411&quot;);
+				t.is(2469.5, number.round( 12345 /  4.999, 1), &quot;rdvx412&quot;);
+				t.is(2469.0, number.round( 12345 /  4.9999, 1), &quot;rdvx413&quot;);
+				t.is(2469, number.round( 12345 /  5, 1), &quot;rdvx414&quot;);
+				t.is(2469.0, number.round( 12345 /  5.0001, 1), &quot;rdvx415&quot;);
+				t.is(2468.5, number.round( 12345 /  5.001, 1), &quot;rdvx416&quot;);
+				t.is(2464.1, number.round( 12345 /  5.01, 1), &quot;rdvx417&quot;);
+				t.is(2420.6, number.round( 12345 /  5.1, 1), &quot;rdvx418&quot;);
+
+				t.is(12345, number.round(  12345 *  1), &quot;rmux401&quot;);
+				t.is(12346, number.round(  12345 *  1.0001), &quot;rmux402&quot;);
+				t.is(12357, number.round(  12345 *  1.001), &quot;rmux403&quot;);
+				t.is(12468, number.round(  12345 *  1.01), &quot;rmux404&quot;);
+				t.is(13580, number.round(  12345 *  1.1), &quot;rmux405&quot;);
+				t.is(49380, number.round(  12345 *  4), &quot;rmux406&quot;);
+				t.is(49381, number.round(  12345 *  4.0001), &quot;rmux407&quot;);
+				t.is(60491, number.round(  12345 *  4.9), &quot;rmux408&quot;);
+				t.is(61602, number.round(  12345 *  4.99), &quot;rmux409&quot;);
+				t.is(61713, number.round(  12345 *  4.999), &quot;rmux410&quot;);
+				t.is(61724, number.round(  12345 *  4.9999), &quot;rmux411&quot;);
+				t.is(61725, number.round(  12345 *  5), &quot;rmux412&quot;);
+				t.is(61726, number.round(  12345 *  5.0001), &quot;rmux413&quot;);
+				t.is(61737, number.round(  12345 *  5.001), &quot;rmux414&quot;);
+				t.is(61848, number.round(  12345 *  5.01), &quot;rmux415&quot;);
+/*
+				t.is(1.4814E+5, number.round(  12345 *  12), &quot;rmux416&quot;);
+				t.is(1.6049E+5, number.round(  12345 *  13), &quot;rmux417&quot;);
+				t.is(1.4826E+5, number.round(  12355 *  12), &quot;rmux418&quot;);
+				t.is(1.6062E+5, number.round(  12355 *  13), &quot;rmux419&quot;);
+*/
+			}
+		},
+		{
+			name: &quot;format&quot;, // old tests
+			runTest: function(t){
+
+	t.is(&quot;0123&quot;, number.format(123, {pattern: &quot;0000&quot;}));
+	t.is(&quot;-12,34,567.890&quot;, number.format(-1234567.89, {pattern: &quot;#,##,##0.000##&quot;, locale: &#039;en-us&#039;}));
+	t.is(&quot;-12,34,567.89012&quot;, number.format(-1234567.890123, {pattern: &quot;#,##,##0.000##&quot;, locale: &#039;en-us&#039;}));
+	t.is(&quot;(1,234,567.89012)&quot;, number.format(-1234567.890123, {pattern: &quot;#,##0.000##;(#,##0.000##)&quot;, locale: &#039;en-us&#039;}));
+	t.is(&quot;(1,234,567.89012)&quot;, number.format(-1234567.890123, {pattern: &quot;#,##0.000##;(#)&quot;, locale: &#039;en-us&#039;}));
+	t.is(&quot;50.1%&quot;, number.format(0.501, {pattern: &quot;#0.#%&quot;, locale: &#039;en-us&#039;}));
+	t.is(&quot;98&quot;, number.format(1998, {pattern: &quot;00&quot;}));
+	t.is(&quot;01998&quot;, number.format(1998, {pattern: &quot;00000&quot;}));
+	t.is(&quot;0.13&quot;, number.format(0.125, {pattern: &quot;0.##&quot;, locale: &#039;en-us&#039;})); //NOTE: expects round_half_up, not round_half_even
+	t.is(&quot;0.1250&quot;, number.format(0.125, {pattern: &quot;0.0000&quot;, locale: &#039;en-us&#039;}));
+	t.is(&quot;0.1&quot;, number.format(0.100004, {pattern: &quot;0.####&quot;, locale: &#039;en-us&#039;}));
+
+	t.is(&quot;-12&quot;, number.format(-12.3, {places:0, locale: &quot;en-us&quot;}));
+	t.is(&quot;-1,234,567.89&quot;, number.format(-1234567.89, {locale: &quot;en-us&quot;}));
+//	t.is(&quot;-12,34,567.89&quot;, number.format(-1234567.89, {locale: &quot;en-in&quot;}));
+	t.is(&quot;-1,234,568&quot;, number.format(-1234567.89, {places:0, locale: &quot;en-us&quot;}));
+//	t.is(&quot;-12,34,568&quot;, number.format(-1234567.89, {places:0, locale: &quot;en-in&quot;}));
+	t.is(&quot;-1\xa0000,10&quot;, number.format(-1000.1, {places:2, locale: &quot;fr-fr&quot;}));
+	t.is(&quot;-1,000.10&quot;, number.format(-1000.1, {places:2, locale: &quot;en-us&quot;}));
+	t.is(&quot;-1\xa0000,10&quot;, number.format(-1000.1, {places:2, locale: &quot;fr-fr&quot;}));
+	t.is(&quot;-1.234,56&quot;, number.format(-1234.56, {places:2, locale: &quot;de-de&quot;}));
+	t.is(&quot;-1,000.10&quot;, number.format(-1000.1, {places:2, locale: &quot;en-us&quot;}));
+	t.is(&quot;123.46%&quot;, number.format(1.23456, {places:2, locale: &quot;en-us&quot;, type: &quot;percent&quot;}));
+	t.is(&quot;123.4&quot;, number.format(123.4, {places:&#039;1,3&#039;, locale: &#039;en-us&#039;}));
+	t.is(&quot;123.45&quot;, number.format(123.45, {places:&#039;1,3&#039;, locale: &#039;en-us&#039;}));
+	t.is(&quot;123.456&quot;, number.format(123.456, {places:&#039;1,3&#039;, locale: &#039;en-us&#039;}));
+
+	//rounding
+	t.is(&quot;-1,234,568&quot;, number.format(-1234567.89, {places:0, locale: &quot;en-us&quot;}));
+//	t.is(&quot;-12,34,568&quot;, number.format(-1234567.89, {places:0, locale: &quot;en-in&quot;}));
+	t.is(&quot;-1,000.11&quot;, number.format(-1000.114, {places:2, locale: &quot;en-us&quot;}));
+	t.is(&quot;-1,000.12&quot;, number.format(-1000.115, {places:2, locale: &quot;en-us&quot;}));
+	t.is(&quot;-1,000.12&quot;, number.format(-1000.116, {places:2, locale: &quot;en-us&quot;}));
+	t.is(&quot;-0.00&quot;, number.format(-0.0001, {places:2, locale: &quot;en-us&quot;}));
+	t.is(&quot;0.00&quot;, number.format(0, {places:2, locale: &quot;en-us&quot;}));
+
+	//change decimal places
+	t.is(&quot;-1\xa0000,100&quot;, number.format(-1000.1, {places:3, locale: &quot;fr-fr&quot;}));
+	t.is(&quot;-1,000.100&quot;, number.format(-1000.1, {places:3, locale: &quot;en-us&quot;}));
+			}
+		},
+		{
+			name: &quot;parse&quot;, // old tests
+			runTest: function(t){
+	t.is(1000, number.parse(&quot;1000&quot;, {locale: &quot;en-us&quot;}));
+	t.is(1000.123, number.parse(&quot;1000.123&quot;, {locale: &quot;en-us&quot;}));
+	t.is(1000, number.parse(&quot;1,000&quot;, {locale: &quot;en-us&quot;}));
+	t.is(-1000, number.parse(&quot;-1000&quot;, {locale: &quot;en-us&quot;}));
+	t.is(-1000.123, number.parse(&quot;-1000.123&quot;, {locale: &quot;en-us&quot;}));
+	t.is(-1234567.89, number.parse(&quot;-1,234,567.89&quot;, {locale: &quot;en-us&quot;}));
+	t.is(-1234567.89, number.parse(&quot;-1 234 567,89&quot;, {locale: &quot;fr-fr&quot;}));
+	t.t(isNaN(number.parse(&quot;-1 234 567,89&quot;, {locale: &quot;en-us&quot;})));
+
+	t.is(123, number.parse(&quot;0123&quot;, {pattern: &quot;0000&quot;}));
+
+	t.t(isNaN(number.parse(&quot;10,00&quot;, {locale: &quot;en-us&quot;})));
+	t.t(isNaN(number.parse(&quot;1000.1&quot;, {locale: &quot;fr-fr&quot;})));
+
+	t.t(isNaN(number.parse(&quot;&quot;)));
+	t.t(isNaN(number.parse(&quot;abcd&quot;)));
+
+	// should allow unlimited precision, by default
+	t.is(1.23456789, number.parse(&quot;1.23456789&quot;, {locale: &quot;en-us&quot;}));
+
+	//test whitespace
+//	t.is(-1234567, number.parse(&quot;  -1,234,567  &quot;, {locale: &quot;en-us&quot;}));
+
+//	t.t(number.parse(&quot;9.1093826E-31&quot;));
+	t.is(1.23, number.parse(&quot;123%&quot;, {locale: &quot;en-us&quot;, type: &quot;percent&quot;}));
+	t.is(1.23, number.parse(&quot;123%&quot;, {places:0, locale: &quot;en-us&quot;, type: &quot;percent&quot;}));
+	t.t(isNaN(number.parse(&quot;123.46%&quot;, {places:0, locale: &quot;en-us&quot;, type: &quot;percent&quot;})));
+	t.is(1.2346, number.parse(&quot;123.46%&quot;, {places:2, locale: &quot;en-us&quot;, type: &quot;percent&quot;}));
+	t.is(0.501, number.parse(&quot;50.1%&quot;, {pattern: &quot;#0.#%&quot;, locale: &#039;en-us&#039;}));
+
+	t.is(123.4, number.parse(&quot;123.4&quot;, {pattern: &quot;#0.#&quot;, locale: &#039;en-us&#039;}));
+	t.is(-123.4, number.parse(&quot;-123.4&quot;, {pattern: &quot;#0.#&quot;, locale: &#039;en-us&#039;}));
+	t.is(123.4, number.parse(&quot;123.4&quot;, {pattern: &quot;#0.#;(#0.#)&quot;, locale: &#039;en-us&#039;}));
+	t.is(-123.4, number.parse(&quot;(123.4)&quot;, {pattern: &quot;#0.#;(#0.#)&quot;, locale: &#039;en-us&#039;}));
+
+	t.is(null, number.format(&quot;abcd&quot;, {pattern: &quot;0000&quot;}));
+
+	t.is(123, number.parse(&quot;123&quot;, {places:0}));
+	t.is(123, number.parse(&quot;123&quot;, {places:&#039;0&#039;}));
+	t.is(123.4, number.parse(&quot;123.4&quot;, {places:1, locale: &#039;en-us&#039;}));
+	t.is(123.45, number.parse(&quot;123.45&quot;, {places:&#039;1,3&#039;, locale: &#039;en-us&#039;}));
+	t.is(123.45, number.parse(&quot;123.45&quot;, {places:&#039;0,2&#039;, locale: &#039;en-us&#039;}));
+			}
+		},
+		{
+			name: &quot;format_icu4j3_6&quot;,
+			runTest: function(t){
+
+/*************************************************************************************************
+ * Evan:The following test cases are referred from ICU4J 3.6 (NumberFormatTest etc.)
+ * see http://icu.sourceforge.net/download/3.6.html#ICU4J
+ *************************************************************************************************/
+
+
+/**
+ * In ICU4J, testing logic for NumberFormat.format() is separated into
+ * differernt single tese cases. So part of these logic are
+ * collected together in this single method.
+ *
+ * !!Failed cases are as follows:
+ * 1.1234567890987654321234567890987654321 should be formatted as
+ *   1,234,567,890,987,654,321,234,567,890,987,654,321 with all the default parameters,
+ *   but got 1.234 instead, may due to the unimplemeted exponent.
+ * 2.\u00a4 and &#039; are not replaced
+ * 	 with pattern &quot;&#039;*&amp;&#039;&#039; &#039;\u00a4&#039; &#039;&#039;&amp;*&#039; #,##0.00&quot;
+ *   1.0 should be formatted to &quot;*&amp;&#039; Re. &#039;&amp;* 1.00&quot;,but got &quot;&#039;*&amp;&#039;&#039; &#039;\u00a4&#039; &#039;&#039;&amp;*&#039; 1.00&quot; instead
+ *   etc.
+ *
+ */
+	//print(&quot;test_number_format_icu4j3_6() start..............&quot;);
+	/* !!Failed case, 1.234 returned instead
+	//refer to ICU4J&#039;s NumberFormatTest.TestCoverage()
+	var bigNum = 1234567890987654321234567890987654321;
+	var expectResult = &quot;1,234,567,890,987,654,321,234,567,890,987,654,321&quot;;
+	tests.number.checkFormatParseCycle(t, null,bigNum,expectResult,false);
+	*/
+
+	//in icu4j should throw out an exception when formatting a string,
+	//but it seems number.format can deal with strings
+	//return 123,456,789
+	number.format(&quot;123456789&quot;);
+
+	//!!Failed case, \u00a4 and &#039; are not replaced
+	/*
+	var options = {pattern:&quot;&#039;*&amp;&#039;&#039; &#039;\u00a4&#039; &#039;&#039;&amp;*&#039; #,##0.00&quot;,locale:&quot;en-us&quot;};
+	tests.number.check(t, options,1.0, &quot;*&amp;&#039; Re. &#039;&amp;* 1.00&quot;);
+	tests.number.check(t, options,-2.0, &quot;-*&amp;&#039; Rs. &#039;&amp;* 2.00&quot;);
+
+	options = {pattern:&quot;#,##0.00 &#039;*&amp;&#039;&#039; &#039;\u00a4&#039; &#039;&#039;&amp;*&#039;&quot;,locale:&quot;en-us&quot;};
+	tests.number.check(t, options,1.0,&quot;1.00 *&amp;&#039; Re. &#039;&amp;*&quot;);
+	tests.number.check(t, options,-2.0,&quot;-2.00 *&amp;&#039; Rs. &#039;&amp;*&quot;);
+	*/
+	//print(&quot;test_number_format_icu4j3_6() end..............\n&quot;);
+			}
+		},
+		{
+			name: &quot;format_patterns&quot;,
+			runTest: function(t){
+
+/**
+ * Refer to ICU4J&#039;s NumberFormatTest.TestPatterns() which now only coveres us locale
+ */
+	//print(&quot;test_number_format_Patterns() start..............&quot;);
+	var patterns = ([&quot;#0.#&quot;, &quot;#0.&quot;, &quot;#.0&quot;, &quot;#&quot;]);
+	var patternsLength = patterns.length;
+	var num = ([&quot;0&quot;,&quot;0&quot;, &quot;0.0&quot;, &quot;0&quot;]);
+	var options;
+	//icu4j result seems doesn&#039;t work as:
+	//var num = ([&quot;0&quot;,&quot;0.&quot;, &quot;.0&quot;, &quot;0&quot;]);
+	for (var i=0; i&lt;patternsLength; ++i)
+	{
+		options = {pattern:patterns[i], locale: &#039;en-us&#039;};
+		tests.number.checkFormatParseCycle(t, options,0,num[i],false);
+	}
+
+	//!!Failed case
+	//In ICU4J:
+	//		  unquoted special characters in the suffix are illegal
+	//		  so &quot;000.000|###&quot; is illegal; &quot;000.000&#039;|###&#039;&quot; is legal
+	//number.format:
+	//		  when formatting 1.2 with illegal pattern &quot;000.000|###&quot;
+	//		  no exception was thrown but got &quot;001.200|###&quot; instead.
+
+	/*
+	patterns = ([&quot;000.000|###&quot;,&quot;000.000&#039;|###&#039;&quot;]);
+	var exception = false;
+	var result;
+	for(var i = 0; i &lt; patterns.length; i ++){
+		try{
+			//&quot;001.200&#039;|###&#039;&quot; is return for &quot;000.000&#039;|###&#039;&quot;
+			//&quot;001.200|###&quot; is return for &quot;000.000|###&quot;
+			result = number.format(1.2,{pattern:patterns[i]});
+			print(&quot;[&quot;+i+&quot;] 1.2 is formatted to &quot; + result + &quot; with pattern &quot; + patterns[i]);
+		}catch(e){
+			exception = true;
+		}
+		if(exception &amp;&amp; i==1){
+			throw &quot;[&quot;+i+&quot;]Failed when formatting 1.2 using legal pattern &quot; + patterns[i];
+		}else if(!exception &amp;&amp; i==0){
+			throw &quot;[&quot;+i+&quot;]Failed when formatting 1.2 using illegal pattern  &quot; + patterns[i];
+		}
+	}*/
+	//print(&quot;test_number_format_Patterns() end..............\n&quot;);
+			}
+		},
+		{
+			name: &quot;exponential&quot;,
+			runTest: function(t){
+/**
+ * TODO: For dojo.number future version
+ * Refer to ICU4J&#039;s NumberFormatTest.TestExponential()
+ */
+			}
+		},
+		{
+			name: &quot;format_quotes&quot;,
+			runTest: function(t){
+/**
+ * TODO: Failed case
+ * Refer to ICU4J&#039;s NumberFormatTest.TestQuotes()
+ */
+	//print(&quot;test_number_format_Quotes() start..............&quot;);
+	//TODO: add more locales
+
+	//TODO:!!Failed case
+	//Pattern &quot;s&#039;aa&#039;&#039;s&#039;c#&quot; should format 6666 to &quot;saa&#039;sc6666&quot;, but got s&#039;aa&#039;&#039;s&#039;c6666 instead
+	// is this case necessary?
+	/*
+	var pattern = &quot;s&#039;aa&#039;&#039;s&#039;c#&quot;;
+	var result = number.format(6666,{pattern:pattern,locale:&quot;en-us&quot;});
+	var expectResult = &quot;saa&#039;sc6666&quot;;
+	t.is(expectResult,result);
+	*/
+	//print(&quot;test_number_format_Quotes() end..............&quot;);
+			}
+		},
+		{
+			name: &quot;format_rounding&quot;,
+			runTest: function(t){
+/**
+ * Refer to ICU4J&#039;s NumberFormatTest.TestRounding487() and NumberFormatTest.TestRounding()
+ */
+	//print(&quot;test_number_format_rounding() start..............&quot;);
+	tests.number.rounding(t,0.000179999, 5, &quot;0.00018&quot;);
+	tests.number.rounding(t,0.00099, 4, &quot;0.001&quot;);
+	tests.number.rounding(t,17.6995, 3, &quot;17.7&quot;);
+	tests.number.rounding(t,15.3999, 0, &quot;15&quot;);
+	tests.number.rounding(t,-29.6, 0, &quot;-30&quot;);
+
+	//TODO refer to NumberFormatTest.TestRounding()
+
+	//print(&quot;test_number_format_rounding() end..............&quot;);
+			}
+		},
+		{
+			name: &quot;format_scientific&quot;,
+			runTest: function(t){
+/**
+ * TODO: For dojo.number future version
+ * Refer to ICU4J&#039;s NumberFormatTest.TestScientific()- Exponential testing
+ * Refer to ICU4J&#039;s NumberFormatTest.TestScientific2()
+ * Refer to ICU4J&#039;s NumberFormatTest.TestScientificGrouping()
+ */
+			}
+		},
+		{
+			name: &quot;format_perMill&quot;,
+			runTest: function(t){
+/**
+ * TODO: Failed case
+ * Refer to ICU4J&#039;s NumberFormatTest.TestPerMill()
+ */
+	//print(&quot;test_number_format_PerMill() start..............&quot;);
+	var pattern;
+	var result;
+	var expectResult;
+
+    //TODO: !!Failed case - ###.###\u2030(\u2030 is ‰)
+	//Pattern ###.###\u2030 should format 0.4857 as 485.7\u2030,but got 485.700\u2030 instead
+	pattern = &quot;###.###\u2030&quot;;
+	expectResult = &quot;485.7\u2030&quot;;
+	result = number.format(0.4857,{pattern:pattern, locale: &#039;en-us&#039;});
+	t.is(expectResult,result);
+
+    //TODO: !!Failed mile percent case - ###.###m
+	//Pattern &quot;###.###m&quot; should format 0.4857 to 485.7m, but got 0.485m instead
+	/*
+	pattern = &quot;###.###m&quot;;
+	expectResult = &quot;485.7m&quot;;
+	result = number.format(0.4857,{pattern:pattern,locale:&quot;en&quot;});
+	t.is(expectResult,result);
+	*/
+	//print(&quot;test_number_format_PerMill() end..............\n&quot;);
+			}
+		},
+		{
+			name: &quot;format_grouping&quot;,
+			runTest: function(t){
+/**
+ * Only test en-us and en-in
+ * Refer to ICU4J&#039;s NumberFormatTest.TestSecondaryGrouping()
+ */
+	//print(&quot;test_number_format_Grouping() start..............&quot;);
+	//primary grouping
+	var sourceInput = 123456789;
+	var expectResult = &quot;12,34,56,789&quot;;
+	var options = {pattern:&quot;#,##,###&quot;,locale:&quot;en-us&quot;};
+
+	//step1: 123456789 formated=&gt; 12,34,56,789
+	//step2:12,34,56,789 parsed=&gt; 123456789 =&gt; formated =&gt; 12,34,56,789
+	tests.number.checkFormatParseCycle(t, options,sourceInput,expectResult,true);
+
+	//TODO: sencondary grouping not implemented yet ?
+	//Pattern &quot;#,###&quot; and secondaryGroupingSize=4 should format 123456789 to &quot;12,3456,789&quot;
+
+	//Special case for &quot;en-in&quot; locale
+	//1876543210 should be formated as 1,87,65,43,210 in &quot;en-in&quot; (India)
+/*
+	sourceInput = 1876543210;
+	expectResult = &quot;1,87,65,43,210&quot;;
+	var result = number.format(sourceInput,{locale:&quot;en-in&quot;});
+	t.is(expectResult,result);
+*/
+	//print(&quot;test_number_format_Grouping() end..............\n&quot;);
+			}
+		},
+		{
+			name: &quot;format_pad&quot;,
+			runTest: function(t){
+/**
+ * TODO:!!Failed cases:
+ * According to ICU4J test criteria:
+ * 1.with pattern &quot;*^##.##&quot;:
+ * 	 0 should be formatted to &quot;^^^^0&quot;,but got &quot;*^0&quot; instead,
+ *   -1.3 should be formatted to &quot;^-1.3&quot;,but got &quot;-*^1.3&quot; instead.
+ *
+ * 2.with pattern &quot;##0.0####*_ &#039;g-m/s^2&#039;&quot; :
+ *   0 should be formatted to &quot;0.0______ g-m/s^2&quot;,but got &quot;:0.0*_ &#039;g-m/s^2&#039;&quot; instead
+ *   1.0/3 should be formatted to &quot;0.33333__ g-m/s^2&quot;,but got &quot;0.33333*_ &#039;g-m/s^2&#039;&quot; instead
+ *
+ * 3.with pattern &quot;*x#,###,###,##0.0#;*x(###,###,##0.0#)&quot;:
+ * 	 -10 should be formatted to &quot;xxxxxxxxxx(10.0)&quot;,but got &quot;*x(10.0)&quot; instead.
+ *   10 should be formatted to &quot;xxxxxxxxxxxx10.0&quot;,but got &quot;*x10.0&quot; instead.
+ *   ......
+ *   -1120456.37 should be formatted to &quot;xx(1,120,456.37)&quot;,but got &quot;*x(1,120,456.37)&quot; instead.
+ *   1120456.37 should be formatted to &quot;xxxx1,120,456.37&quot;,but got &quot;*x1,120,456.37&quot; instead.
+ *   -1252045600.37 should be formatted to &quot;(1,252,045,600.37)&quot;,but got &quot;*x(1,252,045,600.37)&quot; instead.
+ *   1252045600.37 should be formatted to &quot;10,252,045,600.37&quot;,but got &quot;*x10,252,045,600.37&quot; instead.
+ *
+ * 4.with pattern &quot;#,###,###,##0.0#*x;(###,###,##0.0#*x)&quot;
+ * 	 -10 should be formatted to (10.0xxxxxxxxxx),but got &quot;(10.0*x)&quot; instead.
+ *   10 should be formatted to &quot;10.0xxxxxxxxxxxx&quot;,but got &quot;10.0*x&quot; instead.
+ *   ......
+ *   -1120456.37 should be formatted to &quot;(1,120,456.37xx)&quot;,but got &quot;(1,120,456.37*x)&quot; instead.
+ *   1120456.37 should be formatted to &quot;xxxx1,120,456.37&quot;,but got &quot;1,120,456.37*x&quot; instead.
+ *   -1252045600.37 should be formatted to &quot;(1,252,045,600.37)&quot;,but got &quot;(1,252,045,600.37*x)&quot; instead.
+ *   1252045600.37 should be formatted to &quot;&quot;10,252,045,600.37&quot;&quot;,but got &quot;10,252,045,600.37*x&quot; instead.*
+ *
+ * Refer to ICU4J&#039;s NumberFormatTest.TestPad()
+ */
+/*
+function test_number_format_pad(){
+	var locale = &quot;en-us&quot;;
+	print(&quot;test_number_format_Pad() start..............&quot;);
+	var options = {pattern:&quot;*^##.##&quot;,locale:locale};
+
+	tests.number.check(t, options,0,&quot;^^^^0&quot;);
+	tests.number.check(t, options,-1.3,&quot;^-1.3&quot;);
+
+
+	options = {pattern:&quot;##0.0####*_ &#039;g-m/s^2&#039;&quot;,locale:locale};
+	tests.number.check(t, options,0,&quot;0.0______ g-m/s^2&quot;);
+	tests.number.checkFormatParseCycle(t, options,1.0/3,&quot;0.33333__ g-m/s^2&quot;,true);
+
+	//exponent not implemented
+	//options = {pattern:&quot;##0.0####E0*_ &#039;g-m/s^2&#039;&quot;,locale:locale};
+	//tests.number.check(t, options,0,&quot;0.0E0______ g-m/s^2&quot;);
+	//tests.number.checkFormatParseCycle(t, options,1.0/3,&quot;333.333E-3_ g-m/s^2&quot;,true);
+
+	// Test padding before a sign
+	options = {pattern:&quot;*x#,###,###,##0.0#;*x(###,###,##0.0#)&quot;,locale:locale};
+
+	tests.number.check(t, options,-10,&quot;xxxxxxxxxx(10.0)&quot;);
+	tests.number.check(t, options,-1000, &quot;xxxxxxx(1,000.0)&quot;);
+	tests.number.check(t, options,-1000000, &quot;xxx(1,000,000.0)&quot;);
+	tests.number.check(t, options,-100.37, &quot;xxxxxxxx(100.37)&quot;);
+	tests.number.check(t, options,-10456.37, &quot;xxxxx(10,456.37)&quot;);
+	tests.number.check(t, options,-1120456.37, &quot;xx(1,120,456.37)&quot;);
+	tests.number.check(t, options,-112045600.37, &quot;(112,045,600.37)&quot;);
+	tests.number.check(t, options,-1252045600.37, &quot;(1,252,045,600.37)&quot;);
+
+
+	tests.number.check(t, options,10, &quot;xxxxxxxxxxxx10.0&quot;);
+	tests.number.check(t, options,1000, &quot;xxxxxxxxx1,000.0&quot;);
+	tests.number.check(t, options,1000000, &quot;xxxxx1,000,000.0&quot;);
+	tests.number.check(t, options,100.37, &quot;xxxxxxxxxx100.37&quot;);
+	tests.number.check(t, options,10456.37, &quot;xxxxxxx10,456.37&quot;);
+	tests.number.check(t, options,1120456.37, &quot;xxxx1,120,456.37&quot;);
+	tests.number.check(t, options,112045600.37, &quot;xx112,045,600.37&quot;);
+	tests.number.check(t, options,10252045600.37, &quot;10,252,045,600.37&quot;);
+
+	// Test padding between a sign and a number
+	options = {pattern:&quot;#,###,###,##0.0#*x;(###,###,##0.0#*x)&quot;,locale:locale};
+	tests.number.check(t, options, -10, &quot;(10.0xxxxxxxxxx)&quot;);
+	tests.number.check(t, options, -1000, &quot;(1,000.0xxxxxxx)&quot;);
+	tests.number.check(t, options, -1000000, &quot;(1,000,000.0xxx)&quot;);
+	tests.number.check(t, options, -100.37, &quot;(100.37xxxxxxxx)&quot;);
+	tests.number.check(t, options, -10456.37, &quot;(10,456.37xxxxx)&quot;);
+	tests.number.check(t, options, -1120456.37, &quot;(1,120,456.37xx)&quot;);
+	tests.number.check(t, options, -112045600.37, &quot;(112,045,600.37)&quot;);
+	tests.number.check(t, options, -1252045600.37, &quot;(1,252,045,600.37)&quot;);
+
+	tests.number.check(t, options, 10, &quot;10.0xxxxxxxxxxxx&quot;);
+	tests.number.check(t, options, 1000, &quot;1,000.0xxxxxxxxx&quot;);
+	tests.number.check(t, options, 1000000, &quot;1,000,000.0xxxxx&quot;);
+	tests.number.check(t, options, 100.37, &quot;100.37xxxxxxxxxx&quot;);
+	tests.number.check(t, options, 10456.37, &quot;10,456.37xxxxxxx&quot;);
+	tests.number.check(t, options, 1120456.37, &quot;1,120,456.37xxxx&quot;);
+	tests.number.check(t, options, 112045600.37, &quot;112,045,600.37xx&quot;);
+	tests.number.check(t, options, 10252045600.37, &quot;10,252,045,600.37&quot;);
+
+	//Not implemented yet,refer to NumberFormatTest.TestPatterns2()
+	//For future use - maily test pad patterns
+	print(&quot;test_number_format_Pad() end..............&quot;);
+}
+*/
+			}
+		},
+		{
+			name: &quot;parse_icu4j3_6&quot;,
+			runTest: function(t){
+/**
+ * In ICU4J, testing logic for NumberFormat.parse() is separated into
+ * differernt single tese cases. So part of these logic are
+ * collected together in this test case. *
+ */
+	//print(&quot;test_number_parse_icu4j3_6() start..............&quot;);
+	//Refer to ICU4J&#039;s NumberFormatTest.TestParse() which is only a rudimentary version
+	var pattern = &quot;00&quot;;
+	var str = &quot;0.0&quot;;
+	var result = number.parse(str,{pattern:pattern, locale: &#039;en-us&#039;});
+	//TODO: add more locales
+//FIXME: is this a valid test?
+//	t.is(0,result);
+
+	/**************************************** tolerant parse *****************************************
+	 * refers to ICU4J&#039;s NumberFormatTest.TestStrictParse()??
+	 * TODO: Seems dojo.number parses string in a tolerant way.
+	 */
+	 var options = {locale:&quot;en-us&quot;};
+	/*
+	 * TODO: !!Failed case,Should all pass,
+	 * but the following elements failed (all parsed to NaN):
+	 * [1]-&quot;0 &quot;,[2]-&quot;0.&quot;,[3]-&quot;0,&quot;,[5]-&quot;0. &quot;,[6]-&quot;0.100,5&quot;,
+	 * [7]-&quot;.00&quot;,[9]-&quot;12345, &quot;,[10]-&quot;1,234, &quot;,[12]-&quot;0E&quot;
+	 */
+	var passData = ([
+		&quot;0&quot;,           //[0] single zero before end of text is not leading
+        //&quot;0 &quot;,        //[1] single zero at end of number is not leading
+        //&quot;0.&quot;,        //[2] single zero before period (or decimal, it&#039;s ambiguous) is not leading
+        //&quot;0,&quot;,          //[3] single zero before comma (not group separator) is not leading
+        &quot;0.0&quot;,         //[4] single zero before decimal followed by digit is not leading
+        //&quot;0. &quot;,       //[5] same as above before period (or decimal) is not leading
+        //&quot;0.100,5&quot;,   //[6] comma stops parse of decimal (no grouping)
+        //&quot;.00&quot;,       //[7] leading decimal is ok, even with zeros
+        &quot;1234567&quot;,     //[8] group separators are not required
+        //&quot;12345, &quot;,   //[9] comma not followed by digit is not a group separator, but end of number
+        //&quot;1,234, &quot;,   //[10] if group separator is present, group sizes must be appropriate
+        &quot;1,234,567&quot;   //[11] ...secondary too
+        //,&quot;0E&quot;         //[12]not implemented yet,an exponnent not followed by zero or digits is not an exponent
+         ]);
+	runBatchParse(options,passData,true/*tolerant parse*/);
+
+	/*
+	 * TODO:!!Failed case,should all pass,
+	 * but the following failed,
+	 * [10]-&quot;1,45 that&quot; implies that we partially parse input
+	 */
+	var failData = ([
+// leading zeros without separators are tolerated #6933
+//		&quot;00&quot;,          //[0] leading zero before zero
+//		&quot;012&quot;,         //[1] leading zero before digit
+        &quot;0,456&quot;,       //[2] leading zero before group separator
+        &quot;1,2&quot;,         //[3] wrong number of digits after group separator
+        &quot;,0&quot;,          //[4] leading group separator before zero
+        &quot;,1&quot;,          //[5] leading group separator before digit
+        &quot;,.02&quot;,        //[6] leading group separator before decimal
+        &quot;1,.02&quot;,       //[7] group separator before decimal
+        &quot;1,,200&quot;,      //[8] multiple group separators
+        &quot;1,45&quot;,        //[9] wrong number of digits in primary group
+        //&quot;1,45 that&quot;,   //[10] wrong number of digits in primary group
+        &quot;1,45.34&quot;,     //[11] wrong number of digits in primary group
+        &quot;1234,567&quot;,    //[12] wrong number of digits in secondary group
+        &quot;12,34,567&quot;,   //[13] wrong number of digits in secondary group
+        &quot;1,23,456,7890&quot; //[14] wrong number of digits in primary and secondary groups
+		]);
+	runBatchParse(options,failData,false);
+
+	 options = {pattern:&quot;#,##,##0.#&quot;,locale:&quot;en-us&quot;};
+	/*
+	 * TODO:!!Failed case,shoudl all pass.
+
+	 * but [1] [2] and [3] failed
+	 * should be parsed to 1234567,but NaN instead
+	 */
+	var mixedPassData = ([
+		&quot;12,34,567&quot;    	//[0]
+        //,&quot;12,34,567,&quot;		//[1]
+        //&quot;12,34,567, that&quot;,//[2]
+        //&quot;12,34,567 that&quot;	//[3]
+		]);
+	runBatchParse(options,mixedPassData,true/*tolerant parse*/);
+
+	/*
+	 * TODO:!!Failed case,should all pass,
+	 * but actually mixedFailData[2] and mixedFailData[3] passed.
+	 * &quot;12,34,56, that &quot; and [3]-&quot;12,34,56 that&quot; should be parsed to 123456,but NaN instead
+	 */
+	var mixedFailData = ([
+        &quot;12,34,56&quot;,			//[0]
+        &quot;12,34,56,&quot;		//[1]
+        //,&quot;12,34,56, that &quot;,//[2]
+        //&quot;12,34,56 that&quot;,	//[3]
+		]);
+	runBatchParse(options,mixedFailData,false);
+
+
+	/**************************************** strict parse ******************************************
+	 * TODO:May need to test strict parsing in the future?
+	 * e.g. A strict parsing like (with pattern &quot;#,##0.#&quot;)
+	 * 1.Leading zeros
+	 * 		&#039;00&#039;, &#039;0123&#039; fail the parse, but &#039;0&#039; and &#039;0.001&#039; pass
+	 * 2.Leading or doubled grouping separators
+	 * 		&#039;,123&#039; and &#039;1,,234&quot; fail
+	 * 3.Groups of incorrect length when grouping is used
+	 * 		&#039;1,23&#039; and &#039;1234,567&#039; fail, but &#039;1234&#039; passes
+	 * 4.Grouping separators used in numbers followed by exponents
+	 * 		&#039;1,234E5&#039; fails, but &#039;1234E5&#039; and &#039;1,234E&#039; pass
+	 */
+	//options={locale:&quot;en&quot;,strict:true};
+	//runBatchParse(options,passData,false/*strict parse*/);
+	//runBatchParse(options,failData,false/*strict parse*/);
+
+	//options = {pattern:&quot;#,##,##0.#&quot;,locale:&quot;en-us&quot;,strict:true};
+	//runBatchParse(options,mixedPassData,false/*strict parse*/);
+	//runBatchParse(options,mixedFailData,false/*strict parse*/);
+
+	//print(&quot;test_number_parse_icu4j3_6() end..............\n&quot;);
+			}
+		},
+		{
+			name: &quot;parse_whitespace&quot;,
+			runTest: function(t){
+/**
+ * TODO:!!Failed case
+ * With pattern &quot;a  b#0c  &quot;,both &quot;a b3456c &quot; and and &quot;a   b1234c   &quot; should be parsed to 3456,but got NaN instead.
+ *
+ * Refer to ICU4J&#039;s NumberFormatTest.TestWhiteSpaceParsing
+ */
+    /*
+	print(&quot;test_number_parse_WhiteSpace() start..............&quot;);
+   	var pattern = &quot;a  b#0c  &quot;;
+	var expectResult = 3456;
+	result =  number.parse(&quot;a b3456c &quot;,{pattern:pattern,locale:&quot;en-us&quot;});
+   	t.is(expectResult,result);
+	result =  number.parse(&quot;a   b3456c   &quot;,{pattern:pattern,locale:&quot;en-us&quot;});
+	t.is(expectResult,result);
+	print(&quot;test_number_parse_WhiteSpace() end..............\n&quot;);
+	*/
+			}
+		},
+/*************************************************************************************************
+ *                            Regression test cases
+ * These test cases are referred to ICU4J&#039;s NumberFormatRegressionTest and NumberFormatRegression.
+ * The regression cases in ICU4J are used as unit test cases for bug fixing,
+ * They are inluced here so that dojo.number may avoid those similar bugs.
+ *************************************************************************************************/
+		{
+			name: &quot;number_regression_1&quot;,
+			runTest: function(t){
+/**
+ * Refer to ICU4J&#039;s NumberFormatRegressionTest.Test4161100()
+ */
+	tests.number.checkFormatParseCycle(t, {pattern:&quot;#0.#&quot;, locale: &#039;en-us&#039;},-0.09,&quot;-0.1&quot;,false);
+			}
+		},
+		{
+			name: &quot;number_regression_2&quot;,
+			runTest: function(t){
+/**
+ * !!Failed case,rounding hasn&#039;t been implemented yet.
+ * Refer to ICU4J&#039;s NumberFormatRegressionTest.Test4408066()
+ */
+	/*
+	var data =   ([-3.75, -2.5, -1.5,
+                   -1.25, 0,    1.0,
+                   1.25,  1.5,  2.5,
+                   3.75,  10.0, 255.5]);
+	var expected = ([&quot;-4&quot;, &quot;-2&quot;, &quot;-2&quot;,
+                    &quot;-1&quot;, &quot;0&quot;,  &quot;1&quot;,
+                	&quot;1&quot;,  &quot;2&quot;,  &quot;2&quot;,
+                	&quot;4&quot;,  &quot;10&quot;, &quot;256&quot;]);
+	var options = {locale:&quot;zh-cn&quot;,round:true};
+	for(var i =0; i &lt; data.length; i++){
+		tests.number.checkFormatParseCycle(t, options,data[i],expected[i],false);
+	}
+
+	data = ([ 	&quot;-3.75&quot;, &quot;-2.5&quot;, &quot;-1.5&quot;,
+              	&quot;-1.25&quot;, &quot;0&quot;,    &quot;1.0&quot;,
+              	&quot;1.25&quot;,  &quot;1.5&quot;,  &quot;2.5&quot;,
+              	&quot;3.75&quot;,  &quot;10.0&quot;, &quot;255.5&quot;]);
+	expected =([ -3, -2, -1,
+                 -1, 0,  1,
+                 1,  1,  2,
+                 3,  10, 255]);
+
+	for(var i =0; i &lt; data.length; i++){
+		tests.number.checkParse(t, options,data[i],expected[i]);
+	}
+	*/
+			}
+		},
+		{
+			name: &quot;number_regression_3&quot;,
+			runTest: function(t){
+/**
+ * Refer to ICU4J&#039;s NumberRegression.Test4087535() and Test4243108()
+ */
+	tests.number.checkFormatParseCycle(t, {places:0},0,&quot;0&quot;,false);
+	//TODO:in icu4j,0.1 should be formatted to &quot;.1&quot; when minimumIntegerDigits=0
+	tests.number.checkFormatParseCycle(t, {places:0},0.1,&quot;0&quot;,false);
+	tests.number.checkParse(t, {pattern:&quot;#0.#####&quot;, locale: &#039;en-us&#039;},123.55456,123.55456);
+//!! fails because default pattern only has 3 decimal places
+//	tests.number.checkParse(t, null,123.55456,123.55456);
+
+	//See whether it fails first format 0.0 ,parse &quot;99.99&quot;,and then reformat 0.0
+	tests.number.checkFormatParseCycle(t, {pattern:&quot;#.#&quot;},0.0,&quot;0&quot;,false);
+	tests.number.checkParse(t, {locale: &#039;en-us&#039;},&quot;99.99&quot;,99.99);
+	tests.number.checkFormatParseCycle(t, {pattern:&quot;#.#&quot;},0.0,&quot;0&quot;,false);
+			}
+		},
+		{
+			name: &quot;number_regression_4&quot;,
+			runTest: function(t){
+/**
+ * TODO:
+ * In ICU -0.0 and -0.0001 should be formatted to &quot;-0&quot; with FieldPosition(0)
+ * dojo.i18n.number format -0.0 to &quot;-0&quot;; -0.0001 to &quot;-0.000100&quot;
+ *
+ * Refer to ICU4J&#039;s NumberRegression.Test4088503() and Test4106658()
+ */
+	tests.number.checkFormatParseCycle(t, {places:0},123,&quot;123&quot;,false);
+
+	//TODO: differernt from ICU where -0.0 is formatted to &quot;-0&quot;
+	tests.number.checkFormatParseCycle(t, {locale:&quot;en-us&quot;},-0.0,&quot;0&quot;,false);
+
+	//TODO: differernt from ICU where -0.0001 is formatted to &quot;-0&quot;
+	tests.number.checkFormatParseCycle(t, {locale:&quot;en-us&quot;,places:6},-0.0001,&quot;-0.000100&quot;,false);
+			}
+		},
+		{
+			name: &quot;number_regression_5&quot;,
+			runTest: function(t){
+/**
+ * !!Failed case,rounding has not implemented yet.
+ * 0.00159999 should be formatted as 0.0016 but got 0.0015 instead.
+ * Refer to ICU4J&#039;s NumberRegression.Test4071492()
+ */
+	//tests.number.checkFormatParseCycle(t, {places:4,round:true},0.00159999,&quot;0.0016&quot;,false);
+			}
+		},
+		{
+			name: &quot;number_regression_6&quot;,
+			runTest: function(t){
+/**
+ * Refer to ICU4J&#039;s NumberRegression.Test4086575()
+ */
+	var pattern = &quot;###.00;(###.00)&quot;;
+	var locale = &quot;fr&quot;;
+	var options = {pattern:pattern,locale:locale};
+
+	//no group separator
+	tests.number.checkFormatParseCycle(t, options,1234,&quot;1234,00&quot;,false);
+	tests.number.checkFormatParseCycle(t, options,-1234,&quot;(1234,00)&quot;,false);
+
+	//space as group separator
+	pattern = &quot;#,###.00;(#,###.00)&quot;;
+	options = {pattern:pattern,locale:locale};
+	tests.number.checkFormatParseCycle(t, options,1234,&quot;1\u00a0234,00&quot;,false);// Expect 1 234,00
+	tests.number.checkFormatParseCycle(t, options,-1234,&quot;(1\u00a0234,00)&quot;,false);  // Expect (1 234,00)
+			}
+		},
+		{
+			name: &quot;number_regression_7&quot;,
+			runTest: function(t){
+/**
+ * !!Failed case - expontent has not implemented yet
+ * shuold format 1.000000000000001E7 to 10000000.00000001, but got 10,000,000.000 instead
+ * Refer to ICU4J&#039;s NumberRegression.Test4090489() - loses precision
+ */
+	//tests.number.checkFormatParseCycle(t, null,1.000000000000001E7,&quot;10000000.00000001&quot;,false);
+			}
+		},
+		{
+			name: &quot;number_regression_8&quot;,
+			runTest: function(t){
+/**
+ * !!Failed case
+ * 1.with pattern &quot;#,#00.00 p&#039;&#039;ieces;-#,#00.00 p&#039;&#039;ieces&quot;
+ *   3456.78 should be formated to &quot;3,456.78 p&#039;ieces&quot;,
+ *   but got &quot;3,456.78 p&#039;&#039;ieces&quot;,&quot;&#039;&#039;&quot; should be replaced with &quot;&#039;&quot;
+ * 2.with illegal pattern &quot;000.0#0&quot;
+ * 	 no error for the illegal pattern, and 3456.78 is formatted to 456.780
+ * 3.with illegal pattern &quot;0#0.000&quot;
+ * 	 no error for the illegal pattern, and 3456.78 is formatted to 3456.780
+ *
+ * Refer to ICU4J&#039;s NumberRegression.Test4092480(),Test4074454()
+ */
+	var patterns = ([&quot;#0000&quot;,&quot;#000&quot;,&quot;#00&quot;,&quot;#0&quot;,&quot;#&quot;]);
+	var expect = ([&quot;0042&quot;,&quot;042&quot;,&quot;42&quot;,&quot;42&quot;,&quot;42&quot;]);
+
+	for(var i =0; i &lt; patterns.length; i ++){
+		tests.number.checkFormatParseCycle(t, {pattern:patterns[i]},42,expect[i],false);
+		tests.number.checkFormatParseCycle(t, {pattern:patterns[i]},-42,&quot;-&quot;+expect[i],false);
+	}
+
+	tests.number.checkFormatParseCycle(t, {pattern:&quot;#,#00.00;-#.#&quot;, locale: &#039;en-us&#039;},3456.78,&quot;3,456.78&quot;,false);
+	//!!Failed case
+	//tests.number.checkFormatParseCycle(t, {pattern:&quot;#,#00.00 p&#039;&#039;ieces;-#,#00.00 p&#039;&#039;ieces&quot;},3456.78,&quot;3,456.78 p&#039;ieces&quot;,false);
+	//tests.number.checkFormatParseCycle(t, {pattern:&quot;000.0#0&quot;},3456.78,null,false);
+	//tests.number.checkFormatParseCycle(t, {pattern:&quot;0#0.000&quot;},3456.78,null,false);
+			}
+		},
+		{
+			name: &quot;number_regression_9&quot;,
+			runTest: function(t){
+/**
+ * TODO
+ * Refer to ICU4J&#039;s NumberRegression.Test4052223()
+ */
+	//TODO:only got NaN,need an illegal pattern exception?
+	tests.number.checkParse(t, {pattern:&quot;#,#00.00&quot;},&quot;abc3&quot;);
+
+	//TODO: got NaN instead of 1.222, is it ok?
+	//tests.number.checkParse(t, {pattern:&quot;#,##0.###&quot;,locale:&quot;en-us&quot;},&quot;1.222,111&quot;,1.222);
+	//tests.number.checkParse(t, {pattern:&quot;#,##0.###&quot;,locale:&quot;en-us&quot;},&quot;1.222x111&quot;,1.222);
+
+	//got NaN for illeal input,ok
+	tests.number.checkParse(t, null,&quot;hello: ,.#$@^&amp;**10x&quot;);
+			}
+		},
+		{
+			name: &quot;number_regression_10&quot;,
+			runTest: function(t){
+/**
+ * Refer to ICU4J&#039;s NumberRegression.Test4125885()
+ */
+	tests.number.checkFormatParseCycle(t, {pattern:&quot;000.00&quot;, locale: &#039;en-us&#039;},12.34,&quot;012.34&quot;,false);
+	tests.number.checkFormatParseCycle(t, {pattern:&quot;+000.00%;-000.00%&quot;, locale: &#039;en-us&#039;},0.1234,&quot;+012.34%&quot;,false);
+	tests.number.checkFormatParseCycle(t, {pattern:&quot;##,###,###.00&quot;, locale: &#039;en-us&#039;},9.02,&quot;9.02&quot;,false);
+
+	var patterns =([&quot;#.00&quot;, &quot;0.00&quot;, &quot;00.00&quot;, &quot;#0.0#&quot;, &quot;#0.00&quot;]);
+	var expect =  ([&quot;1.20&quot;, &quot;1.20&quot;, &quot;01.20&quot;, &quot;1.2&quot;,   &quot;1.20&quot; ]);
+	for(var i =0 ; i &lt; patterns.length; i ++){
+		tests.number.checkFormatParseCycle(t, {pattern:patterns[i], locale: &#039;en-us&#039;},1.2,expect[i],false);
+	}
+			}
+		},
+		{
+			name: &quot;number_regression_11&quot;,
+			runTest: function(t){
+/**
+ * TODO:!!Failed case
+ * Make sure that all special characters, when quoted in a suffix or prefix, lose their special meaning.
+ * The detail error info :
+ * for input 123
+ * pattern:&#039;0&#039;#0&#039;0&#039;; expect:&quot;01230&quot;; but got &quot;&#039;3&#039;#0&#039;0&#039;&quot; instead
+ * pattern:&#039;,&#039;#0&#039;,&#039;; expect:&quot;,123,&quot;; but got &quot;&#039;,&#039;123&#039;,&#039;&quot; instead
+ * pattern:&#039;.&#039;#0&#039;.&#039;; expect:&quot;.123.&quot;; but got &quot;&#039;.&#039;123&#039;.&#039;&quot; instead
+ * pattern:&#039;‰&#039;#0&#039;‰&#039;; expect:&quot;‰123‰&quot;; but got &quot;&#039;‰&#039;123000&#039;‰&#039;&quot; instead
+ * pattern:&#039;%&#039;#0&#039;%&#039;; expect:&quot;%123%&quot;; but got &quot;&#039;%&#039;12300&#039;%&#039;&quot; instead
+ * pattern:&#039;#&#039;#0&#039;#&#039;; expect:&quot;#123#&quot;; but got &quot;&#039;123&#039;#0&#039;#&#039;&quot; instead
+ * pattern:&#039;;&#039;#0&#039;;&#039;; expect:&quot;;123;&quot;; but got &quot;[dojo-test] FATAL exception raised:
+ * 											  unable to find a number expression in pattern: &#039;&quot;
+ * pattern:&#039;E&#039;#0&#039;E&#039;; expect:&quot;E123E&quot;; not implemeted yet
+ * pattern:&#039;*&#039;#0&#039;*&#039;; expect:&quot;*123*&quot;; but got &quot;&#039;*&#039;123&#039;*&#039;&quot; instead
+ * pattern:&#039;+&#039;#0&#039;+&#039;; expect:&quot;+123+&quot;; but got &quot;&#039;+&#039;123&#039;+&#039;&quot; instead
+ * pattern:&#039;-&#039;#0&#039;-&#039;; expect:&quot;-123-&quot;; but got &quot;&#039;-&#039;123&#039;-&#039;&quot; instead
+ *
+ * TODO: is it ok to remain &quot;&#039;&quot; in the formatted result as above??
+ *
+ * Refer to ICU4J&#039;s NumberRegression.Test4212072()
+ */
+/*
+	var specials = ([ &#039;0&#039;, &#039;,&#039;, &#039;.&#039;, &#039;\u2030&#039;, &#039;%&#039;, &#039;#&#039;,&#039;;&#039;, &#039;E&#039;, &#039;*&#039;, &#039;+&#039;, &#039;-&#039;]);
+	var pattern;
+	var expect;
+
+	for(var i=0; i &lt; specials.length; i ++){
+		pattern = &quot;&#039;&quot; + specials[i] + &quot;&#039;#0&#039;&quot; + specials[i] + &quot;&#039;&quot;;
+		expect = &quot;&quot; +  specials[i] + &quot;123&quot; +  specials[i];
+		tests.number.checkFormatParseCycle(t, {pattern:pattern,locale:&quot;en-us&quot;},123,expect,false);
+	}
+*/
+			}
+		},
+		{
+			name: &quot;number_regression_12&quot;,
+			runTest: function(t){
+/**
+ * TODO: add more rounding test cases, refer to ICU4J&#039;s NumberRegression.Test4071005(),Test4071014() etc..
+ */
+
+/**
+ * TODO:Decimal format doesnt round a double properly when the number is less than 1
+ *
+ * Refer to ICU4J&#039;s NumberRegression.test4241880()
+ */
+/*
+	var input = ([ .019, .009, .015, .016, .014,
+                	.004, .005, .006, .007, .008,
+                	.5, 1.5, .05, .15, .005,
+                	.015, .0005, .0015]);
+	var patterns = ([&quot;##0%&quot;, &quot;##0%&quot;, &quot;##0%&quot;, &quot;##0%&quot;, &quot;##0%&quot;,
+                	 &quot;##0%&quot;, &quot;##0%&quot;, &quot;##0%&quot;, &quot;##0%&quot;, &quot;##0%&quot;,
+                	 &quot;#,##0&quot;, &quot;#,##0&quot;, &quot;#,##0.0&quot;, &quot;#,##0.0&quot;, &quot;#,##0.00&quot;,
+                	 &quot;#,##0.00&quot;, &quot;#,##0.000&quot;, &quot;#,##0.000&quot;]);
+	var expect =([   &quot;2%&quot;, &quot;1%&quot;, &quot;2%&quot;, &quot;2%&quot;, &quot;1%&quot;,
+                	 &quot;0%&quot;, &quot;0%&quot;, &quot;1%&quot;, &quot;1%&quot;, &quot;1%&quot;,
+                	 &quot;0&quot;, &quot;2&quot;, &quot;0.0&quot;, &quot;0.2&quot;, &quot;0.00&quot;,
+                	 &quot;0.02&quot;, &quot;0.000&quot;, &quot;0.002&quot;]);
+	for(var i = 0; i &lt;input.length; i ++){
+		tests.number.checkFormatParseCycle(t, {pattern:patterns[i],round:true},input[i],expect[i],false);
+	}
+*/
+			}
+		}
+	]
+);
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>
