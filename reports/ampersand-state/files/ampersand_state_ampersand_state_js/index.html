@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">66.42</p>
+      <p class="stat">66.34</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">771</p>
+      <p class="stat">773</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">90.52</p>
+      <p class="stat">91.01</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">8.28</p>
+      <p class="stat">8.33</p>
     </div>
   </div>
 </div>
@@ -284,8 +284,8 @@ _.extend(Base.prototype, BBEvents, {
             hasChanged = !isEqual(currentVal, newVal, attr);
 
             // enforce `setOnce` for properties if set
-            if (def.setOnce &amp;&amp; currentVal !== undefined &amp;&amp; hasChanged) {
-                throw new TypeError(&#039;Property \&#039;&#039; + key + &#039;\&#039; can only be set once.&#039;);
+            if (def.setOnce &amp;&amp; currentVal !== undefined &amp;&amp; hasChanged &amp;&amp; !initial) {
+                throw new TypeError(&#039;Property \&#039;&#039; + attr + &#039;\&#039; can only be set once.&#039;);
             }
 
             // keep track of changed attributes
@@ -615,7 +615,7 @@ function createPropertyDefinition(object, name, desc, isSession) {
 
         def.allowNull = desc.allowNull ? desc.allowNull : false;
         if (desc.setOnce) def.setOnce = true;
-        if (def.required &amp;&amp; _.isUndefined(def.default)) def.default = object._getDefaultForType(type);
+        if (def.required &amp;&amp; _.isUndefined(def.default) &amp;&amp; !def.setOnce) def.default = object._getDefaultForType(type);
         def.test = desc.test;
         def.values = desc.values;
     }
@@ -636,7 +636,9 @@ function createPropertyDefinition(object, name, desc, isSession) {
                 }
                 return result;
             }
-            return _.result(def, &#039;default&#039;);
+            result = _.result(def, &#039;default&#039;);
+            this._values[name] = result;
+            return result;
         }
     });
 

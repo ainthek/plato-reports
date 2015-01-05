@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">64.02</p>
+      <p class="stat">64.31</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">259</p>
+      <p class="stat">272</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">42.93</p>
+      <p class="stat">45.75</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">2.72</p>
+      <p class="stat">2.95</p>
     </div>
   </div>
 </div>
@@ -107,6 +107,7 @@ var fs = require(&#039;fs-extra&#039;);
 
 // vendor
 var _ = require(&#039;lodash&#039;);
+var glob = require(&#039;glob&#039;);
 
 // local lib
 var util = require(&#039;./util&#039;),
@@ -126,7 +127,17 @@ var overviewTemplate = __dirname + &#039;/templates/overview.html&#039;,
 
 var log = new Logger(Logger.WARNING);
 
+function unary(fn) { return function(a){ return fn(a);}; }
+
 exports.inspect = function(files, outputDir, options, done) {
+
+	if (!files) {
+	  // at least give me a file man...
+	  return;
+	}
+
+  files = files instanceof Array ? files : [files];
+  files = _.flatten(files.map(unary(glob.sync)));
 
   var flags = {
     complexity : {
@@ -156,16 +167,16 @@ exports.inspect = function(files, outputDir, options, done) {
 
   var reports = [];
 
-  var fileOutputDir = outputDir ? path.join(outputDir,fileDir) : false;
+  var fileOutputDir = outputDir ? path.join(outputDir, fileDir) : false;
 
   var commonBasePath = util.findCommonBase(files);
 
-  var runReports = function(files,done) {
+  var runReports = function(files, done) {
     files.forEach(function(file) {
       if (options.exclude &amp;&amp; options.exclude.test(file)) return;
 
       if (options.recurse &amp;&amp; fs.statSync(file).isDirectory()) {
-        files = fs.readdirSync(file).map(function(innerFile){
+        files = fs.readdirSync(file).map(function(innerFile) {
           return path.join(file,innerFile);
         });
         runReports(files);
@@ -181,7 +192,7 @@ exports.inspect = function(files, outputDir, options, done) {
         }
 
         // if skip empty line option
-        if(options.noempty){
+        if(options.noempty) {
           source = source.replace(/^\s*[\r\n]/gm ,&quot;&quot;);
         }
 
@@ -199,11 +210,11 @@ exports.inspect = function(files, outputDir, options, done) {
         };
 
         var error = false;
-        _.each(reporters,function(reporter, name){
+        _.each(reporters,function(reporter, name) {
           if (!flags[name]) return;
           try {
             report[name] = reporter.process(source, flags[name], report.info);
-          } catch(e) {
+          } catch (e) {
             error = true;
             log.error(&#039;Error reading file %s: &#039;, file, e.toString());
             log.error(e.stack);
@@ -223,17 +234,17 @@ exports.inspect = function(files, outputDir, options, done) {
   };
 
   if (!fileOutputDir) {
-    runReports(files,function(){
+    runReports(files,function() {
       done(reports);
     });
   } else {
-    fs.mkdirp(fileOutputDir,function(){
-      runReports(files,function(){
+    fs.mkdirp(fileOutputDir,function() {
+      runReports(files,function() {
         var reportFilePrefix = path.join(outputDir, &#039;report&#039;);
         var overview = path.join(outputDir, &#039;index.html&#039;);
         var wallDisplay = path.join(outputDir, &#039;display.html&#039;);
 
-        fs.copy(assets, path.join(outputDir, &#039;assets&#039;), function(){
+        fs.copy(assets, path.join(outputDir, &#039;assets&#039;), function() {
           var overviewReport = exports.getOverviewReport(reports);
           updateHistoricalOverview(reportFilePrefix, overviewReport, options);
           writeReport(reportFilePrefix, overviewReport);
@@ -255,9 +266,9 @@ exports.inspect = function(files, outputDir, options, done) {
 // Filters out information unused in the overview for space/performance
 exports.getOverviewReport = function (reports) {
   var culledReports = [];
-
   var summary = {
     total : {
+      jshint: 0,
       sloc : 0,
       maintainability : 0,
     },
@@ -267,7 +278,7 @@ exports.getOverviewReport = function (reports) {
     }
   };
 
-  reports.forEach(function(report){
+  reports.forEach(function(report) {
     // clone objects so we don&#039;t have to worry about side effects
     summary.total.sloc += report.complexity.aggregate.complexity.sloc.physical;
     summary.total.maintainability += report.complexity.maintainability;
@@ -276,6 +287,7 @@ exports.getOverviewReport = function (reports) {
     var reportItem = {};
     reportItem.info = report.info;
     if (report.jshint) {
+      summary.total.jshint += report.jshint.messages.length;
       reportItem.jshint = {
         messages : report.jshint.messages.length
       };
@@ -292,6 +304,7 @@ exports.getOverviewReport = function (reports) {
   });
 
   summary.average.sloc = ~~(summary.total.sloc / reports.length);
+  summary.average.jshint = (summary.total.jshint / reports.length).toFixed(2);
   summary.average.maintainability = (summary.total.maintainability / reports.length).toFixed(2);
 
   return {

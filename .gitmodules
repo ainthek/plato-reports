@@ -34,3 +34,6 @@
 [submodule "src/JSON-js"]
 	path = src/JSON-js
 	url = https://github.com/douglascrockford/JSON-js
+[submodule "src/fixmyjs"]
+	path = src/fixmyjs
+	url = https://github.com/jshint/fixmyjs.git

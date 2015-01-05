@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">50.16</p>
+      <p class="stat">50.05</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">447</p>
+      <p class="stat">449</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">40.51</p>
+      <p class="stat">40.50</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">6.39</p>
+      <p class="stat">6.45</p>
     </div>
   </div>
 </div>
@@ -158,6 +158,8 @@
 	t.is(&quot;2006/08/11&quot;, locale.format(date, {formatLength:&#039;short&#039;,selector:&#039;date&#039;, locale:&#039;ja-jp&#039;}));
 
 	t.is(&quot;6&quot;, locale.format(date, {datePattern:&#039;E&#039;, selector:&#039;date&#039;}));
+
+	t.is(&quot;Fri, Aug 11, 2006 AD&quot;, locale.format(date, {selector: &#039;date&#039;, datePattern: &#039;EEE, MMM d, yyyy G&#039;, locale:&#039;en-us&#039; }));				
 
 	t.is(&quot;12:55 AM&quot;, locale.format(date, {formatLength:&#039;short&#039;,selector:&#039;time&#039;, locale:&#039;en-us&#039;}));
 	t.is(&quot;12:55:12&quot;, locale.format(date, {timePattern:&#039;h:m:s&#039;,selector:&#039;time&#039;}));

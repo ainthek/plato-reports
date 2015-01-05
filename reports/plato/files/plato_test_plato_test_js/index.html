@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">77.58</p>
+      <p class="stat">76.89</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">106</p>
+      <p class="stat">118</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">20.42</p>
+      <p class="stat">24.04</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">0.67</p>
+      <p class="stat">0.82</p>
     </div>
   </div>
 </div>
@@ -127,8 +127,18 @@ exports[&#039;plato&#039;] = {
       &#039;test/fixtures/empty.js&#039;
     ];
 
-    plato.inspect(files, null, {}, function(reports){
+    plato.inspect(files, null, {}, function(reports) {
       test.equal(reports.length, 2, &#039;Should not attempt to report on empty files&#039;);
+      test.done();
+    });
+  },
+  &#039;test file glob&#039; : function(test) {
+    test.expect(1);
+    
+    var files = &#039;./test/fixtures/*.js&#039;;
+    
+    plato.inspect(files, null, {}, function(reports) {
+      test.equal(reports.length, 5, &#039;Should properly test against the array produced by the glob&#039;);
       test.done();
     });
   },
@@ -140,8 +150,8 @@ exports[&#039;plato&#039;] = {
       &#039;test/fixtures/b.js&#039;
     ];
 
-    plato.inspect(files, null, {}, function(reports){
-      reports.forEach(function(report){
+    plato.inspect(files, null, {}, function(reports) {
+      reports.forEach(function(report) {
         test.ok(report.complexity, &#039;Should contain a complexity report&#039;);
         test.ok(report.jshint, &#039;Should contain a jshint report&#039;);
       });
@@ -155,12 +165,14 @@ exports[&#039;plato&#039;] = {
       &#039;test/fixtures/b.js&#039;
     ];
 
-    test.expect((files.length * 2) + 1);
+    test.expect((files.length * 3) + 1);
 
-    plato.inspect(files, null, {}, function(reports){
+    plato.inspect(files, null, {}, function(reports) {
       var overview = plato.getOverviewReport(reports);
+      test.ok(overview.summary.total.jshint &gt;= 0, &#039;Should contain total jshint issues&#039;);
       test.ok(overview.summary.total.sloc &gt; 0, &#039;Should contain total sloc&#039;);
       test.ok(overview.summary.total.maintainability &gt; 0, &#039;Should contain total maintainability&#039;);
+      test.ok(overview.summary.average.jshint &gt;= 0, &#039;Should contain average jshint issues&#039;);
       test.ok(overview.summary.average.sloc &gt; 0, &#039;Should contain average sloc&#039;);
       test.ok(overview.summary.average.maintainability &gt; 0, &#039;Should contain average maintainability&#039;);
       test.equal(overview.reports.length, files.length,&#039;Should contain right number of reports&#039;);
@@ -176,7 +188,7 @@ exports[&#039;plato&#039;] = {
       &#039;test/fixtures/shebang.js&#039;
     ];
 
-    plato.inspect(files, null, {}, function(reports){
+    plato.inspect(files, null, {}, function(reports) {
       test.equal(reports.length, 3, &#039;Should report on files starting with a shebang&#039;);
       test.done();
     });
@@ -188,7 +200,7 @@ exports[&#039;plato&#039;] = {
       &#039;test/fixtures/multipleEmptyLines.js&#039;
     ];
 
-    plato.inspect(files, null, {noempty : true}, function(reports){
+    plato.inspect(files, null, {noempty : true}, function(reports) {
       var overview = plato.getOverviewReport(reports);
       test.ok(overview.summary.total.sloc === 10, &#039;Should contain total sloc without empty lines counted&#039;);
       test.done();
