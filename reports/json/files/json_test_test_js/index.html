@@ -44,7 +44,7 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">54.62</p>
+      <p class="stat">54.49</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">51.87</p>
+      <p class="stat">52.45</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">1.84</p>
+      <p class="stat">1.83</p>
     </div>
   </div>
 </div>
@@ -201,9 +201,9 @@ for (var i = 0; i &lt; names.length; ++i) {
             return function (test) {
                 var numTests = 0;
 
-                var expectedExitCode = null;
+                var p, expectedExitCode = null;
                 try {
-                    var p = path.join(dir, &#039;expected.exitCode&#039;);
+                    p = path.join(dir, &#039;expected.exitCode&#039;);
                     if (fs.statSync(p)) {
                         expectedExitCode = Number(fs.readFileSync(p));
                         numTests += 1;
@@ -212,7 +212,7 @@ for (var i = 0; i &lt; names.length; ++i) {
 
                 var expectedStdout = null;
                 try {
-                    var p = path.join(dir, &#039;expected.stdout&#039;);
+                    p = path.join(dir, &#039;expected.stdout&#039;);
                     if (fs.statSync(p)) {
                         expectedStdout = fs.readFileSync(p, &#039;utf8&#039;);
                         numTests += 1;
@@ -221,7 +221,7 @@ for (var i = 0; i &lt; names.length; ++i) {
 
                 var expectedStderr = null;
                 try {
-                    var p = path.join(dir, &#039;expected.stderr&#039;);
+                    p = path.join(dir, &#039;expected.stderr&#039;);
                     if (fs.statSync(p)) {
                         expectedStderr = fs.readFileSync(p, &#039;utf8&#039;);
                         numTests += 1;
@@ -262,12 +262,12 @@ for (var i = 0; i &lt; names.length; ++i) {
                     }
                     test.done();
                 });
-            }
+            };
         })(dir);
     }
 }
 
-exports[&#039;test&#039;] = testCase(data);</textarea>
+exports.test = testCase(data);</textarea>
   </div>
 </div>
 

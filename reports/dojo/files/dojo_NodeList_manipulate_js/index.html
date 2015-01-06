@@ -48,7 +48,7 @@
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">761</p>
+      <p class="stat">759</p>
     </div>
   </div>
   <div class="row historical">
@@ -240,30 +240,28 @@
 
 		text: function(/*String*/value){
 			// summary:
-			//		allows setting the text value of each node in the NodeList,
-			//		if there is a value passed in, otherwise, returns the text value for all the
+			//		Allows setting the text value of each node in the NodeList,
+			//		if there is a value passed in.  Otherwise, returns the text value for all the
 			//		nodes in the NodeList in one string.
 			// example:
-			//		assume a DOM created by this markup:
+			//		Assume a DOM created by this markup:
 			//	|	&lt;div id=&quot;foo&quot;&gt;&lt;/div&gt;
 			//	|	&lt;div id=&quot;bar&quot;&gt;&lt;/div&gt;
 			//		This code inserts &quot;Hello World&quot; into both divs:
-			//	|	require([&quot;dojo/query&quot;, &quot;dojo/NodeList-manipulate&quot;
-			//	|	], function(query){
+			//	|	require([&quot;dojo/query&quot;, &quot;dojo/NodeList-manipulate&quot;], function(query){
 			//	|		query(&quot;div&quot;).text(&quot;Hello World&quot;);
 			//	| 	});
 			// example:
-			//		assume a DOM created by this markup:
+			//		Assume a DOM created by this markup:
 			//	|	&lt;div id=&quot;foo&quot;&gt;&lt;p&gt;Hello Mars &lt;span&gt;today&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;
 			//	|	&lt;div id=&quot;bar&quot;&gt;&lt;p&gt;Hello World&lt;/p&gt;&lt;/div&gt;
-			//		This code returns &quot;Hello Mars today&quot;:
-			//	|	require([&quot;dojo/query&quot;, &quot;dojo/NodeList-manipulate&quot;
-			//	|	], function(query){
-			//	|		var message = query(&quot;div&quot;).text();
+			//		This code writes &quot;Hello Mars todayHello World&quot; to the console:
+			//	|	require([&quot;dojo/query&quot;, &quot;dojo/NodeList-manipulate&quot;], function(query){
+			//	|		console.log(query(&quot;div&quot;).text());
 			//	| 	});
 			// returns:
-			//		if no value is passed, the result is String, the text value of the first node.
-			//		If a value is passed, the return is this dojo/NodeList
+			//		If no value is passed, the result is String: the text value of the nodes.
+			//		If a value is passed, the return is this dojo/NodeList.
 			if(arguments.length){
 				for(var i = 0, node; node = this[i]; i++){
 					if(node.nodeType == 1){
@@ -282,7 +280,7 @@
 
 		val: function(/*String||Array*/value){
 			// summary:
-			//		If a value is passed, allows seting the value property of form elements in this
+			//		If a value is passed, allows setting the value property of form elements in this
 			//		NodeList, or properly selecting/checking the right value for radio/checkbox/select
 			//		elements. If no value is passed, the value of the first node in this NodeList
 			//		is returned.

@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">66.74</p>
+      <p class="stat">66.89</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">1495</p>
+      <p class="stat">1583</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">79.53</p>
+      <p class="stat">78.96</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">17.42</p>
+      <p class="stat">18.34</p>
     </div>
   </div>
 </div>
@@ -776,25 +776,41 @@ test(&#039;Values attribute basic functionality&#039;, function (t) {
     t.end();
 });
 
-test(&#039;Values attribute default works&#039;, function (t) {
+test(&#039;Values attribute default works and is called only once&#039;, function (t) {
+    var ran = 0;
     var Model = State.extend({
+        dataTypes: {
+            countryType: {
+                default: &#039;Atlantis&#039;
+            }
+        },
         props: {
+            country: {
+                type: &#039;countryType&#039;,
+                required: true
+            },
             state: {
                 values: [&#039;CA&#039;, &#039;WA&#039;, &#039;NV&#039;],
-                default: &#039;CA&#039;
+                default: function(){
+                    ran++;
+                    return &#039;CA&#039;;
+                }
             }
         }
     });
 
     var m = new Model();
-
     t.equal(m.state, &#039;CA&#039;, &#039;Should have applied the default&#039;);
-
+    t.equal(ran, 1, &#039;Should have been invoked only once&#039;);
+    t.equal(m.state, &#039;CA&#039;, &#039;Should have returned the same object&#039;);
+    t.equal(ran, 1, &#039;Should have been invoked only once&#039;);
+    t.equal(m.country, &#039;Atlantis&#039;);
     t.throws(function () {
         m.state = &#039;PR&#039;;
     }, TypeError, &#039;Throws exception when setting something not in list&#039;);
     t.end();
 });
+
 
 test(&#039;toggle() works on boolean and values properties.&#039;, function (t) {
     var Model = State.extend({
@@ -1582,6 +1598,78 @@ test(&#039;#68, #110 mixin props should not be deleted&#039;, function (t) {
 
     t.ok(widget.selected);
     t.ok(sprocket.selected);
+    t.end();
+});
+
+test(&#039;#114 setOnce allows values to be set once and only once&#039;, function (t) {
+    var Model = State.extend({
+        props: {
+            x: {
+                type: &#039;string&#039;,
+                setOnce: true,
+                required: true,
+            }
+        }
+    });
+
+    var model = new Model({ x: &#039;foo&#039; });
+
+    t.equal(model.x, &#039;foo&#039;);
+
+    t.throws(function () {
+        model.x = &#039;bar&#039;;
+    }, /can only be set once/);
+
+    t.end();
+});
+
+test(&#039;#118 setOnce can be used with default string&#039;, function (t) {
+    var TimeRange = State.extend({
+        props: {
+            timezone: {
+                type: &#039;string&#039;,
+                default: &#039;something that can only be set as the default&#039;,
+                setOnce: true
+            }
+        }
+    });
+
+    var tr = new TimeRange();
+
+    t.throws(function () {
+        tr.timezone = &#039;new thing&#039;;
+    }, &#039;since it has a default, this should throw&#039;); 
+    
+
+    var tr2;
+
+    t.doesNotThrow(function () {
+        tr2 = new TimeRange({timezone: &#039;my thing&#039;});
+    }, &#039;if we set on init, should overwrite default&#039;);
+    
+    t.throws(function () {
+        tr.timezone = &#039;new thing&#039;;  
+    }, &#039;should now fail since its been set&#039;); 
+    
+    var OtherTimeRange = State.extend({
+        props: {
+            timezone: {
+                type: &#039;string&#039;,
+                setOnce: true
+            }
+        }
+    });
+
+    tr = new OtherTimeRange();
+
+    t.doesNotThrow(function () {
+        tr.timezone = &#039;thing&#039;;
+    }, &#039;should not throw first time&#039;); 
+
+    t.throws(function () {
+        tr.timezone = &#039;other thing&#039;;
+    }, &#039;throws second time&#039;);
+
     t.end();
 });</textarea>
   </div>

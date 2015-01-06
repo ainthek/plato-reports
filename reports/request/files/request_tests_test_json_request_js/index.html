@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">79.22</p>
+      <p class="stat">77.68</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">54</p>
+      <p class="stat">79</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">9.78</p>
+      <p class="stat">15.30</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">0.46</p>
+      <p class="stat">0.71</p>
     </div>
   </div>
 </div>
@@ -123,6 +123,26 @@ function testJSONValue(testId, value) {
   })
 }
 
+function testJSONValueReviver(testId, value, reviver, revivedValue) {
+  tape(&#039;test &#039; + testId, function(t) {
+    var testUrl = &#039;/&#039; + testId
+    s.on(testUrl, server.createPostJSONValidator(value, &#039;application/json&#039;))
+    var opts = {
+      method: &#039;PUT&#039;,
+      uri: s.url + testUrl,
+      json: true,
+      jsonReviver: reviver,
+      body: value
+    }
+    request(opts, function (err, resp, body) {
+      t.equal(err, null)
+      t.equal(resp.statusCode, 200)
+      t.deepEqual(body, revivedValue)
+      t.end()
+    })
+  })
+}
+
 testJSONValue(&#039;jsonNull&#039;, null)
 testJSONValue(&#039;jsonTrue&#039;, true)
 testJSONValue(&#039;jsonFalse&#039;, false)
@@ -138,6 +158,11 @@ testJSONValue(&#039;jsonObject&#039;, {
   arrayProperty: [&#039;array&#039;],
   objectProperty: { object: &#039;property&#039; }
 })
+
+testJSONValueReviver(&#039;jsonReviver&#039;, -48269.592, function (k, v) {
+  return v * -1
+}, 48269.592)
+testJSONValueReviver(&#039;jsonReviverInvalid&#039;, -48269.592, &#039;invalid reviver&#039;, -48269.592)
 
 tape(&#039;cleanup&#039;, function(t) {
   s.close()

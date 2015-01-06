@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">80.03</p>
+      <p class="stat">80.05</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">3172</p>
+      <p class="stat">3170</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">246.35</p>
+      <p class="stat">240.28</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">40.17</p>
+      <p class="stat">40.11</p>
     </div>
   </div>
 </div>
@@ -1973,15 +1973,13 @@ exports[&#039;noConflict - node only&#039;] = function(test){
         // node only test
         test.expect(3);
         var fs = require(&#039;fs&#039;);
+        var vm = require(&#039;vm&#039;);
         var filename = __dirname + &#039;/../lib/async.js&#039;;
         fs.readFile(filename, function(err, content){
             if(err) return test.done();
 
-            // Script -&gt; NodeScript in node v0.6.x
-            var Script = process.binding(&#039;evals&#039;).Script || process.binding(&#039;evals&#039;).NodeScript;
-
-            var s = new Script(content, filename);
-            var s2 = new Script(
+            var s = vm.createScript(content, filename);
+            var s2 = vm.createScript(
                 content + &#039;this.async2 = this.async.noConflict();&#039;,
                 filename
             );

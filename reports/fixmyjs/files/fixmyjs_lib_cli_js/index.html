@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - fixmyjs/lib/cli.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>fixmyjs/lib/cli.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">71.41</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">220</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">32.69</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.23</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">var commander = require(&#039;commander&#039;)
+var diff = require(&#039;diff&#039;)
+var fixmyjs = require(&#039;../&#039;)
+var fs = require(&#039;fs&#039;)
+var fu = require(&#039;fu&#039;)
+var jshint = require(&#039;jshint&#039;).JSHINT
+var minimatch = require(&#039;minimatch&#039;)
+var path = require(&#039;path&#039;)
+
+function removeJsComments(str) {
+  return (str || &#039;&#039;)
+    .replace(/\/\*[\s\S]*(?:\*\/)/g, &#039;&#039;) //everything between &#039;/* */&#039;
+    .replace(/\/\/[^\n\r]*/g, &#039;&#039;) //everything after &#039;//&#039;
+}
+
+function loadAndParseConfig(filePath) {
+  if (typeof filePath === &#039;object&#039;) {
+    return filePath
+  }
+
+  try {
+    return fs.existsSync(filePath)
+      ? JSON.parse(removeJsComments(fs.readFileSync(filePath, &#039;utf-8&#039;)))
+      : {}
+  } catch (ex) {
+    console.error(&#039;Error opening config file &#039; + filePath)
+    console.error(ex)
+    process.exit(1)
+  }
+}
+
+function mergeConfig(a, b) {
+  var config = fu.merge({}, a)
+  Object.keys(b).forEach(function (key) {
+    if (key == &#039;predef&#039;) {
+      config.predef = fu.concat(config.predef || [], b.predef)
+    } else {
+      config[key] = b[key]
+    }
+  })
+  return config
+}
+
+function getConfigAtPath(fullpath) {
+  return loadAndParseConfig(fullpath)
+}
+
+function getConfig(dir) {
+  return loadAndParseConfig(path.join(dir, &#039;.jshintrc&#039;))
+}
+
+function getIgnore(dir) {
+  var PATH_TO_IGNORE = path.join(dir, &#039;.jshintignore&#039;)
+  var ignoreRules = fs.existsSync(PATH_TO_IGNORE)
+    ? fu.compact(fs.readFileSync(PATH_TO_IGNORE, &#039;utf-8&#039;).split(&#039;\n&#039;))
+    : []
+
+  return fu.map(function (ignoreRule) {
+    return path.join(dir, ignoreRule)
+  }, ignoreRules)
+}
+
+function printDiff(a, b) {
+  if (a == b) {
+    return
+  }
+
+  var DARK = &#039;\x1b[90m&#039;
+  var GREEN = &#039;\x1b[32m&#039;
+  var RED = &#039;\x1b[31m&#039;
+  var RESET = &#039;\x1b[39m&#039;
+
+  var df = diff.diffLines(a, b)
+  var content = fu.map(function (n) {
+    var line = df[n]
+    if (line.removed) {
+      return RED + line.value
+    } else if (line.added) {
+      return GREEN + line.value
+    } else {
+      return DARK + line.value
+    }
+  }, Object.keys(df))
+  console.log(content.join(RESET + &#039;\n&#039;), RESET)
+}
+
+function createPatch(fileName, a, b) {
+  console.log(diff.createPatch(fileName, a, b, &#039;&#039;, &#039;&#039;))
+}
+
+function isDir(fullpath) {
+  try {
+    return fs.statSync(fullpath).isDirectory()
+  } catch (ex) {
+    if (ex.code == &#039;ENOENT&#039;) {
+      console.error(String(ex))
+    }
+    return null
+  }
+}
+
+function shouldIgnorePath(fullpath, ignore) {
+  return fu.any(function (ignoreRule) {
+    var fnmatch = minimatch(fullpath, ignoreRule, { nocase: true })
+    var lsmatch = Boolean(
+      isDir(ignoreRule) &amp;&amp;
+      ignoreRule.match(/^[^\/]*\/?$/) &amp;&amp;
+      fullpath.match(new RegExp(&#039;^&#039; + ignoreRule + &#039;.*&#039;))
+    )
+    return !!(fnmatch || lsmatch)
+  }, ignore)
+}
+
+function shouldLintFile(fileName, ignore) {
+  return (/\.js$/).test(fileName) &amp;&amp; !shouldIgnorePath(fileName, ignore)
+}
+
+function genFixForFile(file, config) {
+  return function () {
+    var content = fs.readFileSync(file).toString()
+    var fixed = &#039;&#039;
+
+    var fmjOptions = commander.indentPref
+      ? fu.merge(config, { indentpref: commander.indentPref })
+      : config
+
+    try {
+      if (commander.legacy) {
+        jshint(content, config)
+        fixed = fixmyjs(jshint.data(), content, fmjOptions).run()
+      } else {
+        fixed = fixmyjs.fix(content, fmjOptions)
+      }
+    } catch (ex) {
+      ex.stack = &#039;File: &#039; + file + &#039;\n&#039; + ex.stack
+      throw ex
+    }
+
+    if (commander.silent) {
+      return true
+    } else if (commander.dryRun || commander.diff) {
+      printDiff(content, fixed)
+    } else if (commander.patch) {
+      createPatch(file, content, fixed)
+    } else {
+      fs.writeFileSync(file, fixed, &#039;utf8&#039;)
+    }
+
+    console.log(&#039;\u2713 &#039; + path.basename(file) + &#039; done.&#039;)
+
+    return content === fixed
+  }
+}
+
+function traverseFiles(_, fileName) {
+  var fullpath = path.resolve(fileName)
+
+  switch (isDir(fullpath)) {
+    case true:
+      if (shouldIgnorePath(fullpath, _.ignore)) {
+        return []
+      }
+      var ignore = fu.concat(_.ignore, getIgnore(fullpath))
+      var config = mergeConfig(_.config, getConfig(fullpath))
+      return fu.concatMap(function (x) {
+        return traverseFiles({
+          ignore: ignore,
+          config: config
+        }, path.join(fileName, x))
+      }, fs.readdirSync(fullpath))
+    case false:
+      return shouldLintFile(fullpath, _.ignore)
+        ? [genFixForFile(fullpath, _.config)]
+        : []
+    case null:
+      return [fu.apply(function () { return false })]
+  }
+}
+
+function getUserHome() {
+  return process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE
+}
+
+function cli() {
+  var SUCCESS = 0
+  var ERROR = 1
+
+  var findFiles = fu.curry(traverseFiles, {
+    ignore: [],
+    config: mergeConfig(
+      getConfig(getUserHome()),
+      commander.config
+        ? getConfigAtPath(commander.config)
+        : {}
+    )
+  })
+  var filesToLint = fu.concatMap(findFiles, commander.args)
+
+  process.exit(fu.foldl(function (statusCode, fn) {
+    return fn()
+      ? statusCode == ERROR ? ERROR : SUCCESS
+      : ERROR
+  }, filesToLint, SUCCESS))
+}
+
+commander
+  .option(&#039;-c, --config [.jshintrc]&#039;, &#039;Load your own config file&#039;)
+  .option(&#039;-d, --diff&#039;, &#039;Similar to dry-run&#039;)
+  .option(&#039;-l, --legacy&#039;, &#039;Use legacy fixmyjs&#039;)
+  .option(&#039;-n, --indent-pref [tabs|spaces]&#039;, &#039;Your indentation preference&#039;)
+  .option(&#039;-p, --patch&#039;, &#039;Output a patch file to stdout&#039;)
+  .option(&#039;-r, --dry-run&#039;, &#039;Performs a dry-run and shows you a diff&#039;)
+  .option(&#039;-s, --silent&#039;, &#039;A useless option&#039;)
+  .parse(process.argv)
+
+if (commander.args.length === 0) {
+  commander.emit(&#039;help&#039;)
+} else {
+  cli()
+}</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

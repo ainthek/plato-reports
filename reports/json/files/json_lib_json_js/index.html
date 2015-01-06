@@ -48,7 +48,7 @@
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">1665</p>
+      <p class="stat">1666</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,7 +62,7 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">121.91</p>
+      <p class="stat">121.95</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
@@ -136,7 +136,7 @@ var OM_FROM_NAME = {
     &#039;json&#039;: OM_JSON,
     &#039;inspect&#039;: OM_INSPECT,
     &#039;compact&#039;: OM_COMPACT
-}
+};
 
 
 
@@ -173,14 +173,15 @@ if (util.format) {
     var formatRegExp = /%[sdj%]/g;
 
     function format(f) {
+        var i;
         if (typeof (f) !== &#039;string&#039;) {
             var objects = [];
-            for (var i = 0; i &lt; arguments.length; i++) {
+            for (i = 0; i &lt; arguments.length; i++) {
                 objects.push(util.inspect(arguments[i]));
             }
             return objects.join(&#039; &#039;);
         }
-        var i = 1;
+        i = 1;
         var args = arguments;
         var len = args.length;
         var str = String(f).replace(formatRegExp, function (x) {
@@ -207,7 +208,7 @@ if (util.format) {
             }
         }
         return str;
-    };
+    }
 }
 
 /**

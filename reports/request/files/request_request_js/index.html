@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">55.28</p>
+      <p class="stat">55.52</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">1766</p>
+      <p class="stat">1825</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">125.55</p>
+      <p class="stat">125.12</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">21.90</p>
+      <p class="stat">22.80</p>
     </div>
   </div>
 </div>
@@ -117,6 +117,7 @@ var http = require(&#039;http&#039;)
   , debug = require(&#039;./lib/debug&#039;)
   , net = require(&#039;net&#039;)
   , CombinedStream = require(&#039;combined-stream&#039;)
+  , isstream = require(&#039;isstream&#039;)
 
 var safeStringify = helpers.safeStringify
   , md5 = helpers.md5
@@ -342,6 +343,13 @@ function responseToJSON() {
     headers: self.headers,
     request: requestToJSON.call(self.request)
   }
+}
+
+// encode rfc3986 characters
+function rfc3986 (str) {
+  return str.replace(/[!&#039;()*]/g, function(c) {
+    return &#039;%&#039; + c.charCodeAt(0).toString(16).toUpperCase()
+  })
 }
 
 function Request (options) {
@@ -1399,12 +1407,12 @@ Request.prototype.onRequestResponse = function (response) {
 
         if (self._json) {
           try {
-            response.body = JSON.parse(response.body)
+            response.body = JSON.parse(response.body, self._jsonReviver)
           } catch (e) {}
         }
         debug(&#039;emitting complete&#039;, self.uri.href)
         if(typeof response.body === &#039;undefined&#039; &amp;&amp; !self._json) {
-          response.body = &#039;&#039;
+          response.body = self.encoding === null ? new Buffer(0) : &#039;&#039;
         }
         self.emit(&#039;complete&#039;, response, response.body)
       })
@@ -1493,7 +1501,9 @@ Request.prototype.qs = function (q, clobber) {
     return self
   }
 
-  self.uri = url.parse(self.uri.href.split(&#039;?&#039;)[0] + &#039;?&#039; + self.qsLib.stringify(base))
+  var qs = self.qsLib.stringify(base)
+
+  self.uri = url.parse(self.uri.href.split(&#039;?&#039;)[0] + &#039;?&#039; + rfc3986(qs))
   self.url = self.uri
   self.path = self.uri.path
 
@@ -1504,6 +1514,7 @@ Request.prototype.form = function (form) {
   if (form) {
     self.setHeader(&#039;content-type&#039;, &#039;application/x-www-form-urlencoded&#039;)
     self.body = (typeof form === &#039;string&#039;) ? form.toString(&#039;utf8&#039;) : self.qsLib.stringify(form).toString(&#039;utf8&#039;)
+    self.body = rfc3986(self.body)
     return self
   }
   // create form-data object
@@ -1513,15 +1524,31 @@ Request.prototype.form = function (form) {
 Request.prototype.multipart = function (multipart) {
   var self = this
 
-  var chunked = (multipart instanceof Array) || (multipart.chunked === undefined) || multipart.chunked
-  multipart = multipart.data || multipart
+  var chunked = false
+  var _multipart = multipart.data || multipart
 
-  var items = chunked ? new CombinedStream() : []
-  function add (part) {
-    return chunked ? items.append(part) : items.push(new Buffer(part))
+  if (!_multipart.forEach) {
+    throw new Error(&#039;Argument error, options.multipart.&#039;)
   }
 
-  if (chunked) {
+  if (self.getHeader(&#039;transfer-encoding&#039;) === &#039;chunked&#039;) {
+    chunked = true
+  }
+  if (multipart.chunked !== undefined) {
+    chunked = multipart.chunked
+  }
+  if (!chunked) {
+    _multipart.forEach(function (part) {
+      if(typeof part.body === &#039;undefined&#039;) {
+        throw new Error(&#039;Body attribute missing in multipart.&#039;)
+      }
+      if (isstream(part.body)) {
+        chunked = true
+      }
+    })
+  }
+
+  if (chunked &amp;&amp; !self.hasHeader(&#039;transfer-encoding&#039;)) {
     self.setHeader(&#039;transfer-encoding&#039;, &#039;chunked&#039;)
   }
 
@@ -1532,19 +1559,17 @@ Request.prototype.multipart = function (multipart) {
     self.setHeader(headerName, self.headers[headerName].split(&#039;;&#039;)[0] + &#039;; boundary=&#039; + self.boundary)
   }
 
-  if (!multipart.forEach) {
-    throw new Error(&#039;Argument error, options.multipart.&#039;)
+  var parts = chunked ? new CombinedStream() : []
+  function add (part) {
+    return chunked ? parts.append(part) : parts.push(new Buffer(part))
   }
 
   if (self.preambleCRLF) {
     add(&#039;\r\n&#039;)
   }
 
-  multipart.forEach(function (part) {
+  _multipart.forEach(function (part) {
     var body = part.body
-    if(typeof body === &#039;undefined&#039;) {
-      throw new Error(&#039;Body attribute missing in multipart.&#039;)
-    }
     var preamble = &#039;--&#039; + self.boundary + &#039;\r\n&#039;
     Object.keys(part).forEach(function (key) {
       if (key === &#039;body&#039;) { return }
@@ -1561,7 +1586,7 @@ Request.prototype.multipart = function (multipart) {
     add(&#039;\r\n&#039;)
   }
 
-  self[chunked ? &#039;_multipart&#039; : &#039;body&#039;] = items
+  self[chunked ? &#039;_multipart&#039; : &#039;body&#039;] = parts
   return self
 }
 Request.prototype.json = function (val) {
@@ -1574,16 +1599,24 @@ Request.prototype.json = function (val) {
   self._json = true
   if (typeof val === &#039;boolean&#039;) {
     if (self.body !== undefined) {
-      self.body = safeStringify(self.body)
+      if (!/^application\/x-www-form-urlencoded\b/.test(self.getHeader(&#039;content-type&#039;))) {
+        self.body = safeStringify(self.body)
+      }
+      self.body = rfc3986(self.body)
       if (!self.hasHeader(&#039;content-type&#039;)) {
         self.setHeader(&#039;content-type&#039;, &#039;application/json&#039;)
       }
     }
   } else {
     self.body = safeStringify(val)
+    self.body = rfc3986(self.body)
     if (!self.hasHeader(&#039;content-type&#039;)) {
       self.setHeader(&#039;content-type&#039;, &#039;application/json&#039;)
     }
+  }
+
+  if (typeof self.jsonReviver === &#039;function&#039;) {
+    self._jsonReviver = self.jsonReviver
   }
 
   return self
@@ -1693,16 +1726,26 @@ Request.prototype.hawk = function (opts) {
 
 Request.prototype.oauth = function (_oauth) {
   var self = this
-  var form, query
+  var form, query, contentType = &#039;&#039;, formContentType = &#039;application/x-www-form-urlencoded&#039;
+
   if (self.hasHeader(&#039;content-type&#039;) &amp;&amp;
-      self.getHeader(&#039;content-type&#039;).slice(0, &#039;application/x-www-form-urlencoded&#039;.length) ===
-        &#039;application/x-www-form-urlencoded&#039;
-     ) {
+      self.getHeader(&#039;content-type&#039;).slice(0, formContentType.length) === formContentType) {
+    contentType = formContentType
     form = self.body
   }
   if (self.uri.query) {
     query = self.uri.query
   }
+
+  var transport = _oauth.transport_method || &#039;header&#039;
+  if (transport === &#039;body&#039; &amp;&amp; (
+      self.method !== &#039;POST&#039; || contentType !== formContentType)) {
+
+    throw new Error(&#039;oauth.transport_method of \&#039;body\&#039; requires \&#039;POST\&#039; &#039; +
+      &#039;and content-type \&#039;&#039; + formContentType + &#039;\&#039;&#039;)
+  }
+
+  delete _oauth.transport_method
 
   var oa = {}
   for (var i in _oauth) {
@@ -1741,11 +1784,27 @@ Request.prototype.oauth = function (_oauth) {
     consumer_secret_or_private_key,
     token_secret)
 
-  var realm = _oauth.realm ? &#039;realm=&quot;&#039; + _oauth.realm + &#039;&quot;,&#039; : &#039;&#039;
-  var authHeader = &#039;OAuth &#039; + realm +
-    Object.keys(oa).sort().map(function (i) {return i + &#039;=&quot;&#039; + oauth.rfc3986(oa[i]) + &#039;&quot;&#039;}).join(&#039;,&#039;)
-  authHeader += &#039;,oauth_signature=&quot;&#039; + oauth.rfc3986(signature) + &#039;&quot;&#039;
-  self.setHeader(&#039;Authorization&#039;, authHeader)
+  var buildSortedParams = function (sep, wrap) {
+    wrap = wrap || &#039;&#039;
+    return Object.keys(oa).sort().map(function (i) {
+      return i + &#039;=&#039; + wrap + oauth.rfc3986(oa[i]) + wrap
+    }).join(sep) + sep + &#039;oauth_signature=&#039; + wrap + oauth.rfc3986(signature) + wrap
+  }
+
+  if (transport === &#039;header&#039;) {
+    var realm = _oauth.realm ? &#039;realm=&quot;&#039; + _oauth.realm + &#039;&quot;,&#039; : &#039;&#039;
+    self.setHeader(&#039;Authorization&#039;, &#039;OAuth &#039; + realm + buildSortedParams(&#039;,&#039;, &#039;&quot;&#039;))
+  }
+  else if (transport === &#039;query&#039;) {
+    self.path += (query ? &#039;&amp;&#039; : &#039;?&#039;) + buildSortedParams(&#039;&amp;&#039;)
+  }
+  else if (transport === &#039;body&#039;) {
+    self.body = (form ? form + &#039;&amp;&#039; : &#039;&#039;) + buildSortedParams(&#039;&amp;&#039;)
+  }
+  else {
+    throw new Error(&#039;oauth.transport_method invalid&#039;)
+  }
+
   return self
 }
 Request.prototype.jar = function (jar) {

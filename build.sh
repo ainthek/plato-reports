@@ -11,6 +11,7 @@ build_reports(){
 	plato -r -d $R/JSON-js 				JSON-js
 	# this one is TS not compilable on OSX with latest tsc
 	#plato -r -d $R/dojo2 -l  sitepen-jshintrc/.jshintrc 	dojo2-core
+	plato -r -d $R/fixmyjs 				 fixmyjs
 	plato -r -d $R/plato 				-x plato/node_modules/ plato
 	plato -r -d $R/async 				-x async/node_modules/ async
 	plato -r -d $R/request 				-x request/node_modules/ request
@@ -19,6 +20,7 @@ build_reports(){
 	plato -r -d $R/ampersand 			-x ampersand/node_modules/ ampersand
 	plato -r -d $R/ampersand-state 		-x ampersand-state/node_modules/ ampersand-state
 	plato -r -d $R/ampersand-view 		-x ampersand-view/node_modules/ ampersand-view
+
 	plato -r -d $R/JSONStream 			-x JSONStream/node_modules/ node_modules/JSONStream
 	plato -r -d $R/asn1 				-x asn1/node_modules/ node_modules/asn1
 	plato -r -d $R/backbone 			-x backbone/node_modules/ node_modules/backbone

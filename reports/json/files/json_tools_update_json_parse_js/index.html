@@ -106,7 +106,7 @@ var execFile = require(&#039;child_process&#039;).execFile;
 
 var startSep = &quot;// START json_parse\n&quot;;
 var endSep = &quot;// END json_parse\n&quot;;
-var jsonJs = path.resolve(__dirname, &quot;..&quot;, &quot;lib&quot;, &quot;json.js&quot;)
+var jsonJs = path.resolve(__dirname, &quot;..&quot;, &quot;lib&quot;, &quot;json.js&quot;);
 var content = fs.readFileSync(jsonJs, &#039;utf8&#039;);
 
 var startIdx = content.indexOf(startSep);
@@ -128,10 +128,10 @@ execFile(process.execPath, [uglifyjs, &quot;-nc&quot;, jsonParseJs],
     ];
     var newContent = bits.join(&#039;&#039;);
     if (newContent === content) {
-      log(&#039;&quot;&#039;+jsonJs+&#039;&quot; not changed.&#039;)
+      log(&#039;&quot;&#039;+jsonJs+&#039;&quot; not changed.&#039;);
     } else {
       fs.writeFileSync(jsonJs, newContent, &#039;utf8&#039;);
-      log(&#039;&quot;&#039;+jsonJs+&#039;&quot; updated.&#039;)
+      log(&#039;&quot;&#039;+jsonJs+&#039;&quot; updated.&#039;);
     }
   }
 );</textarea>
