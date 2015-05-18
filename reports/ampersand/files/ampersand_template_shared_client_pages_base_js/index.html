@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">4.77</p>
+      <p class="stat">4.67</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">0.04</p>
+      <p class="stat">0.03</p>
     </div>
   </div>
 </div>
@@ -92,13 +92,13 @@
     <textarea id="file-source" class="col-md-12">/*global $*/
 // base view for pages
 var View = require(&#039;ampersand-view&#039;);
-var _ = require(&#039;underscore&#039;);
+//var _ = require(&#039;lodash&#039;);
 //var key = require(&#039;keymaster&#039;);
 
 
 module.exports = View.extend({
     // register keyboard handlers
-    registerKeyboardShortcuts: function () {
+    registerKeyboardShortcuts: function() {
         /*
         var self = this;
         _.each(this.keyboardShortcuts, function (value, k) {
@@ -108,7 +108,7 @@ module.exports = View.extend({
         key.setScope(this.cid);
         */
     },
-    unregisterKeyboardShortcuts: function () {
+    unregisterKeyboardShortcuts: function() {
         //key.deleteScope(this.cid);
     }
 });</textarea>

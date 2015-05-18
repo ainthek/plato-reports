@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">78.97</p>
+      <p class="stat">81.52</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">51</p>
+      <p class="stat">53</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">13.50</p>
+      <p class="stat">13.75</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">0.36</p>
+      <p class="stat">0.37</p>
     </div>
   </div>
 </div>
@@ -95,8 +95,8 @@ var http = require(&#039;http&#039;)
   , request = require(&#039;../index&#039;)
   , tape = require(&#039;tape&#039;)
 
-var port1 = 8968
-  , port2 = 8969
+var port1 = 6767
+  , port2 = 6768
 
 var s1 = http.createServer(function(req, resp) {
   if (req.url === &#039;/original&#039;) {
@@ -136,9 +136,11 @@ tape(&#039;piped redirect&#039;, function(t) {
 })
 
 tape(&#039;cleanup&#039;, function(t) {
-  s1.close()
-  s2.close()
-  t.end()
+  s1.close(function() {
+    s2.close(function() {
+      t.end()
+    })
+  })
 })</textarea>
   </div>
 </div>

@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">59.02</p>
+      <p class="stat">58.62</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">328</p>
+      <p class="stat">351</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">51.23</p>
+      <p class="stat">50.24</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">1.92</p>
+      <p class="stat">1.97</p>
     </div>
   </div>
 </div>
@@ -91,7 +91,7 @@
   <div class="row">
     <textarea id="file-source" class="col-md-12">/*
     json2.js
-    2014-02-04
+    2015-05-03
 
     Public Domain.
 
@@ -108,7 +108,9 @@
 
 
     This file creates a global JSON object containing two methods: stringify
-    and parse.
+    and parse. This file is provides the ES5 JSON capability to ES3 systems.
+    If a project might run on IE8 or earlier, then this file should be included.
+    This file does nothing on ES5 systems.
 
         JSON.stringify(value, replacer, space)
             value       any JavaScript value, usually an object or array.
@@ -139,7 +141,9 @@
                 Date.prototype.toJSON = function (key) {
                     function f(n) {
                         // Format integers to have at least two digits.
-                        return n &lt; 10 ? &#039;0&#039; + n : n;
+                        return n &lt; 10 
+                            ? &#039;0&#039; + n 
+                            : n;
                     }
 
                     return this.getUTCFullYear()   + &#039;-&#039; +
@@ -185,8 +189,9 @@
             // text is &#039;[\n\t&quot;e&quot;,\n\t{\n\t\t&quot;pluribus&quot;: &quot;unum&quot;\n\t}\n]&#039;
 
             text = JSON.stringify([new Date()], function (key, value) {
-                return this[key] instanceof Date ?
-                    &#039;Date(&#039; + this[key] + &#039;)&#039; : value;
+                return this[key] instanceof Date 
+                    ? &#039;Date(&#039; + this[key] + &#039;)&#039; 
+                    : value;
             });
             // text is &#039;[&quot;Date(---current time---)&quot;]&#039;
 
@@ -237,10 +242,12 @@
     redistribute.
 */
 
-/*jslint evil: true, regexp: true */
+/*jslint 
+    eval, for, this 
+*/
 
-/*members &quot;&quot;, &quot;\b&quot;, &quot;\t&quot;, &quot;\n&quot;, &quot;\f&quot;, &quot;\r&quot;, &quot;\&quot;&quot;, JSON, &quot;\\&quot;, apply,
-    call, charCodeAt, getUTCDate, getUTCFullYear, getUTCHours,
+/*property
+    JSON, apply, call, charCodeAt, getUTCDate, getUTCFullYear, getUTCHours,
     getUTCMinutes, getUTCMonth, getUTCSeconds, hasOwnProperty, join,
     lastIndex, length, parse, prototype, push, replace, slice, stringify,
     test, toJSON, toString, valueOf
@@ -256,10 +263,23 @@ if (typeof JSON !== &#039;object&#039;) {
 
 (function () {
     &#039;use strict&#039;;
+    
+    var rx_one = /^[\],:{}\s]*$/,
+        rx_two = /\\(?:[&quot;\\\/bfnrt]|u[0-9a-fA-F]{4})/g,
+        rx_three = /&quot;[^&quot;\\\n\r]*&quot;|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,
+        rx_four = /(?:^|:|,)(?:\s*\[)+/g,
+        rx_escapable = /[\\\&quot;\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+        rx_dangerous = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
 
     function f(n) {
         // Format integers to have at least two digits.
-        return n &lt; 10 ? &#039;0&#039; + n : n;
+        return n &lt; 10 
+            ? &#039;0&#039; + n 
+            : n;
+    }
+    
+    function this_value() {
+        return this.valueOf();
     }
 
     if (typeof Date.prototype.toJSON !== &#039;function&#039;) {
@@ -267,25 +287,21 @@ if (typeof JSON !== &#039;object&#039;) {
         Date.prototype.toJSON = function () {
 
             return isFinite(this.valueOf())
-                ? this.getUTCFullYear()     + &#039;-&#039; +
-                    f(this.getUTCMonth() + 1) + &#039;-&#039; +
-                    f(this.getUTCDate())      + &#039;T&#039; +
-                    f(this.getUTCHours())     + &#039;:&#039; +
-                    f(this.getUTCMinutes())   + &#039;:&#039; +
-                    f(this.getUTCSeconds())   + &#039;Z&#039;
+                ? this.getUTCFullYear() + &#039;-&#039; +
+                        f(this.getUTCMonth() + 1) + &#039;-&#039; +
+                        f(this.getUTCDate()) + &#039;T&#039; +
+                        f(this.getUTCHours()) + &#039;:&#039; +
+                        f(this.getUTCMinutes()) + &#039;:&#039; +
+                        f(this.getUTCSeconds()) + &#039;Z&#039;
                 : null;
         };
 
-        String.prototype.toJSON      =
-            Number.prototype.toJSON  =
-            Boolean.prototype.toJSON = function () {
-                return this.valueOf();
-            };
+        Boolean.prototype.toJSON = this_value;
+        Number.prototype.toJSON = this_value;
+        String.prototype.toJSON = this_value;
     }
 
-    var cx,
-        escapable,
-        gap,
+    var gap,
         indent,
         meta,
         rep;
@@ -298,13 +314,15 @@ if (typeof JSON !== &#039;object&#039;) {
 // Otherwise we must also replace the offending characters with safe escape
 // sequences.
 
-        escapable.lastIndex = 0;
-        return escapable.test(string) ? &#039;&quot;&#039; + string.replace(escapable, function (a) {
-            var c = meta[a];
-            return typeof c === &#039;string&#039;
-                ? c
-                : &#039;\\u&#039; + (&#039;0000&#039; + a.charCodeAt(0).toString(16)).slice(-4);
-        }) + &#039;&quot;&#039; : &#039;&quot;&#039; + string + &#039;&quot;&#039;;
+        rx_escapable.lastIndex = 0;
+        return rx_escapable.test(string) 
+            ? &#039;&quot;&#039; + string.replace(rx_escapable, function (a) {
+                var c = meta[a];
+                return typeof c === &#039;string&#039;
+                    ? c
+                    : &#039;\\u&#039; + (&#039;0000&#039; + a.charCodeAt(0).toString(16)).slice(-4);
+            }) + &#039;&quot;&#039; 
+            : &#039;&quot;&#039; + string + &#039;&quot;&#039;;
     }
 
 
@@ -344,7 +362,9 @@ if (typeof JSON !== &#039;object&#039;) {
 
 // JSON numbers must be finite. Encode non-finite numbers as null.
 
-            return isFinite(value) ? String(value) : &#039;null&#039;;
+            return isFinite(value) 
+                ? String(value) 
+                : &#039;null&#039;;
 
         case &#039;boolean&#039;:
         case &#039;null&#039;:
@@ -390,8 +410,8 @@ if (typeof JSON !== &#039;object&#039;) {
                 v = partial.length === 0
                     ? &#039;[]&#039;
                     : gap
-                    ? &#039;[\n&#039; + gap + partial.join(&#039;,\n&#039; + gap) + &#039;\n&#039; + mind + &#039;]&#039;
-                    : &#039;[&#039; + partial.join(&#039;,&#039;) + &#039;]&#039;;
+                        ? &#039;[\n&#039; + gap + partial.join(&#039;,\n&#039; + gap) + &#039;\n&#039; + mind + &#039;]&#039;
+                        : &#039;[&#039; + partial.join(&#039;,&#039;) + &#039;]&#039;;
                 gap = mind;
                 return v;
             }
@@ -405,7 +425,11 @@ if (typeof JSON !== &#039;object&#039;) {
                         k = rep[i];
                         v = str(k, value);
                         if (v) {
-                            partial.push(quote(k) + (gap ? &#039;: &#039; : &#039;:&#039;) + v);
+                            partial.push(quote(k) + (
+                                gap 
+                                    ? &#039;: &#039; 
+                                    : &#039;:&#039;
+                            ) + v);
                         }
                     }
                 }
@@ -417,7 +441,11 @@ if (typeof JSON !== &#039;object&#039;) {
                     if (Object.prototype.hasOwnProperty.call(value, k)) {
                         v = str(k, value);
                         if (v) {
-                            partial.push(quote(k) + (gap ? &#039;: &#039; : &#039;:&#039;) + v);
+                            partial.push(quote(k) + (
+                                gap 
+                                    ? &#039;: &#039; 
+                                    : &#039;:&#039;
+                            ) + v);
                         }
                     }
                 }
@@ -429,8 +457,8 @@ if (typeof JSON !== &#039;object&#039;) {
             v = partial.length === 0
                 ? &#039;{}&#039;
                 : gap
-                ? &#039;{\n&#039; + gap + partial.join(&#039;,\n&#039; + gap) + &#039;\n&#039; + mind + &#039;}&#039;
-                : &#039;{&#039; + partial.join(&#039;,&#039;) + &#039;}&#039;;
+                    ? &#039;{\n&#039; + gap + partial.join(&#039;,\n&#039; + gap) + &#039;\n&#039; + mind + &#039;}&#039;
+                    : &#039;{&#039; + partial.join(&#039;,&#039;) + &#039;}&#039;;
             gap = mind;
             return v;
         }
@@ -439,14 +467,13 @@ if (typeof JSON !== &#039;object&#039;) {
 // If the JSON object does not yet have a stringify method, give it one.
 
     if (typeof JSON.stringify !== &#039;function&#039;) {
-        escapable = /[\\\&quot;\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
         meta = {    // table of character substitutions
             &#039;\b&#039;: &#039;\\b&#039;,
             &#039;\t&#039;: &#039;\\t&#039;,
             &#039;\n&#039;: &#039;\\n&#039;,
             &#039;\f&#039;: &#039;\\f&#039;,
             &#039;\r&#039;: &#039;\\r&#039;,
-            &#039;&quot;&#039; : &#039;\\&quot;&#039;,
+            &#039;&quot;&#039;: &#039;\\&quot;&#039;,
             &#039;\\&#039;: &#039;\\\\&#039;
         };
         JSON.stringify = function (value, replacer, space) {
@@ -496,7 +523,6 @@ if (typeof JSON !== &#039;object&#039;) {
 // If the JSON object does not yet have a parse method, give it one.
 
     if (typeof JSON.parse !== &#039;function&#039;) {
-        cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
         JSON.parse = function (text, reviver) {
 
 // The parse method takes a text and an optional reviver function, and returns
@@ -531,11 +557,11 @@ if (typeof JSON !== &#039;object&#039;) {
 // incorrectly, either silently deleting them, or treating them as line endings.
 
             text = String(text);
-            cx.lastIndex = 0;
-            if (cx.test(text)) {
-                text = text.replace(cx, function (a) {
+            rx_dangerous.lastIndex = 0;
+            if (rx_dangerous.test(text)) {
+                text = text.replace(rx_dangerous, function (a) {
                     return &#039;\\u&#039; +
-                        (&#039;0000&#039; + a.charCodeAt(0).toString(16)).slice(-4);
+                            (&#039;0000&#039; + a.charCodeAt(0).toString(16)).slice(-4);
                 });
             }
 
@@ -552,10 +578,14 @@ if (typeof JSON !== &#039;object&#039;) {
 // we look to see that the remaining characters are only whitespace or &#039;]&#039; or
 // &#039;,&#039; or &#039;:&#039; or &#039;{&#039; or &#039;}&#039;. If that is so, then the text is safe for eval.
 
-            if (/^[\],:{}\s]*$/
-                    .test(text.replace(/\\(?:[&quot;\\\/bfnrt]|u[0-9a-fA-F]{4})/g, &#039;@&#039;)
-                        .replace(/&quot;[^&quot;\\\n\r]*&quot;|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, &#039;]&#039;)
-                        .replace(/(?:^|:|,)(?:\s*\[)+/g, &#039;&#039;))) {
+            if (
+                rx_one.test(
+                    text
+                        .replace(rx_two, &#039;@&#039;)
+                        .replace(rx_three, &#039;]&#039;)
+                        .replace(rx_four, &#039;&#039;)
+                )
+            ) {
 
 // In the third stage we use the eval function to compile the text into a
 // JavaScript structure. The &#039;{&#039; operator is subject to a syntactic ambiguity

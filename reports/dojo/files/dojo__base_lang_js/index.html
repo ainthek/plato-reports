@@ -307,7 +307,7 @@
 			// context: Object?
 			//		Optional. Object to use as root of path. Defaults to
 			//		&#039;dojo.global&#039;. Null may be passed.
-			return getProp(name ? name.split(&quot;.&quot;) : [], create, context); // Object
+			return !name ? context : getProp(name.split(&quot;.&quot;), create, context); // Object
 		},
 
 		exists: function(name, obj){

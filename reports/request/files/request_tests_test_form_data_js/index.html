@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">64.38</p>
+      <p class="stat">64.10</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">113</p>
+      <p class="stat">131</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">24.16</p>
+      <p class="stat">27.58</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">1.29</p>
+      <p class="stat">1.56</p>
     </div>
   </div>
 </div>
@@ -98,7 +98,7 @@ var http = require(&#039;http&#039;)
   , fs = require(&#039;fs&#039;)
   , tape = require(&#039;tape&#039;)
 
-function runTest(t, json) {
+function runTest(t, options) {
   var remoteFile = path.join(__dirname, &#039;googledoodle.jpg&#039;)
     , localFile = path.join(__dirname, &#039;unicycle.jpg&#039;)
     , multipartFormData = {}
@@ -108,6 +108,16 @@ function runTest(t, json) {
       res.writeHead(200, {&#039;content-type&#039;: &#039;image/jpg&#039;, &#039;content-length&#039;:7187})
       res.end(fs.readFileSync(remoteFile), &#039;binary&#039;)
       return
+    }
+
+    if (options.auth) {
+      if (!req.headers.authorization) {
+        res.writeHead(401, {&#039;www-authenticate&#039;: &#039;Basic realm=&quot;Private&quot;&#039;})
+        res.end()
+        return
+      } else {
+        t.ok(req.headers.authorization === &#039;Basic &#039; + new Buffer(&#039;user:pass&#039;).toString(&#039;base64&#039;))
+      }
     }
 
     // temp workaround
@@ -149,22 +159,22 @@ function runTest(t, json) {
       t.ok( data.indexOf(&#039;form-data; name=&quot;batch&quot;&#039;) !== -1 )
       t.ok( data.match(/form-data; name=&quot;batch&quot;/g).length === 2 )
 
-      // check for http://localhost:8080/file traces
+      // check for http://localhost:6767/file traces
       t.ok( data.indexOf(&#039;Photoshop ICC&#039;) !== -1 )
       t.ok( data.indexOf(&#039;Content-Type: &#039; + mime.lookup(remoteFile) ) !== -1 )
 
       res.writeHead(200)
-      res.end(json ? JSON.stringify({status: &#039;done&#039;}) : &#039;done&#039;)
+      res.end(options.json ? JSON.stringify({status: &#039;done&#039;}) : &#039;done&#039;)
     })
   })
 
-  server.listen(8080, function() {
+  server.listen(6767, function() {
 
     // @NOTE: multipartFormData properties must be set here so that my_file read stream does not leak in node v0.8
     multipartFormData.my_field = &#039;my_value&#039;
     multipartFormData.my_buffer = new Buffer([1, 2, 3])
     multipartFormData.my_file = fs.createReadStream(localFile)
-    multipartFormData.remote_file = request(&#039;http://localhost:8080/file&#039;)
+    multipartFormData.remote_file = request(&#039;http://localhost:6767/file&#039;)
     multipartFormData.secret_file = {
       value: fs.createReadStream(localFile),
       options: {
@@ -178,29 +188,37 @@ function runTest(t, json) {
     ]
 
     var reqOptions = {
-      url: &#039;http://localhost:8080/upload&#039;,
+      url: &#039;http://localhost:6767/upload&#039;,
       formData: multipartFormData
     }
-    if (json) {
+    if (options.json) {
       reqOptions.json = true
+    }
+    if (options.auth) {
+      reqOptions.auth = {user: &#039;user&#039;, pass: &#039;pass&#039;, sendImmediately: false}
     }
     request.post(reqOptions, function (err, res, body) {
       t.equal(err, null)
       t.equal(res.statusCode, 200)
-      t.deepEqual(body, json ? {status: &#039;done&#039;} : &#039;done&#039;)
-      server.close()
-      t.end()
+      t.deepEqual(body, options.json ? {status: &#039;done&#039;} : &#039;done&#039;)
+      server.close(function() {
+        t.end()
+      })
     })
 
   })
 }
 
 tape(&#039;multipart formData&#039;, function(t) {
-  runTest(t, false)
+  runTest(t, {json: false})
 })
 
 tape(&#039;multipart formData + JSON&#039;, function(t) {
-  runTest(t, true)
+  runTest(t, {json: true})
+})
+
+tape(&#039;multipart formData + basic auth&#039;, function(t) {
+  runTest(t, {json: false, auth: true})
 })</textarea>
   </div>
 </div>

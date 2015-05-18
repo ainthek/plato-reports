@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">66.25</p>
+      <p class="stat">67.26</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">636</p>
+      <p class="stat">605</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">75.41</p>
+      <p class="stat">71.12</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">4.27</p>
+      <p class="stat">3.70</p>
     </div>
   </div>
 </div>
@@ -378,10 +378,6 @@
 			});
 		};
 
-	if(has(&quot;dojo-unit-tests&quot;)){
-		var unitTests = thisModule.unitTests = [];
-	}
-
 	if(has(&quot;dojo-preload-i18n-Api&quot;) || has(&quot;dojo-v1x-i18n-Api&quot;)){
 		var normalizeLocale = thisModule.normalizeLocale = function(locale){
 				var result = locale ? locale.toLowerCase() : dojo.locale;
@@ -469,7 +465,7 @@
 											bundlePath = match[1] + &quot;/&quot;;
 
 										// backcompat
-										bundle._localized = bundle._localized || {};
+										if(!bundle._localized){continue;}
 
 										var localized;
 										if(loc === &quot;ROOT&quot;){
@@ -623,13 +619,15 @@
 						results.push(cache[url]);
 					}else{
 						var bundle = require.syncLoadNls(mid);
-						// don&#039;t need to check for legacy since syncLoadNls returns a module if the module
-						// (1) was already loaded, or (2) was in the cache. In case 1, if syncRequire is called
-						// from getLocalization --&gt; load, then load will have called checkForLegacyModules() before
-						// calling syncRequire; if syncRequire is called from preloadLocalizations, then we
-						// don&#039;t care about checkForLegacyModules() because that will be done when a particular
-						// bundle is actually demanded. In case 2, checkForLegacyModules() is never relevant
-						// because cached modules are always v1.7+ built modules.
+						// need to check for legacy module here because there might be a legacy module for a
+						// less specific locale (which was not looked up during the first checkForLegacyModules
+						// call in load()).
+						// Also need to reverse the locale and the module name in the mid because syncRequire
+						// deps parameters uses the AMD style package/nls/locale/module while legacy code uses
+						// package/nls/module/locale.
+						if(!bundle){
+							bundle = checkForLegacyModules(mid.replace(/nls\/([^\/]*)\/([^\/]*)$/, &quot;nls/$2/$1&quot;));
+						}
 						if(bundle){
 							results.push(bundle);
 						}else{
@@ -686,35 +684,6 @@
 			);
 			return result;
 		};
-
-		if(has(&quot;dojo-unit-tests&quot;)){
-			unitTests.push(function(doh){
-				doh.register(&quot;tests.i18n.unit&quot;, function(t){
-					var check;
-
-					check = evalBundle(&quot;{prop:1}&quot;, checkForLegacyModules, &quot;nonsense&quot;, amdValue);
-					t.is({prop:1}, check); t.is(undefined, check[1]);
-
-					check = evalBundle(&quot;({prop:1})&quot;, checkForLegacyModules, &quot;nonsense&quot;, amdValue);
-					t.is({prop:1}, check); t.is(undefined, check[1]);
-
-					check = evalBundle(&quot;{&#039;prop-x&#039;:1}&quot;, checkForLegacyModules, &quot;nonsense&quot;, amdValue);
-					t.is({&#039;prop-x&#039;:1}, check); t.is(undefined, check[1]);
-
-					check = evalBundle(&quot;({&#039;prop-x&#039;:1})&quot;, checkForLegacyModules, &quot;nonsense&quot;, amdValue);
-					t.is({&#039;prop-x&#039;:1}, check); t.is(undefined, check[1]);
-
-					check = evalBundle(&quot;define({&#039;prop-x&#039;:1})&quot;, checkForLegacyModules, &quot;nonsense&quot;, amdValue);
-					t.is(amdValue, check); t.is({&#039;prop-x&#039;:1}, amdValue.result);
-
-					check = evalBundle(&quot;define(&#039;some/module&#039;, {&#039;prop-x&#039;:1})&quot;, checkForLegacyModules, &quot;nonsense&quot;, amdValue);
-					t.is(amdValue, check); t.is({&#039;prop-x&#039;:1}, amdValue.result);
-
-					check = evalBundle(&quot;this is total nonsense and should throw an error&quot;, checkForLegacyModules, &quot;nonsense&quot;, amdValue);
-					t.is(check instanceof Error, true);
-				});
-			});
-		}
 	}
 
 	return lang.mixin(thisModule, {

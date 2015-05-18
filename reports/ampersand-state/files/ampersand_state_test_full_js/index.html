@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">66.89</p>
+      <p class="stat">66.81</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">1583</p>
+      <p class="stat">1615</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">78.96</p>
+      <p class="stat">79.08</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">18.34</p>
+      <p class="stat">18.75</p>
     </div>
   </div>
 </div>
@@ -286,7 +286,7 @@ test(&#039;Setting other properties when `extraProperties: &quot;reject&quot;` t
         foo.set({
             craziness: &#039;new&#039;
         });
-    }, Error, &#039;Throws exception if set to rejcet&#039;);
+    }, Error, &#039;Throws exception if set to reject&#039;);
     t.end();
 });
 
@@ -420,7 +420,7 @@ test(&#039;serialize should not include session properties no matter how they\&#
             name: &#039;string&#039;
         },
         session: {
-            // simple definintion
+            // simple definition
             active: &#039;boolean&#039;
         }
     });
@@ -538,12 +538,12 @@ test(&#039;derived properties&#039;, function (t) {
     t.equal(foo.greeting, &#039;hi, henrik&#039;);
     t.equal(foo.greeting, &#039;hi, henrik&#039;);
     t.equal(ran, 1, &#039;cached derived should only run once&#039;);
-    t.equal(notCachedRan, 0, &#039;shold not have been run yet&#039;);
+    t.equal(notCachedRan, 0, &#039;should not have been run yet&#039;);
     foo.name = &#039;someone&#039;;
     t.equal(foo.greeting, &#039;hi, someone&#039;);
     t.equal(foo.greeting, &#039;hi, someone&#039;);
     t.equal(ran, 2, &#039;cached derived should have been cleared and run once again&#039;);
-    t.equal(notCachedRan, 1, &#039;shold have been run once because it was triggered&#039;);
+    t.equal(notCachedRan, 1, &#039;should have been run once because it was triggered&#039;);
     t.equal(foo.notCached, &#039;hi, someone&#039;);
     t.equal(notCachedRan, 2, &#039;incremented again&#039;);
     t.equal(foo.notCached, &#039;hi, someone&#039;);
@@ -739,7 +739,7 @@ test(&#039;Should only allow nulls where specified&#039;, function (t) {
     t.equal(foo.someNumber, null);
     t.throws(function () {
         foo.firstName = null;
-    }, TypeError, &#039;Throws exception when setting unallowed null&#039;);
+    }, TypeError, &#039;Throws exception when setting disallowed null&#039;);
     t.end();
 });
 
@@ -828,7 +828,7 @@ test(&#039;toggle() works on boolean and values properties.&#039;, function (t) 
 
     t.throws(function () {
         m.toggle(&#039;someNumber&#039;);
-    }, TypeError, &#039;Throws exception when toggling a non-togglable property.&#039;);
+    }, TypeError, &#039;Throws exception when toggling a non-toggleable property.&#039;);
 
     m.toggle(&#039;state&#039;);
     t.equal(m.state, &#039;WA&#039;, &#039;Should go to next&#039;);
@@ -1220,7 +1220,7 @@ test(&#039;`state` properties&#039;, function (t) {
     p.sub = sub;
 
     p.on(&#039;change:sub&#039;, function () {
-        t.fail(&#039;shouldnt fire if same instance&#039;);
+        t.fail(&#039;shouldn\&#039;t fire if same instance&#039;);
     });
 
     p.sub = sub;
@@ -1432,7 +1432,7 @@ test(&quot;isValid&quot;, function (t) {
     t.end();
 });
 
-test(&quot;#1545 - `undefined` can be passed to a model constructor without coersion&quot;, function (t) {
+test(&quot;#1545 - `undefined` can be passed to a model constructor without coercion&quot;, function (t) {
     var Model = State.extend({
         defaults: { one: 1 },
         initialize : function (attrs, opts) {
@@ -1582,6 +1582,38 @@ test(&quot;#99 #101 - string dates can be parsed&quot;, function(t) {
     t.end();
 });
 
+test(&#039;#128 don\&#039;t coerce null date as 0&#039;, function (t) {
+    var Day = State.extend({
+        props: {
+            theDate: &#039;date&#039;
+        }
+    });
+
+    var day = new Day({ theDate: null });
+    t.notOk(day.theDate, &#039;date should not be set if null&#039;);
+    t.equal(day.theDate, null);
+
+    day = new Day({ theDate: undefined });
+    t.notOk(day.theDate, &#039;date should not be set if undefined&#039;);
+    t.equal(day.theDate, undefined);
+
+    var Day2 = State.extend({
+        props: {
+            theDate: {
+                type: &#039;date&#039;,
+                required: true,
+                allowNull: false
+            }
+        }
+    });
+
+    t.throws(function () {
+        new Day2({ theDate: null });
+    }, /cannot be null/, &#039;if allowNull:false, and required:true should still throw&#039;);
+
+    t.end();
+});
+
 test(&#039;#68, #110 mixin props should not be deleted&#039;, function (t) {
     var SelectedMixin = {
       session : {
@@ -1638,19 +1670,19 @@ test(&#039;#118 setOnce can be used with default string&#039;, function (t) {
 
     t.throws(function () {
         tr.timezone = &#039;new thing&#039;;
-    }, &#039;since it has a default, this should throw&#039;); 
-    
+    }, &#039;since it has a default, this should throw&#039;);
+
 
     var tr2;
 
     t.doesNotThrow(function () {
         tr2 = new TimeRange({timezone: &#039;my thing&#039;});
     }, &#039;if we set on init, should overwrite default&#039;);
-    
+
     t.throws(function () {
-        tr.timezone = &#039;new thing&#039;;  
-    }, &#039;should now fail since its been set&#039;); 
-    
+        tr.timezone = &#039;new thing&#039;;
+    }, &#039;should now fail since its been set&#039;);
+
     var OtherTimeRange = State.extend({
         props: {
             timezone: {
@@ -1664,7 +1696,7 @@ test(&#039;#118 setOnce can be used with default string&#039;, function (t) {
 
     t.doesNotThrow(function () {
         tr.timezone = &#039;thing&#039;;
-    }, &#039;should not throw first time&#039;); 
+    }, &#039;should not throw first time&#039;);
 
     t.throws(function () {
         tr.timezone = &#039;other thing&#039;;

@@ -48,7 +48,7 @@
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">220</p>
+      <p class="stat">222</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">32.69</p>
+      <p class="stat">32.73</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">2.23</p>
+      <p class="stat">2.26</p>
     </div>
   </div>
 </div>
@@ -97,6 +97,7 @@ var fu = require(&#039;fu&#039;)
 var jshint = require(&#039;jshint&#039;).JSHINT
 var minimatch = require(&#039;minimatch&#039;)
 var path = require(&#039;path&#039;)
+var version = require(&#039;../package.json&#039;).version
 
 function removeJsComments(str) {
   return (str || &#039;&#039;)
@@ -295,6 +296,7 @@ function cli() {
 }
 
 commander
+  .version(version)
   .option(&#039;-c, --config [.jshintrc]&#039;, &#039;Load your own config file&#039;)
   .option(&#039;-d, --diff&#039;, &#039;Similar to dry-run&#039;)
   .option(&#039;-l, --legacy&#039;, &#039;Use legacy fixmyjs&#039;)

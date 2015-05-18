@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">61.95</p>
+      <p class="stat">61.89</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">95</p>
+      <p class="stat">97</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">19.42</p>
+      <p class="stat">19.72</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">0.89</p>
+      <p class="stat">0.87</p>
     </div>
   </div>
 </div>
@@ -90,18 +90,17 @@
 <div class="container">
   <div class="row">
     <textarea id="file-source" class="col-md-12">var fs = require(&#039;fs&#039;);
-var _ = require(&#039;underscore&#039;);
-var humps = require(&#039;humps&#039;);
+var _ = require(&#039;lodash&#039;);
 var repeat = require(&#039;repeat-string&#039;);
 var processTemplate = require(&#039;../helpers/process-template&#039;);
 var collectionTemplate = fs.readFileSync(__dirname + &#039;/../templates/collection.js&#039;, &#039;utf8&#039;);
 var modelTemplate = fs.readFileSync(__dirname + &#039;/../templates/model.js&#039;, &#039;utf8&#039;);
 
 
-module.exports = function (opts, cb) {
+module.exports = function(opts, cb) {
     opts || (opts = {});
     var name = opts.name;
-    var fileName = humps.decamelize(name, &#039;-&#039;);
+    var fileName = _.kebabCase(name);
 
     // build out our config
     var config = _.extend({
@@ -110,7 +109,9 @@ module.exports = function (opts, cb) {
         reqPath: &#039;ampersand-model&#039;,
         collectionTemplate: collectionTemplate,
         modelTemplate: modelTemplate,
-        data: {id: &quot;something&quot;}
+        data: {
+            id: &#039;something&#039;
+        }
     }, opts);
 
     var obj = findObj(config.data);
@@ -118,13 +119,13 @@ module.exports = function (opts, cb) {
     var result = {};
 
     // figure out our indent string
-    config.indentString = (function () {
+    config.indentString = (function() {
         if (config.useTabs) return &#039;\t&#039;;
         return repeat(&#039; &#039;, config.indent);
     })();
 
     // sort with ID first
-    sorted = {};
+    var sorted = {};
     if (idKey) {
         sorted[idKey] = obj[idKey];
     }
@@ -150,26 +151,27 @@ function getProps(obj) {
     var indent = repeat(&#039; &#039;, 8);
     var keys = _.keys(obj);
     var length = keys;
-    _.each(keys, function (key, index) {
+    _.each(keys, function(key, index) {
         var val = obj[key];
         var res;
         if (_.isString(val)) {
-            res = &quot;[&#039;string&#039;]&quot;;
+            res = &#039;[\&#039;string\&#039;]&#039;;
         } else if (_.isArray(val)) {
-            res = &quot;[&#039;array&#039;]&quot;;
+            res = &#039;[\&#039;array\&#039;]&#039;;
         } else if (_.isNumber(val)) {
-            res = &quot;[&#039;number&#039;]&quot;;
+            res = &#039;[\&#039;number\&#039;]&#039;;
         } else if (_.isBoolean(val)) {
-            res = &quot;[&#039;boolean&#039;]&quot;;
+            res = &#039;[\&#039;boolean\&#039;]&#039;;
         } else {
-            res = &quot;[&#039;object&#039;]&quot;;
+            res = &#039;[\&#039;object\&#039;]&#039;;
         }
-        buf.push(indent + key + &quot;: &quot; + res);
+        buf.push(indent + key + &#039;: &#039; + res);
     });
     return buf.join(&#039;,\n&#039;);
 }
 
 var idNames = [&#039;id&#039;, &#039;_id&#039;, &#039;ID&#039;, &#039;_ID&#039;, &#039;primary&#039;];
+
 function findId(obj) {
     var keys = _.keys(obj);
 }

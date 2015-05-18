@@ -48,7 +48,7 @@
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">151</p>
+      <p class="stat">150</p>
     </div>
   </div>
   <div class="row historical">
@@ -91,7 +91,7 @@
   <div class="row">
     <textarea id="file-source" class="col-md-12">/*
     cycle.js
-    2013-02-19
+    2015-02-25
 
     Public Domain.
 
@@ -104,9 +104,10 @@
     NOT CONTROL.
 */
 
-/*jslint evil: true, regexp: true */
+/*jslint eval, for */
 
-/*members $ref, apply, call, decycle, hasOwnProperty, length, prototype, push,
+/*property 
+    $ref, apply, call, decycle, hasOwnProperty, length, prototype, push,
     retrocycle, stringify, test, toString
 */
 
@@ -146,9 +147,9 @@ if (typeof JSON.decycle !== &#039;function&#039;) {
 
             if (typeof value === &#039;object&#039; &amp;&amp; value !== null &amp;&amp;
                     !(value instanceof Boolean) &amp;&amp;
-                    !(value instanceof Date)    &amp;&amp;
-                    !(value instanceof Number)  &amp;&amp;
-                    !(value instanceof RegExp)  &amp;&amp;
+                    !(value instanceof Date) &amp;&amp;
+                    !(value instanceof Number) &amp;&amp;
+                    !(value instanceof RegExp) &amp;&amp;
                     !(value instanceof String)) {
 
 // If the value is an object or array, look to see if we have already
@@ -181,7 +182,7 @@ if (typeof JSON.decycle !== &#039;function&#039;) {
                     for (name in value) {
                         if (Object.prototype.hasOwnProperty.call(value, name)) {
                             nu[name] = derez(value[name],
-                                path + &#039;[&#039; + JSON.stringify(name) + &#039;]&#039;);
+                                    path + &#039;[&#039; + JSON.stringify(name) + &#039;]&#039;);
                         }
                     }
                 }
@@ -216,8 +217,7 @@ if (typeof JSON.retrocycle !== &#039;function&#039;) {
 //      return JSON.retrocycle(JSON.parse(s));
 // produces an array containing a single element which is the array itself.
 
-        var px =
-            /^\$(?:\[(?:\d+|\&quot;(?:[^\\\&quot;\u0000-\u001f]|\\([\\\&quot;\/bfnrt]|u[0-9a-zA-Z]{4}))*\&quot;)\])*$/;
+        var px = /^\$(?:\[(?:\d+|\&quot;(?:[^\\\&quot;\u0000-\u001f]|\\([\\\&quot;\/bfnrt]|u[0-9a-zA-Z]{4}))*\&quot;)\])*$/;
 
         (function rez(value) {
 

@@ -46,7 +46,7 @@ Will download sources from github for each project soon and analyze those.
 | [jshint](https://www.npmjs.org/package/jshint)|  | [62.17](http://ainthek.github.io/plato-reports/reports/jshint/index.html)| [34281](http://ainthek.github.io/plato-reports/reports/jshint/index.html)| 2.5.11|Static analysis tool for JavaScript  |
 | [json-diff-patch](https://www.npmjs.org/package/json-diff-patch)|  | [60.73](http://ainthek.github.io/plato-reports/reports/json-diff-patch/index.html)| [733](http://ainthek.github.io/plato-reports/reports/json-diff-patch/index.html)| 0.0.1|A JavaScript implementation of the JSON Media Type for partial modifications: http://tools.ietf.org/html/draft-ietf-appsawg-json-patch-06  |
 | [json-diff](https://www.npmjs.org/package/json-diff)|  | [67.29](http://ainthek.github.io/plato-reports/reports/json-diff/index.html)| [463](http://ainthek.github.io/plato-reports/reports/json-diff/index.html)| 0.3.1|JSON diff  |
-| [json](https://www.npmjs.org/package/json)|  | [62.10](http://ainthek.github.io/plato-reports/reports/json/index.html)| [1980](http://ainthek.github.io/plato-reports/reports/json/index.html)| 9.0.2|a 'json' command for massaging and processing JSON on the command line  |
+| [json](https://www.npmjs.org/package/json)|  | [62.14](http://ainthek.github.io/plato-reports/reports/json/index.html)| [1982](http://ainthek.github.io/plato-reports/reports/json/index.html)| 9.0.2|a 'json' command for massaging and processing JSON on the command line  |
 | [jsonparse](https://www.npmjs.org/package/jsonparse)|  | [67.35](http://ainthek.github.io/plato-reports/reports/jsonparse/index.html)| [786](http://ainthek.github.io/plato-reports/reports/jsonparse/index.html)| 0.0.6|This is a pure-js JSON streaming parser for node.js  |
 | [lru-cache](https://www.npmjs.org/package/lru-cache)|  | [65.15](http://ainthek.github.io/plato-reports/reports/lru-cache/index.html)| [721](http://ainthek.github.io/plato-reports/reports/lru-cache/index.html)| 2.5.0|A cache object that deletes the least-recently-used items.  |
 | [marked](https://www.npmjs.org/package/marked)|  | [74.46](http://ainthek.github.io/plato-reports/reports/marked/index.html)| [1261](http://ainthek.github.io/plato-reports/reports/marked/index.html)| 0.3.2|A markdown parser built for speed  |
@@ -58,7 +58,7 @@ Will download sources from github for each project soon and analyze those.
 | [open](https://www.npmjs.org/package/open)|  | [58.42](http://ainthek.github.io/plato-reports/reports/open/index.html)| [63](http://ainthek.github.io/plato-reports/reports/open/index.html)| 0.0.5|open a file or url in the user's preferred application  |
 | [printf](https://www.npmjs.org/package/printf)|  | [51.06](http://ainthek.github.io/plato-reports/reports/printf/index.html)| [459](http://ainthek.github.io/plato-reports/reports/printf/index.html)| 0.2.0|Full implementation of the `printf` family in pure JS.  |
 | [readable-stream](https://www.npmjs.org/package/readable-stream)|  | [79.20](http://ainthek.github.io/plato-reports/reports/readable-stream/index.html)| [1564](http://ainthek.github.io/plato-reports/reports/readable-stream/index.html)| 1.0.33|Streams2, a user-land copy of the stream library from Node.js v0.10.x  |
-| [request](https://www.npmjs.org/package/request)|  | [76.10](http://ainthek.github.io/plato-reports/reports/request/index.html)| [7463](http://ainthek.github.io/plato-reports/reports/request/index.html)| 2.49.0|Simplified HTTP request client.  |
+| [request](https://www.npmjs.org/package/request)|  | [75.43](http://ainthek.github.io/plato-reports/reports/request/index.html)| [9805](http://ainthek.github.io/plato-reports/reports/request/index.html)| 2.49.0|Simplified HTTP request client.  |
 | [sax](https://www.npmjs.org/package/sax)|  | [62.08](http://ainthek.github.io/plato-reports/reports/sax/index.html)| [2758](http://ainthek.github.io/plato-reports/reports/sax/index.html)| 0.6.1|An evented streaming XML parser in JavaScript  |
 | [sigmund](https://www.npmjs.org/package/sigmund)|  | [69.89](http://ainthek.github.io/plato-reports/reports/sigmund/index.html)| [335](http://ainthek.github.io/plato-reports/reports/sigmund/index.html)| 1.0.0|Quick and dirty signatures for Objects.  |
 | [sntp](https://www.npmjs.org/package/sntp)|  | [77.94](http://ainthek.github.io/plato-reports/reports/sntp/index.html)| [882](http://ainthek.github.io/plato-reports/reports/sntp/index.html)| 1.0.9|SNTP Client  |
@@ -82,6 +82,7 @@ Also some other frameworks analyzed:
 
 Modules with . jshintrc
 
+- ampersand
 - ampersand-state
 - ampersand-view
 - fixmyjs

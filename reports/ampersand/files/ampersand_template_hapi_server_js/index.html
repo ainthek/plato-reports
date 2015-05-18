@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">76.28</p>
+      <p class="stat">76.41</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">38</p>
+      <p class="stat">48</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">15.96</p>
+      <p class="stat">16.76</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">0.37</p>
+      <p class="stat">0.43</p>
     </div>
   </div>
 </div>
@@ -91,10 +91,14 @@
   <div class="row">
     <textarea id="file-source" class="col-md-12">var Hapi = require(&#039;hapi&#039;);
 var config = require(&#039;getconfig&#039;);
-var server = new Hapi.Server(config.http.listen, config.http.port);
+var MoonBootsHapi = require(&#039;moonboots_hapi&#039;);
 var moonbootsConfig = require(&#039;./moonbootsConfig&#039;);
 var fakeApi = require(&#039;./fakeApi&#039;);
+var staticRoutes = require(&#039;./staticRoutes&#039;);
 var internals = {};
+
+var server = new Hapi.Server();
+server.connection({ host: config.http.listen, port: config.http.port });
 
 // set clientconfig cookie
 internals.configStateConfig = {
@@ -109,22 +113,28 @@ server.ext(&#039;onPreResponse&#039;, function(request, reply) {
         var response = request.response;
         return reply(response.state(&#039;config&#039;, encodeURIComponent(internals.clientConfig)));
     }
-    else {
-        return reply();
-    }
+
+    return reply.continue();
 });
 
-
 // require moonboots_hapi plugin
-server.pack.register({plugin: require(&#039;moonboots_hapi&#039;), options: moonbootsConfig}, function (err) {
+server.register([
+    {
+        register: MoonBootsHapi.register,
+        options: moonbootsConfig
+    },
+    {
+        register: fakeApi.register
+    },
+    {
+        register: staticRoutes
+    }
+], function (err) {
     if (err) throw err;
-    server.pack.register(fakeApi, function (err) {
+    // If everything loaded correctly, start the server:
+    server.start(function (err) {
         if (err) throw err;
-        // If everything loaded correctly, start the server:
-        server.start(function (err) {
-            if (err) throw err;
-            console.log(&#039;{{{title}}} is running at: http://localhost:&#039; + config.http.port + &#039; Yep. That\&#039;s pretty awesome.&#039;);
-        });
+        console.log(&#039;{{{title}}} is running at: http://&#039; + config.http.listen + &#039;:&#039; + config.http.port);
     });
 });</textarea>
   </div>
