@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">71.41</p>
+      <p class="stat">71.65</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">367</p>
+      <p class="stat">381</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">40.61</p>
+      <p class="stat">40.21</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">3.03</p>
+      <p class="stat">3.16</p>
     </div>
   </div>
 </div>
@@ -93,7 +93,16 @@
 var State = require(&#039;ampersand-state&#039;);
 var CollectionView = require(&#039;ampersand-collection-view&#039;);
 var domify = require(&#039;domify&#039;);
-var _ = require(&#039;underscore&#039;);
+var uniqueId = require(&quot;lodash.uniqueid&quot;);
+var pick = require(&quot;lodash.pick&quot;);
+var assign = require(&quot;lodash.assign&quot;);
+var forEach = require(&quot;lodash.foreach&quot;);
+var result = require(&quot;lodash.result&quot;);
+var last = require(&quot;lodash.last&quot;);
+var isString = require(&quot;lodash.isstring&quot;);
+var bind = require(&quot;lodash.bind&quot;);
+var flatten = require(&quot;lodash.flatten&quot;);
+var invoke = require(&quot;lodash.invoke&quot;);
 var events = require(&#039;events-mixin&#039;);
 var matches = require(&#039;matches-selector&#039;);
 var bindings = require(&#039;ampersand-dom-bindings&#039;);
@@ -101,7 +110,7 @@ var getPath = require(&#039;get-object-path&#039;);
 
 
 function View(attrs) {
-    this.cid = _.uniqueId(&#039;view&#039;);
+    this.cid = uniqueId(&#039;view&#039;);
     attrs || (attrs = {});
     var parent = attrs.parent;
     delete attrs.parent;
@@ -115,7 +124,7 @@ function View(attrs) {
     this._initializeSubviews();
     this.template = attrs.template || this.template;
     this.initialize.apply(this, arguments);
-    this.set(_.pick(attrs, viewOptions));
+    this.set(pick(attrs, viewOptions));
     if (this.autoRender &amp;&amp; this.template) {
         this.render();
     }
@@ -176,7 +185,7 @@ var viewOptions = [&#039;model&#039;, &#039;collection&#039;, &#039;el&#039;];
 View.prototype = Object.create(BaseState.prototype);
 
 // Set up all inheritable properties and methods.
-_.extend(View.prototype, {
+assign(View.prototype, {
     // ## query
     // Get an single element based on CSS selector scoped to this.el
     // if you pass an empty string it return `this.el`.
@@ -212,6 +221,12 @@ _.extend(View.prototype, {
         return this.query(&#039;[data-hook~=&quot;&#039; + hook + &#039;&quot;]&#039;);
     },
 
+    // ## queryAllByHook
+    // Convenience method for fetching all elements by their&#039;s `data-hook` attribute.
+    queryAllByHook: function (hook) {
+        return this.queryAll(&#039;[data-hook~=&quot;&#039; + hook + &#039;&quot;]&#039;);
+    },
+
     // Initialize is an empty function by default. Override it with your own
     // initialization logic.
     initialize: function () {},
@@ -228,13 +243,13 @@ _.extend(View.prototype, {
     remove: function () {
         var parsedBindings = this._parsedBindings;
         if (this.el &amp;&amp; this.el.parentNode) this.el.parentNode.removeChild(this.el);
-        if (this._subviews) _.chain(this._subviews).flatten().invoke(&#039;remove&#039;);
+        if (this._subviews) invoke(flatten(this._subviews), &#039;remove&#039;);
         this.stopListening();
         // TODO: Not sure if this is actually necessary.
         // Just trying to de-reference this potentially large
         // amount of generated functions to avoid memory leaks.
-        _.each(parsedBindings, function (properties, modelName) {
-            _.each(properties, function (value, key) {
+        forEach(parsedBindings, function (properties, modelName) {
+            forEach(properties, function (value, key) {
                 delete parsedBindings[modelName][key];
             });
             delete parsedBindings[modelName];
@@ -269,7 +284,7 @@ _.extend(View.prototype, {
     // This only works for delegate-able events: not `focus`, `blur`, and
     // not `change`, `submit`, and `reset` in Internet Explorer.
     delegateEvents: function (events) {
-        if (!(events || (events = _.result(this, &#039;events&#039;)))) return this;
+        if (!(events || (events = result(this, &#039;events&#039;)))) return this;
         this.undelegateEvents();
         for (var key in events) {
             this.eventManager.bind(key, events[key]);
@@ -291,10 +306,8 @@ _.extend(View.prototype, {
         // Storage for our subviews.
         this._subviews || (this._subviews = []);
         this._subviews.push(view);
-        // If view has an &#039;el&#039; it&#039;s a single view not
-        // an array of views registered by renderCollection
-        // so we store a reference to the parent view.
-        if (view.el) view.parent = this;
+        // set the parent reference if it has not been set
+        if (!view.parent) view.parent = this;
         return view;
     },
 
@@ -318,7 +331,7 @@ _.extend(View.prototype, {
         var item;
         for (item in fns) {
             fns[item].forEach(function (fn) {
-                fn(this.el, getPath(this, item), _.last(item.split(&#039;.&#039;)));
+                fn(this.el, getPath(this, item), last(item.split(&#039;.&#039;)));
             }, this);
         }
     },
@@ -382,8 +395,8 @@ _.extend(View.prototype, {
     renderWithTemplate: function (context, templateArg) {
         var template = templateArg || this.template;
         if (!template) throw new Error(&#039;Template string or function needed.&#039;);
-        var newDom = _.isString(template) ? template : template.call(this, context || this);
-        if (_.isString(newDom)) newDom = domify(newDom);
+        var newDom = isString(template) ? template : template.call(this, context || this);
+        if (isString(newDom)) newDom = domify(newDom);
         var parent = this.el &amp;&amp; this.el.parentNode;
         if (parent) parent.replaceChild(newDom, this.el);
         if (newDom.nodeName === &#039;#document-fragment&#039;) throw new Error(&#039;Views can only have one root element.&#039;);
@@ -415,13 +428,14 @@ _.extend(View.prototype, {
         for (var item in hash) {
             this[item] = this.query(hash[item]);
         }
+        return this;
     },
 
     // ## listenToAndRun
     // Shortcut for registering a listener for a model
     // and also triggering it right away.
     listenToAndRun: function (object, events, handler) {
-        var bound = _.bind(handler, this);
+        var bound = bind(handler, this);
         this.listenTo(object, events, bound);
         bound();
     },
@@ -440,7 +454,7 @@ _.extend(View.prototype, {
     // collection. The collectionView is returned.
     renderCollection: function (collection, ViewClass, container, opts) {
         var containerEl = (typeof container === &#039;string&#039;) ? this.query(container) : container;
-        var config = _.extend({
+        var config = assign({
             collection: collection,
             el: containerEl || this.el,
             view: ViewClass,

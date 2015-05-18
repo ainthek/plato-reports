@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">43.00</p>
+      <p class="stat">42.42</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">81</p>
+      <p class="stat">88</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">24.40</p>
+      <p class="stat">25.89</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">0.99</p>
+      <p class="stat">1.10</p>
     </div>
   </div>
 </div>
@@ -106,23 +106,29 @@
 			dua = n.userAgent,
 			dav = n.appVersion,
 			tv = parseFloat(dav);
-
 		has.add(&quot;air&quot;, dua.indexOf(&quot;AdobeAIR&quot;) &gt;= 0);
+		has.add(&quot;wp&quot;, parseFloat(dua.split(&quot;Windows Phone&quot;)[1]) || undefined);
 		has.add(&quot;msapp&quot;, parseFloat(dua.split(&quot;MSAppHost/&quot;)[1]) || undefined);
 		has.add(&quot;khtml&quot;, dav.indexOf(&quot;Konqueror&quot;) &gt;= 0 ? tv : undefined);
-		has.add(&quot;webkit&quot;, parseFloat(dua.split(&quot;WebKit/&quot;)[1]) || undefined);
+		has.add(&quot;webkit&quot;, !has(&quot;wp&quot;) // NOTE: necessary since Windows Phone 8.1 Update 1, see #18540
+				&amp;&amp; parseFloat(dua.split(&quot;WebKit/&quot;)[1]) || undefined);
 		has.add(&quot;chrome&quot;, parseFloat(dua.split(&quot;Chrome/&quot;)[1]) || undefined);
-		has.add(&quot;safari&quot;, dav.indexOf(&quot;Safari&quot;)&gt;=0 &amp;&amp; !has(&quot;chrome&quot;) ? parseFloat(dav.split(&quot;Version/&quot;)[1]) : undefined);
+		has.add(&quot;android&quot;, !has(&quot;wp&quot;) // NOTE: necessary since Windows Phone 8.1 Update 1, see #18528
+				&amp;&amp; parseFloat(dua.split(&quot;Android &quot;)[1]) || undefined);
+		has.add(&quot;safari&quot;, dav.indexOf(&quot;Safari&quot;) &gt;= 0 
+				&amp;&amp; !has(&quot;wp&quot;) // NOTE: necessary since Windows Phone 8.1 Update 1, see #18540
+				&amp;&amp; !has(&quot;chrome&quot;) &amp;&amp; !has(&quot;android&quot;) ?
+			parseFloat(dav.split(&quot;Version/&quot;)[1]) : undefined);
 		has.add(&quot;mac&quot;, dav.indexOf(&quot;Macintosh&quot;) &gt;= 0);
 		has.add(&quot;quirks&quot;, document.compatMode == &quot;BackCompat&quot;);
-		if(dua.match(/(iPhone|iPod|iPad)/)){
+		if(!has(&quot;wp&quot;) // NOTE: necessary since Windows Phone 8.1 Update 1, see #18528
+				&amp;&amp; dua.match(/(iPhone|iPod|iPad)/)){
 			var p = RegExp.$1.replace(/P/, &quot;p&quot;);
 			var v = dua.match(/OS ([\d_]+)/) ? RegExp.$1 : &quot;1&quot;;
 			var os = parseFloat(v.replace(/_/, &quot;.&quot;).replace(/_/g, &quot;&quot;));
 			has.add(p, os);		// &quot;iphone&quot;, &quot;ipad&quot; or &quot;ipod&quot;
 			has.add(&quot;ios&quot;, os);
 		}
-		has.add(&quot;android&quot;, parseFloat(dua.split(&quot;Android &quot;)[1]) || undefined);
 		has.add(&quot;bb&quot;, (dua.indexOf(&quot;BlackBerry&quot;) &gt;= 0 || dua.indexOf(&quot;BB10&quot;) &gt;= 0) &amp;&amp; parseFloat(dua.split(&quot;Version/&quot;)[1]) || undefined);
 		has.add(&quot;trident&quot;, parseFloat(dav.split(&quot;Trident/&quot;)[1]) || undefined);
 
@@ -137,7 +143,8 @@
 			}
 
 			// Mozilla and firefox
-			if(dua.indexOf(&quot;Gecko&quot;) &gt;= 0 &amp;&amp; !has(&quot;khtml&quot;) &amp;&amp; !has(&quot;webkit&quot;) &amp;&amp; !has(&quot;trident&quot;)){
+			if(dua.indexOf(&quot;Gecko&quot;) &gt;= 0 &amp;&amp; !has(&quot;wp&quot;) // NOTE: necessary since Windows Phone 8.1 Update 1
+					&amp;&amp; !has(&quot;khtml&quot;) &amp;&amp; !has(&quot;webkit&quot;) &amp;&amp; !has(&quot;trident&quot;)){
 				has.add(&quot;mozilla&quot;, tv);
 			}
 			if(has(&quot;mozilla&quot;)){

@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">74.78</p>
+      <p class="stat">77.48</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">243</p>
+      <p class="stat">306</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">33.27</p>
+      <p class="stat">39.58</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">1.61</p>
+      <p class="stat">2.07</p>
     </div>
   </div>
 </div>
@@ -98,10 +98,12 @@ var server = require(&#039;./server&#039;)
 var s = server.createServer()
   , currResponseHandler
 
-s.on(&#039;http://google.com/&#039;, function(req, res) {
-  currResponseHandler(req, res)
-  res.writeHeader(200)
-  res.end(&#039;ok&#039;)
+[&#039;http://google.com/&#039;, &#039;https://google.com/&#039;].forEach(function(url) {
+  s.on(url, function(req, res) {
+    currResponseHandler(req, res)
+    res.writeHeader(200)
+    res.end(&#039;ok&#039;)
+  })
 })
 
 var proxyEnvVars = [
@@ -148,14 +150,8 @@ function runTest(name, options, responseHandler) {
       }
     }
 
-    var requestOpts = {
-      url: &#039;http://google.com&#039;
-    }
-    for (var k in options) {
-      requestOpts[k] = options[k]
-    }
-
-    request(requestOpts, function(err, res, body) {
+    options.url = options.url || &#039;http://google.com&#039;
+    request(options, function(err, res, body) {
       if (responseHandler &amp;&amp; !called) {
         t.fail(&#039;proxy response should be called&#039;)
       }
@@ -214,25 +210,80 @@ if (process.env.TEST_PROXY_HARNESS) {
     t.equal(req.headers[&#039;proxy-authorization&#039;], &#039;Basic dXNlcjpwYXNz&#039;)
   })
 
-  runTest(&#039;HTTP_PROXY environment variable&#039;, {
+  // http: urls and basic proxy settings
+
+  runTest(&#039;HTTP_PROXY environment variable and http: url&#039;, {
     env : { HTTP_PROXY : s.url }
   }, true)
 
-  runTest(&#039;http_proxy environment variable&#039;, {
+  runTest(&#039;http_proxy environment variable and http: url&#039;, {
     env : { http_proxy : s.url }
   }, true)
 
-  runTest(&#039;http_proxy with length of one more than the URL&#039;, {
-    env: {
-      HTTP_PROXY : s.url,
-      NO_PROXY: &#039;elgoog1.com&#039; // one more char than google.com
-    }
+  runTest(&#039;HTTPS_PROXY environment variable and http: url&#039;, {
+    env : { HTTPS_PROXY : s.url }
+  }, false)
+
+  runTest(&#039;https_proxy environment variable and http: url&#039;, {
+    env : { https_proxy : s.url }
+  }, false)
+
+  // https: urls and basic proxy settings
+
+  runTest(&#039;HTTP_PROXY environment variable and https: url&#039;, {
+    env    : { HTTP_PROXY : s.url },
+    url    : &#039;https://google.com&#039;,
+    tunnel : false,
+    pool   : false
   }, true)
+
+  runTest(&#039;http_proxy environment variable and https: url&#039;, {
+    env    : { http_proxy : s.url },
+    url    : &#039;https://google.com&#039;,
+    tunnel : false
+  }, true)
+
+  runTest(&#039;HTTPS_PROXY environment variable and https: url&#039;, {
+    env    : { HTTPS_PROXY : s.url },
+    url    : &#039;https://google.com&#039;,
+    tunnel : false
+  }, true)
+
+  runTest(&#039;https_proxy environment variable and https: url&#039;, {
+    env    : { https_proxy : s.url },
+    url    : &#039;https://google.com&#039;,
+    tunnel : false
+  }, true)
+
+  runTest(&#039;multiple environment variables and https: url&#039;, {
+    env : {
+      HTTPS_PROXY : s.url,
+      HTTP_PROXY  : &#039;http://localhost:4/&#039;
+    },
+    url    : &#039;https://google.com&#039;,
+    tunnel : false
+  }, true)
+
+  // no_proxy logic
 
   runTest(&#039;NO_PROXY hostnames are case insensitive&#039;, {
     env : {
       HTTP_PROXY : s.url,
       NO_PROXY   : &#039;GOOGLE.COM&#039;
+    }
+  }, false)
+
+  runTest(&#039;NO_PROXY hostnames are case insensitive 2&#039;, {
+    env : {
+      http_proxy : s.url,
+      NO_PROXY   : &#039;GOOGLE.COM&#039;
+    }
+  }, false)
+
+  runTest(&#039;NO_PROXY hostnames are case insensitive 3&#039;, {
+    env : {
+      HTTP_PROXY : s.url,
+      no_proxy   : &#039;GOOGLE.COM&#039;
     }
   }, false)
 
@@ -312,6 +363,17 @@ if (process.env.TEST_PROXY_HARNESS) {
     }
   }, true)
 
+  // misc
+
+  // this fails if the check &#039;isMatchedAt &gt; -1&#039; in lib/getProxyFromURI.js is
+  // missing or broken
+  runTest(&#039;http_proxy with length of one more than the URL&#039;, {
+    env : {
+      HTTP_PROXY : s.url,
+      NO_PROXY   : &#039;elgoog1.com&#039; // one more char than google.com
+    }
+  }, true)
+
   runTest(&#039;proxy: null should override HTTP_PROXY&#039;, {
     env     : { HTTP_PROXY : s.url },
     proxy   : null,
@@ -329,8 +391,9 @@ if (process.env.TEST_PROXY_HARNESS) {
 
 
 tape(&#039;cleanup&#039;, function(t) {
-  s.close()
-  t.end()
+  s.close(function() {
+    t.end()
+  })
 })</textarea>
   </div>
 </div>

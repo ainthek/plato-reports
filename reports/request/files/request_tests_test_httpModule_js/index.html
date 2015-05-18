@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">76.94</p>
+      <p class="stat">78.29</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">106</p>
+      <p class="stat">108</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">25.97</p>
+      <p class="stat">26.16</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">1.01</p>
+      <p class="stat">1.02</p>
     </div>
   </div>
 </div>
@@ -155,7 +155,7 @@ tape(&#039;setup&#039;, function(t) {
 
 function run_tests(name, httpModules) {
   tape(name, function(t) {
-    var to_https =  &#039;http://localhost:&#039; + plain_server.port + &#039;/to_https&#039;
+    var to_https = &#039;http://localhost:&#039; + plain_server.port + &#039;/to_https&#039;
       , to_plain = &#039;https://localhost:&#039; + https_server.port + &#039;/to_plain&#039;
       , options = { httpModules: httpModules, strictSSL: false }
       , modulesTest = httpModules || {}
@@ -191,9 +191,11 @@ run_tests(&#039;https only&#039;, { &#039;https:&#039;: faux_https })
 run_tests(&#039;http and https&#039;, { &#039;http:&#039;: faux_http, &#039;https:&#039;: faux_https })
 
 tape(&#039;cleanup&#039;, function(t) {
-  plain_server.close()
-  https_server.close()
-  t.end()
+  plain_server.close(function() {
+    https_server.close(function() {
+      t.end()
+    })
+  })
 })</textarea>
   </div>
 </div>

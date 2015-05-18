@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">56.87</p>
+      <p class="stat">56.80</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">920</p>
+      <p class="stat">926</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">89.32</p>
+      <p class="stat">89.29</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">7.19</p>
+      <p class="stat">7.22</p>
     </div>
   </div>
 </div>
@@ -132,29 +132,35 @@
 		return map;
 	}
 
-	// Map from widget name or list of widget names(ex: &quot;dijit/form/Button,acme/MyMixin&quot;) to a constructor.
-	var _ctorMap = {};
-
 	function getCtor(/*String[]*/ types, /*Function?*/ contextRequire){
 		// summary:
 		//		Retrieves a constructor.  If the types array contains more than one class/MID then the
 		//		subsequent classes will be mixed into the first class and a unique constructor will be
 		//		returned for that array.
 
+		if(!contextRequire){
+			contextRequire = require;
+		}
+
+		// Map from widget name or list of widget names(ex: &quot;dijit/form/Button,acme/MyMixin&quot;) to a constructor.
+		// Keep separate map for each requireContext to avoid false matches (ex: &quot;./Foo&quot; can mean different things
+		// depending on context.)
+		var ctorMap = contextRequire._dojoParserCtorMap || (contextRequire._dojoParserCtorMap = {});
+
 		var ts = types.join();
-		if(!_ctorMap[ts]){
+		if(!ctorMap[ts]){
 			var mixins = [];
 			for(var i = 0, l = types.length; i &lt; l; i++){
 				var t = types[i];
 				// TODO: Consider swapping getObject and require in the future
-				mixins[mixins.length] = (_ctorMap[t] = _ctorMap[t] || (dlang.getObject(t) || (~t.indexOf(&#039;/&#039;) &amp;&amp;
-					(contextRequire ? contextRequire(t) : require(t)))));
+				mixins[mixins.length] = (ctorMap[t] = ctorMap[t] || (dlang.getObject(t) || (~t.indexOf(&#039;/&#039;) &amp;&amp;
+					contextRequire(t))));
 			}
 			var ctor = mixins.shift();
-			_ctorMap[ts] = mixins.length ? (ctor.createSubclass ? ctor.createSubclass(mixins) : ctor.extend.apply(ctor, mixins)) : ctor;
+			ctorMap[ts] = mixins.length ? (ctor.createSubclass ? ctor.createSubclass(mixins) : ctor.extend.apply(ctor, mixins)) : ctor;
 		}
 
-		return _ctorMap[ts];
+		return ctorMap[ts];
 	}
 
 	var parser = {
@@ -370,7 +376,7 @@
 				hash[attrData + &quot;props&quot;] = &quot;data-dojo-props&quot;;
 				hash[attrData + &quot;type&quot;] = &quot;data-dojo-type&quot;;
 				hash[attrData + &quot;mixins&quot;] = &quot;data-dojo-mixins&quot;;
-				hash[scope + &quot;type&quot;] = &quot;dojoType&quot;;
+				hash[scope + &quot;type&quot;] = &quot;dojotype&quot;;
 				hash[attrData + &quot;id&quot;] = &quot;data-dojo-id&quot;;
 			}
 

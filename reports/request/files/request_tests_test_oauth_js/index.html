@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">66.91</p>
+      <p class="stat">69.24</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">512</p>
+      <p class="stat">654</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">40.15</p>
+      <p class="stat">46.51</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">4.64</p>
+      <p class="stat">6.28</p>
     </div>
   </div>
 </div>
@@ -97,6 +97,8 @@ var oauth = require(&#039;oauth-sign&#039;)
   , path = require(&#039;path&#039;)
   , request = require(&#039;../index&#039;)
   , tape = require(&#039;tape&#039;)
+  , crypto = require(&#039;crypto&#039;)
+  , http = require(&#039;http&#039;)
 
 function getSignature(r) {
   var sign
@@ -393,6 +395,23 @@ tape(&#039;rfc5849 RSA example&#039;, function(t) {
   })
 })
 
+tape(&#039;plaintext signature method&#039;, function(t) {
+  var plaintext = request.post(
+    { url: &#039;https://dummy.com&#039;
+    , oauth:
+      { consumer_secret: &#039;consumer_secret&#039;
+      , token_secret: &#039;token_secret&#039;
+      , signature_method: &#039;PLAINTEXT&#039;
+      }
+    })
+
+  process.nextTick(function() {
+    t.equal(&#039;consumer_secret&amp;token_secret&#039;, getSignature(plaintext))
+    plaintext.abort()
+    t.end()
+  })
+})
+
 tape(&#039;invalid transport_method&#039;, function(t) {
   t.throws(
     function () {
@@ -426,7 +445,7 @@ tape(&#039;invalid method while using transport_method \&#039;body\&#039;&#039;,
         { transport_method: &#039;body&#039;
         }
       })
-    }, /requires &#039;POST&#039;/)
+    }, /requires POST/)
   t.end()
 })
 
@@ -440,7 +459,7 @@ tape(&#039;invalid content-type while using transport_method \&#039;body\&#039;&
         { transport_method: &#039;body&#039;
         }
       })
-    }, /requires &#039;POST&#039;/)
+    }, /requires POST/)
   t.end()
 })
 
@@ -525,20 +544,20 @@ tape(&#039;query transport_method with qs parameter and existing query string in
     t.notOk(r.headers.Authorization, &#039;oauth Authorization header should not be present with transport_method \&#039;query\&#039;&#039;)
     t.notOk(r.path.match(/\?&amp;/), &#039;there should be no ampersand at the beginning of the query&#039;)
     t.equal(&#039;OB33pYjWAnf+xtOHN4Gmbdil168=&#039;, qs.parse(r.path).oauth_signature)
-    var matches = r.path.match(/\?(.*?)&amp;(oauth.*$)/)
-    t.ok(matches, &#039;regex to split oauth parameters from qs parameters matched successfully&#039;)
-    var qsParams = qs.parse(matches[1])
-    var oauthParams = qs.parse(matches[2])
 
-    var i, paramNames = [&#039;a2&#039;, &#039;a3[0]&#039;, &#039;a3[1]&#039;, &#039;c@&#039;, &#039;b5&#039;, &#039;c2&#039;]
-    for (i = 0; i &lt; paramNames.length; i++) {
-      t.ok(qsParams.hasOwnProperty(paramNames[i]), &#039;Non-oauth query params should be first in query string: &#039; + paramNames[i])
-    }
+    var params = qs.parse(r.path.split(&#039;?&#039;)[1])
+      , keys = Object.keys(params)
 
-    paramNames = [&#039;consumer_key&#039;, &#039;nonce&#039;, &#039;timestamp&#039;, &#039;version&#039;, &#039;signature&#039;, &#039;token&#039;, &#039;signature_method&#039;]
-    for (i = 0; i &lt; paramNames.length; i++) {
-      var paramName = &#039;oauth_&#039; + paramNames[i]
-      t.ok(oauthParams[paramName], &#039;OAuth query params should be included after request specific parameters: &#039; + paramName)
+    var paramNames = [
+      &#039;a2&#039;, &#039;b5&#039;, &#039;a3[0]&#039;, &#039;a3[1]&#039;, &#039;c@&#039;, &#039;c2&#039;,
+      &#039;realm&#039;, &#039;oauth_nonce&#039;, &#039;oauth_signature_method&#039;, &#039;oauth_timestamp&#039;,
+      &#039;oauth_token&#039;, &#039;oauth_version&#039;, &#039;oauth_signature&#039;
+    ]
+
+    for (var i = 0; i &lt; keys.length; i++) {
+      t.ok(keys[i] === paramNames[i],
+        &#039;Non-oauth query params should be first, &#039; +
+        &#039;OAuth query params should be second in query string&#039;)
     }
 
     r.abort()
@@ -599,6 +618,129 @@ tape(&#039;body transport_method with prexisting body params&#039;, function(t) 
     t.equal(&#039;OB33pYjWAnf+xtOHN4Gmbdil168=&#039;, qs.parse(r.body.toString()).oauth_signature)
     r.abort()
     t.end()
+  })
+})
+
+tape(&#039;body_hash manual built&#039;, function(t) {
+  function buildBodyHash (body) {
+    var shasum = crypto.createHash(&#039;sha1&#039;)
+    shasum.update(body || &#039;&#039;)
+    var sha1 = shasum.digest(&#039;hex&#039;)
+    return new Buffer(sha1).toString(&#039;base64&#039;)
+  }
+
+  var json = {foo: &#039;bar&#039;}
+  var r = request.post(
+    { url: &#039;http://example.com&#039;
+    , oauth:
+      { consumer_secret: &#039;consumer_secret&#039;
+      , body_hash: buildBodyHash(JSON.stringify(json))
+      }
+    , json: json
+    })
+
+  process.nextTick(function() {
+    var body_hash = r.headers.Authorization.replace(/.*oauth_body_hash=&quot;([^&quot;]+)&quot;.*/, &#039;$1&#039;)
+    t.equal(&#039;YTVlNzQ0ZDAxNjQ1NDBkMzNiMWQ3ZWE2MTZjMjhmMmZhOTdlNzU0YQ%3D%3D&#039;, body_hash)
+    r.abort()
+    t.end()
+  })
+})
+
+tape(&#039;body_hash automatic built&#039;, function(t) {
+  var r = request.post(
+    { url: &#039;http://example.com&#039;
+    , oauth:
+      { consumer_secret: &#039;consumer_secret&#039;
+      , body_hash: true
+      }
+    , json: {foo: &#039;bar&#039;}
+    })
+
+  process.nextTick(function() {
+    var body_hash = r.headers.Authorization.replace(/.*oauth_body_hash=&quot;([^&quot;]+)&quot;.*/, &#039;$1&#039;)
+    t.equal(&#039;YTVlNzQ0ZDAxNjQ1NDBkMzNiMWQ3ZWE2MTZjMjhmMmZhOTdlNzU0YQ%3D%3D&#039;, body_hash)
+    r.abort()
+    t.end()
+  })
+})
+
+tape(&#039;body_hash PLAINTEXT signature_method&#039;, function(t) {
+  t.throws(function() {
+    request.post(
+    { url: &#039;http://example.com&#039;
+    , oauth:
+      { consumer_secret: &#039;consumer_secret&#039;
+      , body_hash: true
+      , signature_method: &#039;PLAINTEXT&#039;
+      }
+    , json: {foo: &#039;bar&#039;}
+    })
+  }, /oauth: PLAINTEXT signature_method not supported with body_hash signing/)
+  t.end()
+})
+
+tape(&#039;refresh oauth_nonce on redirect&#039;, function(t) {
+  var oauth_nonce1, oauth_nonce2
+  var s = http.createServer(function (req, res) {
+    if (req.url === &#039;/redirect&#039;) {
+      oauth_nonce1 = req.headers.authorization.replace(/.*oauth_nonce=&quot;([^&quot;]+)&quot;.*/, &#039;$1&#039;)
+      res.writeHead(302, {location:&#039;http://localhost:6767/response&#039;})
+      res.end()
+    } else if (req.url === &#039;/response&#039;) {
+      oauth_nonce2 = req.headers.authorization.replace(/.*oauth_nonce=&quot;([^&quot;]+)&quot;.*/, &#039;$1&#039;)
+      res.writeHead(200, {&#039;content-type&#039;:&#039;text/plain&#039;})
+      res.end()
+    }
+  })
+  s.listen(6767, function () {
+    request.get(
+      { url: &#039;http://localhost:6767/redirect&#039;
+      , oauth:
+        { consumer_key: &#039;consumer_key&#039;
+        , consumer_secret: &#039;consumer_secret&#039;
+        , token: &#039;token&#039;
+        , token_secret: &#039;token_secret&#039;
+        }
+      }, function (err, res, body) {
+        t.equal(err, null)
+        t.notEqual(oauth_nonce1, oauth_nonce2)
+        s.close(function () {
+          t.end()
+        })
+      })
+  })
+})
+
+tape(&#039;no credentials on external redirect&#039;, function(t) {
+  var s1 = http.createServer(function (req, res) {
+    res.writeHead(302, {location:&#039;http://127.0.0.1:6768&#039;})
+    res.end()
+  })
+  var s2 = http.createServer(function (req, res) {
+    res.writeHead(200, {&#039;content-type&#039;:&#039;text/plain&#039;})
+    res.end()
+  })
+  s1.listen(6767, function () {
+    s2.listen(6768, function () {
+      request.get(
+        { url: &#039;http://localhost:6767&#039;
+        , oauth:
+          { consumer_key: &#039;consumer_key&#039;
+          , consumer_secret: &#039;consumer_secret&#039;
+          , token: &#039;token&#039;
+          , token_secret: &#039;token_secret&#039;
+          }
+        }, function (err, res, body) {
+          t.equal(err, null)
+          t.equal(res.request.headers.Authorization, undefined)
+          s1.close(function () {
+            s2.close(function () {
+              t.end()
+            })
+          })
+        })
+    })
   })
 })</textarea>
   </div>

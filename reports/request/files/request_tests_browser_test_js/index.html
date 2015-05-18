@@ -48,7 +48,7 @@
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">25</p>
+      <p class="stat">35</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">6.83</p>
+      <p class="stat">9.80</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">0.12</p>
+      <p class="stat">0.18</p>
     </div>
   </div>
 </div>
@@ -100,14 +100,24 @@ if (!Function.prototype.bind) {
 }
 
 
-var assert = require(&#039;assert&#039;)
-  , tape = require(&#039;tape&#039;)
+var tape = require(&#039;tape&#039;)
   , request = require(&#039;../../index&#039;)
 
-tape(&#039;Request browser test&#039;, function(t) {
+tape(&#039;returns on error&#039;, function(t) {
   t.plan(1)
   request({
-    uri: &#039;https://api.github.com&#039;,
+    uri: &#039;https://stupid.nonexistent.path:port123/\\&lt;-great-idea&#039;,
+    withCredentials: false
+  }, function (error, response) {
+    t.equal(response.statusCode, 0)
+    t.end()
+  })
+})
+
+tape(&#039;succeeds on valid URLs (with https and CORS)&#039;, function(t) {
+  t.plan(1)
+  request({
+    uri: &#039;https://localhost:6767&#039;,
     withCredentials: false
   }, function (error, response) {
     t.equal(response.statusCode, 200)

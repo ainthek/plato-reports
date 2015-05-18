@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">64.36</p>
+      <p class="stat">65.76</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">98</p>
+      <p class="stat">99</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">27.46</p>
+      <p class="stat">27.55</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">1.20</p>
+      <p class="stat">1.21</p>
     </div>
   </div>
 </div>
@@ -146,7 +146,7 @@ tape(&#039;multipart form append&#039;, function(t) {
       field = FIELDS.shift()
       t.ok( data.indexOf(&#039;form-data; name=&quot;&#039; + field.name + &#039;&quot;&#039;) !== -1 )
       t.ok( data.indexOf(&#039;; filename=&quot;&#039; + path.basename(field.value.path) + &#039;&quot;&#039;) !== -1 )
-      // check for http://localhost:8080/file traces
+      // check for http://localhost:6767/file traces
       t.ok( data.indexOf(&#039;Photoshop ICC&#039;) !== -1 )
       t.ok( data.indexOf(&#039;Content-Type: &#039; + mime.lookup(remoteFile) ) !== -1 )
 
@@ -156,24 +156,25 @@ tape(&#039;multipart form append&#039;, function(t) {
       res.end(&#039;done&#039;)
 
       t.equal(FIELDS.length, 0)
-      t.end()
     })
   })
 
-  server.listen(8080, function() {
+  server.listen(6767, function() {
 
     FIELDS = [
       { name: &#039;my_field&#039;, value: &#039;my_value&#039; },
       { name: &#039;my_buffer&#039;, value: new Buffer([1, 2, 3]) },
       { name: &#039;my_file&#039;, value: fs.createReadStream(localFile) },
-      { name: &#039;remote_file&#039;, value: request(&#039;http://localhost:8080/file&#039;) }
+      { name: &#039;remote_file&#039;, value: request(&#039;http://localhost:6767/file&#039;) }
     ]
 
-    var req = request.post(&#039;http://localhost:8080/upload&#039;, function(err, res, body) {
+    var req = request.post(&#039;http://localhost:6767/upload&#039;, function(err, res, body) {
       t.equal(err, null)
       t.equal(res.statusCode, 200)
       t.equal(body, &#039;done&#039;)
-      server.close()
+      server.close(function() {
+        t.end()
+      })
     })
     var form = req.form()
 

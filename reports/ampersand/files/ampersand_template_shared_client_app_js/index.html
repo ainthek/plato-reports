@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">71.77</p>
+      <p class="stat">73.98</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">54</p>
+      <p class="stat">45</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">8.92</p>
+      <p class="stat">9.20</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">0.35</p>
+      <p class="stat">0.29</p>
     </div>
   </div>
 </div>
@@ -89,61 +89,51 @@
 
 <div class="container">
   <div class="row">
-    <textarea id="file-source" class="col-md-12">/*global app, me, $*/
-var _ = require(&#039;underscore&#039;);
-var logger = require(&#039;andlog&#039;);
+    <textarea id="file-source" class="col-md-12">var app = require(&#039;ampersand-app&#039;);
+var _ = require(&#039;lodash&#039;);
 var config = require(&#039;clientconfig&#039;);
-
 var Router = require(&#039;./router&#039;);
-var tracking = require(&#039;./helpers/metrics&#039;);
 var MainView = require(&#039;./views/main&#039;);
 var Me = require(&#039;./models/me&#039;);
 var People = require(&#039;./models/persons&#039;);
 var domReady = require(&#039;domready&#039;);
 
+// attach our app to `window` so we can
+// easily access it from the console.
+window.app = app;
 
-module.exports = {
-    // this is the the whole app initter
-    blastoff: function () {
-        var self = window.app = this;
-
-        // create our global &#039;me&#039; object and an empty collection for our people models.
-        window.me = new Me();
-        this.people = new People();
-
-        // init our URL handlers and the history tracker
-        this.router = new Router();
-
-        // wait for document ready to render our main view
-        // this ensures the document has a body, etc.
-        domReady(function () {
-            // init our main view
-            var mainView = self.view = new MainView({
-                model: me,
-                el: document.body
-            });
-
-            // ...and render it
-            mainView.render();
-
-            // we have what we need, we can now start our router and show the appropriate page
-            self.router.history.start({pushState: true, root: &#039;/&#039;});
+// Extends our main app singleton
+app.extend({
+    me: new Me(),
+    people: new People(),
+    router: new Router(),
+    // This is where it all starts
+    init: function() {
+        // Create and attach our main view
+        this.mainView = new MainView({
+            model: this.me,
+            el: document.body
         });
-    },
 
-    // This is how you navigate around the app.
+        // this kicks off our backbutton tracking (browser history)
+        // and will cause the first matching handler in the router
+        // to fire.
+        this.router.history.start({ pushState: true });
+    },
+    // This is a helper for navigating around the app.
     // this gets called by a global click handler that handles
     // all the &lt;a&gt; tags in the app.
-    // it expects a url without a leading slash.
-    // for example: &quot;costello/settings&quot;.
-    navigate: function (page) {
+    // it expects a url pathname for example: &quot;/costello/settings&quot;
+    navigate: function(page) {
         var url = (page.charAt(0) === &#039;/&#039;) ? page.slice(1) : page;
-        this.router.history.navigate(url, {trigger: true});
+        this.router.history.navigate(url, {
+            trigger: true
+        });
     }
-};
+});
 
-// run it
-module.exports.blastoff();</textarea>
+// run it on domReady
+domReady(_.bind(app.init, app));</textarea>
   </div>
 </div>
 
