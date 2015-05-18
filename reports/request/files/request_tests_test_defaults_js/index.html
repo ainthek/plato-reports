@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">73.76</p>
+      <p class="stat">74.63</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">259</p>
+      <p class="stat">367</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">43.84</p>
+      <p class="stat">61.71</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">3.21</p>
+      <p class="stat">4.54</p>
     </div>
   </div>
 </div>
@@ -112,6 +112,14 @@ tape(&#039;setup&#039;, function(t) {
       assert.equal(req.headers.merged, &#039;yes&#039;)
       resp.writeHead(200)
       resp.end()
+    })
+
+    s.on(&#039;/foo-no-test&#039;, function(req, resp) {
+      assert.equal(req.headers.foo, &#039;bar&#039;)
+      assert.equal(&#039;test&#039; in req.headers, false)
+      assert.equal(req.method, &#039;GET&#039;)
+      resp.writeHead(200, {&#039;Content-Type&#039;: &#039;text/plain&#039;})
+      resp.end(&#039;TESTING!&#039;)
     })
 
     s.on(&#039;/post&#039;, function (req, resp) {
@@ -196,6 +204,11 @@ tape(&#039;setup&#039;, function(t) {
       })
     })
 
+    s.on(&#039;/function&#039;, function(req, resp) {
+      resp.writeHead(200, {&#039;Content-Type&#039;: &#039;text/plain&#039;})
+      resp.end()
+    })
+
     t.end()
   })
 })
@@ -218,6 +231,16 @@ tape(&#039;merge headers&#039;, function(t) {
   }, function (e, r, b) {
     t.equal(e, null)
     t.equal(r.statusCode, 200)
+    t.end()
+  })
+})
+
+tape(&#039;default undefined header&#039;, function(t) {
+  request.defaults({
+    headers: { foo: &#039;bar&#039;, test: undefined }
+  })(s.url + &#039;/foo-no-test&#039;, function(e, r, b) {
+    t.equal(e, null)
+    t.equal(b, &#039;TESTING!&#039;)
     t.end()
   })
 })
@@ -276,7 +299,7 @@ tape(&#039;head(object, function)&#039;, function(t) {
 })
 
 tape(&#039;recursive defaults&#039;, function(t) {
-  t.plan(6)
+  t.plan(8)
 
   var defaultsOne = request.defaults({ headers: { foo: &#039;bar1&#039; } })
     , defaultsTwo = defaultsOne.defaults({ headers: { baz: &#039;bar2&#039; } })
@@ -302,6 +325,40 @@ tape(&#039;recursive defaults&#039;, function(t) {
     t.equal(e, null)
     t.equal(b, &#039;TESTING!&#039;)
   })
+
+  defaultsTwo.get(s.url + &#039;/get_recursive2&#039;, function (e, r, b) {
+    t.equal(e, null)
+    t.equal(b, &#039;TESTING!&#039;)
+  })
+})
+
+tape(&#039;recursive defaults requester&#039;, function(t) {
+  t.plan(4)
+
+  var defaultsOne = request.defaults({}, function(options, callback) {
+      var headers = options.headers || {}
+      headers.foo = &#039;bar1&#039;
+      options.headers = headers
+
+      request(options, callback)
+    })
+    , defaultsTwo = defaultsOne.defaults({}, function(options, callback) {
+      var headers = options.headers || {}
+      headers.baz = &#039;bar2&#039;
+      options.headers = headers
+
+      defaultsOne(options, callback)
+    })
+
+  defaultsOne.get(s.url + &#039;/get_recursive1&#039;, function (e, r, b) {
+    t.equal(e, null)
+    t.equal(b, &#039;TESTING!&#039;)
+  })
+
+  defaultsTwo.get(s.url + &#039;/get_recursive2&#039;, function (e, r, b) {
+    t.equal(e, null)
+    t.equal(b, &#039;TESTING!&#039;)
+  })
 })
 
 tape(&#039;test custom request handler function&#039;, function(t) {
@@ -312,9 +369,8 @@ tape(&#039;test custom request handler function&#039;, function(t) {
     body: &#039;TESTING!&#039;
   }, function(uri, options, callback) {
     var params = request.initParams(uri, options, callback)
-    options = params.options
-    options.headers.x = &#039;y&#039;
-    return request(params.uri, params.options, params.callback)
+    params.headers.x = &#039;y&#039;
+    return request(params.uri, params, params.callback)
   })
 
   t.throws(function() {
@@ -324,6 +380,23 @@ tape(&#039;test custom request handler function&#039;, function(t) {
   }, /HTTP HEAD requests MUST NOT include a request body/)
 
   requestWithCustomHandler.get(s.url + &#039;/get_custom&#039;, function(e, r, b) {
+    t.equal(e, null)
+  })
+})
+
+tape(&#039;test custom request handler function without options&#039;, function(t) {
+  t.plan(1)
+
+  var customHandlerWithoutOptions = request.defaults(function(uri, options, callback) {
+    var params = request.initParams(uri, options, callback)
+    var headers = params.headers || {}
+    headers.x = &#039;y&#039;
+    headers.foo = &#039;bar&#039;
+    params.headers = headers
+    return request(params.uri, params, params.callback)
+  })
+
+  customHandlerWithoutOptions.get(s.url + &#039;/get_custom&#039;, function(e, r, b) {
     t.equal(e, null)
   })
 })
@@ -344,9 +417,44 @@ tape(&#039;test only setting undefined properties&#039;, function(t) {
   })
 })
 
+tape(&#039;test only function&#039;, function(t) {
+  var post = request.post
+  t.doesNotThrow(function () {
+    post(s.url + &#039;/function&#039;, function (e, r, b) {
+      t.equal(r.statusCode, 200)
+      t.end()
+    })
+  })
+})
+
+tape(&#039;invoke defaults&#039;, function(t) {
+  var d = request.defaults({
+    uri: s.url + &#039;/get&#039;,
+    headers: { foo: &#039;bar&#039; }
+  })
+  d({}, function (e, r, b) {
+    t.equal(e, null)
+    t.equal(b, &#039;TESTING!&#039;)
+    t.end()
+  })
+})
+
+tape(&#039;invoke convenience method from defaults&#039;, function(t) {
+  var d = request.defaults({
+    uri: s.url + &#039;/get&#039;,
+    headers: { foo: &#039;bar&#039; }
+  })
+  d.get({}, function (e, r, b) {
+    t.equal(e, null)
+    t.equal(b, &#039;TESTING!&#039;)
+    t.end()
+  })
+})
+
 tape(&#039;cleanup&#039;, function(t) {
-  s.close()
-  t.end()
+  s.close(function() {
+    t.end()
+  })
 })</textarea>
   </div>
 </div>

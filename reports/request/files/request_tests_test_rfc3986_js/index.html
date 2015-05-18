@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">77.27</p>
+      <p class="stat">83.94</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">77</p>
+      <p class="stat">104</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">21.63</p>
+      <p class="stat">15.93</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">0.60</p>
+      <p class="stat">0.68</p>
     </div>
   </div>
 </div>
@@ -111,58 +111,85 @@ function runTest (t, options) {
       if (options.qs) {
         t.equal(req.url, &#039;/?rfc3986=%21%2A%28%29%27&#039;)
       }
-      if (options.form) {
-        t.equal(data, &#039;rfc3986=%21%2A%28%29%27&#039;)
-      }
-      if (options.body) {
-        if (options.headers) {
-          t.equal(data, &#039;rfc3986=%21%2A%28%29%27&#039;)
-        }
-        else {
-          t.equal(data, &#039;{&quot;rfc3986&quot;:&quot;%21%2A%28%29%27&quot;}&#039;)
-        }
-      }
-      if (typeof options.json === &#039;object&#039;) {
-        t.equal(data, &#039;{&quot;rfc3986&quot;:&quot;%21%2A%28%29%27&quot;}&#039;)
-      }
+      t.equal(data, options._expectBody)
 
       res.writeHead(200)
       res.end(&#039;done&#039;)
     })
   })
 
-  server.listen(8080, function() {
+  server.listen(6767, function() {
 
-    request.post(&#039;http://localhost:8080&#039;, options, function(err, res, body) {
+    request.post(&#039;http://localhost:6767&#039;, options, function(err, res, body) {
       t.equal(err, null)
-      server.close()
-      t.end()
+      server.close(function() {
+        t.end()
+      })
     })
   })
 }
 
+var bodyEscaped = &#039;rfc3986=%21%2A%28%29%27&#039;
+  , bodyJson    = &#039;{&quot;rfc3986&quot;:&quot;!*()\&#039;&quot;}&#039;
+
 var cases = [
-  {qs: {rfc3986: &#039;!*()\&#039;&#039;}},
-  {qs: {rfc3986: &#039;!*()\&#039;&#039;}, json: true},
-  {form: {rfc3986: &#039;!*()\&#039;&#039;}},
-  {form: {rfc3986: &#039;!*()\&#039;&#039;}, json: true},
-  {qs: {rfc3986: &#039;!*()\&#039;&#039;}, form: {rfc3986: &#039;!*()\&#039;&#039;}},
-  {qs: {rfc3986: &#039;!*()\&#039;&#039;}, form: {rfc3986: &#039;!*()\&#039;&#039;}, json: true},
   {
+    _name: &#039;qs&#039;,
+    qs: {rfc3986: &#039;!*()\&#039;&#039;},
+    _expectBody: &#039;&#039;
+  },
+  {
+    _name: &#039;qs + json&#039;,
+    qs: {rfc3986: &#039;!*()\&#039;&#039;},
+    json: true,
+    _expectBody: &#039;&#039;
+  },
+  {
+    _name: &#039;form&#039;,
+    form: {rfc3986: &#039;!*()\&#039;&#039;},
+    _expectBody: bodyEscaped
+  },
+  {
+    _name: &#039;form + json&#039;,
+    form: {rfc3986: &#039;!*()\&#039;&#039;},
+    json: true,
+    _expectBody: bodyEscaped
+  },
+  {
+    _name: &#039;qs + form&#039;,
+    qs: {rfc3986: &#039;!*()\&#039;&#039;},
+    form: {rfc3986: &#039;!*()\&#039;&#039;},
+    _expectBody: bodyEscaped
+  },
+  {
+    _name: &#039;qs + form + json&#039;,
+    qs: {rfc3986: &#039;!*()\&#039;&#039;},
+    form: {rfc3986: &#039;!*()\&#039;&#039;},
+    json: true,
+    _expectBody: bodyEscaped
+  },
+  {
+    _name: &#039;body + header + json&#039;,
     headers: {&#039;content-type&#039;: &#039;application/x-www-form-urlencoded; charset=UTF-8&#039;},
     body: &#039;rfc3986=!*()\&#039;&#039;,
-    json: true
+    json: true,
+    _expectBody: bodyEscaped
   },
   {
-    body: {rfc3986: &#039;!*()\&#039;&#039;}, json: true
+    _name: &#039;body + json&#039;,
+    body: {rfc3986: &#039;!*()\&#039;&#039;},
+    json: true,
+    _expectBody: bodyJson
   },
   {
-    json: {rfc3986: &#039;!*()\&#039;&#039;}
+    _name: &#039;json object&#039;,
+    json: {rfc3986: &#039;!*()\&#039;&#039;},
+    _expectBody: bodyJson
   }
 ]
 
-cases.forEach(function (options, index) {
-  tape(&#039;rfc3986 &#039; + index, function(t) {
+cases.forEach(function (options) {
+  tape(&#039;rfc3986 &#039; + options._name, function(t) {
     runTest(t, options)
   })
 })</textarea>

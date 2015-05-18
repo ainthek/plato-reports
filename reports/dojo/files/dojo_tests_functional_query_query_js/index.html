@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/functional/query/query.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/functional/query/query.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">72.18</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">901</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">61.67</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">12.69</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+    &#039;intern!object&#039;,
+    &#039;intern/chai!assert&#039;,
+    &#039;require&#039;,
+    &#039;dojo/_base/array&#039;
+], function (registerSuite, assert, require, array) {
+
+	array.forEach([&quot;query.html&quot;, &quot;queryQuirks.html&quot;], function (file) {
+		array.forEach([&quot;lite&quot;, &quot;css2&quot;, &quot;css2.1&quot;, &quot;css3&quot;, &quot;acme&quot;], function (selector) {
+			var tests = {
+				name: file + &quot;: &quot; + selector,
+
+				before: function () {
+					return this.get(&quot;remote&quot;)
+						.get(require.toUrl(&quot;./&quot; + file))
+						.setExecuteAsyncTimeout(10000)
+						.executeAsync(function (selector, send) {
+							require([
+								&#039;dojo/query!&#039; + selector,
+								&#039;dojo/sniff&#039;,
+								&#039;dojo/_base/array&#039;,
+								&#039;dojo/dom&#039;,
+								&#039;dojo/dom-construct&#039;,
+								&#039;dojo/request/iframe&#039;,
+								&#039;dojo/domReady!&#039;
+							], function (_query, _sniff, _array, _dom, _domConstruct, _iframe) {
+								query = _query;
+								has = _sniff;
+								array = _array;
+								dom = _dom;
+								domConstruct = _domConstruct;
+								iframe = _iframe;
+
+								send();
+							})
+						}, [selector])
+						.execute(function () {
+							createDocument = function (xml) {
+								var fauxXhr = {responseText: xml};
+								if (&quot;DOMParser&quot; in window) {
+									var parser = new DOMParser();
+									fauxXhr.responseXML = parser.parseFromString(xml, &quot;text/xml&quot;);
+								}
+								// kludge: code from dojo.xhr contentHandler to create doc on IE
+								var result = fauxXhr.responseXML;
+								if (has(&quot;ie&quot;)) {
+									// Needed for IE6-8
+									if ((!result || !result.documentElement)) {
+										var ms = function (n) {
+											return &quot;MSXML&quot; + n + &quot;.DOMDocument&quot;;
+										};
+										var dp = [&quot;Microsoft.XMLDOM&quot;, ms(6), ms(4), ms(3), ms(2)];
+										array.some(dp, function (p) {
+											try {
+												var dom = new ActiveXObject(p);
+												dom.async = false;
+												dom.loadXML(fauxXhr.responseText);
+												result = dom;
+											} catch (e) {
+												return false;
+											}
+											return true;
+										});
+									}
+								}
+								return result; // DOMDocument
+							}
+						});
+				},
+
+				css2: {
+					&quot;basic sanity checks&quot;: function () {
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								var result = {};
+
+								result[&#039;h3&#039;] = query(&#039;h3&#039;).length;
+								result[&#039;#t&#039;] = query(&#039;#t&#039;).length;
+								result[&#039;#bug&#039;] = query(&#039;#bug&#039;).length;
+								result[&#039;#t h3&#039;] = query(&#039;#t h3&#039;).length;
+								result[&#039;div#t&#039;] = query(&#039;div#t&#039;).length;
+								result[&#039;div#t h3&#039;] = query(&#039;div#t h3&#039;).length;
+								result[&#039;span#t&#039;] = query(&#039;span#t&#039;).length;
+								result[&#039;.bogus&#039;] = query(&#039;.bogus&#039;).length;
+								result[&#039;.bogus-scoped&#039;] = query(&#039;.bogus&#039;, dom.byId(&#039;container&#039;)).length;
+								result[&#039;#bogus&#039;] = query(&#039;#bogus&#039;).length;
+								result[&#039;#bogus-scoped&#039;] = query(&#039;#bogus&#039;, dom.byId(&#039;container&#039;)).length;
+								result[&#039;#t div &gt; h3&#039;] = query(&#039;#t div &gt; h3&#039;).length;
+								result[&#039;.foo&#039;] = query(&#039;.foo&#039;).length;
+								result[&#039;.foo.bar&#039;] = query(&#039;.foo.bar&#039;).length;
+								result[&#039;.baz&#039;] = query(&#039;.baz&#039;).length;
+								result[&#039;#t &gt; h3&#039;] = query(&#039;#t &gt; h3&#039;).length;
+								result[&#039;null&#039;] = query(null).length;
+
+								return result;
+							}).then(function (results) {
+								assert.equal((results[&#039;h3&#039;]), 4);
+								assert.equal((results[&#039;#t&#039;]), 1);
+								assert.equal((results[&#039;#bug&#039;]), 1);
+								assert.equal((results[&#039;#t h3&#039;]), 4);
+								assert.equal((results[&#039;div#t&#039;]), 1);
+								assert.equal((results[&#039;div#t h3&#039;]), 4);
+								assert.equal((results[&#039;span#t&#039;]), 0);
+								assert.equal((results[&#039;.bogus&#039;]), 0);
+								assert.equal((results[&#039;.bogus-scoped&#039;]), 0);
+								assert.equal((results[&#039;#bogus&#039;]), 0);
+								assert.equal((results[&#039;#bogus-scoped&#039;]), 0);
+								assert.equal((results[&#039;#t div &gt; h3&#039;]), 1);
+								assert.equal((results[&#039;.foo&#039;]), 2);
+								assert.equal((results[&#039;.foo.bar&#039;]), 1);
+								assert.equal((results[&#039;.baz&#039;]), 2);
+								assert.equal((results[&#039;#t &gt; h3&#039;]), 3);
+								assert.equal((results[&#039;null&#039;]), 0);
+							});
+					},
+					&quot;comma1&quot;: function () {
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								return query(&#039;#baz,#foo,#t&#039;).length;
+							})
+							.then(function (result) {
+								assert.equal(result, 2);
+							});
+					},
+					&quot;comma2&quot;: function () {
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								return query(&#039;#foo,#baz,#t&#039;).length;
+							})
+							.then(function (result) {
+								assert.equal(result, 2);
+							});
+					},
+					&quot;syntactic equivalents&quot;: function () {
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								var result = {};
+
+								result[&quot;#t &gt; *&quot;] = query(&#039;#t &gt; *&#039;).length;
+								result[&quot;.foo &gt; *&quot;] = query(&#039;.foo &gt; *&#039;).length;
+
+								return result;
+							})
+							.then(function (result) {
+								assert.equal(result[&quot;#t &gt; *&quot;], 12);
+								assert.equal(result[&quot;.foo &gt; *&quot;], 3);
+							});
+					},
+					&quot;with a root, by ID&quot;: function () {
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								var result = {};
+
+								result[&#039;&gt; *&#039;] = query(&#039;&gt; *&#039;, &#039;container&#039;).length;
+								result[&#039;&gt; *, &gt; h3&#039;] = query(&#039;&gt; *, &gt; h3&#039;, &#039;container&#039;).length;
+								result[&#039;&gt; h3&#039;] = query(&#039;&gt; h3&#039;, &#039;t&#039;).length;
+
+								return result;
+							})
+							.then(function (result) {
+								assert.equal(result[&#039;&gt; *&#039;], 3);
+								assert.equal(result[&#039;&gt; *, &gt; h3&#039;], 3);
+								assert.equal(result[&#039;&gt; h3&#039;], 3);
+							});
+
+					},
+					&quot;compound queries&quot;: function () {
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								var result = {};
+
+								result[&#039;.foo, .bar&#039;] = query(&#039;.foo, .bar&#039;).length;
+								result[&#039;.foo,.bar&#039;] = query(&#039;.foo,.bar&#039;).length;
+
+								return result;
+							})
+							.then(function (result) {
+								assert.equal(result[&#039;.foo, .bar&#039;], 2);
+								assert.equal(result[&#039;.foo,.bar&#039;], 2);
+							});
+					},
+
+					&quot;multiple class attribute&quot;: function () {
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								var result = {};
+
+								result[&#039;.foo.bar&#039;] = query(&#039;.foo.bar&#039;).length;
+								result[&#039;.foo&#039;] = query(&#039;.foo&#039;).length;
+								result[&#039;.baz&#039;] = query(&#039;.baz&#039;).length;
+
+								return result;
+							})
+							.then(function (result) {
+								assert.equal(result[&#039;.foo.bar&#039;], 1);
+								assert.equal(result[&#039;.foo&#039;], 2);
+								assert.equal(result[&#039;.baz&#039;], 2);
+							});
+					},
+					&quot;case sensitivity&quot;: function () {
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								return {
+									baz: [query(&#039;span.baz&#039;).length, query(&#039;sPaN.baz&#039;).length, query(&#039;SPAN.baz&#039;).length],
+									fooBar: query(&#039;.fooBar&#039;).length
+								};
+							})
+							.then(function (result) {
+								assert.deepEqual(result.baz, [1, 1, 1]);
+
+								// For quirks mode, case sensitivity is browser dependent, so querying .fooBar
+								 // may return 1 or 2 entries.  See #8775 and #14874 for details. 
+								if (!/quirks/i.test(file)) {
+									assert.equal(result.fooBar, 1);
+								}
+							});
+					},
+					&quot;attribute selectors&quot;: function () {
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								return query(&#039;[foo]&#039;).length;
+							})
+							.then(function (result) {
+								assert.equal(result, 3);
+							});
+					},
+					&quot;attribute substring selectors&quot;: function () {
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								var result = {};
+
+								result[&#039;[foo$=\&quot;thud\&quot;]&#039;] = query(&#039;[foo$=\&quot;thud\&quot;]&#039;).length;
+								result[&#039;[foo$=thud]&#039;] = query(&#039;[foo$=thud]&#039;).length;
+								result[&#039;[foo$=\&quot;thudish\&quot;]&#039;] = query(&#039;[foo$=\&quot;thudish\&quot;]&#039;).length;
+								result[&#039;#t [foo$=thud]&#039;] = query(&#039;#t [foo$=thud]&#039;).length;
+								result[&#039;#t [title$=thud]&#039;] = query(&#039;#t [title$=thud]&#039;).length;
+								result[&#039;#t span[title$=thud ]&#039;] = query(&#039;#t span[title$=thud ]&#039;).length;
+								result[&#039;[id$=\&#039;55555\&#039;]&#039;] = query(&#039;[id$=\&#039;55555\&#039;]&#039;).length;
+								result[&#039;[foo~=\&quot;bar\&quot;]&#039;] = query(&#039;[foo~=\&quot;bar\&quot;]&#039;).length;
+								result[&#039;[ foo ~= \&quot;bar\&quot; ]&#039;] = query(&#039;[ foo ~= \&quot;bar\&quot; ]&#039;).length;
+								result[&#039;[foo|=\&quot;bar\&quot;]&#039;] = query(&#039;[foo|=\&quot;bar\&quot;]&#039;).length;
+								result[&#039;[foo|=\&quot;bar-baz\&quot;]&#039;] = query(&#039;[foo|=\&quot;bar-baz\&quot;]&#039;).length;
+								result[&#039;[foo|=\&quot;baz\&quot;]&#039;] = query(&#039;[foo|=\&quot;baz\&quot;]&#039;).length;
+
+								return result;
+							})
+							.then(function (result) {
+								assert.equal(result[&#039;[foo$=\&quot;thud\&quot;]&#039;], 1);
+								assert.equal(result[&#039;[foo$=thud]&#039;], 1);
+								assert.equal(result[&#039;[foo$=\&quot;thudish\&quot;]&#039;], 1);
+								assert.equal(result[&#039;#t [foo$=thud]&#039;], 1);
+								assert.equal(result[&#039;#t [title$=thud]&#039;], 1);
+								assert.equal(result[&#039;#t span[title$=thud ]&#039;], 0);
+								assert.equal(result[&#039;[id$=\&#039;55555\&#039;]&#039;], 1);
+								assert.equal(result[&#039;[foo~=\&quot;bar\&quot;]&#039;], 2);
+								assert.equal(result[&#039;[ foo ~= \&quot;bar\&quot; ]&#039;], 2);
+								assert.equal(result[&#039;[foo|=\&quot;bar\&quot;]&#039;], 2);
+								assert.equal(result[&#039;[foo|=\&quot;bar-baz\&quot;]&#039;], 1);
+								assert.equal(result[&#039;[foo|=\&quot;baz\&quot;]&#039;], 0);
+							});
+					},
+					&quot;descendant selectors&quot;: function () {
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								var result = {};
+
+								result[&#039;&gt; *&#039;] = query(&#039;&gt; *&#039;, &#039;container&#039;).length;
+								result[&#039;&gt; [qux]&#039;] = query(&#039;&gt; [qux]&#039;, &#039;container&#039;).length;
+								result[&#039;&gt; [qux][0].id&#039;] = query(&#039;&gt; [qux]&#039;, &#039;container&#039;)[0].id;
+								result[&#039;&gt; [qux][1].id&#039;] = query(&#039;&gt; [qux]&#039;, &#039;container&#039;)[1].id;
+								result[&#039;&gt;*&#039;] = query(&#039;&gt;*&#039;, &#039;container&#039;).length;
+								result[&#039;#bug[0].value&#039;] = query(&#039;#bug&#039;)[0].value;	// test id query doesn&#039;t match name
+
+
+								// suppress exception for known bug #18516; remove this code if that bug is fixed.
+								if(has(&quot;ie&quot;) &lt;= 9 &amp;&amp; has(&quot;quirks&quot;)){
+									result[&#039;#bug[0].value&#039;] = &quot;passed&quot;;
+								}
+
+								return result;
+							})
+							.then(function (result) {
+								assert.equal(result[&#039;&gt; *&#039;], 3, &#039;&gt; *&#039;);
+								assert.equal(result[&#039;&gt; [qux]&#039;], 2, &#039;&gt; [qux]&#039;);
+								assert.equal(result[&#039;&gt; [qux][0].id&#039;], &quot;child1&quot;, &#039;&gt; [qux][0].id&#039;);
+								assert.equal(result[&#039;&gt; [qux][1].id&#039;], &quot;child3&quot;, &#039;&gt; [qux][1].id&#039;);
+								assert.equal(result[&#039;&gt;*&#039;], 3, &#039;&gt;*&#039;);
+								assert.equal(result[&#039;#bug[0].value&#039;], &quot;passed&quot;, &#039;#bug[0].value&#039;);
+							});
+					},
+					&quot;bug 9071&quot;: function () {
+						// bug 9071
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								var result = {};
+
+								result[&#039;t4 a&#039;] = query(&#039;a&#039;, &#039;t4&#039;).length;
+								result[&#039;t4 p a&#039;] = query(&#039;p a&#039;, &#039;t4&#039;).length;
+								result[&#039;t4 div p&#039;] = query(&#039;div p&#039;, &#039;t4&#039;).length;
+								result[&#039;t4 div p a&#039;] = query(&#039;div p a&#039;, &#039;t4&#039;).length;
+								result[&#039;t4 .subA&#039;] = query(&#039;.subA&#039;, &#039;t4&#039;).length;
+								result[&#039;t4 .subP .subA&#039;] = query(&#039;.subP .subA&#039;, &#039;t4&#039;).length;
+								result[&#039;t4 .subDiv .subP&#039;] = query(&#039;.subDiv .subP&#039;, &#039;t4&#039;).length;
+								result[&#039;t4 .subDiv .subP .subA&#039;] = query(&#039;.subDiv .subP .subA&#039;, &#039;t4&#039;).length;
+
+								return result;
+							})
+							.then(function (result) {
+								assert.equal(result[&#039;t4 a&#039;], 2);
+								assert.equal(result[&#039;t4 p a&#039;], 2);
+								assert.equal(result[&#039;t4 div p&#039;], 2);
+								assert.equal(result[&#039;t4 div p a&#039;], 2);
+								assert.equal(result[&#039;t4 .subA&#039;], 2);
+								assert.equal(result[&#039;t4 .subP .subA&#039;], 2);
+								assert.equal(result[&#039;t4 .subDiv .subP&#039;], 2);
+								assert.equal(result[&#039;t4 .subDiv .subP .subA&#039;], 2);
+							});
+					},
+					&quot;failed scope arg&quot;: function () {
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								var result = {};
+
+								result[&#039;thinger *&#039;] = query(&#039;*&#039;, &#039;thinger&#039;).length;
+								result[&#039;div#foo&#039;] = query(&#039;div#foo&#039;).length;
+
+								return result;
+							})
+							.then(function (result) {
+								assert.equal(result[&#039;thinger *&#039;], 0);
+								assert.equal(result[&#039;div#foo&#039;], 0);
+							});
+					},
+					&quot;escaping special characters with quotes&quot;: function () {
+						// http://www.w3.org/TR/CSS21/syndata.html#strings
+						// bug 10651
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								var result = {};
+
+								result[&#039;option[value=&quot;a+b&quot;]&#039;] = query(&#039;option[value=&quot;a+b&quot;]&#039;, &quot;attrSpecialChars&quot;).length;
+								result[&#039;option[value=&quot;a~b&quot;]&#039;] = query(&#039;option[value=&quot;a~b&quot;]&#039;, &quot;attrSpecialChars&quot;).length;
+								result[&#039;option[value=&quot;a^b&quot;]&#039;] = query(&#039;option[value=&quot;a^b&quot;]&#039;, &quot;attrSpecialChars&quot;).length;
+								result[&#039;option[value=&quot;a,b&quot;]&#039;] = query(&#039;option[value=&quot;a,b&quot;]&#039;, &quot;attrSpecialChars&quot;).length;
+
+								return result;
+							})
+							.then(function (result) {
+								assert.equal(result[&#039;option[value=&quot;a+b&quot;]&#039;], 1);
+								assert.equal(result[&#039;option[value=&quot;a~b&quot;]&#039;], 1);
+								assert.equal(result[&#039;option[value=&quot;a^b&quot;]&#039;], 1);
+								assert.equal(result[&#039;option[value=&quot;a,b&quot;]&#039;], 1);
+							});
+					},
+					&quot;selector with substring that contains equals sign - bug 7479&quot;: function () {
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								return query(&quot;a[href*=&#039;foo=bar&#039;]&quot;, &#039;attrSpecialChars&#039;).length;
+							})
+							.then(function (result) {
+								assert.equal(result, 1);
+							});
+					},
+					&quot;selector with substring that contains brackets - bug 9193, 11189, 13084&quot;: function () {
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								var result = {};
+
+								result[&#039;input[name=&quot;data[foo][bar]&quot;]&#039;] = query(&#039;input[name=&quot;data[foo][bar]&quot;]&#039;, &quot;attrSpecialChars&quot;).length;
+								result[&#039;input[name=&quot;foo[0].bar&#039;] = query(&#039;input[name=&quot;foo[0].bar&quot;]&#039;, &quot;attrSpecialChars&quot;).length;
+								result[&#039;input[name=&quot;test[0]&quot;]&#039;] = query(&#039;input[name=&quot;test[0]&quot;]&#039;, &quot;attrSpecialChars&quot;).length;
+
+								return result;
+							})
+							.then(function (result) {
+								assert.equal(result[&#039;input[name=&quot;data[foo][bar]&quot;]&#039;], 1);
+								assert.equal(result[&#039;input[name=&quot;foo[0].bar&#039;], 1);
+								assert.equal(result[&#039;input[name=&quot;test[0]&quot;]&#039;], 1);
+							});
+					},
+					&quot;escaping special characters with backslashes&quot;: function () {
+						//http://www.w3.org/TR/CSS21/syndata.html#characters
+						// selector with substring that contains brackets (bug 9193, 11189, 13084)
+						// eval() converts 4 backslashes --&gt; 1 by the time dojo.query() sees the string
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								var result = {};
+
+								result[&#039;input[name=data\\[foo\\]\\[bar\\]]&#039;] = query(&quot;input[name=data\\[foo\\]\\[bar\\]]&quot;, &quot;attrSpecialChars&quot;).length;
+								result[&#039;input[name=foo\\[0\\]\\.bar]&#039;] = query(&quot;input[name=foo\\[0\\]\\.bar]&quot;, &quot;attrSpecialChars&quot;).length;
+
+								return result;
+							})
+							.then(function (result) {
+								assert.equal(result[&#039;input[name=data\\[foo\\]\\[bar\\]]&#039;], 1);
+								assert.equal(result[&#039;input[name=foo\\[0\\]\\.bar]&#039;], 1);
+							});
+					},
+					&quot;crossDocumentQuery&quot;: function () {
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								var result = {};
+								var t3 = window.frames[&quot;t3&quot;];
+								var doc = iframe.doc(t3);
+								doc.open();
+								doc.write([
+									&quot;&lt;html&gt;&lt;head&gt;&quot;,
+									&quot;&lt;title&gt;inner document&lt;/title&gt;&quot;,
+									&quot;&lt;/head&gt;&quot;,
+									&quot;&lt;body&gt;&quot;,
+									&quot;   &lt;div id=&#039;st1&#039;&gt;&quot;,
+									&quot;       &lt;h3&gt;h3&quot;,
+									&quot;           &lt;span&gt;&quot;,
+									&quot;               span&quot;,
+									&quot;               &lt;span&gt;&quot;,
+									&quot;                   inner&quot;,
+									&quot;                   &lt;span&gt;&quot;,
+									&quot;                       inner-inner&quot;,
+									&quot;                   &lt;/span&gt;&quot;,
+									&quot;               &lt;/span&gt;&quot;,
+									&quot;           &lt;/span&gt;&quot;,
+									&quot;           endh3&quot;,
+									&quot;       &lt;/h3&gt;&quot;,
+									&quot;   &lt;/div&gt;&quot;,
+									&quot;&lt;/body&gt;&quot;,
+									&quot;&lt;/html&gt;&quot;
+								].join(&quot;&quot;));
+
+								doc.close();
+
+								result[&quot;st1 h3&quot;] = query(&#039;h3&#039;, dom.byId(&quot;st1&quot;, doc)).length;
+								// use a long query to force a test of the XPath system on FF. see bug #7075
+								result[&#039;st1 h3 &gt; span &gt; span &gt; span&#039;] = query(&#039;h3 &gt; span &gt; span &gt; span&#039;, dom.byId(&quot;st1&quot;, doc)).length;
+								result[&#039;body.children[0] h3 &gt; span &gt; span &gt; span&#039;] = query(&#039;h3 &gt; span &gt; span &gt; span&#039;, doc.body.children[0]).length;
+
+								return result;
+							})
+							.then(function (result) {
+								assert.equal(result[&#039;st1 h3&#039;], 1);
+								assert.equal(result[&#039;st1 h3 &gt; span &gt; span &gt; span&#039;], 1);
+								assert.equal(result[&#039;body.children[0] h3 &gt; span &gt; span &gt; span&#039;], 1);
+							});
+					},
+					&quot;escaping of &#039;:&#039; chars inside an ID&quot;: {
+						&quot;silly_IDs1&quot;: function () {
+							return this.get(&quot;remote&quot;)
+								.execute(function () {
+									var result = {};
+
+									result[&quot;silly:id::with:colons&quot;] = document.getElementById(&quot;silly:id::with:colons&quot;);
+									result[&quot;#silly\\:id\\:\\:with\\:colons&quot;] = query(&quot;#silly\\:id\\:\\:with\\:colons&quot;).length;
+									result[&quot;#silly\\~id&quot;] = query(&quot;#silly\\~id&quot;).length;
+
+									return result;
+								})
+								.then(function (result) {
+									assert.isNotNull(result[&quot;silly:id::with:colons&quot;], &quot;getElementById&quot;);
+									assert.equal(result[&quot;#silly\\:id\\:\\:with\\:colons&quot;], 1, &quot;query(\&quot;#silly\\:id\\:\\:with\\:colons\&quot;)&quot;);
+									assert.equal(result[&quot;#silly\\~id&quot;], 1, &quot;query(\&quot;#silly\\~id\&quot;)&quot;);
+								});
+						}
+					},
+					&quot;xml&quot;: function () {
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								var doc = createDocument([
+									&quot;&lt;ResultSet&gt;&quot;,
+									&quot;&lt;Result&gt;One&lt;/Result&gt;&quot;,
+									&quot;&lt;RESULT&gt;Two&lt;/RESULT&gt;&quot;,
+									&quot;&lt;result&gt;&lt;nested&gt;Three&lt;/nested&gt;&lt;/result&gt;&quot;,
+									&quot;&lt;result&gt;Four&lt;/result&gt;&quot;,
+									&quot;&lt;/ResultSet&gt;&quot;
+								].join(&quot;&quot;));
+
+								var de = doc.documentElement;
+
+								// note: don&#039;t name structure members after elements because it gets corrupted on IE (webdriver bug)
+								return {
+									lower: query(&quot;result&quot;, de).length,
+									mixed: query(&quot;Result&quot;, de).length,
+									upper: query(&quot;RESULT&quot;, de).length,
+									nomatch1: query(&quot;resulT&quot;, de).length,
+									nomatch2: query(&quot;rEsulT&quot;, de).length
+								};
+							})
+							.then(function (result) {
+								assert.equal(result.lower, 2, &quot;all lower&quot;);
+								assert.equal(result.mixed, 1, &quot;mixed case&quot;);
+								assert.equal(result.upper, 1, &quot;all upper&quot;);
+								assert.equal(result.nomatch1, 0, &quot;no match 1&quot;);
+								assert.equal(result.nomatch2, 0, &quot;no match 2&quot;);
+							});
+
+					},
+					&quot;xml_attrs&quot;: function () {
+						var remote = this.get(&quot;remote&quot;);
+						if (/internet explorer/.test(remote.environmentType.browserName)) {
+							return this.skip(&quot;do not run in IE till bug #14880 is fixed&quot;);
+						}
+						return remote.execute(function () {
+							var doc = createDocument([
+								&quot;&lt;ResultSet&gt;&quot;,
+								&quot;&lt;RESULT thinger=&#039;blah&#039;&gt;ONE&lt;/RESULT&gt;&quot;,
+								&quot;&lt;RESULT thinger=&#039;gadzooks&#039;&gt;&lt;CHILD&gt;Two&lt;/CHILD&gt;&lt;/RESULT&gt;&quot;,
+								&quot;&lt;/ResultSet&gt;&quot;
+							].join(&quot;&quot;));
+							var de = doc.documentElement;
+
+							return {
+								RESULT: query(&quot;RESULT&quot;, de).length,
+								&quot;RESULT[THINGER]&quot;: query(&quot;RESULT[THINGER]&quot;, de).length,
+								&quot;RESULT[thinger]&quot;: query(&quot;RESULT[thinger]&quot;, de).length,
+								&quot;RESULT[thinger=blah]&quot;: query(&quot;RESULT[thinger=blah]&quot;, de).length,
+								&quot;RESULT &gt; CHILD&quot;: query(&quot;RESULT &gt; CHILD&quot;, de).length
+							};
+						})
+							.then(function (result) {
+								assert.equal(result[&quot;RESULT&quot;], 2, &quot;result elements&quot;);
+								assert.equal(result[&quot;RESULT[THINGER]&quot;], 0, &quot;result elements with attrs (wrong)&quot;);
+								assert.equal(result[&quot;RESULT[thinger]&quot;], 2, &quot;result elements with attrs&quot;);
+								assert.equal(result[&quot;RESULT[thinger=blah]&quot;], 1, &quot;result elements with attr value&quot;);
+								assert.equal(result[&quot;RESULT &gt; CHILD&quot;], 1, &quot;Using child operator&quot;);
+							});
+					},
+					&quot;sort&quot;: function () {
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								var i = query(&quot;div&quot;);
+								// smoke test
+								i.sort(function (a, b) {
+									return 1;
+								});
+								return true;
+							})
+							.then(function (result) {
+								assert.isTrue(result);
+							});
+
+					},
+					&quot;document_fragment&quot;: function () {
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								var result = {};
+								var detachedDom = domConstruct.toDom(&quot;&lt;i&gt;&lt;u&gt;&lt;a&gt;&lt;/a&gt;&lt;b id=&#039;b&#039;&gt;&lt;/b&gt;&lt;/u&gt;&lt;/i&gt;&quot;);
+								var documentFragment = domConstruct.toDom(&quot;&lt;i&gt;&lt;/i&gt;    &lt;u&gt;&lt;a&gt;&lt;/a&gt;&lt;b id=&#039;b&#039;&gt;&lt;/b&gt;&lt;/u&gt;&quot;);
+								var detachedDom2 = domConstruct.toDom(&quot;&lt;i&gt;&lt;u&gt;&lt;a&gt;&lt;/a&gt;&lt;b&gt;&lt;/b&gt;&lt;/u&gt;&lt;/i&gt;&quot;);
+								var documentFragment2 = domConstruct.toDom(&quot;&lt;i&gt;&lt;/i&gt;    &lt;u&gt;&lt;a&gt;&lt;/a&gt;&lt;b&gt;&lt;/b&gt;&lt;/u&gt;&quot;);
+
+								result[&quot;#b detached&quot;] = query(&quot;#b&quot;, detachedDom).length;
+								result[&quot;#b detached first child&quot;] = query(&quot;#b&quot;, detachedDom.firstChild).length;
+								result[&quot;#b fragment&quot;] = query(&quot;#b&quot;, documentFragment).length;
+								// In IE8 in quirks mode there is no text node on the document fragment
+								result[&quot;#b fragment child&quot;] = query(&quot;#b&quot;, has(&#039;ie&#039;) === 8 &amp;&amp; has(&quot;quirks&quot;) ?
+									documentFragment.childNodes[1] : documentFragment.childNodes[2]).length;
+								result[&quot;#b detached2&quot;] = query(&quot;#b&quot;, detachedDom2).length;
+								result[&quot;#b fragment2&quot;] = query(&quot;#b&quot;, documentFragment2).length;
+
+								return result;
+							})
+							.then(function (result) {
+								assert.equal(result[&quot;#b detached&quot;], 1);
+								assert.equal(result[&quot;#b detached first child&quot;], 1);
+								assert.equal(result[&quot;#b fragment&quot;], 1);
+								assert.equal(result[&quot;#b fragment child&quot;], 1);
+								assert.equal(result[&quot;#b detached2&quot;], 0);
+								assert.equal(result[&quot;#b fragment2&quot;], 0);
+							});
+					}
+				}
+			};
+
+			if (/css2.1|css3|acme/.test(selector)) {
+				tests[&quot;css2.1&quot;] = function () {
+					return this.get(&quot;remote&quot;)
+						.execute(function () {
+							var result = {};
+
+							result[&quot;h1:first-child&quot;] = query(&#039;h1:first-child&#039;).length;
+							result[&quot;h3:first-child&quot;] = query(&#039;h3:first-child&#039;).length;
+							result[&quot;.foo+ span&quot;] = query(&#039;.foo+ span&#039;).length;
+							result[&quot;.foo+span&quot;] = query(&#039;.foo+span&#039;).length;
+							result[&quot;.foo +span&quot;] = query(&#039;.foo +span&#039;).length;
+							result[&quot;.foo + span&quot;] = query(&#039;.foo + span&#039;).length;
+
+							return result;
+						})
+						.then(function (result) {
+							// first-child
+							assert.equal(result[&quot;h1:first-child&quot;], 1);
+							assert.equal(result[&quot;h3:first-child&quot;], 2);
+
+							// + sibling selector
+							assert.equal(result[&quot;.foo+ span&quot;], 1);
+							assert.equal(result[&quot;.foo+span&quot;], 1);
+							assert.equal(result[&quot;.foo +span&quot;], 1);
+							assert.equal(result[&quot;.foo + span&quot;], 1);
+						});
+				};
+			}
+
+			if (/css3|acme/.test(selector)) {
+				tests[&quot;css3&quot;] = {
+					&quot;sub-selector parsing&quot;: function () {
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								return query(&#039;#t span.foo:not(:first-child)&#039;).length;
+							})
+							.then(function (result) {
+								assert.equal(result, 1);
+							});
+					},
+					&quot;~ sibling selector&quot;: function () {
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								var result = {};
+
+								result[&quot;.foo~ span&quot;] = query(&#039;.foo~ span&#039;).length;
+								result[&quot;.foo~span&quot;] = query(&#039;.foo~span&#039;).length;
+								result[&quot;.foo ~span&quot;] = query(&#039;.foo ~span&#039;).length;
+								result[&quot;.foo ~ span&quot;] = query(&#039;.foo ~ span&#039;).length;
+								result[&quot;#foo~ *&quot;] = query(&#039;#foo~ *&#039;).length;
+								result[&quot;#foo ~*&quot;] = query(&#039;#foo ~*&#039;).length;
+								result[&quot;#foo ~*&quot;] = query(&#039;#foo ~*&#039;).length;
+								result[&quot;#foo ~ *&quot;] = query(&#039;#foo ~ *&#039;).length;
+
+								return result;
+							})
+							.then(function (result) {
+								assert.equal(result[&quot;.foo~ span&quot;], 4);
+								assert.equal(result[&quot;.foo~span&quot;], 4);
+								assert.equal(result[&quot;.foo ~span&quot;], 4);
+								assert.equal(result[&quot;.foo ~ span&quot;], 4);
+								assert.equal(result[&quot;#foo~ *&quot;], 1);
+								assert.equal(result[&quot;#foo ~*&quot;], 1);
+								assert.equal(result[&quot;#foo ~*&quot;], 1);
+								assert.equal(result[&quot;#foo ~ *&quot;], 1);
+							});
+
+					},
+					&quot;nth-child tests&quot;: function () {
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								var result = {};
+
+								result[&quot;#t &gt; h3:nth-child(odd)&quot;] = query(&#039;#t &gt; h3:nth-child(odd)&#039;).length;
+								result[&quot;#t h3:nth-child(odd)&quot;] = query(&#039;#t h3:nth-child(odd)&#039;).length;
+								result[&quot;#t h3:nth-child(2n+1)&quot;] = query(&#039;#t h3:nth-child(2n+1)&#039;).length;
+								result[&quot;#t h3:nth-child(even)&quot;] = query(&#039;#t h3:nth-child(even)&#039;).length;
+								result[&quot;#t h3:nth-child(2n)&quot;] = query(&#039;#t h3:nth-child(2n)&#039;).length;
+								result[&quot;#t h3:nth-child(2n+3)&quot;] = query(&#039;#t h3:nth-child(2n+3)&#039;).length;
+								result[&quot;#t h3:nth-child(1)&quot;] = query(&#039;#t h3:nth-child(1)&#039;).length;
+								result[&quot;#t &gt; h3:nth-child(1)&quot;] = query(&#039;#t &gt; h3:nth-child(1)&#039;).length;
+								result[&quot;#t :nth-child(3)&quot;] = query(&#039;#t :nth-child(3)&#039;).length;
+								result[&quot;#t &gt; div:nth-child(1)&quot;] = query(&#039;#t &gt; div:nth-child(1)&#039;).length;
+								result[&quot;#t :nth-child(3)&quot;] = query(&#039;#t :nth-child(3)&#039;).length;
+								result[&quot;#t &gt; div:nth-child(1)&quot;] = query(&#039;#t &gt; div:nth-child(1)&#039;).length;
+								result[&quot;#t span&quot;] = query(&#039;#t span&#039;).length;
+								result[&quot;#t &gt; *:nth-child(n+10)&quot;] = query(&#039;#t &gt; *:nth-child(n+10)&#039;).length;
+								result[&quot;#t &gt; *:nth-child(n+12)&quot;] = query(&#039;#t &gt; *:nth-child(n+12)&#039;).length;
+								result[&quot;#t &gt; *:nth-child(-n+10)&quot;] = query(&#039;#t &gt; *:nth-child(-n+10)&#039;).length;
+								result[&quot;#t &gt; *:nth-child(-2n+10)&quot;] = query(&#039;#t &gt; *:nth-child(-2n+10)&#039;).length;
+								result[&quot;#t &gt; *:nth-child(2n+2)&quot;] = query(&#039;#t &gt; *:nth-child(2n+2)&#039;).length;
+								result[&quot;#t &gt; *:nth-child(2n+4)&quot;] = query(&#039;#t &gt; *:nth-child(2n+4)&#039;).length;
+								result[&quot;#t&gt; *:nth-child(2n+4)&quot;] = query(&#039;#t&gt; *:nth-child(2n+4)&#039;).length;
+								result[&quot;#t &gt; *:nth-child(n-5)&quot;] = query(&#039;#t &gt; *:nth-child(n-5)&#039;).length;
+								result[&quot;#t &gt;*:nth-child(n-5)&quot;] = query(&#039;#t &gt;*:nth-child(n-5)&#039;).length;
+								result[&quot;#t &gt; *:nth-child(2n-5)&quot;] = query(&#039;#t &gt; *:nth-child(2n-5)&#039;).length;
+								result[&quot;#t&gt;*:nth-child(2n-5)&quot;] = query(&#039;#t&gt;*:nth-child(2n-5)&#039;).length;
+								// function(){ doh.is(dom.byId(&#039;_foo&#039;), result[&quot;.foo:nth-child(2)&quot;][0], &quot;.foo:nth-child(2)&quot;); },
+
+								return result;
+							})
+							.then(function (result) {
+								// nth-child tests
+								assert.equal(result[&quot;#t &gt; h3:nth-child(odd)&quot;], 2, &quot;#t &gt; h3:nth-child(odd)&quot;);
+								assert.equal(result[&quot;#t h3:nth-child(odd)&quot;], 3, &quot;#t h3:nth-child(odd)&quot;);
+								assert.equal(result[&quot;#t h3:nth-child(2n+1)&quot;], 3, &quot;#t h3:nth-child(2n+1)&quot;);
+								assert.equal(result[&quot;#t h3:nth-child(even)&quot;], 1, &quot;#t h3:nth-child(even)&quot;);
+								assert.equal(result[&quot;#t h3:nth-child(2n)&quot;], 1, &quot;#t h3:nth-child(2n)&quot;);
+								assert.equal(result[&quot;#t h3:nth-child(2n+3)&quot;], 1, &quot;#t h3:nth-child(2n+3)&quot;);
+								assert.equal(result[&quot;#t h3:nth-child(1)&quot;], 2, &quot;#t h3:nth-child(1)&quot;);
+								assert.equal(result[&quot;#t &gt; h3:nth-child(1)&quot;], 1, &quot;#t &gt; h3:nth-child(1)&quot;);
+								assert.equal(result[&quot;#t :nth-child(3)&quot;], 3, &quot;#t :nth-child(3)&quot;);
+								assert.equal(result[&quot;#t &gt; div:nth-child(1)&quot;], 0, &quot;#t &gt; div:nth-child(1)&quot;);
+								assert.equal(result[&quot;#t span&quot;], 7, &quot;#t span&quot;);
+								assert.equal(result[&quot;#t &gt; *:nth-child(n+10)&quot;], 3, &quot;#t &gt; *:nth-child(n+10)&quot;);
+								assert.equal(result[&quot;#t &gt; *:nth-child(n+12)&quot;], 1, &quot;#t &gt; *:nth-child(n+12)&quot;);
+								assert.equal(result[&quot;#t &gt; *:nth-child(-n+10)&quot;], 10, &quot;#t &gt; *:nth-child(-n+10)&quot;);
+								assert.equal(result[&quot;#t &gt; *:nth-child(-2n+10)&quot;], 5, &quot;#t &gt; *:nth-child(-2n+10)&quot;);
+								assert.equal(result[&quot;#t &gt; *:nth-child(2n+2)&quot;], 6, &quot;#t &gt; *:nth-child(2n+2)&quot;);
+								assert.equal(result[&quot;#t &gt; *:nth-child(2n+4)&quot;], 5, &quot;#t &gt; *:nth-child(2n+4)&quot;);
+								assert.equal(result[&quot;#t&gt; *:nth-child(2n+4)&quot;], 5, &quot;#t&gt; *:nth-child(2n+4)&quot;);
+								assert.equal(result[&quot;#t &gt; *:nth-child(n-5)&quot;], 12, &quot;#t &gt; *:nth-child(n-5)&quot;);
+								assert.equal(result[&quot;#t &gt;*:nth-child(n-5)&quot;], 12, &quot;#t &gt;*:nth-child(n-5)&quot;);
+								assert.equal(result[&quot;#t &gt; *:nth-child(2n-5)&quot;], 6, &quot;#t &gt; *:nth-child(2n-5)&quot;);
+								assert.equal(result[&quot;#t&gt;*:nth-child(2n-5)&quot;], 6, &quot;#t&gt;*:nth-child(2n-5)&quot;);
+								// function(){ doh.is(dom.byId(&#039;_foo&#039;), result[&quot;.foo:nth-child(2)&quot;][0], &quot;.foo:nth-child(2)&quot;); },
+							});
+
+					},
+					&quot;:checked pseudo-selector&quot;: function () {
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								var result = {};
+
+								result[&quot;#t2 &gt; :checked&quot;] = query(&#039;#t2 &gt; :checked&#039;).length;
+								result[&quot;#t2 &gt; input[type=checkbox]:checked&quot;] =
+									query(&#039;#t2 &gt; input[type=checkbox]:checked&#039;)[0] === dom.byId(&#039;checkbox2&#039;);
+								result[&quot;#t2 &gt; input[type=radio]:checked&quot;] =
+									query(&#039;#t2 &gt; input[type=radio]:checked&#039;)[0] === dom.byId(&#039;radio2&#039;);
+
+								result[&quot;#t2select option:checked&quot;] = query(&#039;#t2select option:checked&#039;).length;
+
+								result[&quot;#radio1:disabled&quot;] = query(&#039;#radio1:disabled&#039;).length;
+								result[&quot;#radio1:enabled&quot;] = query(&#039;#radio1:enabled&#039;).length;
+								result[&quot;#radio2:disabled&quot;] = query(&#039;#radio2:disabled&#039;).length;
+								result[&quot;#radio2:enabled&quot;] = query(&#039;#radio2:enabled&#039;).length;
+
+								return result;
+							})
+							.then(function (result) {
+								assert.equal(result[&#039;#t2 &gt; :checked&#039;], 2);
+								assert.isTrue(result[&#039;#t2 &gt; input[type=checkbox]:checked&#039;]);
+								assert.isTrue(result[&#039;#t2 &gt; input[type=radio]:checked&#039;]);
+								// This :checked selector is only defined for elements that have the checked property, option elements are not specified by the spec (http://www.w3.org/TR/css3-selectors/#checked) and not universally supported
+								//assert.equal(result[&#039;#t2select option:checked&#039;], 2);
+
+								assert.equal(result[&#039;#radio1:disabled&#039;], 1);
+								assert.equal(result[&#039;#radio1:enabled&#039;], 0);
+								assert.equal(result[&#039;#radio2:disabled&#039;], 0);
+								assert.equal(result[&#039;#radio2:enabled&#039;], 1);
+							});
+
+					},
+					&quot;:empty pseudo-selector&quot;: function () {
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								var result = {};
+
+								result[&quot;#t &gt; span:empty&quot;] = query(&#039;#t &gt; span:empty&#039;).length;
+								result[&quot;#t span:empty&quot;] = query(&#039;#t span:empty&#039;).length;
+								result[&quot;h3 span:empty&quot;] = query(&#039;h3 span:empty&#039;).length;
+								result[&quot;h3 :not(:empty)&quot;] = query(&#039;h3 :not(:empty)&#039;).length;
+
+								return result;
+							})
+							.then(function (result) {
+								assert.equal(result[&#039;#t &gt; span:empty&#039;], 4);
+								assert.equal(result[&#039;#t span:empty&#039;], 6);
+								assert.equal(result[&#039;h3 span:empty&#039;], 0);
+								assert.equal(result[&#039;h3 :not(:empty)&#039;], 1);
+							});
+
+					}
+				};
+			}
+
+			if (selector == &quot;acme&quot;) {
+				tests.acme = {
+					&quot;Case insensitive class selectors - bug #8775, #14874&quot;: function () {
+						// Case insensitive class selectors (#8775, #14874).
+						// In standards mode documents, querySelectorAll() is case-sensitive about class selectors,
+						// but acme is case-insensitive for backwards compatibility.
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								return query(&quot;.fooBar&quot;).length;
+							})
+							.then(function (result) {
+								assert.equal(result, 1);
+							});
+					},
+					&quot;sub-selector parsing&quot;: function () {
+						// TODO: move this test to CSS3 section when #14875 is fixed
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								return query(&#039;#t span.foo:not(span:first-child)&#039;).length;
+							})
+							.then(function (result) {
+								assert.equal(result, 1);
+							});
+					},
+					&quot;special characters in attribute values without backslashes&quot;: function () {
+						// supported by acme but apparently not standard, see http://www.w3.org/TR/CSS21/syndata.html#characters
+						function attrSpecialCharsNoEscape() {
+							// bug 10651
+							return this.get(&quot;remote&quot;)
+								.execute(function () {
+									var result = {};
+
+									result[&quot;option[value=a+b]&quot;] = query(&#039;option[value=a+b]&#039;, &#039;attrSpecialChars&#039;).length;
+									result[&quot;option[value=a~b]&quot;] = query(&#039;option[value=a~b]&#039;, &#039;attrSpecialChars&#039;).length;
+									result[&quot;option[value=a^b]&quot;] = query(&#039;option[value=a^b]&#039;, &#039;attrSpecialChars&#039;).length;
+
+									return result;
+								})
+								.then(function (result) {
+									assert.equal(result[&quot;option[value=a+b]&quot;], 1, &quot;value=a+b&quot;);
+									assert.equal(result[&quot;option[value=a~b]&quot;], 1, &quot;value=a~b&quot;);
+									assert.equal(result[&quot;option[value=a^b]&quot;], 1, &quot;value=a^b&quot;);
+								});
+						}
+					},
+					&quot;implied * after &gt; (non-standard syntax)&quot;: function () {
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								var result = {};
+
+								result[&#039;#t &gt;&#039;] = query(&#039;#t &gt;&#039;).length;
+								result[&#039;.foo &gt;&#039;] = query(&#039;.foo &gt;&#039;).length;
+								result[&#039;&gt;&#039;] = query(&#039;&gt;&#039;, &#039;container&#039;).length;
+								result[&#039;&gt; .not-there&#039;] = query(&#039;&gt; .not-there&#039;).length;
+								result[&#039;#foo ~&#039;] = query(&#039;#foo ~&#039;).length;
+								result[&#039;#foo~&#039;] = query(&#039;#foo~&#039;).length;
+
+								return result;
+							})
+							.then(function (result) {
+								assert.equal(result[&#039;#t &gt;&#039;], 12);
+								assert.equal(result[&#039;.foo &gt;&#039;], 3);
+								assert.equal(result[&#039;&gt;&#039;], 3);
+								assert.equal(result[&#039;&gt; .not-there&#039;], 0);
+								assert.equal(result[&#039;#foo ~&#039;], 1);
+								assert.equal(result[&#039;#foo~&#039;], 1);
+							});
+
+					},
+					&quot;implied * before and after + and ~ (non-standard syntax)&quot;: function () {
+						return this.get(&quot;remote&quot;)
+							.execute(function () {
+								var result = {};
+								result[&quot;+&quot;] = query(&#039;+&#039;, &#039;container&#039;).length;
+								result[&quot;~&quot;] = query(&#039;~&#039;, &#039;container&#039;).length;
+								return result;
+							})
+							.then(function (result) {
+								assert.equal(result[&#039;+&#039;], 1);
+								assert.equal(result[&#039;~&#039;], 3);
+							});
+
+					},
+					&quot;check for correct document order&quot;: {
+						// not sure if this is guaranteed by css3, so putting in acme section
+						domOrder: function () {
+							return this.get(&quot;remote&quot;)
+								.execute(function () {
+									var result = {};
+
+									var inputs = query(&quot;.upperclass .lowerclass input&quot;);
+
+									result[&quot;notbug&quot;] = inputs[0].id;
+									result[&quot;bug&quot;] = inputs[1].id;
+									result[&quot;checkbox1&quot;] = inputs[2].id;
+									result[&quot;checkbox2&quot;] = inputs[3].id;
+									result[&quot;radio1&quot;] = inputs[4].id;
+									result[&quot;radio2&quot;] = inputs[5].id;
+									result[&quot;radio3&quot;] = inputs[6].id;
+
+									return result;
+								})
+								.then(function (result) {
+									assert.equal(result[&quot;notbug&quot;], &quot;notbug&quot;);
+									assert.equal(result[&quot;bug&quot;], &quot;bug&quot;);
+									assert.equal(result[&quot;checkbox1&quot;], &quot;checkbox1&quot;);
+									assert.equal(result[&quot;checkbox2&quot;], &quot;checkbox2&quot;);
+									assert.equal(result[&quot;radio1&quot;], &quot;radio1&quot;);
+									assert.equal(result[&quot;radio2&quot;], &quot;radio2&quot;);
+									assert.equal(result[&quot;radio3&quot;], &quot;radio3&quot;);
+								});
+						},
+
+						// TODO: move to css2 section after #7869 fixed for lite engine (on IE)
+						xml_nthchild: function () {
+							return this.get(&quot;remote&quot;)
+								.execute(function () {
+									var doc = createDocument([
+											&quot;&lt;ResultSet&gt;&quot;,
+											&quot;&lt;result&gt;One&lt;/result&gt;&quot;,
+											&quot;&lt;result&gt;Two&lt;/result&gt;&quot;,
+											&quot;&lt;result&gt;Three&lt;/result&gt;&quot;,
+											&quot;&lt;result&gt;Four&lt;/result&gt;&quot;,
+											&quot;&lt;/ResultSet&gt;&quot;
+										].join(&quot;&quot;)
+									);
+									var de = doc.documentElement;
+
+									return query(&quot;result:nth-child(4)&quot;, de)[0].firstChild.data;
+								})
+								.then(function (result) {
+									assert.equal(result, &quot;Four&quot;, &quot;fourth child&quot;);
+								});
+						}
+					}
+				};
+			}
+
+			registerSuite(tests);
+		});
+	});
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/unit/dom-prop.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/unit/dom-prop.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">66.65</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">325</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">30.34</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.49</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+   &#039;intern!object&#039;,
+   &#039;intern/chai!assert&#039;,
+   &#039;sinon&#039;,
+   &#039;../../dom-prop&#039;,
+   &#039;../../dom-style&#039;,
+   &#039;../../_base/connect&#039;
+], function (registerSuite, assert, sinon, domProp, domStyle, connect) {
+    var baseId = &quot;dom-prop&quot;,
+        uniqueId = 0;
+
+    function getId() {
+        return baseId + uniqueId++;
+    }
+
+    var container;
+
+    registerSuite({
+        name: &#039;dojo/dom-prop&#039;,
+        setup: function () {
+            container = document.createElement(&quot;div&quot;);
+            document.body.appendChild(container);
+        },
+        teardown: function () {
+            document.body.removeChild(container);
+        },
+        &quot;names&quot;: {
+            &quot;maps values correctly&quot;: function () {
+                //arrange
+
+                //act
+
+                //assert
+                assert.equal(domProp.names[&quot;class&quot;], &quot;className&quot;);
+                assert.equal(domProp.names[&quot;for&quot;], &quot;htmlFor&quot;);
+                assert.equal(domProp.names[&quot;tabindex&quot;], &quot;tabIndex&quot;);
+                assert.equal(domProp.names[&quot;readonly&quot;], &quot;readOnly&quot;);
+                assert.equal(domProp.names[&quot;colspan&quot;], &quot;colSpan&quot;);
+                assert.equal(domProp.names[&quot;frameborder&quot;], &quot;frameBorder&quot;);
+                assert.equal(domProp.names[&quot;rowspan&quot;], &quot;rowSpan&quot;);
+                assert.equal(domProp.names[&quot;textcontent&quot;], &quot;textContent&quot;);
+                assert.equal(domProp.names[&quot;valuetype&quot;], &quot;valueType&quot;);
+
+            }
+        },
+        &quot;get()&quot;: {
+            &quot;node + string&quot;: function () {
+                //arrange
+                var node = document.createElement(&quot;div&quot;),
+                    propertyName = &quot;name&quot;,
+                    propertyValue = &quot;the value&quot;;
+
+                node[propertyName] = propertyValue;
+
+                //act
+                var result = domProp.get(node, propertyName);
+
+                //assert
+                assert.equal(result, propertyValue);
+
+            },
+            &quot;string + string&quot;: function () {
+                //arrange
+                var node = document.createElement(&quot;div&quot;),
+                    propertyName = &quot;name&quot;,
+                    propertyValue = &quot;the value&quot;,
+                    id = getId();
+
+                node[propertyName] = propertyValue;
+                node.id = id;
+                container.appendChild(node);
+
+                //act
+                var result = domProp.get(id, propertyName);
+
+                //assert
+                assert.equal(result, propertyValue);
+            },
+            &quot;node + &#039;textContent&#039;&quot;: function () {
+                //arrange
+                var node = document.createElement(&quot;div&quot;),
+                    propertyName = &quot;textContent&quot;,
+                    propertyValue = &quot;the value&quot;;
+
+                node[propertyName] = propertyValue;
+
+                //act
+                var result = domProp.get(node, propertyName);
+
+                //assert
+                assert.equal(result, propertyValue);
+            },
+            &quot;attribute name is case-insensitive&quot;: function () {
+                //arrange
+                var node = document.createElement(&quot;div&quot;),
+                    propertyName = &quot;name&quot;.toUpperCase(),
+                    propertyValue = &quot;the value&quot;;
+
+                node[propertyName] = propertyValue;
+
+                //act
+                var result = domProp.get(node, propertyName);
+
+                //assert
+                assert.equal(result, propertyValue);
+            },
+            &quot;getting attribute that is aliased in JavaScript gets correct attribute&quot;: function () {
+                //arrange
+                var node = document.createElement(&quot;div&quot;),
+                    propertyValue = 42,
+                    attributes =
+                    [
+                        { requested: &quot;class&quot;, expected: &quot;className&quot; },
+                        { requested: &quot;for&quot;, expected: &quot;htmlFor&quot; },
+                        { requested: &quot;tabindex&quot;, expected: &quot;tabIndex&quot; },
+                        { requested: &quot;readonly&quot;, expected: &quot;readOnly&quot; },
+                        { requested: &quot;colspan&quot;, expected: &quot;colSpan&quot; },
+                        { requested: &quot;frameborder&quot;, expected: &quot;frameBorder&quot; },
+                        { requested: &quot;rowspan&quot;, expected: &quot;rowSpan&quot; },
+                        { requested: &quot;textcontent&quot;, expected: &quot;textContent&quot; },
+                        { requested: &quot;valuetype&quot;, expected: &quot;valueType&quot; },
+                    ];
+
+                for (var i in attributes) {
+                    node[attributes[i].expected] = propertyValue;
+
+                    //act
+                    var result = domProp.get(node, attributes[i].requested);
+
+                    //assert
+                    assert.equal(result, propertyValue);
+                }
+            }
+        },
+        &quot;set()&quot;: {
+            &quot;node + string + string&quot;: function () {
+                //arrange
+                var node = document.createElement(&quot;div&quot;),
+                    propertyName = &quot;name&quot;,
+                    propertyValue = &quot;the value&quot;;
+
+                //act
+                domProp.set(node, propertyName, propertyValue);
+
+                //assert
+                assert.equal(node[propertyName], propertyValue);
+
+            },
+            &quot;string + string + string&quot;: function () {
+                //arrange
+                var node = document.createElement(&quot;div&quot;),
+                    propertyName = &quot;name&quot;,
+                    propertyValue = &quot;the value&quot;,
+                    id = getId();
+
+                node.id = id;
+                container.appendChild(node);
+
+                //act
+                domProp.set(id, propertyName, propertyValue);
+
+                //assert
+                assert.equal(node[propertyName], propertyValue);
+            },
+            &quot;setting attribute that is aliased in JavaScript sets correct attribute&quot;: function () {
+                //arrange
+                var node = document.createElement(&quot;div&quot;),
+                    propertyValue = 42,
+                    propertyNames =
+                    [
+                        { requested: &quot;class&quot;, expected: &quot;className&quot; },
+                        { requested: &quot;for&quot;, expected: &quot;htmlFor&quot; },
+                        { requested: &quot;tabindex&quot;, expected: &quot;tabIndex&quot; },
+                        { requested: &quot;readonly&quot;, expected: &quot;readOnly&quot; },
+                        { requested: &quot;colspan&quot;, expected: &quot;colSpan&quot; },
+                        { requested: &quot;frameborder&quot;, expected: &quot;frameBorder&quot; },
+                        { requested: &quot;rowspan&quot;, expected: &quot;rowSpan&quot; },
+                        { requested: &quot;textcontent&quot;, expected: &quot;textContent&quot; },
+                        { requested: &quot;valuetype&quot;, expected: &quot;valueType&quot; },
+                    ];
+
+                for (var i in propertyNames) {
+
+                    //act
+                    domProp.set(node, propertyNames[i].requested, propertyValue);
+
+                    //assert
+                    assert.equal(node[propertyNames[i].expected], propertyValue);
+                }
+            },
+            &quot;node + map&quot;: function () {
+                //arrange
+                var node = document.createElement(&quot;div&quot;),
+                    map =
+                    {
+                        name: &quot;the name&quot;,
+                        id: getId()
+                    };
+
+                //act
+                domProp.set(node, map);
+
+                //assert
+                for (var i in map) {
+                    assert.equal(node[i], map[i]);
+                }
+
+            },
+            &quot;node + &#039;style&#039; + any delegates to dojo/dom-style::set()&quot;: function () {
+                //arrange
+                var node = document.createElement(&quot;div&quot;),
+                    propertyValue = {
+                        width: &quot;100px&quot;
+                    },
+                    mock = sinon.spy(domStyle, &quot;set&quot;);
+
+                //act
+                domProp.set(node, &quot;style&quot;, propertyValue);
+
+                //assert
+                assert.isTrue(mock.calledWith(node, propertyValue));
+
+                mock.restore();
+
+            },
+            &quot;node + &#039;innerHTML&#039; + string&quot;: function () {
+                //arrange
+                var node = document.createElement(&quot;div&quot;),
+                    propertyValue = &quot;&lt;h1&gt;Foo&lt;/h1&gt;&quot;;
+
+                //act
+                domProp.set(node, &quot;innerHTML&quot;, propertyValue);
+
+                //assert
+                assert.equal(node.innerHTML, propertyValue);
+
+            },
+            &quot;&lt;tag whose innerHTML is readonly in IE/&gt; + &#039;innerHTML&#039; + string&quot;: function () {
+                //arrange
+                var map =
+                    [
+                        { tag: &quot;table&quot;, markup: &quot;&lt;tbody&gt;&lt;tr&gt;&lt;td&gt;Foo&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&quot; },
+                        { tag: &quot;tbody&quot;, markup: &quot;&lt;tr&gt;&lt;td&gt;Bar&lt;/td&gt;&lt;/tr&gt;&quot; },
+                        { tag: &quot;tfoot&quot;, markup: &quot;&lt;tr&gt;&lt;td&gt;Baz&lt;/td&gt;&lt;/tr&gt;&quot; },
+                        { tag: &quot;thead&quot;, markup: &quot;&lt;tr&gt;&lt;td&gt;Buz&lt;/td&gt;&lt;/tr&gt;&quot; },
+                        { tag: &quot;tr&quot;, markup: &quot;&lt;td&gt;quux&lt;/td&gt;&quot; },
+                        { tag: &quot;title&quot;, markup: &quot;the value&quot; }
+                    ];
+
+                for (var i in map) {
+                    var node = document.createElement(map[i].tag);
+
+                    //act
+                    domProp.set(node, &quot;innerHTML&quot;, map[i].markup);
+
+                    //assert
+                    assert.equal(node.innerHTML, map[i].markup);
+                }
+
+            },
+            &quot;node + &#039;textContent&#039; + string&quot;: function () {
+                //arrange
+                var node = document.createElement(&quot;div&quot;),
+                    propertyValue = &quot;Foo&quot;;
+
+                //act
+                domProp.set(node, &quot;textContent&quot;, propertyValue);
+
+                //assert
+                assert.equal(node.textContent, propertyValue);
+            },
+            &quot;if property is already assigned as a function and &#039;null&#039; is set, then function removed&quot;: function () {
+                //arrange
+                var node = document.createElement(&quot;div&quot;),
+                    oldPropertyValue = function () { },
+                    propertyName = &quot;foofunction&quot;;
+
+                node[propertyName] = oldPropertyValue;
+
+                //act
+                domProp.set(node, propertyName, null);
+
+
+                //assert
+                assert.isNull(node[propertyName]);
+
+            },
+            &quot;if property is already assigned as a function, then dojo/_base/connect::disconnect() called with correct args&quot;: function () {
+                //arrange
+                var node = document.createElement(&quot;div&quot;),
+                    oldPropertyValue = function () { },
+                    newPropertyValue = function () { },
+                    propertyName = &quot;foofunction&quot;,
+                    mock = sinon.spy(connect, &quot;disconnect&quot;);
+
+                domProp.set(node, propertyName, oldPropertyValue);
+
+                //act
+                domProp.set(node, propertyName, newPropertyValue);
+
+                //assert
+                assert.isTrue(mock.called);
+
+                mock.restore();
+
+            },
+            &quot;node + string + function&quot;: function () {
+                //arrange
+                var node = document.createElement(&quot;div&quot;),
+                    propertyValue = function () { },
+                    propertyName = &quot;foofunction&quot;,
+                    mock = sinon.spy(connect, &quot;connect&quot;);
+
+                //act
+                domProp.set(node, propertyName, propertyValue);
+
+                //assert
+                assert.isTrue(mock.calledWith(node, propertyName, propertyValue));
+
+                mock.restore();
+            }
+
+        }
+    });
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

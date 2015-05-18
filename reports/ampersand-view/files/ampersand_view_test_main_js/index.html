@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">65.75</p>
+      <p class="stat">65.77</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">693</p>
+      <p class="stat">722</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">57.88</p>
+      <p class="stat">57.75</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">7.35</p>
+      <p class="stat">7.86</p>
     </div>
   </div>
 </div>
@@ -121,7 +121,7 @@ var Model = AmpersandModel.extend({
 
 function getView(bindings, model) {
     if (!bindings.template) {
-        bindings.template = &#039;&lt;li&gt;&lt;span&gt;&lt;/span&gt;&lt;img/&gt;&lt;/li&gt;&#039;;
+        bindings.template = &#039;&lt;li&gt;&lt;span&gt;&lt;/span&gt;&lt;img&gt;&lt;/li&gt;&#039;;
     }
     var View = AmpersandView.extend(bindings);
     var view = new View({
@@ -201,6 +201,21 @@ test(&#039;registerSubview: default container to this.el&#039;, function (t) {
     t.end();
 });
 
+test(&#039;caching elements&#039;, function(t) {
+  var View = AmpersandView.extend({
+    template: &#039;&lt;p&gt;&lt;span&gt;&lt;/span&gt;&lt;/p&gt;&#039;,
+    render: function () {
+      this.renderWithTemplate();
+      return this.cacheElements(({span:&#039;span&#039;}));
+    }
+  });
+  var instance = new View(),
+     rendered  = instance.render();
+  t.equal(instance, rendered);
+  t.equal(typeof rendered.span, &#039;object&#039;);
+  t.end();
+});
+
 test(&#039;listen to and run&#039;, function (t) {
     t.plan(1);
     var model = new Model({
@@ -270,7 +285,7 @@ test(&#039;href bindings&#039;, function (t) {
 
 test(&#039;input bindings&#039;, function (t) {
     var view = getView({
-        template: &#039;&lt;li&gt;&lt;input/&gt;&lt;/li&gt;&#039;,
+        template: &#039;&lt;li&gt;&lt;input&gt;&lt;/li&gt;&#039;,
         bindings: {
             &#039;model.something&#039;: {
                 type: &#039;attribute&#039;,
@@ -358,7 +373,7 @@ test(&#039;nested binding definitions&#039;, function (t) {
 
 test(&#039;renderAndBind with no model&#039;, function (t) {
     var View = AmpersandView.extend({
-        template: &#039;&lt;li&gt;&lt;span&gt;&lt;/span&gt;&lt;img/&gt;&lt;/li&gt;&#039;
+        template: &#039;&lt;li&gt;&lt;span&gt;&lt;/span&gt;&lt;img&gt;&lt;/li&gt;&#039;
     });
     var view = new View();
     t.ok(view.renderWithTemplate()); //Should not throw error
@@ -367,7 +382,7 @@ test(&#039;renderAndBind with no model&#039;, function (t) {
 
 test(&#039;queryByHook&#039;, function (t) {
     var View = AmpersandView.extend({
-        template: &#039;&lt;li data-hook=&quot;list-item&quot;&gt;&lt;span data-hook=&quot;username&quot;&gt;&lt;/span&gt;&lt;img data-hook=&quot;user-avatar&quot;/&gt;&lt;/li&gt;&#039;
+        template: &#039;&lt;li data-hook=&quot;list-item&quot;&gt;&lt;span data-hook=&quot;username&quot;&gt;&lt;/span&gt;&lt;img data-hook=&quot;user-avatar&quot;&gt;&lt;/li&gt;&#039;
     });
     var view = new View();
     view.renderWithTemplate();
@@ -375,6 +390,20 @@ test(&#039;queryByHook&#039;, function (t) {
     t.ok(view.queryByHook(&#039;user-avatar&#039;) instanceof Element, &#039;should find username&#039;);
     t.ok(view.queryByHook(&#039;nothing&#039;) === undefined, &#039;should find username&#039;);
     t.ok(view.queryByHook(&#039;list-item&#039;) instanceof Element, &#039;should also work for root element&#039;);
+    t.end();
+});
+
+test(&#039;queryAllByHook&#039;, function (t) {
+    var View = AmpersandView.extend({
+        template: &#039;&lt;li data-hook=&quot;list-item&quot;&gt;&lt;span data-hook=&quot;username info&quot;&gt;&lt;/span&gt;&lt;img data-hook=&quot;user-avatar info&quot;&gt;&lt;/li&gt;&#039;
+    });
+    var view = new View();
+    view.renderWithTemplate();
+    t.ok(view.queryAllByHook(&#039;info&#039;) instanceof Array, &#039;should return array of results&#039;);
+    t.equal(view.queryAllByHook(&#039;info&#039;).length, 2, &#039;should find all relevant elements&#039;);
+    t.ok(view.queryAllByHook(&#039;info&#039;)[0] instanceof Element, &#039;should be able to access found elements&#039;);
+    t.ok(view.queryAllByHook(&#039;info&#039;)[1] instanceof Element, &#039;should be able to access found elements&#039;);
+    t.deepEqual(view.queryAllByHook(&#039;nothing&#039;), [], &#039;should return empty array if no results found&#039;);
     t.end();
 });
 
@@ -449,7 +478,7 @@ test(&#039;queryAll should include root element if matches&#039;, function (t) {
 //            &#039;blur #thing&#039;: &#039;handleBlur&#039;
 //        },
 //        autoRender: true,
-//        template: &#039;&lt;div&gt;&lt;input id=&quot;thing&quot;/&gt;&lt;/div&gt;&lt;/div&gt;&#039;,
+//        template: &#039;&lt;div&gt;&lt;input id=&quot;thing&quot;&gt;&lt;/div&gt;&lt;/div&gt;&#039;,
 //        handleFocus: function () {
 //            t.pass(&#039;focus called&#039;);
 //        },

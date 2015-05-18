@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/unit/date/locale.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/unit/date/locale.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">67.39</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">376</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">34.33</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">6.36</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+	&#039;intern!object&#039;,
+	&#039;intern/chai!assert&#039;,
+	&#039;../../../date/locale&#039;,
+	&#039;dojo/_base/kernel&#039;,
+	&#039;dojo/_base/array&#039;,
+	&#039;dojo/i18n&#039;,
+	&#039;dojo/Deferred&#039;
+], function (registerSuite, assert, locale, kernel, array, i18n, Deferred) {
+	/* jshint maxlen: false */
+
+	function assertDates(date1, date2) {
+		assert.instanceOf(date1, Date);
+		assert.instanceOf(date2, Date);
+		assert.equal(date1.getTime(), date2.getTime());
+	}
+
+	registerSuite({
+		name: &#039;dojo/date/locale&#039;,
+
+		setup: (function () {
+			function loadAsync(partLocaleList) {
+				var dfd = new Deferred();
+				var deps = array.map(partLocaleList, function (locale) {
+					return i18n.getL10nName(&#039;dojo/cldr&#039;, &#039;gregorian&#039;, locale);
+				});
+				require(deps, dfd.resolve);
+			}
+
+			function loadSync(partLocaleList) {
+				array.forEach(partLocaleList, function (locale) {
+					/* global dojo */
+					dojo.requireLocalization(&#039;dojo.cldr&#039;, &#039;gregorian&#039;, locale);
+				});
+			}
+
+			return function () {
+				var partLocaleList = [&#039;en-us&#039;, &#039;fr-fr&#039;, &#039;es&#039;, &#039;de-at&#039;, &#039;ja-jp&#039;, &#039;zh-cn&#039;];
+				if (kernel.isAsync) {
+					return loadAsync(partLocaleList);
+				} else { // tests for the v1.x loader/i18n machinery
+					loadSync(partLocaleList);
+				}
+			};
+		})(),
+
+		&#039;.isWeekend&#039;: function () {
+			var thursday = new Date(2006, 8, 21);
+			var friday = new Date(2006, 8, 22);
+			var saturday = new Date(2006, 8, 23);
+			var sunday = new Date(2006, 8, 24);
+			var monday = new Date(2006, 8, 25);
+
+			assert.isFalse(locale.isWeekend(thursday, &#039;en-us&#039;));
+			assert.isFalse(locale.isWeekend(friday, &#039;en-us&#039;));
+			assert.isTrue(locale.isWeekend(saturday, &#039;en-us&#039;));
+			assert.isTrue(locale.isWeekend(sunday, &#039;en-us&#039;));
+			assert.isFalse(locale.isWeekend(monday, &#039;en-us&#039;));
+		},
+
+		&#039;.format&#039;: (function () {
+			var date = new Date(2006, 7, 11, 0, 55, 12, 345);
+
+			return {
+				&#039;full&#039;: function () {
+					assert.equal(locale.format(date, {formatLength: &#039;full&#039;, selector: &#039;date&#039;, locale: &#039;en-us&#039;}), &#039;Friday, August 11, 2006&#039;);
+					assert.equal(locale.format(date, {formatLength: &#039;full&#039;, selector: &#039;date&#039;, locale: &#039;fr-fr&#039;}), &#039;vendredi 11 ao\xFBt 2006&#039;);
+					assert.equal(locale.format(date, {formatLength: &#039;full&#039;, selector: &#039;date&#039;, locale: &#039;de-at&#039;}), &#039;Freitag, 11. August 2006&#039;);
+					assert.equal(locale.format(date, {formatLength: &#039;full&#039;, selector: &#039;date&#039;, locale: &#039;ja-jp&#039;}), &#039;2006\u5E748\u670811\u65E5\u91D1\u66DC\u65E5&#039;);
+				},
+
+				&#039;short&#039;: function () {
+					assert.equal(locale.format(date, {formatLength: &#039;short&#039;, selector: &#039;date&#039;, locale: &#039;en-us&#039;}), &#039;8/11/06&#039;);
+					assert.equal(locale.format(date, {formatLength: &#039;short&#039;, selector: &#039;date&#039;, locale: &#039;fr-fr&#039;}), &#039;11/08/2006&#039;);
+					assert.equal(locale.format(date, {formatLength: &#039;short&#039;, selector: &#039;date&#039;, locale: &#039;de-at&#039;}), &#039;11.08.06&#039;);
+					assert.equal(locale.format(date, {formatLength: &#039;short&#039;, selector: &#039;date&#039;, locale: &#039;ja-jp&#039;}), &#039;2006/08/11&#039;);
+				},
+
+				&#039;time&#039;: function () {
+					assert.equal(locale.format(date, {datePattern: &#039;E&#039;, selector: &#039;date&#039;}), &#039;6&#039;);
+					assert.equal(locale.format(date, {selector: &#039;date&#039;, datePattern: &#039;EEE, MMM d, yyyy G&#039;, locale:&#039;en-us&#039; }), &#039;Fri, Aug 11, 2006 AD&#039;);
+					assert.equal(locale.format(date, {formatLength: &#039;short&#039;, selector: &#039;time&#039;, locale: &#039;en-us&#039;}), &#039;12:55 AM&#039;);
+					assert.equal(locale.format(date, {timePattern: &#039;h:m:s&#039;, selector: &#039;time&#039;}), &#039;12:55:12&#039;);
+					assert.equal(locale.format(date, {timePattern: &#039;h:m:s.SS&#039;, selector: &#039;time&#039;}), &#039;12:55:12.35&#039;);
+					assert.equal(locale.format(date, {timePattern: &#039;k:m:s.SS&#039;, selector: &#039;time&#039;}), &#039;24:55:12.35&#039;);
+					assert.equal(locale.format(date, {timePattern: &#039;H:m:s.SS&#039;, selector: &#039;time&#039;}), &#039;0:55:12.35&#039;);
+					assert.equal(locale.format(date, {timePattern: &#039;K:m:s.SS&#039;, selector: &#039;time&#039;}), &#039;0:55:12.35&#039;);
+					assert.equal(locale.format(date, {formatLength: &#039;full&#039;, selector: &#039;time&#039;, locale: &#039;zh-cn&#039;}).replace(/^.*(\u4e0a\u5348.*)/, &#039;$1&#039;), &#039;\u4e0a\u534812:55:12&#039;);
+				},
+
+				&#039;date&#039;: function () {
+					var options = {datePattern: &#039;ddMMyyyy&#039;, selector: &#039;date&#039;};
+					assert.equal(locale.format(date, options), &#039;11082006&#039;);
+
+					options = {datePattern: &#039;hh \&#039;o\&#039;\&#039;clock\&#039; a&#039;, selector: &#039;date&#039;, locale: &#039;en&#039;};
+					assert.equal(locale.format(date, options), &#039;12 o\&#039;clock AM&#039;);
+
+					options = {datePattern: &#039;dd/MM/yyyy&#039;, timePattern: &#039;hh:mma&#039;, locale: &#039;en&#039;, am: &#039;am&#039;, pm: &#039;pm&#039;};
+					assert.equal(locale.format(date, options), &#039;11/08/2006, 12:55am&#039;);
+				}
+			};
+		}()),
+
+		&#039;.parse&#039;: (function () {
+			var AUG_11_2006 = new Date(2006, 7, 11, 0);
+			var AUG_11_2006_12_30_AM = new Date(2006, 7, 11, 0, 30);
+			var AUG_11_2006_12_30_PM = new Date(2006, 7, 11, 12, 30);
+
+			return {
+				// in the en locale the date format is M/d/yy
+				// the time format is M/d/yy h:mm a
+				&#039;short format&#039;: {
+					&#039;leading zero month&#039;: function () {
+						assertDates(locale.parse(&#039;08/11/06&#039;, {formatLength: &#039;short&#039;, selector: &#039;date&#039;, locale: &#039;en&#039;}), AUG_11_2006);
+					},
+
+					&#039;single digit month&#039;: function () {
+						assertDates(locale.parse(&#039;8/11/06&#039;, {formatLength: &#039;short&#039;, selector: &#039;date&#039;, locale: &#039;en&#039;}), AUG_11_2006);
+					},
+
+					&#039;tolerate four digit year&#039;: function () {
+						assertDates(locale.parse(&#039;8/11/2006&#039;, {formatLength: &#039;short&#039;, selector: &#039;date&#039;, locale: &#039;en&#039;}), AUG_11_2006);
+					},
+
+					&#039;four digit year in strict mode returns null&#039;: function () {
+						assert.isNull(locale.parse(&#039;8/11/2006&#039;, {formatLength: &#039;short&#039;, selector: &#039;date&#039;, locale: &#039;en&#039;, strict: true}));
+					},
+
+					&#039;upper case PM in time&#039;: function () {
+						assertDates(locale.parse(&#039;08/11/06, 12:30 PM&#039;, {formatLength: &#039;short&#039;, locale: &#039;en&#039;}, &#039;PM&#039;), AUG_11_2006_12_30_PM);
+					},
+
+					&#039;lower case pm in time&#039;: function () {
+						assertDates(locale.parse(&#039;08/11/06, 12:30 pm&#039;, {formatLength: &#039;short&#039;, locale: &#039;en&#039;}, &#039;pm&#039;), AUG_11_2006_12_30_PM);
+					},
+
+					&#039;lower case pm fails in strict mode&#039;: function () {
+						assert.isNull(locale.parse(&#039;8/11/06, 12:30 pm&#039;, {formatLength: &#039;short&#039;, locale: &#039;en&#039;, strict: true}));
+					},
+
+					&#039;upper case PM passes in strict mode&#039;: function () {
+						assert.ok(locale.parse(&#039;8/11/06, 12:30 PM&#039;, {formatLength: &#039;short&#039;, locale: &#039;en&#039;, strict: true}));
+					},
+
+					&#039;upper case AM in time&#039;: function () {
+						assertDates(locale.parse(&#039;08/11/06, 12:30 AM&#039;, {formatLength: &#039;short&#039;, locale: &#039;en&#039;}, &#039;AM&#039;), AUG_11_2006_12_30_AM);
+					}
+				},
+
+				// in the en locale the format is MMM d, yyyy
+				&#039;medium format&#039;: {
+					&#039;basic usage&#039;: function () {
+						assertDates(locale.parse(&#039;Aug 11, 2006&#039;, {formatLength: &#039;medium&#039;, selector: &#039;date&#039;, locale: &#039;en&#039;}), AUG_11_2006);
+					},
+
+					&#039;tolerate peroid in month abbreviation&#039;: function () {
+						assertDates(locale.parse(&#039;Aug. 11, 2006&#039;, {formatLength: &#039;medium&#039;, selector: &#039;date&#039;, locale: &#039;en&#039;}), AUG_11_2006);
+					},
+
+					&#039;period in month abbreviation returns null in strict mode&#039;: function () {
+						assert.isNull(locale.parse(&#039;Aug. 11, 2006&#039;, {formatLength: &#039;medium&#039;, selector: &#039;date&#039;, locale: &#039;en&#039;, strict: true}));
+					}
+				},
+
+				// in the en locale the format is MMMM d, yyyy
+				&#039;long format&#039;: {
+					&#039;basic usage&#039;: function () {
+						assertDates(locale.parse(&#039;August 11, 2006&#039;, {formatLength: &#039;long&#039;, selector: &#039;date&#039;, locale: &#039;en&#039;}), AUG_11_2006);
+					}
+				},
+
+				// in the en locale the format is EEEE, MMMM d, yyyy
+				&#039;full format&#039;: {
+					&#039;basic usage&#039;: function () {
+						assertDates(locale.parse(&#039;Friday, August 11, 2006&#039;, {formatLength: &#039;full&#039;, selector: &#039;date&#039;, locale: &#039;en&#039;}), AUG_11_2006);
+					}
+				},
+
+				&#039;date pattern&#039;: {
+					&#039;ddMMyyyy&#039;: function () {
+						assertDates(locale.parse(&#039;11082006&#039;, {datePattern: &#039;ddMMyyyy&#039;, selector: &#039;date&#039;}), new Date(2006, 7, 11));
+					},
+
+					&#039;ddMMMyyyy&#039;: function () {
+						assertDates(locale.parse(&#039;31Aug2006&#039;, {datePattern: &#039;ddMMMyyyy&#039;, selector: &#039;date&#039;, locale: &#039;en&#039;}), new Date(2006, 7, 31));
+					},
+
+					&#039;DDD&#039;: function () {
+						assertDates(locale.parse(&#039;007&#039;, {datePattern: &#039;DDD&#039;, selector: &#039;date&#039;}), new Date(1970, 0, 7));
+						assertDates(locale.parse(&#039;031&#039;, {datePattern: &#039;DDD&#039;, selector: &#039;date&#039;}), new Date(1970, 0, 31));
+						assertDates(locale.parse(&#039;100&#039;, {datePattern: &#039;DDD&#039;, selector: &#039;date&#039;}), new Date(1970, 3, 10));
+					}
+				},
+
+				&#039;de locale&#039;: function () {
+					assertDates(locale.parse(&#039;11.08.06&#039;, {formatLength: &#039;short&#039;, selector: &#039;date&#039;, locale: &#039;de&#039;}), AUG_11_2006);
+					assert.isNull(locale.parse(&#039;11.8/06&#039;, {formatLength: &#039;short&#039;, selector: &#039;date&#039;, locale: &#039;de&#039;}));
+					assert.isNull(locale.parse(&#039;11.8x06&#039;, {formatLength: &#039;short&#039;, selector: &#039;date&#039;, locale: &#039;de&#039;}));
+					assert.isNull(locale.parse(&#039;11.0.06&#039;, {formatLength: &#039;short&#039;, selector: &#039;date&#039;, locale: &#039;de&#039;}));
+					assert.isNull(locale.parse(&#039;11.13.06&#039;, {formatLength: &#039;short&#039;, selector: &#039;date&#039;, locale: &#039;de&#039;}));
+					assert.isNull(locale.parse(&#039;32.08.06&#039;, {formatLength: &#039;short&#039;, selector: &#039;date&#039;, locale: &#039;de&#039;}));
+				},
+
+				&#039;es locale&#039;: {
+					&#039;short format&#039;: {
+						&#039;leading zero month&#039;: function () {
+							assertDates(locale.parse(&#039;11/08/06&#039;, {formatLength: &#039;short&#039;, selector: &#039;date&#039;, locale: &#039;es&#039;}), AUG_11_2006);
+						},
+
+						&#039;single digit month&#039;: function () {
+							assertDates(locale.parse(&#039;11/8/06&#039;, {formatLength: &#039;short&#039;, selector: &#039;date&#039;, locale: &#039;es&#039;}), AUG_11_2006);
+						},
+
+						&#039;tolerate four digit year&#039;: function () {
+							assertDates(locale.parse(&#039;11/8/2006&#039;, {formatLength: &#039;short&#039;, selector: &#039;date&#039;, locale: &#039;es&#039;}), AUG_11_2006);
+						},
+
+						&#039;four digit year in strict mode returns null&#039;: function () {
+							assert.isNull(locale.parse(&#039;11/8/2006&#039;, {formatLength: &#039;short&#039;, selector: &#039;date&#039;, locale: &#039;es&#039;, strict: true}));
+						}
+					},
+
+					&#039;long format&#039;: {
+						&#039;basic usage&#039;: function () {
+							assertDates(locale.parse(&#039;11 de agosto de 2006&#039;, {formatLength: &#039;long&#039;, selector: &#039;date&#039;, locale: &#039;es&#039;}), AUG_11_2006);
+						},
+
+						&#039;case-insensitive month&#039;: function () {
+							assertDates(locale.parse(&#039;11 de Agosto de 2006&#039;, {formatLength: &#039;long&#039;, selector: &#039;date&#039;, locale: &#039;es&#039;}), AUG_11_2006);
+						},
+
+						&#039;case-insensitive month fails in strict mode&#039;: function () {
+							assert.isNull(locale.parse(&#039;Viernes, 11 de agosto de 2006&#039;, {formatLength: &#039;full&#039;, selector: &#039;date&#039;, locale: &#039;es&#039;, strict: true}));
+						}
+					}
+				},
+
+				//Japanese (ja)
+				//note: to avoid garbling from non-utf8-aware editors that may touch this file, using the \uNNNN format
+				//for expressing double-byte chars.
+				//toshi (year): \u5e74
+				//getsu (month): \u6708
+				//nichi (day): \u65e5
+				//kinyoubi (Friday): \u91d1\u66dc\u65e5
+				//zenkaku space: \u3000
+				&#039;ja locale&#039;: {
+					&#039;short format&#039;: {
+						&#039;leading zero month&#039;: function () {
+							assertDates(locale.parse(&#039;06/08/11&#039;, {formatLength: &#039;short&#039;, selector: &#039;date&#039;, locale: &#039;ja&#039;}), AUG_11_2006);
+						},
+
+						&#039;single digit month&#039;: function () {
+							assertDates(locale.parse(&#039;06/8/11&#039;, {formatLength: &#039;short&#039;, selector: &#039;date&#039;, locale: &#039;ja&#039;}), AUG_11_2006);
+						},
+
+						&#039;tolerate four digit year&#039;: function () {
+							assertDates(locale.parse(&#039;2006/8/11&#039;, {formatLength: &#039;short&#039;, selector: &#039;date&#039;, locale: &#039;ja&#039;}), AUG_11_2006);
+						},
+
+						&#039;four digit year in strict mode returns null&#039;: function () {
+							assert.isNull(locale.parse(&#039;2006/8/11&#039;, {formatLength: &#039;short&#039;, selector: &#039;date&#039;, locale: &#039;ja&#039;, strict: true}));
+						}
+					},
+
+					&#039;medium format&#039;: {
+						&#039;leading zero month&#039;: function () {
+							assertDates(locale.parse(&#039;2006/08/11&#039;, {formatLength: &#039;medium&#039;, selector: &#039;date&#039;, locale: &#039;ja&#039;}), AUG_11_2006);
+						},
+
+						&#039;single digit month&#039;: function () {
+							assertDates(locale.parse(&#039;2006/8/11&#039;, {formatLength: &#039;medium&#039;, selector: &#039;date&#039;, locale: &#039;ja&#039;}), AUG_11_2006);
+						}
+					},
+
+					&#039;long format&#039;: {
+						&#039;basic usage&#039;: function () {
+							assertDates(locale.parse(&#039;2006\u5e748\u670811\u65e5&#039;, {formatLength: &#039;long&#039;, selector: &#039;date&#039;, locale: &#039;ja&#039;}), AUG_11_2006);
+						}
+					},
+
+					&#039;full format&#039;: {
+						&#039;basic usage&#039;: function () {
+							assertDates(locale.parse(&#039;2006\u5e748\u670811\u65e5\u91d1\u66dc\u65e5&#039;, {formatLength: &#039;full&#039;, selector: &#039;date&#039;, locale: &#039;ja&#039;}), AUG_11_2006);
+						}
+					}
+				},
+
+				&#039;fr-fr locale&#039;: {
+					&#039;medium format&#039;: {
+						&#039;tolerance for abbreviations&#039;: function () {
+							assertDates(locale.parse(&#039;11 avr 06&#039;, { formatLength: &#039;medium&#039;, selector: &#039;date&#039;, locale: &#039;fr-fr&#039; }), new Date(2006, 3, 11, 0));
+						},
+
+						&#039;round trip&#039;: function () {
+							var options = { formatLength: &#039;medium&#039;, selector: &#039;date&#039;, locale: &#039;fr-fr&#039; };
+							assertDates(locale.parse(locale.format(AUG_11_2006, options), options), AUG_11_2006);
+						}
+					}
+				},
+
+				&#039;he locale&#039;: {
+					&#039;basic usage via roundtrip&#039;: function () {
+						var options = {locale: &#039;he&#039;, formatLength: &#039;full&#039;, selector: &#039;date&#039;};
+						assert.ok(locale.parse(locale.format(new Date(), options), options));
+					}
+				},
+
+				&#039;times&#039;: function () {
+					var time = new Date(2006, 7, 11, 12, 30);
+					var tformat = {selector: &#039;time&#039;, strict: true, timePattern: &#039;h:mm a&#039;, locale: &#039;en&#039;};
+
+					assert.equal(locale.parse(&#039;12:30 PM&#039;, tformat).getHours(), time.getHours());
+					assert.equal(locale.parse(&#039;12:30 PM&#039;, tformat).getMinutes(), time.getMinutes());
+				},
+
+				&#039;format patterns&#039;: function () {
+					var time = new Date(2006, 7, 11, 12, 30);
+					var tformat;
+
+					tformat = {selector: &#039;time&#039;, strict: true, timePattern: &#039;h \&#039;o\&#039;\&#039;clock\&#039;&#039;, locale: &#039;en&#039;};
+					assert.equal(locale.parse(&#039;12 o\&#039;clock&#039;, tformat).getHours(), time.getHours());
+
+					tformat = {selector: &#039;time&#039;, strict: true, timePattern: &#039; \&#039;Hour is\&#039; h&#039;, locale: &#039;en&#039;};
+					assert.equal(locale.parse(&#039; Hour is 12&#039;, tformat).getHours(), time.getHours());
+
+					tformat = {selector: &#039;time&#039;, strict: true, timePattern: &#039;\&#039;Hour is\&#039; h&#039;, locale: &#039;en&#039;};
+					assert.equal(locale.parse(&#039;Hour is 12&#039;, tformat).getHours(), time.getHours());
+				},
+
+				&#039;invalid dates fail&#039;: function () {
+					assert.isNull(locale.parse(&#039;2/29/2007&#039;, {formatLength: &#039;short&#039;, selector: &#039;date&#039;, locale: &#039;en&#039;}));
+					assert.isNull(locale.parse(&#039;4/31/2007&#039;, {formatLength: &#039;short&#039;, selector: &#039;date&#039;, locale: &#039;en&#039;}));
+					assert.isNull(locale.parse(&#039;Decemb 30, 2007&#039;, {formatLength: &#039;long&#039;, selector: &#039;date&#039;, locale: &#039;en&#039;}));
+				},
+
+				&#039;month &gt; 12 fails&#039;: function () {
+					assert.isNull(locale.parse(&#039;15/1/2005&#039;, {formatLength: &#039;short&#039;, selector: &#039;date&#039;, locale: &#039;en&#039;}));
+				},
+
+				&#039;day of month &gt; number days in month fails&#039;: function () {
+					assert.isNull(locale.parse(&#039;Aug 32, 2006&#039;, {formatLength: &#039;medium&#039;, selector: &#039;date&#039;, locale: &#039;en&#039;}));
+				},
+
+				&#039;pre-epoch date&#039;: function () {
+					var AUG_11_06CE = new Date(2006, 7, 11, 0);
+
+					AUG_11_06CE.setFullYear(6); // literally the year 6 C.E.
+					assertDates(locale.parse(&#039;Aug 11, 06&#039;, {selector: &#039;date&#039;, datePattern: &#039;MMM dd, yyyy&#039;, locale: &#039;en&#039;, strict: true}), AUG_11_06CE);
+				},
+
+				&#039;dates with no spaces&#039;: function () {
+					assertDates(locale.parse(&#039;11Aug2006&#039;, {selector: &#039;date&#039;, datePattern: &#039;ddMMMyyyy&#039;, locale: &#039;en&#039;}), AUG_11_2006);
+					assertDates(locale.parse(&#039;Aug2006&#039;, {selector: &#039;date&#039;, datePattern: &#039;MMMyyyy&#039;, locale: &#039;en&#039;}), new Date(2006, 7, 1));
+					assertDates(locale.parse(&#039;111910&#039;, {fullyear: false, datePattern: &#039;MMddyy&#039;, selector: &#039;date&#039;}), new Date(2010, 10, 19));
+				}
+			};
+		})(),
+
+		&#039;._getDayOfYear&#039;: function () {
+			assert.equal(locale._getDayOfYear(new Date(2006, 0, 1)), 1);
+			assert.equal(locale._getDayOfYear(new Date(2006, 1, 1)), 32);
+			assert.equal(locale._getDayOfYear(new Date(2007, 2, 13, 0, 13)), 72);
+			assert.equal(locale._getDayOfYear(new Date(2007, 2, 13, 1, 13)), 72);
+		},
+
+		&#039;._getWeekOfYear&#039;: function () {
+			assert.equal(locale._getWeekOfYear(new Date(2000, 0, 1)), 0);
+			assert.equal(locale._getWeekOfYear(new Date(2000, 0, 2)), 1);
+			assert.equal(locale._getWeekOfYear(new Date(2000, 0, 2), 1), 0);
+			assert.equal(locale._getWeekOfYear(new Date(2007, 0, 1)), 0);
+			assert.equal(locale._getWeekOfYear(new Date(2007, 0, 1), 1), 1);
+			assert.equal(locale._getWeekOfYear(new Date(2007, 6, 14)), 27);
+			assert.equal(locale._getWeekOfYear(new Date(2007, 6, 14), 1), 28);
+		}
+	});
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

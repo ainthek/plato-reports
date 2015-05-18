@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/testsDOH/_base/loader/bootstrap.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/testsDOH/_base/loader/bootstrap.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">64.45</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">157</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">33.47</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.76</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([&quot;dojo&quot;, &quot;doh&quot;, &quot;../../../_base/sniff&quot;, &quot;require&quot;], function(dojo, doh, has, require){
+	doh.register(&quot;testsDOH._base._loader.bootstrap&quot;, [
+		function hasConsole(t){
+			t.assertTrue(&quot;console&quot; in dojo.global);
+			t.assertTrue(&quot;assert&quot; in console);
+			t.assertEqual(&quot;function&quot;, typeof console.assert);
+		},
+
+		function getText(t){
+			if(require.getText){
+				var text = require.getText(require.toUrl(&quot;dojo/testsDOH/_base/loader/getText.txt&quot;)).replace(/\r|\n/g, &quot;&quot;);
+				t.assertEqual(&quot;dojo._getText() test data&quot;, text);
+				if(dojo._getText){
+					text = dojo._getText(require.toUrl(&quot;dojo/testsDOH/_base/loader/getText.txt&quot;)).replace(/\r|\n/g, &quot;&quot;);
+					t.assertEqual(&quot;dojo._getText() test data&quot;, text);
+				}
+			}
+		},
+
+		{
+			name: &quot;getObject&quot;,
+			setUp: function(){
+				//Set an object in global scope.
+				dojo.global.globalValue = {
+					color: &quot;blue&quot;,
+					size: 20
+				};
+
+				//Set up an object in a specific scope.
+				this.foo = {
+					bar: {
+						color: &quot;red&quot;,
+						size: 100
+					}
+				};
+			},
+			runTest: function(t){
+				//Test for existing object using global as root path.
+				var globalVar = dojo.getObject(&quot;globalValue&quot;);
+				t.is(&quot;object&quot;, (typeof globalVar));
+				t.assertEqual(&quot;blue&quot;, globalVar.color);
+				t.assertEqual(20, globalVar.size);
+				t.assertEqual(&quot;blue&quot;, dojo.getObject(&quot;globalValue.color&quot;));
+
+				//Test for non-existent object using global as root path.
+				//Then create it.
+				t.assertFalse(dojo.getObject(&quot;something.thatisNew&quot;));
+				t.assertTrue(typeof(dojo.getObject(&quot;something.thatisNew&quot;, true)) == &quot;object&quot;);
+
+				//Test for existing object using another object as root path.
+				var scopedVar = dojo.getObject(&quot;foo.bar&quot;, false, this);
+				t.assertTrue(typeof(scopedVar) == &quot;object&quot;);
+				t.assertEqual(&quot;red&quot;, scopedVar.color);
+				t.assertEqual(100, scopedVar.size);
+				t.assertEqual(&quot;red&quot;, dojo.getObject(&quot;foo.bar.color&quot;, true, this));
+
+				//Test for existing object using another object as root path.
+				//Then create it.
+				t.assertFalse(dojo.getObject(&quot;something.thatisNew&quot;, false, this));
+				t.assertTrue(typeof(dojo.getObject(&quot;something.thatisNew&quot;, true, this)) == &quot;object&quot;);
+			},
+			tearDown: function(){
+				//Clean up global object that should not exist if
+				//the test is re-run.
+				try{
+					delete dojo.global.something;
+					delete this.something;
+				}catch(e){}
+			}
+		},
+
+		{
+			name: &quot;exists&quot;,
+			setUp: function(){
+				this.foo = {
+					bar: {},
+					baz: 0,
+					bam: false,
+					bal: &quot;&quot;,
+					ban: null
+				};
+			},
+			runTest: function(t){
+				t.assertTrue(dojo.exists(&quot;foo.bar&quot;, this));
+				t.assertFalse(dojo.exists(&quot;foo.bar&quot;));
+				t.assertTrue(dojo.exists(&quot;foo.baz&quot;, this));
+				t.assertTrue(dojo.exists(&quot;foo.bal&quot;, this));
+				t.assertTrue(dojo.exists(&quot;foo.ban&quot;, this));
+				t.assertTrue(dojo.exists(&quot;foo.bam&quot;, this));
+				t.assertFalse(dojo.exists(&quot;foo.bat&quot;, this));
+				t.assertTrue(dojo.exists(&quot;a.b&quot;, { a:{ b:0 }}));
+				t.assertFalse(dojo.exists(&quot;foo.bar.baz.bam.bap&quot;, this));
+			}
+		},
+
+		function evalWorks(t){
+			t.assertTrue(dojo.eval(&quot;(true)&quot;));
+			t.assertFalse(dojo.eval(&quot;(false)&quot;));
+			if(!has(&quot;ie&quot;)){
+				// eval truly executes in global scope for non IE
+				t.is(window.rawld, undefined);
+				dojo.eval(&quot;var rawld = 3.14;&quot;);
+				t.assertEqual(rawld, 3.14);
+				t.assertEqual(window.rawld, 3.14);
+				window.rawld = undefined;
+			}else{
+				// example of how to compensate for IE
+				t.is(window.rawld, undefined);
+				dojo.eval(&quot;window.rawld = 3.14;&quot;);
+				t.assertEqual(rawld, 3.14);
+				t.assertEqual(window.rawld, 3.14);
+				window.rawld = undefined;
+			}
+		},
+
+		function _mixin(t){
+			var a = {
+				x: 1,
+				y: function(){ return 2; },
+				z1: 99,
+				w: 2,
+				v: undefined
+			};
+			var b = {
+				x: 11,
+				y: function(){ return 12; },
+				z2: 33,
+				toString: function(){ return &quot;bark!&quot;; },
+				toLocaleString: function(){ return &quot;le bark-s!&quot;; },
+				w: undefined,
+				v: undefined,
+				u: undefined
+			};
+			t.is(1, a.x);
+			t.is(2, a.y());
+			t.is(99, a.z1);
+			t.t(&quot;w&quot; in a);
+			t.is(2, a.w);
+			t.t(&quot;v&quot; in a);
+			t.is(undefined, a.v);
+			t.f(&quot;u&quot; in a);
+			dojo._mixin(a, b);
+			t.is(11, a.x);
+			t.is(12, a.y());
+			t.is(&quot;bark!&quot;, a.toString());
+			t.is(&quot;le bark-s!&quot;, a.toLocaleString());
+			t.is(99, a.z1);
+			t.is(33, a.z2);
+			t.t(&quot;w&quot; in a);
+			t.is(undefined, a.w);
+			t.t(&quot;v&quot; in a);
+			t.is(undefined, a.v);
+			t.t(&quot;u&quot; in a);
+			t.is(undefined, a.u);
+		}
+	]);
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

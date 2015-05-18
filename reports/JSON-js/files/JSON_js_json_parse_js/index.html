@@ -48,7 +48,7 @@
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">297</p>
+      <p class="stat">299</p>
     </div>
   </div>
   <div class="row historical">
@@ -91,7 +91,7 @@
   <div class="row">
     <textarea id="file-source" class="col-md-12">/*
     json_parse.js
-    2012-06-20
+    2015-05-02
 
     Public Domain.
 
@@ -137,8 +137,11 @@
     NOT CONTROL.
 */
 
-/*members &quot;&quot;, &quot;\&quot;&quot;, &quot;\/&quot;, &quot;\\&quot;, at, b, call, charAt, f, fromCharCode,
-    hasOwnProperty, message, n, name, prototype, push, r, t, text
+/*jslint for */
+
+/*property 
+    at, b, call, charAt, f, fromCharCode, hasOwnProperty, message, n, name, 
+    prototype, push, r, t, text
 */
 
 var json_parse = (function () {
@@ -155,14 +158,14 @@ var json_parse = (function () {
     var at,     // The index of the current character
         ch,     // The current character
         escapee = {
-            &#039;&quot;&#039;:  &#039;&quot;&#039;,
+            &#039;&quot;&#039;: &#039;&quot;&#039;,
             &#039;\\&#039;: &#039;\\&#039;,
-            &#039;/&#039;:  &#039;/&#039;,
-            b:    &#039;\b&#039;,
-            f:    &#039;\f&#039;,
-            n:    &#039;\n&#039;,
-            r:    &#039;\r&#039;,
-            t:    &#039;\t&#039;
+            &#039;/&#039;: &#039;/&#039;,
+            b: &#039;\b&#039;,
+            f: &#039;\f&#039;,
+            n: &#039;\n&#039;,
+            r: &#039;\r&#039;,
+            t: &#039;\t&#039;
         },
         text,
 
@@ -171,10 +174,10 @@ var json_parse = (function () {
 // Call error when something is wrong.
 
             throw {
-                name:    &#039;SyntaxError&#039;,
+                name: &#039;SyntaxError&#039;,
                 message: m,
-                at:      at,
-                text:    text
+                at: at,
+                text: text
             };
         },
 
@@ -393,7 +396,9 @@ var json_parse = (function () {
         case &#039;-&#039;:
             return number();
         default:
-            return ch &gt;= &#039;0&#039; &amp;&amp; ch &lt;= &#039;9&#039; ? number() : word();
+            return ch &gt;= &#039;0&#039; &amp;&amp; ch &lt;= &#039;9&#039; 
+                ? number() 
+                : word();
         }
     };
 

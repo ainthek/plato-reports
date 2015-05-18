@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/unit/NodeList-manipulate.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/unit/NodeList-manipulate.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">63.15</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">1156</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">56.31</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">10.91</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+    &#039;intern!object&#039;,
+    &#039;intern/chai!assert&#039;,
+    &#039;sinon&#039;,
+    &#039;../../NodeList&#039;,
+    &#039;../../dom-attr&#039;,
+    &#039;../../dom-construct&#039;,
+    &#039;../../query&#039;,
+    &#039;../../NodeList-manipulate&#039;,
+    &#039;../../NodeList-traverse&#039;
+], function (registerSuite, assert, sinon, NodeList, attr, construct, query) {
+    registerSuite({
+        name: &#039;dojo/NodeList-manipulate&#039;,
+
+        // Test this private method because a lot of public methods defer to it.
+        // Better to test all in one place so that the consumers can rely on it to &quot;do the right thing&quot;
+        // instead of checking implementation details themselves
+        &quot;_placeMultiple&quot;: {
+            &quot;returns original node list&quot;: function () {
+                //arrange
+                var nodeList = new NodeList();
+
+                //act
+                var result = nodeList._placeMultiple(document.createElement(&quot;div&quot;), &quot;last&quot;);
+
+                //assert
+                assert.strictEqual(result, nodeList);
+
+            },
+            &quot;string + string calls dojo/dom-construct::place with correct arguments&quot;: function () {
+                //arrange
+                var nodes =
+                    [
+                        document.createElement(&quot;input&quot;),
+                        document.createElement(&quot;input&quot;)
+                    ],
+                    nodeList = new NodeList(nodes),
+                    queryResults = [
+                        document.createElement(&quot;span&quot;),
+                        document.createElement(&quot;span&quot;)
+                    ],
+                    container = document.createElement(&quot;div&quot;),
+                    mock = sinon.spy(construct, &quot;place&quot;),
+                    position = &quot;last&quot;;
+
+                for (var i in nodes) {
+                    nodes[i].className = &quot;class&quot; + i;
+                }
+
+                for (var i in queryResults) {
+                    container.appendChild(queryResults[i]);
+                }
+
+                document.body.appendChild(container);
+
+                //act
+                nodeList._placeMultiple(&quot;span&quot;, position);
+
+                //assert
+
+                //last node in nodelist placed with dojo/dom-construct::place into first query result node
+                assert.deepEqual(mock.args[0], [nodes[1], queryResults[0], position]);
+                //addiitional nodes in nodelist place into first query result before the last node
+                assert.equal(nodes[1].previousSibling, nodes[0]);
+
+                //last node in nodelist is cloned and that clone is placed with dojo/dom-construct::place into additional query result nodes
+                assert.notEqual(mock.args[1][0], nodes[1]);
+                assert.equal(mock.args[1][0].outerHTML, nodes[1].outerHTML);
+
+                //addiitional nodes in nodelist place into first query result before the last node
+                assert.notEqual(queryResults[1].children[1], nodes[1]);
+                assert.equal(queryResults[1].children[1].outerHTML, nodes[1].outerHTML);
+
+                mock.restore();
+
+            },
+            &quot;Node + string calls dojo/dom-construct::place with correct arguments&quot;: function () {
+                //arrange
+                var nodes =
+                    [
+                        document.createElement(&quot;input&quot;),
+                        document.createElement(&quot;input&quot;)
+                    ],
+                    nodeList = new NodeList(nodes),
+                    queryNode = document.createElement(&quot;span&quot;),
+                    container = document.createElement(&quot;div&quot;),
+                    mock = sinon.spy(construct, &quot;place&quot;),
+                    position = &quot;last&quot;;
+
+                for (var i in nodes) {
+                    nodes[i].className = &quot;class&quot; + i;
+                }
+
+                container.appendChild(queryNode);
+
+                document.body.appendChild(container);
+
+                //act
+                nodeList._placeMultiple(queryNode, position);
+
+                //assert
+
+                //last node in nodelist placed with dojo/dom-construct::place into queryNode
+                assert.deepEqual(mock.args[0], [nodes[1], queryNode, position]);
+                //addiitional nodes in nodelist place into queryNode before the last node
+                assert.equal(nodes[1].previousSibling, nodes[0]);
+
+                mock.restore();
+
+            },
+            &quot;NodeList + string calls dojo/dom-construct::place with correct arguments&quot;: function () {
+                //arrange
+                var nodes =
+                    [
+                        document.createElement(&quot;input&quot;),
+                        document.createElement(&quot;input&quot;)
+                    ],
+                    nodeList = new NodeList(nodes),
+                    queryResults = [
+                        document.createElement(&quot;span&quot;),
+                        document.createElement(&quot;span&quot;)
+                    ],
+                    queryNodeList = new NodeList(queryResults),
+                    container = document.createElement(&quot;div&quot;),
+                    mock = sinon.spy(construct, &quot;place&quot;),
+                    position = &quot;last&quot;;
+
+                for (var i in nodes) {
+                    nodes[i].className = &quot;class&quot; + i;
+                }
+
+                for (var i in queryResults) {
+                    container.appendChild(queryResults[i]);
+                }
+
+                document.body.appendChild(container);
+
+                //act
+                nodeList._placeMultiple(queryNodeList, position);
+
+                //assert
+
+                //last node in nodelist placed with dojo/dom-construct::place into first query result node
+                assert.deepEqual(mock.args[0], [nodes[1], queryResults[0], position]);
+                //addiitional nodes in nodelist place into first query result before the last node
+                assert.equal(nodes[1].previousSibling, nodes[0]);
+
+                //last node in nodelist is cloned and that clone is placed with dojo/dom-construct::place into additional query result nodes
+                assert.notEqual(mock.args[1][0], nodes[1]);
+                assert.equal(mock.args[1][0].outerHTML, nodes[1].outerHTML);
+
+                //addiitional nodes in nodelist place into first query result before the last node
+                assert.notEqual(queryResults[1].children[1], nodes[1]);
+                assert.equal(queryResults[1].children[1].outerHTML, nodes[1].outerHTML);
+
+                mock.restore();
+            }
+        },
+        &quot;innerHTML()&quot;: {
+
+            &quot;when argument present =&gt; delegate to addContent&quot;: function () {
+                //arrange
+                var expected = &quot;foo&quot;,
+                    argument = &quot;bar&quot;,
+                    nodes = [&quot;bar&quot;, &quot;baz&quot;],
+                    nodeList = new NodeList(nodes),
+                    mock = sinon.stub(nodeList, &quot;addContent&quot;).returns(expected);
+
+                //act
+                var result = nodeList.innerHTML(argument);
+
+                //assert
+                assert.equal(result, expected);
+                assert.deepEqual(mock.args[0], [argument, &quot;only&quot;]);
+
+                mock.restore();
+
+            },
+            &quot;when no argument, return first nodes innerHTML&quot;: function () {
+                //arrange
+                var node = document.createElement(&quot;div&quot;),
+                    otherNode = document.createElement(&quot;div&quot;),
+                    expected = &quot;the expected result&quot;,
+                    nodeList = new NodeList([node, otherNode]);
+
+                node.innerHTML = expected;
+                otherNode = &quot;this is not the expected content&quot;;
+
+                //act
+                var result = nodeList.innerHTML();
+
+                //assert
+                assert.equal(result, expected);
+            }
+        },
+        &quot;text()&quot;: {
+            &quot;string =&gt; attr.set&quot;: function () {
+                //arrange
+                var nodes = [
+                    document.createElement(&quot;div&quot;),
+                    document.createElement(&quot;div&quot;)
+                ],
+                nodeList = new NodeList(nodes),
+                expected = &quot;the expected content&quot;,
+                mock = sinon.spy(attr, &quot;set&quot;);
+
+                //act
+                var result = nodeList.text(expected);
+
+                //assert
+                for (var i in nodes) {
+                    assert.deepEqual(mock.args[i], [nodes[i], &quot;textContent&quot;, expected]);
+                }
+                assert.equal(result, nodeList);
+
+                mock.restore();
+
+            },
+            &quot;no args =&gt; attr.get&quot;: function () {
+                //arrange
+                var nodes = [
+                    document.createElement(&quot;div&quot;),
+                    document.createElement(&quot;div&quot;)
+                ],
+                nodeList = new NodeList(nodes),
+                expected = [
+                    &quot;the first expected content&quot;,
+                    &quot;the second expected content&quot;
+                ],
+                mock = sinon.stub(attr, &quot;get&quot;);
+
+                for (var i in nodes) {
+                    mock.withArgs(nodes[i]).returns(expected[i]);
+                }
+
+                //act
+                var result = nodeList.text();
+
+                //assert
+                assert.equal(result, expected[0] + expected[1]);
+                for (var i in nodes) {
+                    assert.deepEqual(mock.args[i], [nodes[i], &quot;textContent&quot;]);
+                }
+
+                mock.restore();
+            }
+
+        },
+        &quot;val()&quot;: {
+            &quot;empty nodelist::val() = undefined&quot;: function () {
+                //arrange
+                var nodeList = new NodeList();
+
+                //act
+                var result = nodeList.val();
+
+                //assert
+                assert.isUndefined(result);
+
+            },
+            &quot;nodeList([&lt;select/&gt;, ...]);:val() = value of first element&quot;: function () {
+                //arrange
+                var expected = &quot;the value&quot;,
+                    firstNode = document.createElement(&quot;select&quot;),
+                    nextNode = document.createElement(&quot;input&quot;),
+                    notSelectedOption = document.createElement(&quot;option&quot;),
+                    selectedOption = document.createElement(&quot;option&quot;),
+                    nodeList = new NodeList([firstNode, nextNode]);
+
+                notSelectedOption.value = &quot;not the expected value&quot;;
+                selectedOption.value = expected;
+                firstNode.add(notSelectedOption);
+                firstNode.add(selectedOption);
+                selectedOption.selected = true;
+
+                //act
+                var result = nodeList.val();
+
+                //assert
+                assert.equal(result, expected);
+
+            },
+            &quot;nodeList([&lt;select multiple/&gt;, ...])::val() = array of selected options&quot;: function () {
+                //arrange
+                var expected = [&quot;blue&quot;, &quot;yellow&quot;],
+                    notExpected = &quot;red&quot;,
+                    node = document.createElement(&quot;select&quot;),
+                    notSelectedOption = document.createElement(&quot;option&quot;),
+                    firstSelectedOption = document.createElement(&quot;option&quot;),
+                    secondSelectedOption = document.createElement(&quot;option&quot;),
+                    nodeList = new NodeList([node]);
+
+                node.multiple = true;
+                notSelectedOption.value = notExpected;
+                firstSelectedOption.value = expected[0];
+                secondSelectedOption.value = expected[1];
+
+                node.add(firstSelectedOption);
+                node.add(notSelectedOption);
+                node.add(secondSelectedOption);
+
+                firstSelectedOption.selected = true;
+                secondSelectedOption.selected = true;
+
+                //act
+                var result = nodeList.val();
+
+                //assert
+                assert.deepEqual(result, expected);
+
+            },
+            &quot;nodeList([&lt;input/&gt;, &lt;input/&gt;])::val(string) =&gt; sets the value of the input elements&quot;: function () {
+                //arrange
+                var expected = &quot;the value&quot;,
+                    nodes = [
+                        document.createElement(&quot;input&quot;),
+                        document.createElement(&quot;input&quot;)
+                    ],
+                    nodeList = new NodeList(nodes);
+
+                for (var i in nodes) {
+                    nodes[i].value = &quot;the old value&quot;;
+                }
+
+                //act
+                var result = nodeList.val(expected);
+
+                //assert
+                for (var i in nodes) {
+                    assert.equal(expected, nodes[i].value);
+                }
+                assert.equal(result, nodeList);
+
+            },
+            &quot;nodeList([&lt;input/&gt;, &lt;input/&gt;])::val(array) =&gt; sets the value of the input elements&quot;: function () {
+                //arrange
+                var expected = [
+                        &quot;the first value&quot;,
+                        &quot;the second value&quot;
+                ],
+                    nodes = [
+                        document.createElement(&quot;input&quot;),
+                        document.createElement(&quot;input&quot;)
+                    ],
+                    nodeList = new NodeList(nodes);
+
+                for (var i in nodes) {
+                    nodes[i].value = &quot;the old value&quot;;
+                }
+
+                //act
+                var result = nodeList.val(expected);
+
+                //assert
+                for (var i in nodes) {
+                    assert.equal(expected[i], nodes[i].value);
+                }
+                assert.equal(result, nodeList);
+            },
+            &quot;nodeList([&lt;select/&gt;])::val(string) =&gt; sets correct options to selected&quot;: function () {
+                //arrange
+                var expected = &quot;the value&quot;,
+                    node = document.createElement(&quot;select&quot;),
+                    notSelectedOption = document.createElement(&quot;option&quot;),
+                    selectedOption = document.createElement(&quot;option&quot;),
+                    nodeList = new NodeList([node]);
+
+                notSelectedOption.value = &quot;not the expected value&quot;;
+                selectedOption.value = expected;
+
+                node.add(notSelectedOption);
+                node.add(selectedOption);
+
+                //act
+                var result = nodeList.val(expected);
+
+                //assert
+                assert.isTrue(selectedOption.selected);
+                assert.isFalse(notSelectedOption.selected);
+                assert.equal(result, nodeList);
+            },
+            &quot;nodeList([&lt;input type=&#039;checkbox&#039;/&gt;, &lt;input type=&#039;checkbox&#039;/&gt;])::val(string) =&gt; selects correct elements&quot;: function () {
+                //arrange
+                var expected = &quot;the value&quot;,
+                    nodeToCheck = document.createElement(&quot;input&quot;),
+                    nodeToNotCheck = document.createElement(&quot;input&quot;),
+                    nodes = [nodeToNotCheck, nodeToCheck],
+                    nodeList = new NodeList(nodes);
+
+                for (var i in nodes) {
+                    nodes[i].type = &quot;checkbox&quot;;
+                }
+
+                nodeToCheck.value = expected;
+                nodeToNotCheck.value = &quot;not expected value&quot;;
+
+                nodeToCheck.checked = false;
+                nodeToNotCheck.checked = true;
+
+                //act
+                var result = nodeList.val(expected);
+
+                //assert
+                assert.isTrue(nodeToCheck.checked);
+                assert.isFalse(nodeToNotCheck.checked);
+                assert.equal(result, nodeList);
+
+            },
+            &quot;nodeList([&lt;input type=&#039;radio&#039;/&gt;])::val(string) =&gt; selects correct elements&quot;: function () {
+                //arrange
+                var expected = &quot;the value&quot;,
+                    nodeToCheck = document.createElement(&quot;input&quot;),
+                    nodeToNotCheck = document.createElement(&quot;input&quot;),
+                    nodes = [nodeToNotCheck, nodeToCheck],
+                    nodeList = new NodeList(nodes);
+
+                for (var i in nodes) {
+                    nodes[i].type = &quot;radio&quot;;
+                    nodes[i].name = &quot;theName&quot; + i;
+                }
+
+                nodeToCheck.value = expected;
+                nodeToNotCheck.value = &quot;not expected value&quot;;
+
+                nodeToCheck.checked = false;
+                nodeToNotCheck.checked = true;
+
+                //act
+                var result = nodeList.val(expected);
+
+                //assert
+                assert.isTrue(nodeToCheck.checked);
+                assert.isFalse(nodeToNotCheck.checked);
+                assert.equal(result, nodeList);
+
+            }
+        },
+        &quot;append()&quot;: {
+            &quot;any =&gt; this.addContent(any, &#039;last&#039;)&quot;: function () {
+                //arrange
+                var arg = { foo: &quot;bar&quot; },
+                    expected = &quot;the result&quot;,
+                    nodeList = new NodeList(),
+                    mock = sinon.stub(nodeList, &quot;addContent&quot;).returns(expected);
+
+                //act
+                var result = nodeList.append(arg);
+
+                //assert
+                assert.deepEqual(mock.args[0], [arg, &quot;last&quot;]);
+                assert.equal(result, expected);
+
+                mock.restore();
+
+            }
+        },
+        &quot;appendTo()&quot;: {
+            &quot;string =&gt; this._placeMultiple(string, &#039;last&#039;)&quot;: function () {
+                //arrange
+                var arg = { foo: &quot;bar&quot; },
+                    expected = &quot;the result&quot;,
+                    nodeList = new NodeList(),
+                    mock = sinon.stub(nodeList, &quot;_placeMultiple&quot;).returns(expected);
+
+                //act
+                var result = nodeList.appendTo(arg);
+
+                //assert
+                assert.deepEqual(mock.args[0], [arg, &quot;last&quot;]);
+                assert.equal(result, expected);
+
+                mock.restore();
+
+            }
+        },
+        &quot;prepend()&quot;: {
+            &quot;string =&gt; this.prepend(string, &#039;first&#039;)&quot;: function () {
+                //arrange
+                var arg = { foo: &quot;bar&quot; },
+                    expected = &quot;the result&quot;,
+                    nodeList = new NodeList(),
+                    mock = sinon.stub(nodeList, &quot;addContent&quot;).returns(expected);
+
+                //act
+                var result = nodeList.prepend(arg);
+
+                //assert
+                assert.deepEqual(mock.args[0], [arg, &quot;first&quot;]);
+                assert.equal(result, expected);
+
+                mock.restore();
+
+            }
+        },
+        &quot;prependTo()&quot;: {
+            &quot;string =&gt; this._placeMultiple(string, &#039;first&#039;)&quot;: function () {
+                //arrange
+                var arg = { foo: &quot;bar&quot; },
+                    expected = &quot;the result&quot;,
+                    nodeList = new NodeList(),
+                    mock = sinon.stub(nodeList, &quot;_placeMultiple&quot;).returns(expected);
+
+                //act
+                var result = nodeList.prependTo(arg);
+
+                //assert
+                assert.deepEqual(mock.args[0], [arg, &quot;first&quot;]);
+                assert.equal(result, expected);
+
+                mock.restore();
+
+            }
+        },
+        &quot;after()&quot;: {
+            &quot;string =&gt; this.after(string, &#039;after&#039;)&quot;: function () {
+                //arrange
+                var arg = { foo: &quot;bar&quot; },
+                    expected = &quot;the result&quot;,
+                    nodeList = new NodeList(),
+                    mock = sinon.stub(nodeList, &quot;addContent&quot;).returns(expected);
+
+                //act
+                var result = nodeList.after(arg);
+
+                //assert
+                assert.deepEqual(mock.args[0], [arg, &quot;after&quot;]);
+                assert.equal(result, expected);
+
+                mock.restore();
+
+            }
+        },
+        &quot;insertAfter()&quot;: {
+            &quot;string =&gt; this._placeMultiple(string, &#039;after&#039;)&quot;: function () {
+                //arrange
+                var arg = { foo: &quot;bar&quot; },
+                    expected = &quot;the result&quot;,
+                    nodeList = new NodeList(),
+                    mock = sinon.stub(nodeList, &quot;_placeMultiple&quot;).returns(expected);
+
+                //act
+                var result = nodeList.insertAfter(arg);
+
+                //assert
+                assert.deepEqual(mock.args[0], [arg, &quot;after&quot;]);
+                assert.equal(result, expected);
+
+                mock.restore();
+
+            }
+        },
+        &quot;before()&quot;: {
+            &quot;string =&gt; this.after(string, &#039;before&#039;)&quot;: function () {
+                //arrange
+                var arg = { foo: &quot;bar&quot; },
+                    expected = &quot;the result&quot;,
+                    nodeList = new NodeList(),
+                    mock = sinon.stub(nodeList, &quot;addContent&quot;).returns(expected);
+
+                //act
+                var result = nodeList.before(arg);
+
+                //assert
+                assert.deepEqual(mock.args[0], [arg, &quot;before&quot;]);
+                assert.equal(result, expected);
+
+                mock.restore();
+
+            }
+        },
+        &quot;insertBefore()&quot;: {
+            &quot;string =&gt; this._placeMultiple(string, &#039;before&#039;)&quot;: function () {
+                //arrange
+                var arg = { foo: &quot;bar&quot; },
+                    expected = &quot;the result&quot;,
+                    nodeList = new NodeList(),
+                    mock = sinon.stub(nodeList, &quot;_placeMultiple&quot;).returns(expected);
+
+                //act
+                var result = nodeList.insertBefore(arg);
+
+                //assert
+                assert.deepEqual(mock.args[0], [arg, &quot;before&quot;]);
+                assert.equal(result, expected);
+
+                mock.restore();
+
+            }
+        },
+        &quot;remove()&quot;: {
+            &quot;remove is alias of NodeList.prototype.orphan&quot;: function () {
+                //arrange
+                var nodeList = new NodeList();
+
+                //act
+
+                //assert
+                assert.strictEqual(nodeList.remove, NodeList.prototype.orphan);
+            }
+        },
+        &quot;wrap()&quot;: {
+            &quot;returns nodeList&quot;: function () {
+                //arrange
+                var nodeList = new NodeList();
+
+                //act
+                var result = nodeList.wrap(&quot;&lt;div&gt;&lt;/div&gt;&quot;);
+
+                //assert
+                assert.strictEqual(result, nodeList);
+
+            },
+            &quot;inserts nodes at the lowest level of the wrapper&quot;: function () {
+                //arrange
+                var node = document.createElement(&quot;input&quot;),
+                    nodeList = new NodeList([node]),
+                    container = document.createElement(&quot;div&quot;)
+
+                container.appendChild(node);
+
+                //act
+                nodeList.wrap(&quot;&lt;div&gt;&lt;span&gt;&lt;b&gt;&lt;/b&gt;&lt;/span&gt;&lt;/div&gt;&quot;);
+
+                //assert
+                assert.equal(node.parentNode.nodeName.toLowerCase(), &quot;b&quot;);
+            },
+            &quot;wraps all nodes in nodelist&quot;: function () {
+                //arrange
+                var nodes =
+                    [
+                        document.createElement(&quot;input&quot;),
+                        document.createElement(&quot;input&quot;)
+                    ],
+                    nodeList = new NodeList(nodes),
+                    container = document.createElement(&quot;div&quot;)
+
+                for (var i in nodes) {
+                    container.appendChild(nodes[i]);
+                }
+
+                //act
+                nodeList.wrap(&quot;&lt;span&gt;&lt;/span&gt;&quot;);
+
+                //assert
+                for (var i in nodes) {
+                    assert.equal(nodes[i].parentNode.nodeName.toLowerCase(), &quot;span&quot;);
+                }
+            }
+        },
+        &quot;wrapAll()&quot;: {
+            &quot;returns original nodeList&quot;: function () {
+                //arrange
+                var nodeList = new NodeList();
+
+                //act
+                var result = nodeList.wrapAll(&quot;&lt;div&gt;&lt;/div&gt;&quot;);
+
+                //assert
+                assert.strictEqual(result, nodeList);
+
+            },
+            &quot;wraps all nodes in the wrapper as direct children&quot;: function () {
+                //arrange
+                var nodes = [
+                        document.createElement(&quot;input&quot;),
+                        document.createElement(&quot;input&quot;),
+                        document.createElement(&quot;input&quot;)],
+                    nodeList = new NodeList(nodes),
+                    containers = [
+                        document.createElement(&quot;div&quot;),
+                        document.createElement(&quot;div&quot;),
+                        document.createElement(&quot;div&quot;)];
+
+                for (var i in nodes) {
+                    containers[i].appendChild(nodes[i]);
+                }
+
+                //act
+                nodeList.wrapAll(&quot;&lt;div&gt;&lt;/div&gt;&quot;);
+
+                //assert
+                var parent = nodes[0].parentElement;
+                for (var i in nodes) {
+                    assert.strictEqual(parent, nodes[i].parentElement);
+                }
+
+            },
+            &quot;wrapper located in the same location as the first node&quot;: function () {
+                //arrange
+                var nodes =
+                    [
+                        document.createElement(&quot;input&quot;),
+                        document.createElement(&quot;input&quot;),
+                        document.createElement(&quot;input&quot;)
+                    ],
+                    nodeList = new NodeList(nodes),
+                    containers = [
+                        document.createElement(&quot;div&quot;),
+                        document.createElement(&quot;div&quot;),
+                        document.createElement(&quot;div&quot;)];
+
+                for (var i in nodes) {
+                    containers[i].appendChild(nodes[i]);
+                }
+
+                //act
+                nodeList.wrapAll(&quot;&lt;div&gt;&lt;/div&gt;&quot;);
+
+                //assert
+                var parent = nodes[0].parentElement;
+                assert.strictEqual(parent.parentElement, containers[0]);
+            }
+        },
+        &quot;wrapInner()&quot;: {
+            &quot;returns the original node list&quot;: function () {
+                //arrange
+                var nodeList = new NodeList();
+
+                //act
+                var result = nodeList.wrapInner(&quot;&lt;div&gt;&lt;/div&gt;&quot;);
+
+                //assert
+                assert.strictEqual(result, nodeList);
+
+            },
+            &quot;wraps the direct children with the wrapper&quot;: function () {
+                //arrange
+                var children =
+                    [
+                        document.createElement(&quot;input&quot;),
+                        document.createElement(&quot;input&quot;)
+                    ],
+                    container = document.createElement(&quot;div&quot;),
+                    nodeList = new NodeList(container);
+
+                for (var i in children) {
+                    container.appendChild(children[i]);
+                }
+
+                //act
+                nodeList.wrapInner(&quot;&lt;span&gt;&lt;/span&gt;&quot;);
+
+                //assert
+                for (var i in children) {
+                    assert.equal(children[i].parentElement.nodeName.toLowerCase(), &quot;span&quot;);
+                }
+            }
+        },
+        &quot;replaceWith()&quot;: {
+            &quot;returns the original node list&quot;: function () {
+                //arrange
+                var nodeList = new NodeList();
+
+                //act
+                var result = nodeList.replaceWith(&quot;&lt;div&gt;&lt;/div&gt;&quot;);
+
+
+                //assert
+                assert.strictEqual(result, nodeList);
+
+
+            },
+            &quot;content is passed through the _normalize method&quot;: function () {
+                //arrange
+                var nodes =
+                    [
+                        document.createElement(&quot;span&quot;),
+                        document.createElement(&quot;span&quot;)
+                    ],
+                    nodeList = new NodeList(nodes),
+                    container = document.createElement(&quot;div&quot;),
+                    arg = &quot;&lt;div&gt;&lt;/div&gt;&quot;,
+                    expected = document.createElement(&quot;div&quot;),
+                    mock = sinon.stub(nodeList, &quot;_normalize&quot;).returns(expected);
+
+                for (var i in nodes) {
+                    container.appendChild(nodes[i]);
+                }
+
+                //act
+                nodeList.replaceWith(arg);
+
+                //assert
+                assert.isTrue(mock.calledWith(arg, nodes[0]));
+
+                mock.restore();
+            },
+            &quot;calls _place method with correct arguments&quot;: function () {
+                //arrange
+                var nodes =
+                    [
+                        document.createElement(&quot;span&quot;),
+                        document.createElement(&quot;span&quot;)
+                    ],
+                    nodeList = new NodeList(nodes),
+                    container = document.createElement(&quot;div&quot;),
+                    arg = &quot;&lt;div&gt;&lt;/div&gt;&quot;,
+                    expected = document.createElement(&quot;div&quot;),
+                    _normalizeMock = sinon.stub(nodeList, &quot;_normalize&quot;).returns(arg),
+                    mock = sinon.stub(nodeList, &quot;_place&quot;);
+
+                for (var i in nodes) {
+                    container.appendChild(nodes[i]);
+                }
+
+                //act
+                nodeList.replaceWith(arg);
+
+                //assert
+                assert.isTrue(mock.calledWith(arg, nodes[0], &quot;before&quot;, false));
+                assert.isTrue(mock.calledWith(arg, nodes[1], &quot;before&quot;, true));
+
+                _normalizeMock.restore();
+                mock.restore();
+
+            },
+            &quot;removes original nodes&quot;: function () {
+                //arrange
+                var nodes =
+                    [
+                        document.createElement(&quot;span&quot;),
+                        document.createElement(&quot;span&quot;)
+                    ],
+                    nodeList = new NodeList(nodes),
+                    container = document.createElement(&quot;div&quot;),
+                    arg = &quot;&lt;div&gt;&lt;/div&gt;&quot;,
+                    expected = document.createElement(&quot;div&quot;),
+                    _normalizeMock = sinon.stub(nodeList, &quot;_normalize&quot;).returns(arg),
+                    _placeMock = sinon.stub(nodeList, &quot;_place&quot;);
+
+                for (var i in nodes) {
+                    container.appendChild(nodes[i]);
+                }
+
+                //act
+                nodeList.replaceWith(arg);
+
+                //assert
+                for (var i in nodes) {
+                    assert.notEqual(container, nodes[i].parentElement);
+                }
+
+                _normalizeMock.restore();
+                _placeMock.restore();
+            }
+
+        },
+        &quot;replaceAll()&quot;: {
+            &quot;returns the original node list&quot;: function () {
+                //arrange
+                var nodeList = new NodeList();
+
+                //act
+                var result = nodeList.replaceAll(&quot;div&quot;);
+
+
+                //assert
+                assert.strictEqual(result, nodeList);
+
+            },
+            &quot;content is passed through the _normalize method&quot;: function () {
+                //arrange
+                var nodes =
+                    [
+                        document.createElement(&quot;span&quot;),
+                        document.createElement(&quot;span&quot;)
+                    ],
+                    nodeList = new NodeList(nodes),
+                    container = document.createElement(&quot;div&quot;),
+                    queryNodes =
+                    [
+                        document.createElement(&quot;div&quot;),
+                        document.createElement(&quot;div&quot;)
+                    ],
+                    queryNodeList = new NodeList(queryNodes),
+                    expectedContent = document.createElement(&quot;b&quot;),
+                    _normalizeMock = sinon.stub(nodeList, &quot;_normalize&quot;).returns(expectedContent),
+                    _placeMock = sinon.spy(nodeList, &quot;_place&quot;);
+
+                for (var i in nodes) {
+                    container.appendChild(nodes[i]);
+                }
+                for (var i in queryNodes) {
+                    container.appendChild(queryNodes[i]);
+                }
+                document.body.appendChild(container);
+
+                //act
+                nodeList.replaceAll(&quot;div div&quot;);
+
+                //assert
+                assert.isTrue(_normalizeMock.calledWith(nodeList, nodes[0]));
+
+                _normalizeMock.restore();
+                _placeMock.restore();
+            },
+            &quot;calls _place method with correct arguments&quot;: function () {
+                //arrange
+                var nodes =
+                    [
+                        document.createElement(&quot;span&quot;),
+                        document.createElement(&quot;span&quot;)
+                    ],
+                    nodeList = new NodeList(nodes),
+                    container = document.createElement(&quot;div&quot;),
+                    queryNodes =
+                    [
+                        document.createElement(&quot;div&quot;),
+                        document.createElement(&quot;div&quot;)
+                    ],
+                    queryNodeList = new NodeList(queryNodes),
+                    expectedContent = document.createElement(&quot;b&quot;),
+                    _normalizeMock = sinon.stub(nodeList, &quot;_normalize&quot;).returns(expectedContent),
+                    _placeMock = sinon.spy(nodeList, &quot;_place&quot;);
+
+                for (var i in nodes) {
+                    container.appendChild(nodes[i]);
+                }
+                for (var i in queryNodes) {
+                    container.appendChild(queryNodes[i]);
+                }
+                document.body.appendChild(container);
+
+                //act
+                nodeList.replaceAll(&quot;div div&quot;);
+
+                //assert
+                assert.isTrue(_placeMock.calledWith(expectedContent, queryNodes[0], &quot;before&quot;, false));
+                assert.isTrue(_placeMock.calledWith(expectedContent, queryNodes[1], &quot;before&quot;, true));
+
+                _normalizeMock.restore();
+                _placeMock.restore();
+            },
+            &quot;removes original nodes&quot;: function () {
+                //arrange
+                var nodes =
+                    [
+                        document.createElement(&quot;span&quot;),
+                        document.createElement(&quot;span&quot;)
+                    ],
+                    nodeList = new NodeList(nodes),
+                    container = document.createElement(&quot;div&quot;),
+                    queryNodes =
+                    [
+                        document.createElement(&quot;div&quot;),
+                        document.createElement(&quot;div&quot;)
+                    ],
+                    queryNodeList = new NodeList(queryNodes),
+                    expectedContent = document.createElement(&quot;b&quot;),
+                    _normalizeMock = sinon.stub(nodeList, &quot;_normalize&quot;).returns(expectedContent),
+                    _placeMock = sinon.spy(nodeList, &quot;_place&quot;);
+
+                for (var i in nodes) {
+                    container.appendChild(nodes[i]);
+                }
+                for (var i in queryNodes) {
+                    container.appendChild(queryNodes[i]);
+                }
+                document.body.appendChild(container);
+
+                //act
+                nodeList.replaceAll(&quot;div div&quot;);
+
+                //assert
+                assert.isFalse(container.contains(queryNodes[0]));
+                assert.isFalse(container.contains(queryNodes[1]));
+
+                _normalizeMock.restore();
+                _placeMock.restore();
+            }
+        },
+        &quot;clone()&quot;: {
+            &quot;returns node list populated with clones of originals&quot;: function () {
+                //arrange
+                var nodes =
+                    [
+                        document.createElement(&quot;input&quot;),
+                        document.createElement(&quot;input&quot;)
+                    ],
+                    nodeList = new NodeList(nodes);
+
+                for (var i in nodes) {
+                    nodes[i].className = &quot;nodeClass&quot; + i;
+                }
+
+                //act
+                var result = nodeList.clone();
+
+                //assert
+                assert.notStrictEqual(result, nodeList);
+                for (var i in nodes) {
+                    assert.notStrictEqual(result[i], nodes[i]);
+                    assert.equal(result[i].outerHTML, nodes[i].outerHTML);
+                }
+
+            }
+        },
+        &quot;validation tests&quot;: (function () {
+            var container;
+            function verify(/*dojo.NodeList*/nl, /*Array*/ids, /*String*/ comment) {
+                comment = comment || &quot;verify&quot;;
+                for (var i = 0, node; (node = nl[i]) ; i++) {
+                    assert.isTrue(node.id == ids[i] || node == ids[i], comment + &quot; &quot; + i)
+                }
+                //Make sure lengths are equal.
+                assert.equal(i, ids.length, comment + &quot; length&quot;);
+            }
+
+            var divs;
+
+            return {
+                setup: function () {
+                    var html =
+                        &#039;&lt;div&gt;&#039; +
+                        &#039;    &lt;h1 id=&quot;firstH1&quot;&gt;testing dojo.NodeList-traverse&lt;/h1&gt;&#039; +
+                        &#039;    &lt;div id=&quot;sq100&quot; class=&quot;testDiv&quot;&gt;&#039; +
+                        &#039;        100px square, abs&#039; +
+                        &#039;    &lt;/div&gt;&#039; +
+                        &#039;    &lt;div id=&quot;t&quot; class=&quot;testDiv&quot;&gt;&#039; +
+                        &#039;        &lt;span id=&quot;c1&quot;&gt;c1&lt;/span&gt;&#039; +
+                        &#039;    &lt;/div&gt;&#039; +
+                        &#039;   &lt;div id=&quot;third&quot; class=&quot;third testDiv&quot;&gt;&#039; +
+                        &#039;       &lt;!-- This is the third top level div --&gt;&#039; +
+                        &#039;       &lt;span id=&quot;crass&quot;&gt;Crass, baby&lt;/span&gt;&#039; +
+                        &#039;       The third div&#039; +
+                        &#039;       &lt;span id=&quot;classy&quot; class=&quot;classy&quot;&gt;Classy, baby&lt;/span&gt;&#039; +
+                        &#039;       The third div, again&#039; +
+                        &#039;       &lt;!-- Another comment --&gt;&#039; +
+                        &#039;       &lt;span id=&quot;yeah&quot;&gt;Yeah, baby&lt;/span&gt;&#039; +
+                        &#039;   &lt;/div&gt;&#039; +
+                        &#039;   &lt;div id=&quot;level1&quot; class=&quot;foo&quot;&gt;&#039; +
+                        &#039;       &lt;div id=&quot;level2&quot; class=&quot;bar&quot;&gt;&#039; +
+                        &#039;           &lt;div id=&quot;level3&quot; class=&quot;foo&quot;&gt;&#039; +
+                        &#039;               &lt;div id=&quot;level4&quot; class=&quot;bar&quot;&gt;&#039; +
+                        &#039;                   &lt;div id=&quot;level5&quot; class=&quot;bar&quot;&gt;&#039; +
+                        &#039;                       &lt;div id=&quot;level6&quot; class=&quot;bang&quot;&gt;foo bar bar bang&lt;/div&gt;&#039; +
+                        &#039;                   &lt;/div&gt;&#039; +
+                        &#039;               &lt;/div&gt;&#039; +
+                        &#039;           &lt;/div&gt;&#039; +
+                        &#039;       &lt;/div&gt;&#039; +
+                        &#039;   &lt;/div&gt;&#039; +
+                        &#039;&lt;/div&gt;&#039;;
+                    container = construct.toDom(html);
+
+                    document.body.appendChild(container);
+
+                    divs = query(&quot;div.testDiv&quot;);
+                },
+                teardown: function () {
+                    document.body.removeChild(container);
+                },
+                &quot;children&quot;: function () {
+                    verify(divs.last().children(), [&quot;crass&quot;, &quot;classy&quot;, &quot;yeah&quot;]);
+                },
+
+                &quot;closest&quot;: function () {
+                    // test simple selector
+                    var classy = query(&quot;#classy&quot;);
+                    var closestDiv = classy.closest(&quot;div&quot;);
+                    verify(closestDiv, [&quot;third&quot;], &quot;closest(&#039;div&#039;)&quot;);
+                    verify(closestDiv.end().closest(&quot;.classy&quot;), [&quot;classy&quot;], &quot;closestDiv.end().closest(&#039;.classy&#039;)&quot;);
+
+                    // test descendant selector
+                    var bang = query(&quot;.bang&quot;);
+                    var closestFooBar = bang.closest(&quot;.foo &gt; .bar&quot;);
+                    verify(closestFooBar, [&quot;level4&quot;], &quot;.foo &gt; .bar&quot;);
+
+                    // test descendant selector that doesn&#039;t match (&quot;.foo&quot; alone matches nodes, but not
+                    // &quot;.bogus .foo&quot;)
+                    var closestBogusFoo = bang.closest(&quot;.bogus .foo&quot;);
+                    verify(closestBogusFoo, [], &quot;.bogus .foo&quot;);
+
+                    // positive test that scope argument works: .foo &gt; .bar should match a scope
+                    // of &quot;level2&quot; or above
+                    closestFooBar = bang.closest(&quot;.foo &gt; .bar&quot;, &quot;level2&quot;);
+                    verify(closestFooBar, [&quot;level4&quot;], &quot;.foo &gt; .bar query relative to level2&quot;);
+
+                    // &gt; .bar should match a scope of level3 or level1
+                    var topBar = bang.closest(&quot;&gt; .bar&quot;, &quot;level3&quot;);
+                    verify(topBar, [&quot;level4&quot;], &quot;&gt; .bar query relative to level3&quot;);
+
+                    // negative test that scope argument works:  .foo &gt; .bar relative to level3
+                    // doesn&#039;t match since .foo is level3, rather than a child of level3
+                    closestFooBar = bang.closest(&quot;.foo &gt; .bar&quot;, &quot;level3&quot;);
+                    verify(closestFooBar, [], &quot;.foo &gt; .bar query relative to level3&quot;);
+
+                    // complex test of multiple elements in NodeList
+                    // Only some of the elements in query(&quot;div&quot;) have a &quot;.foo&quot; ancestor,
+                    // and three of those elements have the *same* .foo ancestor, so
+                    // closest(&quot;.foo&quot;) should result in list of just two elements
+                    var closestFoo = query(&quot;div&quot;).closest(&quot;.foo&quot;);
+                    verify(closestFoo, [&quot;level1&quot;, &quot;level3&quot;], &quot;.foo from div&quot;);
+
+                },
+
+                &quot;parent&quot;: function () {
+                    verify(query(&quot;#classy&quot;).parent(), [&quot;third&quot;]);
+                },
+
+                &quot;parents&quot;: function () {
+                    var classy = query(&quot;#classy&quot;);
+                    verify(classy.parents(), [&quot;third&quot;, container, document.body, document.body.parentElement]);
+                    verify(classy.parents(&quot;.third&quot;), [&quot;third&quot;]);
+                    verify(classy.parents(&quot;body&quot;), [document.body]);
+                },
+
+                &quot;siblings&quot;: function () {
+                    verify(query(&quot;#classy&quot;).siblings(), [&quot;crass&quot;, &quot;yeah&quot;]);
+                },
+
+                &quot;next&quot;: function () {
+                    verify(query(&quot;#crass&quot;).next(), [&quot;classy&quot;]);
+                },
+
+                &quot;nextAll&quot;: function () {
+                    verify(query(&quot;#crass&quot;).nextAll(), [&quot;classy&quot;, &quot;yeah&quot;]);
+                    verify(query(&quot;#crass&quot;).nextAll(&quot;#yeah&quot;), [&quot;yeah&quot;]);
+                },
+
+                &quot;prev&quot;: function () {
+                    verify(query(&quot;#classy&quot;).prev(), [&quot;crass&quot;]);
+                },
+
+                &quot;prevAll&quot;: function () {
+                    verify(query(&quot;#yeah&quot;).prevAll(), [&quot;classy&quot;, &quot;crass&quot;]);
+                    verify(query(&quot;#yeah&quot;).prevAll(&quot;#crass&quot;), [&quot;crass&quot;]);
+                },
+
+                &quot;andSelf&quot;: function () {
+                    verify(query(&quot;#yeah&quot;).prevAll().andSelf(), [&quot;classy&quot;, &quot;crass&quot;, &quot;yeah&quot;]);
+                },
+
+                &quot;first&quot;: function () {
+                    verify(divs.first(), [&quot;sq100&quot;]);
+                },
+
+                &quot;last&quot;: function () {
+                    verify(divs.last(), [&quot;third&quot;]);
+                },
+
+                &quot;even&quot;: function () {
+                    var even = divs.even();
+                    verify(even, [&quot;t&quot;]);
+                    verify(even.end(), [&quot;sq100&quot;, &quot;t&quot;, &quot;third&quot;]);
+                },
+
+                &quot;odd&quot;: function () {
+                    var odd = divs.odd();
+                    verify(odd, [&quot;sq100&quot;, &quot;third&quot;]);
+                    verify(odd.end(), [&quot;sq100&quot;, &quot;t&quot;, &quot;third&quot;]);
+                }
+
+            }
+        })()
+    });
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

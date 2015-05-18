@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">74.25</p>
+      <p class="stat">75.74</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">80</p>
+      <p class="stat">87</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">14.47</p>
+      <p class="stat">14.24</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">0.69</p>
+      <p class="stat">0.61</p>
     </div>
   </div>
 </div>
@@ -89,26 +89,25 @@
 
 <div class="container">
   <div class="row">
-    <textarea id="file-source" class="col-md-12">/*global app, me, $*/
-// This app view is responsible for rendering all content that goes into
+    <textarea id="file-source" class="col-md-12">// This app view is responsible for rendering all content that goes into
 // &lt;html&gt;. It&#039;s initted right away and renders itself on DOM ready.
-
-// This view also handles all the &#039;document&#039; level events such as keyboard shortcuts.
-var View = require(&#039;ampersand-view&#039;);
-var ViewSwitcher = require(&#039;ampersand-view-switcher&#039;);
-var _ = require(&#039;underscore&#039;);
-var domify = require(&#039;domify&#039;);
-var dom = require(&#039;ampersand-dom&#039;);
-var templates = require(&#039;../templates&#039;);
-var tracking = require(&#039;../helpers/metrics&#039;);
+var app = require(&#039;ampersand-app&#039;);
 var setFavicon = require(&#039;favicon-setter&#039;);
+var View = require(&#039;ampersand-view&#039;);
+var dom = require(&#039;ampersand-dom&#039;);
+var ViewSwitcher = require(&#039;ampersand-view-switcher&#039;);
+var _ = require(&#039;lodash&#039;);
+var domify = require(&#039;domify&#039;);
+var localLinks = require(&#039;local-links&#039;);
+var templates = require(&#039;../templates&#039;);
 
 
 module.exports = View.extend({
     template: templates.body,
+    autoRender: true,
     initialize: function () {
         // this marks the correct nav item selected
-        this.listenTo(app.router, &#039;page&#039;, this.handleNewPage);
+        this.listenTo(app, &#039;page&#039;, this.handleNewPage);
     },
     events: {
         &#039;click a[href]&#039;: &#039;handleLinkClick&#039;
@@ -118,7 +117,7 @@ module.exports = View.extend({
         document.head.appendChild(domify(templates.head()));
 
         // main renderer
-        this.renderWithTemplate({me: me});
+        this.renderWithTemplate(this);
 
         // init and configure our page switcher
         this.pageSwitcher = new ViewSwitcher(this.queryByHook(&#039;page-container&#039;), {
@@ -136,7 +135,7 @@ module.exports = View.extend({
         });
 
         // setting a favicon for fun (note, it&#039;s dynamic)
-        setFavicon(&#039;/images/ampersand.png&#039;);
+        setFavicon(&#039;/favicon.ico&#039;);
         return this;
     },
 
@@ -148,15 +147,20 @@ module.exports = View.extend({
         this.updateActiveNav();
     },
 
+    // Handles all `&lt;a&gt;` clicks in the app not handled
+    // by another view. This lets us determine if this is
+    // a click that should be handled internally by the app.
     handleLinkClick: function (e) {
-        var aTag = e.target;
-        var local = aTag.host === window.location.host;
-
-        // if it&#039;s a plain click (no modifier keys)
-        // and it&#039;s a local url, navigate internally
-        if (local &amp;&amp; !e.ctrlKey &amp;&amp; !e.shiftKey &amp;&amp; !e.altKey &amp;&amp; !e.metaKey &amp;&amp; !e.defaultPrevented) {
+        // This module determines whether a click event is 
+        // a local click (making sure the for modifier keys, etc)
+        // and dealing with browser quirks to determine if this
+        // event was from clicking an internal link. That we should
+        // treat like local navigation.
+        var localPath = localLinks.pathname(e);
+        
+        if (localPath) {
             e.preventDefault();
-            app.navigate(aTag.pathname);
+            app.navigate(localPath);
         }
     },
 

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/unit/html.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/unit/html.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">73.10</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">258</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">22.52</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.05</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+	&#039;intern!object&#039;,
+	&#039;intern/chai!assert&#039;,
+	&#039;sinon&#039;,
+	&#039;../../html&#039;,
+	&#039;../../parser&#039;,
+	&#039;../../_base/kernel&#039;,
+	&#039;dojo/_base/declare&#039;,
+	&#039;dojo/Deferred&#039;,
+	&#039;dojo/dom-construct&#039;,
+	&#039;dojo/query&#039;,
+	&#039;dojo/_base/array&#039;,
+	&#039;dojo/text!./support/html.template.html&#039;
+], function (registerSuite, assert, sinon, html, parser, dojo, declare, Deferred, domConstruct, query,
+			 arrayUtil, template) {
+	/* globals ifrs, id00, id01 */
+
+	function ieTrimSpaceBetweenTags (str){
+		return str.replace(/(&lt;[a-z]*[^&gt;]*&gt;)\s*/ig, &#039;$1&#039;);
+	}
+
+	function deleteGlobal(name) {
+		window[name] = undefined;
+		try {
+			delete window[name];
+		} catch(e) { /* ie is special */ }
+	}
+
+	registerSuite(function () {
+		var container;
+
+		function testHtmlSet(node, markup) {
+			if(typeof node === &#039;string&#039;) {
+				node = query(node, container)[0];
+			}
+			html.set(node, markup);
+			assert.strictEqual(ieTrimSpaceBetweenTags(node.innerHTML), markup);
+			return node;
+		}
+
+		return {
+			name: &#039;dojo/html&#039;,
+
+			&#039;before&#039;: function () {
+				declare(&#039;SimpleThing&#039;, null, {
+					constructor: function(params, node) {
+						node.setAttribute(&#039;test&#039;, &#039;ok&#039;);
+					}
+				});
+			},
+
+			beforeEach: function () {
+				container = domConstruct.place(template, document.body);
+			},
+
+			afterEach: function () {
+				document.body.removeChild(container);
+				container = null;
+
+				deleteGlobal(&#039;ifrs&#039;);
+				deleteGlobal(&#039;id00&#039;);
+				deleteGlobal(&#039;id01&#039;);
+			},
+
+			&#039;after&#039;: function () {
+				deleteGlobal(&#039;SimpleThing&#039;);
+			},
+
+			&#039;.set&#039;: {
+				&#039;basic usage&#039;: function () {
+					var markup = &#039;expected&#039;;
+
+					testHtmlSet(container, markup);
+				},
+
+				&#039;attach onEnd handler&#039;: function () {
+					var msg = &#039;expected&#039;;
+					var handler = sinon.stub();
+
+					html.set(container, msg, { onEnd: handler });
+					assert.isTrue(handler.calledOnce);
+				},
+
+				&#039;parseContent: true&#039;: function () {
+					var dfd = new Deferred();
+					/* jshint maxlen: 130 */ // splitting this line doesn&#039;t make it more readable
+					var content = &#039;&lt;div data-&#039; + dojo._scopeName + &#039;-type=&quot;SimpleThing&quot; data-&#039; + dojo._scopeName + &#039;-id=&quot;ifrs&quot; data=&quot;{}&quot;&gt;&lt;/div&gt;&#039;;
+					var options = {
+						parseContent: true,
+						postscript: function () {
+							this.set();
+
+							assert.isDefined(ifrs);
+							assert.strictEqual(ifrs.declaredClass, &#039;SimpleThing&#039;);
+							assert.lengthOf(this.parseResults, 1);
+							dfd.resolve();
+						}
+					};
+
+					html.set(container, content, options);
+					return dfd;
+				},
+
+				&#039;change content of tr in thead&#039;: function () {
+					var query = &#039;#tableTest &gt; thead &gt; tr&#039;;
+					var markup = &#039;&lt;td&gt;&lt;div&gt;This&lt;/div&gt;Should&lt;u&gt;Work&lt;/u&gt;&lt;/td&gt;&#039;;
+
+					testHtmlSet(query, markup);
+				},
+
+				&#039;change content of th in thead&#039;: function () {
+					var query = &#039;#tableTest &gt; thead&#039;;
+					var markup = &#039;&lt;tr&gt;&lt;td&gt;&lt;div&gt;This&lt;/div&gt;Should&lt;u&gt;Work&lt;/u&gt;&lt;/td&gt;&lt;/tr&gt;&#039;;
+
+					testHtmlSet(query, markup);
+				},
+
+				&#039;change content of tr in tbody&#039;: function () {
+					var query = &#039;#tableTest &gt; tbody &gt; tr&#039;;
+					var markup = &#039;&lt;td&gt;&lt;div&gt;This&lt;/div&gt;Should&lt;u&gt;Work&lt;/u&gt;&lt;/td&gt;&#039;;
+
+					testHtmlSet(query, markup);
+				},
+
+				&#039;change content of tbody&#039;: function () {
+					var query = &#039;#tableTest &gt; tbody&#039;;
+					var markup = &#039;&lt;tr&gt;&lt;td&gt;&lt;div&gt;This&lt;/div&gt;Should&lt;u&gt;Work&lt;/u&gt;&lt;/td&gt;&lt;/tr&gt;&#039;;
+
+					testHtmlSet(query, markup);
+				},
+
+				&#039;change content of table&#039;: function () {
+					var query = &#039;#tableTest&#039;;
+					var markup = &#039;&lt;tbody&gt;&lt;tr&gt;&lt;td&gt;&lt;div&gt;This&lt;/div&gt;Should&lt;u&gt;Work&lt;/u&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&#039;;
+
+					testHtmlSet(query, markup);
+				},
+
+				&#039;basic NodeList&#039;: function () {
+					var tmpUL = domConstruct.create(&#039;ul&#039;);
+					domConstruct.create(&#039;li&#039;, { innerHTML: &#039;item 1&#039; }, tmpUL);
+					domConstruct.create(&#039;li&#039;, { innerHTML: &#039;item 2&#039; }, tmpUL);
+
+					html.set(container, tmpUL.childNodes);
+					assert.lengthOf(query(&#039;li&#039;, container), 2);
+				},
+
+				&#039;mixed content&#039;: function () {
+					var markup = &#039;&lt;h4&gt;See Jane&lt;/h4&gt;Look at her &lt;span&gt;Run&lt;/span&gt;!&#039;;
+
+					testHtmlSet(container, markup);
+				},
+
+				&#039;extractContent: true&#039;: function () {
+					var markup = &#039;&#039; +
+						&#039;&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD HTML 4.01//EN&quot;&gt;&#039; +
+						&#039;&lt;html&gt;											&#039; +
+						&#039;	&lt;head&gt;										&#039; +
+						&#039;		&lt;title&gt;									&#039; +
+						&#039;			the title							&#039; +
+						&#039;		&lt;/title&gt;								&#039; +
+						&#039;	&lt;/head&gt;										&#039; +
+						&#039;	&lt;body&gt;										&#039; +
+						&#039;		&lt;p&gt;										&#039; +
+						&#039;			This is the &lt;b&gt;Good Stuff&lt;/b&gt;&lt;br&gt;	&#039; +
+						&#039;		&lt;/p&gt;									&#039; +
+						&#039;	&lt;/body&gt;										&#039; +
+						&#039;&lt;/html&gt;										&#039;;
+
+					html.set(container, markup, { extractContent: true });
+					assert.strictEqual(container.innerHTML.indexOf(&#039;title&#039;), -1);
+					assert.lengthOf(query(&#039;*&#039;, container), 3);
+				},
+
+				&#039;inheritance&#039;: (function() {
+					var parseSpy;
+
+				    function runTest(options) {
+						/* jshint maxlen: 130 */ // splitting this line doesn&#039;t make it more readable
+						var markup = &#039;&lt;div data-dojo-testing-type=&quot;SimpleThing&quot; data-dojo-testing-id=&quot;ifrs&quot; data=&quot;{}&quot;&gt;&lt;/div&gt;&#039;;
+
+						html.set(container, markup, options);
+						return parseSpy.lastCall.args[0].inherited;
+					}
+
+					return {
+						&#039;beforeEach&#039;: function () {
+							parseSpy = sinon.spy(parser, &#039;parse&#039;);
+						},
+
+						&#039;afterEach&#039;: function () {
+							parseSpy.restore();
+							delete window.ifrs;
+						},
+
+						&#039;dir, lang, textDir are not specified&#039;: function () {
+							var options = { parseContent: true };
+							var inherited = runTest(options);
+
+							assert.isTrue(parseSpy.called);
+							assert.isUndefined(inherited.dir, &#039;dir should not exist&#039;);
+							assert.isUndefined(inherited.lang, &#039;lang should not exist&#039;);
+							assert.isUndefined(inherited.textDir, &#039;textDir should not exist&#039;);
+						},
+
+						&#039;dir, lang, textDir are specified&#039;: function () {
+							var options = {
+								parseContent: true,
+								dir: &#039;expectedDir&#039;,
+								lang: &#039;expectedLang&#039;,
+								textDir: &#039;expectedTextDir&#039;
+							};
+							var inherited = runTest(options);
+
+							assert.isTrue(parseSpy.called);
+							assert.strictEqual(inherited.dir, options.dir);
+							assert.strictEqual(inherited.lang, options.lang);
+							assert.strictEqual(inherited.textDir, options.textDir);
+						}
+					};
+				}()),
+
+				&#039;_emptyNode&#039;: function () {
+					container.innerHTML = &#039;&lt;div&gt;&lt;span&gt;just&lt;/span&gt;some test&lt;br/&gt;&lt;/div&gt;text&#039;;
+					html._emptyNode(container);
+					assert.lengthOf(container.childNodes, 0);
+					assert.strictEqual(container.innerHTML, &#039;&#039;);
+				},
+
+				&#039;_ContentSetter&#039;: function () {
+					/* jshint maxlen: 130 */ // splitting these lines doesn&#039;t make it more readable
+					var args = [
+						[ &#039;simple&#039; ],
+						[
+							&#039;&lt;div data-&#039; + dojo._scopeName + &#039;-type=&quot;SimpleThing&quot; data-&#039; + dojo._scopeName + &#039;-id=&quot;id00&quot;&gt;parsed content&lt;/div&gt;&#039;,
+							{ parseContent: true }
+						],
+						[
+							&#039;&lt;div data-&#039; + dojo._scopeName + &#039;-type=&quot;SimpleThing&quot; data-&#039; + dojo._scopeName + &#039;-id=&quot;id01&quot;&gt;parsed content&lt;/div&gt;&#039;,
+							{ parseContent: true }
+						]
+					];
+					var setter = new html._ContentSetter({ node: container });
+
+					arrayUtil.forEach(args, function (applyArgs) {
+						setter.node = container;
+						setter.set.apply(setter, applyArgs);
+						setter.tearDown();
+					});
+
+					assert.isDefined(id00);
+					assert.isDefined(id01);
+					assert.isUndefined(setter.parseResults);
+				}
+			}
+		};
+	});
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

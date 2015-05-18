@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">72.39</p>
+      <p class="stat">72.19</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">184</p>
+      <p class="stat">214</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">25.68</p>
+      <p class="stat">29.60</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">1.50</p>
+      <p class="stat">1.96</p>
     </div>
   </div>
 </div>
@@ -107,13 +107,13 @@ tape(&#039;setup&#039;, function(t) {
     var ok
 
     if (req.headers.authorization) {
-      if (req.headers.authorization === &#039;Basic &#039; + new Buffer(&#039;test:testing2&#039;).toString(&#039;base64&#039;)) {
+      if (req.headers.authorization === &#039;Basic &#039; + new Buffer(&#039;user:pass&#039;).toString(&#039;base64&#039;)) {
         ok = true
-      } else if ( req.headers.authorization === &#039;Basic &#039; + new Buffer(&#039;test:&#039;).toString(&#039;base64&#039;)) {
+      } else if ( req.headers.authorization === &#039;Basic &#039; + new Buffer(&#039;user:&#039;).toString(&#039;base64&#039;)) {
         ok = true
-      } else if ( req.headers.authorization === &#039;Basic &#039; + new Buffer(&#039;:apassword&#039;).toString(&#039;base64&#039;)) {
+      } else if ( req.headers.authorization === &#039;Basic &#039; + new Buffer(&#039;:pass&#039;).toString(&#039;base64&#039;)) {
         ok = true
-      } else if ( req.headers.authorization === &#039;Basic &#039; + new Buffer(&#039;justauser&#039;).toString(&#039;base64&#039;)) {
+      } else if ( req.headers.authorization === &#039;Basic &#039; + new Buffer(&#039;user:pâss&#039;).toString(&#039;base64&#039;)) {
         ok = true
       } else {
         // Bad auth header, don&#039;t send back WWW-Authenticate header
@@ -126,7 +126,7 @@ tape(&#039;setup&#039;, function(t) {
     }
 
     if (req.url === &#039;/post/&#039;) {
-      var expectedContent = &#039;data_key=data_value&#039;
+      var expectedContent = &#039;key=value&#039;
       req.on(&#039;data&#039;, function(data) {
         assert.equal(data, expectedContent)
       })
@@ -146,77 +146,82 @@ tape(&#039;setup&#039;, function(t) {
   })
 })
 
-tape(&#039;&#039;, function(t) {
-  request({
+tape(&#039;sendImmediately - false&#039;, function(t) {
+  var r = request({
     &#039;method&#039;: &#039;GET&#039;,
     &#039;uri&#039;: &#039;http://localhost:6767/test/&#039;,
     &#039;auth&#039;: {
-      &#039;user&#039;: &#039;test&#039;,
-      &#039;pass&#039;: &#039;testing2&#039;,
+      &#039;user&#039;: &#039;user&#039;,
+      &#039;pass&#039;: &#039;pass&#039;,
       &#039;sendImmediately&#039;: false
     }
   }, function(error, res, body) {
+    t.equal(r._auth.user, &#039;user&#039;)
     t.equal(res.statusCode, 200)
     t.equal(numBasicRequests, 2)
     t.end()
   })
 })
 
-tape(&#039;&#039;, function(t) {
+tape(&#039;sendImmediately - true&#039;, function(t) {
   // If we don&#039;t set sendImmediately = false, request will send basic auth
-  request({
+  var r = request({
     &#039;method&#039;: &#039;GET&#039;,
     &#039;uri&#039;: &#039;http://localhost:6767/test2/&#039;,
     &#039;auth&#039;: {
-      &#039;user&#039;: &#039;test&#039;,
-      &#039;pass&#039;: &#039;testing2&#039;
+      &#039;user&#039;: &#039;user&#039;,
+      &#039;pass&#039;: &#039;pass&#039;
     }
   }, function(error, res, body) {
+    t.equal(r._auth.user, &#039;user&#039;)
     t.equal(res.statusCode, 200)
     t.equal(numBasicRequests, 3)
     t.end()
   })
 })
 
-tape(&#039;&#039;, function(t) {
-  request({
+tape(&#039;credentials in url&#039;, function(t) {
+  var r = request({
     &#039;method&#039;: &#039;GET&#039;,
-    &#039;uri&#039;: &#039;http://test:testing2@localhost:6767/test2/&#039;
+    &#039;uri&#039;: &#039;http://user:pass@localhost:6767/test2/&#039;
   }, function(error, res, body) {
+    t.equal(r._auth.user, &#039;user&#039;)
     t.equal(res.statusCode, 200)
     t.equal(numBasicRequests, 4)
     t.end()
   })
 })
 
-tape(&#039;&#039;, function(t) {
-  request({
+tape(&#039;POST request&#039;, function(t) {
+  var r = request({
     &#039;method&#039;: &#039;POST&#039;,
-    &#039;form&#039;: { &#039;data_key&#039;: &#039;data_value&#039; },
+    &#039;form&#039;: { &#039;key&#039;: &#039;value&#039; },
     &#039;uri&#039;: &#039;http://localhost:6767/post/&#039;,
     &#039;auth&#039;: {
-      &#039;user&#039;: &#039;test&#039;,
-      &#039;pass&#039;: &#039;testing2&#039;,
+      &#039;user&#039;: &#039;user&#039;,
+      &#039;pass&#039;: &#039;pass&#039;,
       &#039;sendImmediately&#039;: false
     }
   }, function(error, res, body) {
+    t.equal(r._auth.user, &#039;user&#039;)
     t.equal(res.statusCode, 200)
     t.equal(numBasicRequests, 6)
     t.end()
   })
 })
 
-tape(&#039;&#039;, function(t) {
+tape(&#039;user - empty string&#039;, function(t) {
   t.doesNotThrow( function() {
-    request({
+    var r = request({
       &#039;method&#039;: &#039;GET&#039;,
       &#039;uri&#039;: &#039;http://localhost:6767/allow_empty_user/&#039;,
       &#039;auth&#039;: {
         &#039;user&#039;: &#039;&#039;,
-        &#039;pass&#039;: &#039;apassword&#039;,
+        &#039;pass&#039;: &#039;pass&#039;,
         &#039;sendImmediately&#039;: false
       }
     }, function(error, res, body ) {
+      t.equal(r._auth.user, &#039;&#039;)
       t.equal(res.statusCode, 200)
       t.equal(numBasicRequests, 8)
       t.end()
@@ -224,17 +229,18 @@ tape(&#039;&#039;, function(t) {
   })
 })
 
-tape(&#039;&#039;, function(t) {
+tape(&#039;pass - undefined&#039;, function(t) {
   t.doesNotThrow( function() {
-    request({
+    var r = request({
       &#039;method&#039;: &#039;GET&#039;,
       &#039;uri&#039;: &#039;http://localhost:6767/allow_undefined_password/&#039;,
       &#039;auth&#039;: {
-        &#039;user&#039;: &#039;justauser&#039;,
+        &#039;user&#039;: &#039;user&#039;,
         &#039;pass&#039;: undefined,
         &#039;sendImmediately&#039;: false
       }
     }, function(error, res, body ) {
+      t.equal(r._auth.user, &#039;user&#039;)
       t.equal(res.statusCode, 200)
       t.equal(numBasicRequests, 10)
       t.end()
@@ -242,36 +248,60 @@ tape(&#039;&#039;, function(t) {
   })
 })
 
-tape(&#039;&#039;, function(t) {
-  request
-    .get(&#039;http://localhost:6767/test/&#039;)
-    .auth(&#039;test&#039;,&#039;&#039;,false)
-    .on(&#039;response&#039;, function (res) {
+
+tape(&#039;pass - utf8&#039;, function(t) {
+  t.doesNotThrow( function() {
+    var r = request({
+      &#039;method&#039;: &#039;GET&#039;,
+      &#039;uri&#039;: &#039;http://localhost:6767/allow_undefined_password/&#039;,
+      &#039;auth&#039;: {
+        &#039;user&#039;: &#039;user&#039;,
+        &#039;pass&#039;: &#039;pâss&#039;,
+        &#039;sendImmediately&#039;: false
+      }
+    }, function(error, res, body ) {
+      t.equal(r._auth.user, &#039;user&#039;)
+      t.equal(r._auth.pass, &#039;pâss&#039;)
       t.equal(res.statusCode, 200)
       t.equal(numBasicRequests, 12)
       t.end()
     })
+  })
 })
 
-tape(&#039;&#039;, function(t) {
-  request.get(&#039;http://localhost:6767/test/&#039;,
-    {
-      auth: {
-        user: &#039;test&#039;,
-        pass: &#039;&#039;,
-        sendImmediately: false
-      }
-    }, function (err, res) {
-      t.equal(err, null)
+tape(&#039;auth method&#039;, function(t) {
+  var r = request
+    .get(&#039;http://localhost:6767/test/&#039;)
+    .auth(&#039;user&#039;, &#039;&#039;, false)
+    .on(&#039;response&#039;, function (res) {
+      t.equal(r._auth.user, &#039;user&#039;)
       t.equal(res.statusCode, 200)
       t.equal(numBasicRequests, 14)
       t.end()
     })
 })
 
+tape(&#039;get method&#039;, function(t) {
+  var r = request.get(&#039;http://localhost:6767/test/&#039;,
+    {
+      auth: {
+        user: &#039;user&#039;,
+        pass: &#039;&#039;,
+        sendImmediately: false
+      }
+    }, function (err, res) {
+      t.equal(r._auth.user, &#039;user&#039;)
+      t.equal(err, null)
+      t.equal(res.statusCode, 200)
+      t.equal(numBasicRequests, 16)
+      t.end()
+    })
+})
+
 tape(&#039;cleanup&#039;, function(t) {
-  basicServer.close()
-  t.end()
+  basicServer.close(function() {
+    t.end()
+  })
 })</textarea>
   </div>
 </div>

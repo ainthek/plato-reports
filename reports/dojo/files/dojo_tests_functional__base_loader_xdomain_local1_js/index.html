@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/functional/_base/loader/xdomain/local1.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/functional/_base/loader/xdomain/local1.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">79.52</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">86</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">13.91</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.85</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/* global xdomainExecSequence, xdomainLog */
+xdomainExecSequence.push(&#039;local1-1&#039;);
+
+// multiple dojo.provides should define multiple modules
+var x1 = dojo.provide(&#039;dojo.tests._base.loader.xdomain.local1&#039;);
+var x2 = dojo.provide(&#039;dojo.tests._base.loader.xdomain.local1SteppedOn&#039;);
+var x3 = dojo.provide(&#039;dojo.tests._base.loader.xdomain.local1NotSteppedOn&#039;);
+xdomainExecSequence.push(&#039;local1-2&#039;);
+
+// this puts the loader in xd loading mode
+dojo.require(&#039;dojo.cookie&#039;);
+xdomainExecSequence.push(&#039;local1-3&#039;);
+
+// load a not xd module while in xd loading mode
+dojo.require(&#039;dojo.tests._base.loader.xdomain.local1-dep&#039;);
+xdomainExecSequence.push(&#039;local1-4&#039;);
+
+// a loadInit that makes a calculation a later requireIf depends upon
+dojo.loadInit(function () {
+	xdomainExecSequence.push(&#039;local1-5&#039;);
+	var dependentModule = dojo.getObject(&#039;dojo.tests._base.loader.xdomain.local1-runtimeDependent&#039;, true);
+	dependentModule.choice = 1;
+});
+xdomainExecSequence.push(&#039;local1-6&#039;);
+
+// a couple of requireIf&#039;s, only one of which should result in a module being loaded
+dojo.requireIf(dojo.getObject(&#039;dojo.tests._base.loader.xdomain.local1-runtimeDependent&#039;).choice === 1,
+	&#039;dojo.tests._base.loader.xdomain.local1-runtimeDependent1&#039;);
+xdomainExecSequence.push(&#039;local1-7&#039;);
+dojo.requireIf(dojo.getObject(&#039;dojo.tests._base.loader.xdomain.local1-runtimeDependent&#039;).choice === 2,
+	&#039;dojo.tests._base.loader.xdomain.local1-runtimeDependent2&#039;);
+xdomainExecSequence.push(&#039;local1-8&#039;);
+
+// platformRequire test
+dojo.platformRequire({
+	browser: [
+		&#039;dojo.tests._base.loader.xdomain.local1-browser&#039;,
+		[ &#039;dojo.tests._base.loader.xdomain.local1-browser-skip&#039;, true ]
+	]
+});
+
+// these are xd bundles which should be loaded async
+xdomainExecSequence.push(&#039;local1-9&#039;);
+dojo.requireLocalization(&#039;dojo&#039;, &#039;colors&#039;);
+xdomainExecSequence.push(&#039;local1-10&#039;);
+dojo.requireLocalization(&#039;dojo&#039;, &#039;colors&#039;, &#039;fr&#039;);
+xdomainExecSequence.push(&#039;local1-11&#039;);
+dojo.requireLocalization(&#039;dojo&#039;, &#039;colors&#039;);
+xdomainExecSequence.push(&#039;local1-12&#039;);
+
+// these are not xd bundles which should be loaded sync
+dojo.requireLocalization(&#039;dojo.tests._base.loader&#039;, &#039;amdBundle&#039;);
+xdomainExecSequence.push(&#039;local1-13&#039;);
+dojo.requireLocalization(&#039;dojo.tests._base.loader&#039;, &#039;amdBundle&#039;, &#039;ab&#039;);
+xdomainExecSequence.push(&#039;local1-14&#039;);
+dojo.requireLocalization(&#039;dojo.tests._base.loader&#039;, &#039;syncBundle&#039;);
+xdomainExecSequence.push(&#039;local1-15&#039;);
+dojo.requireLocalization(&#039;dojo.tests._base.loader&#039;, &#039;syncBundle&#039;, &#039;ab&#039;);
+xdomainExecSequence.push(&#039;local1-16&#039;);
+
+// another loadInit; it should be executed immediately after the first load init
+dojo.loadInit(function () {
+	xdomainExecSequence.push(&#039;local1-17&#039;);
+	var dependentModule = dojo.getObject(&#039;dojo.tests._base.loader.xdomain.local1-runtimeDependent&#039;);
+	dependentModule.status = &#039;ok&#039;;
+});
+xdomainExecSequence.push(&#039;local1-18&#039;);
+
+xdomainLog.push(
+	1, (x1 === dojo.tests._base.loader.xdomain.local1),
+	2, (x1 === dojo.getObject(&#039;dojo.tests._base.loader.xdomain.local1&#039;)),
+	3, (x2 === dojo.tests._base.loader.xdomain.local1SteppedOn),
+	4, (x2 === dojo.getObject(&#039;dojo.tests._base.loader.xdomain.local1SteppedOn&#039;)),
+	5, (x3 === dojo.tests._base.loader.xdomain.local1NotSteppedOn),
+	6, (x3 === dojo.getObject(&#039;dojo.tests._base.loader.xdomain.local1NotSteppedOn&#039;))
+);
+
+x3.status = &#039;local1NotSteppedOn&#039;;
+dojo.tests._base.loader.xdomain.local1 = &#039;stepOnLocal1&#039;;
+dojo.tests._base.loader.xdomain.local1SteppedOn = &#039;stepOn1SteppedOn&#039;;
+
+xdomainLog.push(
+	7, (&#039;stepOnLocal1&#039; === dojo.tests._base.loader.xdomain.local1),
+	8, (&#039;stepOnLocal1&#039; === dojo.getObject(&#039;dojo.tests._base.loader.xdomain.local1&#039;)),
+	9, (&#039;stepOn1SteppedOn&#039; === dojo.tests._base.loader.xdomain.local1SteppedOn),
+	10, (&#039;stepOn1SteppedOn&#039; === dojo.getObject(&#039;dojo.tests._base.loader.xdomain.local1SteppedOn&#039;))
+);</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

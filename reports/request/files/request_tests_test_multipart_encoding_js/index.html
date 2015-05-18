@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - request/tests/test-multipart-encoding.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>request/tests/test-multipart-encoding.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">73.56</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">149</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">36.05</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.49</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">&#039;use strict&#039;
+
+var http = require(&#039;http&#039;)
+  , path = require(&#039;path&#039;)
+  , request = require(&#039;../index&#039;)
+  , fs = require(&#039;fs&#039;)
+  , tape = require(&#039;tape&#039;)
+
+
+var localFile = path.join(__dirname, &#039;unicycle.jpg&#039;)
+var cases = {
+  // based on body type
+  &#039;+array -stream&#039;: {
+    options: {
+      multipart: [{name: &#039;field&#039;, body: &#039;value&#039;}]
+    },
+    expected: {chunked: false}
+  },
+  &#039;+array +stream&#039;: {
+    options: {
+      multipart: [{name: &#039;file&#039;, body: null}]
+    },
+    expected: {chunked: true}
+  },
+  // encoding overrides body value
+  &#039;+array +encoding&#039;: {
+    options: {
+      headers: {&#039;transfer-encoding&#039;: &#039;chunked&#039;},
+      multipart: [{name: &#039;field&#039;, body: &#039;value&#039;}]
+    },
+    expected: {chunked: true}
+  },
+
+  // based on body type
+  &#039;+object -stream&#039;: {
+    options: {
+      multipart: {data: [{name: &#039;field&#039;, body: &#039;value&#039;}]}
+    },
+    expected: {chunked: false}
+  },
+  &#039;+object +stream&#039;: {
+    options: {
+      multipart: {data: [{name: &#039;file&#039;, body: null}]}
+    },
+    expected: {chunked: true}
+  },
+  // encoding overrides body value
+  &#039;+object +encoding&#039;: {
+    options: {
+      headers: {&#039;transfer-encoding&#039;: &#039;chunked&#039;},
+      multipart: {data: [{name: &#039;field&#039;, body: &#039;value&#039;}]}
+    },
+    expected: {chunked: true}
+  },
+
+  // based on body type
+  &#039;+object -chunked -stream&#039;: {
+    options: {
+      multipart: {chunked: false, data: [{name: &#039;field&#039;, body: &#039;value&#039;}]}
+    },
+    expected: {chunked: false}
+  },
+  &#039;+object -chunked +stream&#039;: {
+    options: {
+      multipart: {chunked: false, data: [{name: &#039;file&#039;, body: null}]}
+    },
+    expected: {chunked: true}
+  },
+  // chunked overrides body value
+  &#039;+object +chunked -stream&#039;: {
+    options: {
+      multipart: {chunked: true, data: [{name: &#039;field&#039;, body: &#039;value&#039;}]}
+    },
+    expected: {chunked: true}
+  },
+  // encoding overrides chunked
+  &#039;+object +encoding -chunked&#039;: {
+    options: {
+      headers: {&#039;transfer-encoding&#039;: &#039;chunked&#039;},
+      multipart: {chunked: false, data: [{name: &#039;field&#039;, body: &#039;value&#039;}]}
+    },
+    expected: {chunked: true}
+  }
+}
+
+function runTest(t, test) {
+
+  var server = http.createServer(function(req, res) {
+
+    t.ok(req.headers[&#039;content-type&#039;].match(/^multipart\/related; boundary=[^\s;]+$/))
+
+    if (test.expected.chunked) {
+      t.ok(req.headers[&#039;transfer-encoding&#039;] === &#039;chunked&#039;)
+      t.notOk(req.headers[&#039;content-length&#039;])
+    } else {
+      t.ok(req.headers[&#039;content-length&#039;])
+      t.notOk(req.headers[&#039;transfer-encoding&#039;])
+    }
+
+    // temp workaround
+    var data = &#039;&#039;
+    req.setEncoding(&#039;utf8&#039;)
+
+    req.on(&#039;data&#039;, function(d) {
+      data += d
+    })
+
+    req.on(&#039;end&#039;, function() {
+      // check for the fields traces
+      if (test.expected.chunked &amp;&amp; data.indexOf(&#039;name: file&#039;) !== -1) {
+        // file
+        t.ok(data.indexOf(&#039;name: file&#039;) !== -1)
+        // check for unicycle.jpg traces
+        t.ok(data.indexOf(&#039;2005:06:21 01:44:12&#039;) !== -1)
+      } else {
+        // field
+        t.ok(data.indexOf(&#039;name: field&#039;) !== -1)
+        var parts = test.options.multipart.data || test.options.multipart
+        t.ok(data.indexOf(parts[0].body) !== -1)
+      }
+
+      res.writeHead(200)
+      res.end()
+    })
+  })
+
+  server.listen(6767, function() {
+    // @NOTE: multipartData properties must be set here
+    // so that file read stream does not leak in node v0.8
+    var parts = test.options.multipart.data || test.options.multipart
+    if (parts[0].name === &#039;file&#039;) {
+      parts[0].body = fs.createReadStream(localFile)
+    }
+
+    request.post(&#039;http://localhost:6767&#039;, test.options, function (err, res, body) {
+      t.equal(err, null)
+      t.equal(res.statusCode, 200)
+      server.close(function () {
+        t.end()
+      })
+    })
+  })
+}
+
+Object.keys(cases).forEach(function (name) {
+  tape(&#039;multipart-encoding &#039; + name, function(t) {
+    runTest(t, cases[name])
+  })
+})</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

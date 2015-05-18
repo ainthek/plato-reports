@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">77.08</p>
+      <p class="stat">75.41</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">145</p>
+      <p class="stat">216</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">26.31</p>
+      <p class="stat">45.30</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">1.35</p>
+      <p class="stat">2.19</p>
     </div>
   </div>
 </div>
@@ -95,9 +95,12 @@ var request = require(&#039;../index&#039;)
   , http = require(&#039;http&#039;)
   , zlib = require(&#039;zlib&#039;)
   , assert = require(&#039;assert&#039;)
+  , bufferEqual = require(&#039;buffer-equal&#039;)
   , tape = require(&#039;tape&#039;)
 
 var testContent = &#039;Compressible response content.\n&#039;
+  , testContentBig
+  , testContentBigGzip
   , testContentGzip
 
 var server = http.createServer(function(req, res) {
@@ -109,6 +112,10 @@ var server = http.createServer(function(req, res) {
     if (req.url === &#039;/error&#039;) {
       // send plaintext instead of gzip (should cause an error for the client)
       res.end(testContent)
+    } else if (req.url === &#039;/chunks&#039;) {
+      res.writeHead(200)
+      res.write(testContentBigGzip.slice(0, 4096))
+      setTimeout(function() { res.end(testContentBigGzip.slice(4096)) }, 10)
     } else {
       zlib.gzip(testContent, function(err, data) {
         assert.equal(err, null)
@@ -121,11 +128,30 @@ var server = http.createServer(function(req, res) {
 })
 
 tape(&#039;setup&#039;, function(t) {
+  // Need big compressed content to be large enough to chunk into gzip blocks.
+  // Want it to be deterministic to ensure test is reliable.
+  // Generate pseudo-random printable ASCII characters using MINSTD
+  var a = 48271
+    , m = 0x7FFFFFFF
+    , x = 1
+  testContentBig = new Buffer(10240)
+  for (var i = 0; i &lt; testContentBig.length; ++i) {
+    x = (a * x) &amp; m
+    // Printable ASCII range from 32-126, inclusive
+    testContentBig[i] = (x % 95) + 32
+  }
+
   zlib.gzip(testContent, function(err, data) {
     t.equal(err, null)
     testContentGzip = data
-    server.listen(6767, function() {
-      t.end()
+
+    zlib.gzip(testContentBig, function(err, data2) {
+      t.equal(err, null)
+      testContentBigGzip = data2
+
+      server.listen(6767, function() {
+        t.end()
+      })
     })
   })
 })
@@ -230,9 +256,54 @@ tape(&#039;transparently supports gzip error to pipes&#039;, function(t) {
     })
 })
 
+tape(&#039;pause when streaming from a gzip request object&#039;, function(t) {
+  var chunks = []
+  var paused = false
+  var options = { url: &#039;http://localhost:6767/chunks&#039;, gzip: true }
+  request.get(options)
+    .on(&#039;data&#039;, function(chunk) {
+      var self = this
+
+      t.notOk(paused, &#039;Only receive data when not paused&#039;)
+
+      chunks.push(chunk)
+      if (chunks.length === 1) {
+        self.pause()
+        paused = true
+        setTimeout(function() {
+          paused = false
+          self.resume()
+        }, 100)
+      }
+    })
+    .on(&#039;end&#039;, function() {
+      t.ok(chunks.length &gt; 1, &#039;Received multiple chunks&#039;)
+      t.ok(bufferEqual(Buffer.concat(chunks), testContentBig), &#039;Expected content&#039;)
+      t.end()
+    })
+})
+
+tape(&#039;pause before streaming from a gzip request object&#039;, function(t) {
+  var paused = true
+  var options = { url: &#039;http://localhost:6767/foo&#039;, gzip: true }
+  var r = request.get(options)
+  r.pause()
+  r.on(&#039;data&#039;, function(data) {
+    t.notOk(paused, &#039;Only receive data when not paused&#039;)
+    t.equal(data.toString(), testContent)
+  })
+  r.on(&#039;end&#039;, t.end.bind(t))
+
+  setTimeout(function() {
+    paused = false
+    r.resume()
+  }, 100)
+})
+
 tape(&#039;cleanup&#039;, function(t) {
-  server.close()
-  t.end()
+  server.close(function() {
+    t.end()
+  })
 })</textarea>
   </div>
 </div>

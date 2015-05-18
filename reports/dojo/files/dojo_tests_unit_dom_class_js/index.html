@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/unit/dom-class.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/unit/dom-class.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">71.19</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">793</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">66.67</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">6.78</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+    &#039;intern!object&#039;,
+    &#039;intern/chai!assert&#039;,
+    &#039;../../dom-class&#039;,
+    &#039;dojo/dom-construct&#039;,
+    &#039;dojo/sniff&#039;
+
+], function (registerSuite, assert, domClass, domConstruct) {
+
+    var cssClass = &#039;test-css-class&#039;;
+    var moreCssClass = &#039;test-adding-css-class&#039;;
+    var multipleCss = &#039;existing-css-class&#039;;
+    var value = &#039;the value&#039;;
+    var node;
+    var nodeIdIndex = 1;
+
+    function generateId() {
+        return &#039;nodeid_&#039; + nodeIdIndex++;
+    }
+
+    registerSuite({
+        name: &#039;dojo/dom-class&#039;,
+
+        &#039;.contains&#039;: {
+            beforeEach: function () {
+                node = domConstruct.toDom(&#039;&lt;div class=&quot;&#039; +
+                    cssClass + &#039;&quot;&quot;&gt;&lt;/div&gt;&#039;);
+                domConstruct.place(node, document.body);
+            },
+
+            afterEach: function () {
+                domConstruct.destroy(node);
+            },
+
+            &#039;node + class&#039;: function () {
+                // when a node and class are passed, then true is returned
+
+                assert.isTrue(domClass.contains(node, cssClass));
+            },
+
+            &#039;string + class&#039;: function () {
+                // when a node and class are passed, then true is returned
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+
+                assert.isTrue(domClass.contains(nodeId, cssClass));
+            },
+
+            &#039;node + unknown class&#039;: function () {
+                // when a node and unknown class are passed, then false is returned
+
+                assert.isFalse(domClass.contains(node, &#039;unknown-css-class&#039;));
+           },
+
+            &#039;string + unknown class&#039;: function () {
+                // when a node id and unknown class are passed, then false is returned
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+
+                assert.isFalse(domClass.contains(nodeId, &#039;unknown-css-class&#039;));
+           },
+
+            &#039;node w/ multiple classes + class&#039;: function () {
+                // when a node and class are passed, then true is returned
+
+                node.setAttribute(&#039;class&#039;, cssClass + &#039; &#039; + multipleCss);
+
+                assert.isTrue(domClass.contains(node, cssClass));
+                assert.isTrue(domClass.contains(node, multipleCss));
+           },
+
+
+            &#039;string w/ multiple classes + class&#039;: function () {
+                // when a node id and class are passed, then true is returned
+
+                var nodeId = generateId();
+
+                node.setAttribute(&#039;id&#039;, nodeId);
+                node.setAttribute(&#039;class&#039;, cssClass + &#039; &#039; + multipleCss);
+
+                assert.isTrue(domClass.contains(node, cssClass));
+                assert.isTrue(domClass.contains(node, multipleCss));
+           },
+
+            &#039;node w/ multiple classes + unknown class&#039;: function () {
+                // when a node and unknown class are passed, then false is returned
+
+                node.setAttribute(&#039;class&#039;, cssClass + &#039; &#039; + multipleCss);
+
+                assert.isFalse(domClass.contains(node, &#039;unknown-css-class&#039;));
+            },
+
+            &#039;string w/ multiple classes + unknown class&#039;: function () {
+                // when a node id and unknown class are passed, then false is returned
+                var nodeId = generateId();
+
+                node.setAttribute(&#039;id&#039;, nodeId);
+                node.setAttribute(&#039;class&#039;, cssClass + &#039; &#039; + multipleCss);
+
+                assert.isFalse(domClass.contains(nodeId, &#039;unknown-css-class&#039;));
+            },
+
+            &#039;document + class&#039;: function () {
+                //contains on document should not throw error
+
+                assert.isFalse(domClass.contains(document, &#039;unknown-css-class&#039;));
+            }
+        },
+
+        &#039;.add&#039;: {
+            beforeEach: function () {
+                node = domConstruct.toDom(&#039;&lt;div&gt;&lt;/div&gt;&#039;);
+                domConstruct.place(node, document.body);
+            },
+
+            afterEach: function () {
+                domConstruct.destroy(node);
+            },
+
+            &#039;node + class&#039;: function () {
+                // when a node and class are passed, then the class is added
+
+                domClass.add(node, cssClass);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), cssClass);
+            },
+
+            &#039;string + class&#039;: function () {
+                // when a node id and class are passed, then the class is added
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+
+                domClass.add(nodeId, cssClass);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), cssClass);
+            },
+
+            &#039;node + array&#039;: function () {
+                // when a node and classes are passed, then the classes are added
+
+                domClass.add(node, [cssClass, moreCssClass]);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), [cssClass, moreCssClass].join(&#039; &#039;));
+            },
+
+            &#039;string + array&#039;: function () {
+                // when a node id and classes are passed, then the classes are added
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+
+                domClass.add(nodeId, [cssClass, moreCssClass]);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), [cssClass, moreCssClass].join(&#039; &#039;));
+            }
+        },
+
+        &#039;.remove&#039;: {
+            beforeEach: function () {
+                node = domConstruct.toDom(&#039;&lt;div class=&quot;&#039; +
+                    cssClass + &#039;&quot;&gt;&lt;/div&gt;&#039;);
+                domConstruct.place(node, document.body);
+            },
+
+            afterEach: function () {
+                domConstruct.destroy(node);
+            },
+
+            &#039;node + undefined&#039;: function () {
+                // when a node and undefined are passed, then all classes are removed
+
+                domClass.remove(node, undefined);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), &#039;&#039;);
+            },
+
+            &#039;string + undefined&#039;: function () {
+                // when a node id and undefined are passed, then all classes are removed
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+
+                domClass.remove(nodeId, undefined);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), &#039;&#039;);
+            },
+
+            &#039;node + class&#039;: function () {
+                // when a node and class are passed, then the class is added
+
+                domClass.remove(node, cssClass);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), &#039;&#039;);
+            },
+
+            &#039;string + class&#039;: function () {
+                // when a node id and class are passed, then the class is added
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+
+                domClass.remove(nodeId, cssClass);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), &#039;&#039;);
+            },
+
+            &#039;node + classes&#039;: function () {
+                // when a node and class are passed, then the class is added
+
+                node.setAttribute(&#039;class&#039;, cssClass + &#039; &#039; + moreCssClass);
+
+                domClass.remove(node, cssClass + &#039; &#039; + moreCssClass);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), &#039;&#039;);
+            },
+
+            &#039;string + classes&#039;: function () {
+                // when a node id and class are passed, then the class is added
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+                node.setAttribute(&#039;class&#039;, cssClass + &#039; &#039; + moreCssClass);
+
+                domClass.remove(nodeId, cssClass + &#039; &#039; + moreCssClass);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), &#039;&#039;);
+            },
+
+            &#039;node + array&#039;: function () {
+                // when a node and classes are passed, then the classes are added
+
+                node.setAttribute(&#039;class&#039;, cssClass + &#039; &#039; + moreCssClass);
+
+                domClass.remove(node, [cssClass, moreCssClass]);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), &#039;&#039;);
+            },
+
+            &#039;string + array&#039;: function () {
+                // when a node id and classes are passed, then the classes are added
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+                node.setAttribute(&#039;class&#039;, cssClass + &#039; &#039; + moreCssClass);
+
+                domClass.remove(nodeId, [cssClass, moreCssClass]);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), &#039;&#039;);
+            },
+
+            &#039;node w/ multiple + class&#039;: function () {
+                // when a node and class are passed, then the class is added
+
+                node.setAttribute(&#039;class&#039;, cssClass + &#039; &#039; + multipleCss);
+
+                domClass.remove(node, cssClass);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), multipleCss);
+            },
+
+            &#039;string w/ multiple + class&#039;: function () {
+                // when a node id and class are passed, then the class is added
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+                node.setAttribute(&#039;class&#039;, cssClass + &#039; &#039; + multipleCss);
+
+                domClass.remove(nodeId, cssClass);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), multipleCss);
+            },
+
+            &#039;node w/ multiple + array&#039;: function () {
+                // when a node and classes are passed, then the classes are added
+
+                node.setAttribute(&#039;class&#039;, cssClass + &#039; &#039; + multipleCss + &#039; &#039; + moreCssClass);
+
+                domClass.remove(node, [cssClass, moreCssClass]);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), multipleCss);
+            },
+
+            &#039;string w/ multiple + array&#039;: function () {
+                // when a node id and classes are passed, then the classes are added
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+                node.setAttribute(&#039;class&#039;, cssClass + &#039; &#039; + multipleCss + &#039; &#039; + moreCssClass);
+
+                domClass.remove(nodeId, [cssClass, moreCssClass]);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), multipleCss);
+            }
+        },
+
+        &#039;.replace&#039;: {
+            beforeEach: function () {
+                node = domConstruct.toDom(&#039;&lt;div class=&quot;&#039; +
+                    cssClass + &#039;&quot;&gt;&lt;/div&gt;&#039;);
+                domConstruct.place(node, document.body);
+            },
+
+            afterEach: function () {
+                domConstruct.destroy(node);
+            },
+
+            &#039;node + add&#039;: function () {
+                // when a node and add class is passed, the class is added.
+
+                domClass.replace(node, moreCssClass);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), moreCssClass);
+            },
+
+            &#039;string + add&#039;: function () {
+                // when a node id and add class is passed, the class is added.
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+
+                domClass.replace(nodeId, moreCssClass);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), moreCssClass);
+            },
+
+            &#039;node + null add&#039;: function () {
+                // when a node and remove class is passed, the class is removed.
+
+                domClass.replace(node, null, cssClass);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), &#039;&#039;);
+            },
+
+            &#039;string + null add&#039;: function () {
+                // when a node id and remove class is passed, the class is removed.
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+
+                domClass.replace(nodeId, null, cssClass);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), &#039;&#039;);
+            },
+
+            &#039;node + null remove&#039;: function () {
+                // when a node and add class is passed, the class is added
+
+                domClass.replace(node, moreCssClass, null);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), cssClass + &#039; &#039; + moreCssClass);
+            },
+
+            &#039;string + null remove&#039;: function () {
+                // when a node id and add class is passed, the class is added
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+
+                domClass.replace(nodeId, moreCssClass, null);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), cssClass + &#039; &#039; + moreCssClass);
+            },
+
+            &#039;node + class&#039;: function () {
+                // when a node and add and remove class is passed, the classes are added and removed
+
+                domClass.replace(node, moreCssClass, cssClass);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), moreCssClass);
+            },
+
+            &#039;string + class&#039;: function () {
+                // when a node id and add and remove class is passed, the classes are added and removed
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+
+                domClass.replace(nodeId, moreCssClass, cssClass);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), moreCssClass);
+            },
+
+            &#039;node + classes as string - removing&#039;: function () {
+                // when a node and multiple classes are passed separated by a space, the classes are removed
+
+                node.setAttribute(&#039;class&#039;, cssClass + &#039; &#039; + moreCssClass);
+
+                domClass.replace(node, null, moreCssClass + &#039; &#039; + cssClass);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), &#039;&#039;);
+            },
+
+            &#039;string + classes as string - removing&#039;: function () {
+                // when a node id and multiple classes are passed separated by a space, the classes are removed
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+                node.setAttribute(&#039;class&#039;, cssClass + &#039; &#039; + moreCssClass);
+
+                domClass.replace(nodeId, null, moreCssClass + &#039; &#039; + cssClass);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), &#039;&#039;);
+            },
+
+            &#039;node + classes as string - adding&#039;: function () {
+                // when a node and multiple classes are passed separated by a space, the classes are added
+
+                node.setAttribute(&#039;class&#039;, &#039;&#039;);
+
+                domClass.replace(node, moreCssClass + &#039; &#039; + cssClass);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), moreCssClass + &#039; &#039; + cssClass);
+            },
+
+            &#039;string + classes as string - adding&#039;: function () {
+                // when a node id and multiple classes are passed separated by a space, the classes are added
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+                node.setAttribute(&#039;class&#039;, &#039;&#039;);
+
+                domClass.replace(nodeId, moreCssClass + &#039; &#039; + cssClass);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), moreCssClass + &#039; &#039; + cssClass);
+            },
+
+            &#039;node + classes as array - removing&#039;: function () {
+                // when a node and multiple classes are passed as an array, the classes are removed
+
+                node.setAttribute(&#039;class&#039;, cssClass + &#039; &#039; + moreCssClass);
+
+                domClass.replace(node, null, [moreCssClass, cssClass]);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), &#039;&#039;);
+            },
+
+            &#039;string + classes as array - removing&#039;: function () {
+                // when a node id and multiple classes are passed as an array, the classes are removed
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+                node.setAttribute(&#039;class&#039;, cssClass + &#039; &#039; + moreCssClass);
+
+                domClass.replace(nodeId, null, [moreCssClass, cssClass]);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), &#039;&#039;);
+            },
+
+            &#039;node + classes as array - adding&#039;: function () {
+                // when a node and multiple classes are passed as an array, the classes are added
+
+                node.setAttribute(&#039;class&#039;, &#039;&#039;);
+
+                domClass.replace(node, [moreCssClass, cssClass]);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), moreCssClass + &#039; &#039; + cssClass);
+            },
+
+            &#039;string + classes as array - adding&#039;: function () {
+                // when a node id and multiple classes are passed as an array, the classes are added
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+                node.setAttribute(&#039;class&#039;, &#039;&#039;);
+
+                domClass.replace(nodeId, [moreCssClass, cssClass]);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), moreCssClass + &#039; &#039; + cssClass);
+            },
+
+            &#039;node + classes as string - replacing&#039;: function () {
+                // when a node and multiple classes are passed separated by a space, the classes are added
+
+                domClass.replace(node, moreCssClass + &#039; &#039; + multipleCss, cssClass);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), moreCssClass + &#039; &#039; + multipleCss);
+            },
+
+            &#039;string + classes as string - replacing&#039;: function () {
+                // when a node and multiple classes are passed separated by a space, the classes are added
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+
+                domClass.replace(nodeId, moreCssClass + &#039; &#039; + multipleCss, cssClass);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), moreCssClass + &#039; &#039; + multipleCss);
+            },
+
+            &#039;node + classes as array - replacing&#039;: function () {
+                // when a node and multiple classes are passed as an array, the classes are removed
+
+                node.setAttribute(&#039;class&#039;, cssClass + &#039; &#039; + moreCssClass);
+
+                domClass.replace(node, [multipleCss], [moreCssClass, cssClass]);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), multipleCss);
+            },
+
+            &#039;string + classes as array - replacing&#039;: function () {
+                // when a node id and multiple classes are passed as an array, the classes are removed
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+                node.setAttribute(&#039;class&#039;, cssClass + &#039; &#039; + moreCssClass);
+
+                domClass.replace(nodeId, [multipleCss], [moreCssClass, cssClass]);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), multipleCss);
+            }
+        },
+
+        &#039;.toggle&#039;: {
+            beforeEach: function () {
+                node = domConstruct.toDom(&#039;&lt;div class=&quot;&#039; +
+                    cssClass + &#039;&quot;&gt;&lt;/div&gt;&#039;);
+                domConstruct.place(node, document.body);
+            },
+
+            afterEach: function () {
+                domConstruct.destroy(node);
+            },
+
+            &#039;node + class&#039;: function () {
+                // when you pass a node and class, the class is removed
+
+                domClass.toggle(node, cssClass);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), &#039;&#039;);
+            },
+
+            &#039;string + class&#039;: function () {
+                // when you pass a node id and class, the class is removed
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+
+                domClass.toggle(nodeId, cssClass);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), &#039;&#039;);
+            },
+
+            &#039;node + class + true&#039;: function () {
+                // when you pass a node and class and a true condition, the class is added
+
+                domClass.toggle(node, cssClass, true);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), cssClass);
+            },
+
+            &#039;string + class + true&#039;: function () {
+                // when you pass a node id and class and a true condition, the class is added
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+
+                domClass.toggle(nodeId, cssClass, true);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), cssClass);
+            },
+
+            &#039;node + class + false&#039;: function () {
+                // when you pass a node and class and a false condition, the class is removed
+
+                domClass.toggle(node, cssClass, false);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), &#039;&#039;);
+            },
+
+            &#039;string + class + false&#039;: function () {
+                // when you pass a node id and class and a false condition, the class is removed
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+
+                domClass.toggle(nodeId, cssClass, false);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), &#039;&#039;);
+            },
+
+            &#039;node + new class&#039;: function () {
+                // when you pass a node and new class, the class is added
+
+                domClass.toggle(node, multipleCss);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), cssClass + &#039; &#039; + multipleCss);
+            },
+
+            &#039;string + new class&#039;: function () {
+                // when you pass a node id and new class, the class is added
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+
+                domClass.toggle(nodeId, multipleCss);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), cssClass + &#039; &#039; + multipleCss);
+            },
+
+            &#039;node + array&#039;: function () {
+                // when you pass a node and array, the classes are toggled
+
+                domClass.toggle(node, [cssClass, multipleCss]);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), multipleCss);
+            },
+
+            &#039;string + array&#039;: function () {
+                // when you pass a node id and array, the classes are toggled
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+
+                domClass.toggle(nodeId, [cssClass, multipleCss]);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), multipleCss);
+            },
+
+            &#039;node + array + true&#039;: function () {
+                // when you pass a node and array + true, the classes are added
+
+                domClass.toggle(node, [cssClass, multipleCss], true);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), cssClass + &#039; &#039; + multipleCss);
+            },
+
+            &#039;string + array + true&#039;: function () {
+                // when you pass a node id and array + true, the classes are added
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+
+                domClass.toggle(nodeId, [cssClass, multipleCss], true);
+
+                assert.equal( node.getAttribute(&#039;class&#039;), cssClass + &#039; &#039; + multipleCss);
+            },
+
+            &#039;node + classes&#039;: function () {
+                // when you pass a node and multples classes, the classes are toggled
+
+                domClass.toggle(node, cssClass + &#039; &#039; + multipleCss);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), multipleCss);
+            },
+
+            &#039;string + classes&#039;: function () {
+                // when you pass a node id and multples classes, the classes are toggled
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+
+                domClass.toggle(nodeId, cssClass + &#039; &#039; + multipleCss);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), multipleCss);
+            },
+
+            &#039;node + classes + false&#039;: function () {
+                // when you pass a node and multples classes + false, the classes are removed
+
+                domClass.toggle(node, cssClass + &#039; &#039; + multipleCss, false);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), &#039;&#039;);
+            },
+
+            &#039;string + classes + false&#039;: function () {
+                // when you pass a node id and multples classes + false, the classes are removed
+
+                var nodeId = generateId();
+                node.setAttribute(&#039;id&#039;, nodeId);
+
+                domClass.toggle(nodeId, cssClass + &#039; &#039; + multipleCss, false);
+
+                assert.equal(node.getAttribute(&#039;class&#039;), &#039;&#039;);
+            }
+        },
+
+        &#039;validation tests&#039;: {
+
+            beforeEach: function () {
+                node = domConstruct.toDom(&#039;&lt;div&gt;&lt;/div&gt;&#039;);
+                domConstruct.place(node, document.body);
+            },
+
+            afterEach: function () {
+                domConstruct.destroy(node);
+            },
+
+            &#039;testClassFunctions&#039;: function () {
+                domClass.remove(node);
+                domClass.add(node, &#039;a&#039;);
+                assert.equal(node.className, &#039;a&#039;, &#039;class is a&#039;);
+
+                domClass.remove(node, &#039;c&#039;);
+                assert.equal(node.className, &#039;a&#039;, &#039;class is still a&#039;);
+                assert.isTrue(domClass.contains(node, &#039;a&#039;), &#039;class is a, test for a&#039;);
+                assert.isFalse(domClass.contains(node, &#039;b&#039;), &#039;class is a, test for b&#039;);
+
+                domClass.add(node, &#039;b&#039;);
+                assert.equal(node.className, &#039;a b&#039;, &#039;class is a b&#039;);
+                assert.isTrue(domClass.contains(node, &#039;a&#039;), &#039;class is a b, test for a&#039;);
+                assert.isTrue(domClass.contains(node, &#039;b&#039;), &#039;class is a b, test for b&#039;);
+
+                domClass.remove(node, &#039;a&#039;);
+                assert.equal(node.className, &#039;b&#039;, &#039;class is b&#039;);
+                assert.isFalse(domClass.contains(node, &#039;a&#039;), &#039;class is b, test for a&#039;);
+                assert.isTrue(domClass.contains(node, &#039;b&#039;), &#039;class is b, test for b&#039;);
+
+                domClass.toggle(node, &#039;a&#039;);
+                assert.equal(node.className, &#039;b a&#039;, &#039;class is b a&#039;);
+                assert.isTrue(domClass.contains(node, &#039;a&#039;), &#039;class is b a, test for a&#039;);
+                assert.isTrue(domClass.contains(node, &#039;b&#039;), &#039;class is b a, test for b&#039;);
+
+                domClass.toggle(node, &#039;a&#039;);
+                assert.equal(node.className, &#039;b&#039;, &#039;class is b (again)&#039;);
+                assert.isFalse(domClass.contains(node, &#039;a&#039;), &#039;class is b (again), test for a&#039;);
+                assert.isTrue(domClass.contains(node, &#039;b&#039;), &#039;class is b (again), test for b&#039;);
+
+                domClass.toggle(node, &#039;b&#039;);
+                assert.equal(node.className, &#039;&#039;, &#039;class is blank&#039;);
+                assert.isFalse(domClass.contains(node, &#039;a&#039;), &#039;class is blank, test for a&#039;);
+                assert.isFalse(domClass.contains(node, &#039;b&#039;), &#039;class is blank, test for b&#039;);
+
+                domClass.remove(node, &#039;c&#039;);
+                assert.isTrue(!node.className, &#039;no class&#039;);
+
+                var acuWorked = true;
+                try{
+                    domClass.add(node);
+                }catch(e){
+                    acuWorked = false;
+                }
+                assert.equal(acuWorked, true, &#039;addClass handles undefined class&#039;);
+
+                domClass.add(node, &#039;a&#039;);
+                domClass.replace(node, &#039;b&#039;, &#039;a&#039;);
+                assert.isTrue(domClass.contains(node, &#039;b&#039;), &#039;class is b after replacing a, test for b&#039;);
+                assert.isFalse(domClass.contains(node, &#039;a&#039;), &#039;class is b after replacing a, test for not a&#039;);
+
+                domClass.replace(node, &#039;&#039;, &#039;b&#039;);
+                assert.isFalse(domClass.contains(node, &#039;b&#039;), &#039;class b should be removed, with no class added&#039;);
+                assert.equal(node.className, &#039;&#039;, &#039;The className is empty&#039;);
+
+                domClass.add(node, &#039;b a&#039;);
+                domClass.replace(node, &#039;c&#039;, &#039;&#039;);
+                assert.equal(node.className,&#039;b a c&#039;,
+                    &#039;The className is  is &quot;b a c&quot; after using an empty string in replaceClass&#039;);
+
+                assert.isFalse(domClass.contains(document, &#039;ab&#039;), &#039;hasClass on document should not throw error&#039;);
+            },
+
+            &#039;testAddRemoveClassMultiple&#039;: function () {
+
+                domClass.remove(node);
+                domClass.add(node, &#039;a&#039;);
+                assert.equal(node.className, &#039;a&#039;, &#039;class is a&#039;);
+
+                domClass.add(node, &#039;a b&#039;);
+                assert.equal(node.className, &#039;a b&#039;, &#039;class is a b&#039;);
+
+                domClass.add(node, &#039;b a&#039;);
+                assert.equal(node.className, &#039;a b&#039;, &#039;class is still a b&#039;);
+
+                domClass.add(node, [&#039;a&#039;, &#039;c&#039;]);
+                assert.equal(node.className, &#039;a b c&#039;, &#039;class is a b c&#039;);
+
+                domClass.remove(node, &#039;c a&#039;);
+                assert.equal(node.className, &#039;b&#039;, &#039;class is b&#039;);
+
+                domClass.remove(node);
+                assert.equal(node.className, &#039;&#039;, &#039;empty class&#039;);
+
+                domClass.add(node, &#039;  c   b   a &#039;);
+                assert.equal(node.className, &#039;c b a&#039;, &#039;class is c b a&#039;);
+
+                domClass.remove(node, &#039; c b &#039;);
+                assert.equal(node.className, &#039;a&#039;, &#039;class is a&#039;);
+
+                domClass.remove(node, [&#039;a&#039;, &#039;c&#039;]);
+                assert.equal(node.className, &#039;&#039;, &#039;empty class&#039;);
+
+                domClass.add(node, &#039;a b&#039;);
+                domClass.replace(node, &#039;c&#039;, &#039;a b&#039;);
+                assert.equal(node.className, &#039;c&#039;, &#039;class is c&#039;);
+
+                domClass.replace(node, &#039;&#039;);
+                assert.equal(node.className, &#039;&#039;, &#039;empty class&#039;);
+            }
+        }
+    });
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

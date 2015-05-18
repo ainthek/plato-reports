@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">71.53</p>
+      <p class="stat">70.41</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">162</p>
+      <p class="stat">139</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">53.49</p>
+      <p class="stat">39.00</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">1.58</p>
+      <p class="stat">1.06</p>
     </div>
   </div>
 </div>
@@ -110,22 +110,27 @@ var extend                = require(&#039;util&#039;)._extend
   , helpers               = require(&#039;./lib/helpers&#039;)
 
 var isFunction            = helpers.isFunction
-  , constructObject       = helpers.constructObject
-  , filterForCallback     = helpers.filterForCallback
-  , constructOptionsFrom  = helpers.constructOptionsFrom
   , paramsHaveRequestBody = helpers.paramsHaveRequestBody
 
 
 // organize params for patch, post, put, head, del
 function initParams(uri, options, callback) {
-  callback = filterForCallback([options, callback])
-  options = constructOptionsFrom(uri, options)
+  if (typeof options === &#039;function&#039;) {
+    callback = options
+  }
 
-  return constructObject()
-    .extend({callback: callback})
-    .extend({options: options})
-    .extend({uri: options.uri})
-    .done()
+  var params = {}
+  if (typeof options === &#039;object&#039;) {
+    params = extend({}, options)
+    params = extend(params, {uri: uri})
+  } else if (typeof uri === &#039;string&#039;) {
+    params = extend({}, {uri: uri})
+  } else {
+    params = extend({}, uri)
+  }
+
+  params.callback = callback
+  return params
 }
 
 function request (uri, options, callback) {
@@ -134,60 +139,24 @@ function request (uri, options, callback) {
   }
 
   var params = initParams(uri, options, callback)
-  options = params.options
-  options.callback = params.callback
-  options.uri = params.uri
 
-  return new request.Request(options)
-}
-
-function requester(params) {
-  if(typeof params.options._requester === &#039;function&#039;) {
-    return params.options._requester
-  }
-  return request
-}
-
-request.get = function (uri, options, callback) {
-  var params = initParams(uri, options, callback)
-  params.options.method = &#039;GET&#039;
-  return requester(params)(params.uri || null, params.options, params.callback)
-}
-
-request.head = function (uri, options, callback) {
-  var params = initParams(uri, options, callback)
-  params.options.method = &#039;HEAD&#039;
-
-  if (paramsHaveRequestBody(params)) {
+  if (params.method === &#039;HEAD&#039; &amp;&amp; paramsHaveRequestBody(params)) {
     throw new Error(&#039;HTTP HEAD requests MUST NOT include a request body.&#039;)
   }
 
-  return requester(params)(params.uri || null, params.options, params.callback)
+  return new request.Request(params)
 }
 
-request.post = function (uri, options, callback) {
-  var params = initParams(uri, options, callback)
-  params.options.method = &#039;POST&#039;
-  return requester(params)(params.uri || null, params.options, params.callback)
-}
+var verbs = [&#039;get&#039;, &#039;head&#039;, &#039;post&#039;, &#039;put&#039;, &#039;patch&#039;, &#039;del&#039;]
 
-request.put = function (uri, options, callback) {
-  var params = initParams(uri, options, callback)
-  params.options.method = &#039;PUT&#039;
-  return requester(params)(params.uri || null, params.options, params.callback)
-}
-
-request.patch = function (uri, options, callback) {
-  var params = initParams(uri, options, callback)
-  params.options.method = &#039;PATCH&#039;
-  return requester(params)(params.uri || null, params.options, params.callback)
-}
-
-request.del = function (uri, options, callback) {
-  var params = initParams(uri, options, callback)
-  params.options.method = &#039;DELETE&#039;
-  return requester(params)(params.uri || null, params.options, params.callback)
-}
+verbs.forEach(function(verb) {
+  var method = verb === &#039;del&#039; ? &#039;DELETE&#039; : verb.toUpperCase()
+  request[verb] = function (uri, options, callback) {
+    var params = initParams(uri, options, callback)
+    params.method = method
+    return request(params, params.callback)
+  }
+})
 
 request.jar = function (store) {
   return cookies.jar(store)
@@ -197,74 +166,82 @@ request.cookie = function (str) {
   return cookies.parse(str)
 }
 
+function wrapRequestMethod (method, options, requester, verb) {
+
+  return function (uri, opts, callback) {
+    var params = initParams(uri, opts, callback)
+
+    var headerlessOptions = extend({}, options)
+    delete headerlessOptions.headers
+    params = extend(headerlessOptions, params)
+
+    if (options.headers) {
+      var headers = extend({}, options.headers)
+      params.headers = extend(headers, params.headers)
+    }
+
+    if (verb) {
+      params.method = (verb === &#039;del&#039; ? &#039;DELETE&#039; : verb.toUpperCase())
+    }
+
+    if (isFunction(requester)) {
+      method = requester
+    }
+
+    return method(params, params.callback)
+  }
+}
+
 request.defaults = function (options, requester) {
   var self = this
-  var wrap = function (method) {
-    var headerlessOptions = function (options) {
-      options = extend({}, options)
-      delete options.headers
-      return options
-    }
 
-    var getHeaders = function (params, options) {
-      return constructObject()
-        .extend(options.headers)
-        .extend(params.options.headers)
-        .done()
-    }
-
-    return function (uri, opts, callback) {
-      var params = initParams(uri, opts, callback)
-      params.options = extend(headerlessOptions(options), params.options)
-
-      if (options.headers) {
-        params.options.headers = getHeaders(params, options)
-      }
-
-      if (isFunction(requester)) {
-        if (method === self) {
-          method = requester
-        } else {
-          params.options._requester = requester
-        }
-      }
-
-      return method(params.options, params.callback)
-    }
+  if (typeof options === &#039;function&#039;) {
+    requester = options
+    options = {}
   }
 
-  var defaults      = wrap(self)
-  defaults.get      = wrap(self.get)
-  defaults.patch    = wrap(self.patch)
-  defaults.post     = wrap(self.post)
-  defaults.put      = wrap(self.put)
-  defaults.head     = wrap(self.head)
-  defaults.del      = wrap(self.del)
-  defaults.cookie   = wrap(self.cookie)
+  var defaults      = wrapRequestMethod(self, options, requester)
+
+  var verbs = [&#039;get&#039;, &#039;head&#039;, &#039;post&#039;, &#039;put&#039;, &#039;patch&#039;, &#039;del&#039;]
+  verbs.forEach(function(verb) {
+    defaults[verb]  = wrapRequestMethod(self[verb], options, requester, verb)
+  })
+
+  defaults.cookie   = wrapRequestMethod(self.cookie, options, requester)
   defaults.jar      = self.jar
   defaults.defaults = self.defaults
   return defaults
 }
 
 request.forever = function (agentOptions, optionsArg) {
-  var options = constructObject()
+  var options = {}
   if (optionsArg) {
-    options.extend(optionsArg)
+    options = extend({}, optionsArg)
   }
   if (agentOptions) {
     options.agentOptions = agentOptions
   }
 
-  options.extend({forever: true})
-  return request.defaults(options.done())
+  options.forever = true
+  return request.defaults(options)
 }
 
 // Exports
 
 module.exports = request
 request.Request = require(&#039;./request&#039;)
-request.debug = process.env.NODE_DEBUG &amp;&amp; /\brequest\b/.test(process.env.NODE_DEBUG)
-request.initParams = initParams</textarea>
+request.initParams = initParams
+
+// Backwards compatibility for request.debug
+Object.defineProperty(request, &#039;debug&#039;, {
+  enumerable : true,
+  get : function() {
+    return request.Request.debug
+  },
+  set : function(debug) {
+    request.Request.debug = debug
+  }
+})</textarea>
   </div>
 </div>
 

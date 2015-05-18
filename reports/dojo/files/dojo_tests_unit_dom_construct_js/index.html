@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/unit/dom-construct.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/unit/dom-construct.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">71.71</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">796</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">52.14</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">8.08</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+    &#039;intern!object&#039;,
+    &#039;intern/chai!assert&#039;,
+    &#039;sinon&#039;,
+    &#039;../../dom-construct&#039;,
+    &#039;../../dom-attr&#039;
+], function (registerSuite, assert, sinon, domConstruct, domAttr) {
+    var baseId = &quot;dom-construct&quot;,
+        uniqueId = 0;
+
+    function getId() {
+        return baseId + uniqueId++;
+    }
+
+    registerSuite({
+        name: &#039;dojo/dom-construct&#039;,
+
+        &quot;toDom&quot;: (function () {
+            return {
+                &quot;returns expected node when one requested&quot;: function () {
+                    //arrange
+                    var rawHTML = &quot;&lt;div&gt;&lt;/div&gt;&quot;;
+
+                    //act
+                    var result = domConstruct.toDom(rawHTML);
+
+                    //assert
+                    assert.equal(result.nodeName.toLowerCase(), &quot;div&quot;);
+
+                },
+                &quot;returns expected result when tree requested&quot;: function () {
+                    //arrange
+                    var parent = document.createElement(&quot;div&quot;),
+                        child = document.createElement(&quot;span&quot;);
+
+                    parent.appendChild(child);
+
+                    //act
+                    var result = domConstruct.toDom(parent.outerHTML);
+
+                    //assert
+                    assert.equal(result.outerHTML, result.outerHTML);
+                },
+                &quot;returns expected result when forest requested&quot;: function () {
+                    //arrange
+                    var parent = document.createElement(&quot;div&quot;),
+                        children =
+                        [
+                            document.createElement(&quot;span&quot;),
+                            document.createElement(&quot;span&quot;)
+                        ];
+
+                    for (var i in children) {
+                        parent.appendChild(children[i]);
+                    }
+
+                    //act
+                    var result = domConstruct.toDom(parent.innerHTML);
+
+                    //assert
+                    assert.equal(result.outerHTML, result.innerHTML);
+                },
+                &quot;able to create &lt;option/&gt; tag, which must be created in context of &lt;select/&gt;&quot;: function () {
+                    //arrange
+                    var node = &quot;&lt;option&gt;&lt;/option&gt;&quot;;
+
+                    //act
+                    var result = domConstruct.toDom(node);
+
+                    //assert
+                    assert.equal(result.nodeName.toLowerCase(), &quot;option&quot;);
+
+                },
+                &quot;able to create &lt;tbody/&gt; tag, which must be created in context of &lt;table/&gt;&quot;: function () {
+                    //arrange
+                    var node = &quot;&lt;tbody&gt;&lt;/tbody&gt;&quot;;
+
+                    //act
+                    var result = domConstruct.toDom(node);
+
+                    //assert
+                    assert.equal(result.nodeName.toLowerCase(), &quot;tbody&quot;);
+
+                },
+                &quot;able to create &lt;thead/&gt; tag, which must be created in context of &lt;table/&gt;&quot;: function () {
+                    //arrange
+                    var node = &quot;&lt;thead&gt;&lt;/thead&gt;&quot;;
+
+                    //act
+                    var result = domConstruct.toDom(node);
+
+                    //assert
+                    assert.equal(result.nodeName.toLowerCase(), &quot;thead&quot;);
+
+                },
+                &quot;able to create &lt;tfoot/&gt; tag, which must be created in context of &lt;table/&gt;&quot;: function () {
+                    //arrange
+                    var node = &quot;&lt;tfoot&gt;&lt;/tfoot&gt;&quot;;
+
+                    //act
+                    var result = domConstruct.toDom(node);
+
+                    //assert
+                    assert.equal(result.nodeName.toLowerCase(), &quot;tfoot&quot;);
+
+                },
+                &quot;able to create &lt;tr/&gt; tag, which must be created in context of &lt;table&gt;&lt;tbody/&gt;&lt;/table&gt;&quot;: function () {
+                    //arrange
+                    var node = &quot;&lt;tr&gt;&lt;/tr&gt;&quot;;
+
+                    //act
+                    var result = domConstruct.toDom(node);
+
+                    //assert
+                    assert.equal(result.nodeName.toLowerCase(), &quot;tr&quot;);
+
+                },
+                &quot;able to create &lt;td/&gt; tag, which must be created in context of &lt;table&gt;&lt;tbody&gt;&lt;tr/&gt;&lt;/tbody&gt;&lt;/table&gt;&quot;: function () {
+                    //arrange
+                    var node = &quot;&lt;td&gt;&lt;/td&gt;&quot;;
+
+                    //act
+                    var result = domConstruct.toDom(node);
+
+                    //assert
+                    assert.equal(result.nodeName.toLowerCase(), &quot;td&quot;);
+
+                },
+                &quot;able to create &lt;th/&gt; tag, which must be created in context of &lt;table&gt;&lt;thead&gt;&lt;tr/&gt;&lt;/thead&gt;&lt;/table&gt;&quot;: function () {
+                    //arrange
+                    var node = &quot;&lt;th&gt;&lt;/th&gt;&quot;;
+
+                    //act
+                    var result = domConstruct.toDom(node);
+
+                    //assert
+                    assert.equal(result.nodeName.toLowerCase(), &quot;th&quot;);
+
+                },
+                &quot;able to create &lt;legend/&gt; tag, which must be created in context of &lt;fieldset/&gt;&quot;: function () {
+                    //arrange
+                    var node = &quot;&lt;legend&gt;&lt;/legend&gt;&quot;;
+
+                    //act
+                    var result = domConstruct.toDom(node);
+
+                    //assert
+                    assert.equal(result.nodeName.toLowerCase(), &quot;legend&quot;);
+
+                },
+                &quot;able to create &lt;caption/&gt; tag, which must be created in context of &lt;table/&gt;&quot;: function () {
+                    //arrange
+                    var node = &quot;&lt;caption&gt;&lt;/caption&gt;&quot;;
+
+                    //act
+                    var result = domConstruct.toDom(node);
+
+                    //assert
+                    assert.equal(result.nodeName.toLowerCase(), &quot;caption&quot;);
+
+                },
+                &quot;able to create &lt;colgroup/&gt; tag, which must be created in context of &lt;table/&gt;&quot;: function () {
+                    //arrange
+                    var node = &quot;&lt;colgroup&gt;&lt;/colgroup&gt;&quot;;
+
+                    //act
+                    var result = domConstruct.toDom(node);
+
+                    //assert
+                    assert.equal(result.nodeName.toLowerCase(), &quot;colgroup&quot;);
+
+                },
+                &quot;able to create &lt;col/&gt; tag, which must be created in context of &lt;table&gt;&lt;colgroup/&gt;&lt;/table&gt;&quot;: function () {
+                    //arrange
+                    var node = &quot;&lt;col&gt;&lt;/col&gt;&quot;;
+
+                    //act
+                    var result = domConstruct.toDom(node);
+
+                    //assert
+                    assert.equal(result.nodeName.toLowerCase(), &quot;col&quot;);
+
+                },
+                &quot;able to create &lt;li/&gt; tag, which must be created in context of &lt;ul/&gt;&quot;: function () {
+                    //arrange
+                    var node = &quot;&lt;li&gt;&lt;/li&gt;&quot;;
+
+                    //act
+                    var result = domConstruct.toDom(node);
+
+                    //assert
+                    assert.equal(result.nodeName.toLowerCase(), &quot;li&quot;);
+
+                },
+            };
+        })(),
+        &quot;place&quot;: (function () {
+            return {
+                &quot;when first arg is rawHTML, then it is converted to DOM and placed&quot;: function () {
+                    //arrange
+                    var container = document.createElement(&quot;div&quot;),
+                        child = document.createElement(&quot;span&quot;),
+                        reference = document.createElement(&quot;h1&quot;);
+
+                    container.appendChild(child);
+
+                    //act
+                    domConstruct.place(container.outerHTML, reference, &quot;only&quot;);
+
+                    //assert
+                    assert.equal(reference.firstElementChild.nodeName, container.nodeName);
+                    assert.equal(reference.firstElementChild.firstElementChild.nodeName, child.nodeName);
+                },
+                &quot;when first arg is a node id, then the correct node is placed&quot;: function () {
+                    //arrange
+                    var node = document.createElement(&quot;div&quot;),
+                        reference = document.createElement(&quot;h1&quot;),
+                        nodeId = getId();
+
+                    node.id = nodeId;
+                    document.body.appendChild(node);
+
+                    //act
+                    domConstruct.place(nodeId, reference, &quot;only&quot;);
+
+                    //assert
+                    assert.equal(reference.firstElementChild.nodeName, node.nodeName);
+                },
+                &quot;when first arg is a node, then it is placed&quot;: function () {
+                    //arrange
+                    var node = document.createElement(&quot;div&quot;),
+                        reference = document.createElement(&quot;h1&quot;);
+
+                    document.body.appendChild(node);
+
+                    //act
+                    domConstruct.place(node, reference, &quot;only&quot;);
+
+                    //assert
+                    assert.equal(reference.firstElementChild.nodeName, node.nodeName);
+                },
+                &quot;when second arg is a string, then the node with that id is used as reference&quot;: function () {
+                    //arrange
+                    var node = document.createElement(&quot;div&quot;),
+                        reference = document.createElement(&quot;h1&quot;),
+                        referenceId = getId();
+
+                    document.body.appendChild(reference);
+                    reference.id = referenceId;
+
+                    //act
+                    domConstruct.place(node, referenceId, &quot;only&quot;);
+
+                    //assert
+                    assert.equal(reference.firstElementChild.nodeName, node.nodeName);
+                },
+                &quot;when second arg is a node, then it is used as the reference node&quot;: function () {
+                    //arrange
+                    var node = document.createElement(&quot;div&quot;),
+                        reference = document.createElement(&quot;h1&quot;);
+
+                    document.body.appendChild(reference);
+
+                    //act
+                    domConstruct.place(node, reference, &quot;only&quot;);
+
+                    //assert
+                    assert.equal(reference.firstElementChild.nodeName, node.nodeName);
+                },
+                &quot;when third argument is &#039;before&#039;, then the first arg is placed before the second&quot;: function () {
+                    //arrange
+                    var node = document.createElement(&quot;div&quot;),
+                        reference = document.createElement(&quot;h1&quot;);
+
+                    document.body.appendChild(reference);
+
+                    //act
+                    domConstruct.place(node, reference, &quot;before&quot;);
+
+                    //assert
+                    assert.equal(reference.previousSibling.nodeName, node.nodeName);
+                },
+                &quot;when third argument is &#039;after&#039;, then the first arg is placed after the second&quot;: function () {
+                    //arrange
+                    var node = document.createElement(&quot;div&quot;),
+                        reference = document.createElement(&quot;h1&quot;);
+
+                    document.body.appendChild(reference);
+
+                    //act
+                    domConstruct.place(node, reference, &quot;after&quot;);
+
+                    //assert
+                    assert.equal(reference.nextSibling.nodeName, node.nodeName);
+                },
+                &quot;when third argument is &#039;replace&#039;, then the first arg replaces the second&quot;: function () {
+                    //arrange
+                    var container = document.createElement(&quot;div&quot;),
+                        node = document.createElement(&quot;span&quot;),
+                        reference = document.createElement(&quot;h1&quot;);
+
+                    document.body.appendChild(container);
+                    container.appendChild(reference);
+
+                    //act
+                    domConstruct.place(node, reference, &quot;replace&quot;);
+
+                    //assert
+                    assert.equal(container.firstElementChild.nodeName, node.nodeName);
+                },
+                &quot;when third argument is &#039;only&#039;, then the first arg is placed as only content of second&quot;: function () {
+                    //arrange
+                    var node = document.createElement(&quot;span&quot;),
+                        reference = document.createElement(&quot;h1&quot;),
+                        children =
+                        [
+                            document.createElement(&quot;button&quot;),
+                            document.createElement(&quot;button&quot;),
+                            document.createElement(&quot;button&quot;)
+                        ];
+
+                    for (var i in children) {
+                        reference.appendChild(children[i]);
+                    }
+
+                    document.body.appendChild(reference);
+
+                    //act
+                    domConstruct.place(node, reference, &quot;only&quot;);
+
+                    //assert
+                    assert.equal(reference.firstElementChild.nodeName, node.nodeName);
+                    assert.equal(reference.children.length, 1);
+                },
+                &quot;when third argument is &#039;first&#039;, then the first arg is placed as first child of second&quot;: function () {
+                    //arrange
+                    var node = document.createElement(&quot;span&quot;),
+                        reference = document.createElement(&quot;h1&quot;),
+                        children =
+                        [
+                            document.createElement(&quot;button&quot;),
+                            document.createElement(&quot;button&quot;),
+                            document.createElement(&quot;button&quot;)
+                        ];
+
+                    for (var i in children) {
+                        reference.appendChild(children[i]);
+                    }
+
+                    document.body.appendChild(reference);
+
+                    //act
+                    domConstruct.place(node, reference, &quot;first&quot;);
+
+                    //assert
+                    assert.equal(reference.firstElementChild.nodeName, node.nodeName);
+                    assert.equal(reference.children.length, children.length + 1);
+                },
+                &quot;when third argument is &#039;last&#039;, then the first arg is placed as last child of second&quot;: function () {
+                    //arrange
+                    var node = document.createElement(&quot;span&quot;),
+                        reference = document.createElement(&quot;h1&quot;),
+                        children =
+                        [
+                            document.createElement(&quot;button&quot;),
+                            document.createElement(&quot;button&quot;),
+                            document.createElement(&quot;button&quot;)
+                        ];
+
+                    for (var i in children) {
+                        reference.appendChild(children[i]);
+                    }
+
+                    document.body.appendChild(reference);
+
+                    //act
+                    domConstruct.place(node, reference, &quot;last&quot;);
+
+                    //assert
+                    assert.equal(reference.lastElementChild.nodeName, node.nodeName);
+                    assert.equal(reference.children.length, children.length + 1);
+                },
+                &quot;when third argument is a number, then the first arg is placed as the correct child of second&quot;: function () {
+                    //arrange
+                    var node = document.createElement(&quot;span&quot;),
+                        reference = document.createElement(&quot;h1&quot;),
+                        children =
+                        [
+                            document.createElement(&quot;button&quot;),
+                            document.createElement(&quot;button&quot;),
+                            document.createElement(&quot;button&quot;)
+                        ],
+                        position = 2;
+
+                    for (var i in children) {
+                        reference.appendChild(children[i]);
+                    }
+
+                    document.body.appendChild(reference);
+
+                    //act
+                    domConstruct.place(node, reference, position);
+
+                    //assert
+                    assert.equal(reference.children[position].nodeName, node.nodeName);
+                    assert.equal(reference.children.length, children.length + 1);
+                },
+                &quot;when third argument is a number and the reference node is empty, then the first arg is placed as the first child of second&quot;: function () {
+                    //arrange
+                    var node = document.createElement(&quot;span&quot;),
+                        reference = document.createElement(&quot;h1&quot;),
+                        position = 2;
+
+                    document.body.appendChild(reference);
+
+                    //act
+                    domConstruct.place(node, reference, position);
+
+                    //assert
+                    assert.equal(reference.firstElementChild.nodeName, node.nodeName);
+                    assert.equal(reference.children.length, 1);
+                },
+                &quot;when third argument is a number that is greater than the number of children in the reference, then the first arg is placed as the first child of second&quot;: function () {
+                    //arrange
+                    var node = document.createElement(&quot;span&quot;),
+                        reference = document.createElement(&quot;h1&quot;),
+                        children =
+                        [
+                            document.createElement(&quot;button&quot;),
+                            document.createElement(&quot;button&quot;),
+                            document.createElement(&quot;button&quot;)
+                        ],
+                        position = children + 42;
+
+                    for (var i in children) {
+                        reference.appendChild(children[i]);
+                    }
+
+                    document.body.appendChild(reference);
+
+                    //act
+                    domConstruct.place(node, reference, position);
+
+                    //assert
+                    assert.equal(reference.lastElementChild.nodeName, node.nodeName);
+                    assert.equal(reference.children.length, children.length + 1);
+                }
+            };
+        })(),
+        &quot;create&quot;: (function () {
+            return {
+                &quot;when first arg is a string, then correct element type is created&quot;: function () {
+                    //arrange
+                    var tagType = &quot;div&quot;;
+
+                    //act
+                    var result = domConstruct.create(tagType);
+
+                    //assert
+                    assert.equal(result.nodeName.toLowerCase(), tagType);
+
+                },
+                &quot;when attributes provided, then dojo/dom-attr:set called with correct args&quot;: function () {
+                    //arrange
+                    var tag = document.createElement(&quot;div&quot;),
+                        attrs = { foo: &quot;bar&quot;, baz: &quot;buz&quot; },
+                        mock = sinon.spy(domAttr, &quot;set&quot;);
+
+                    //act
+                    domConstruct.create(tag, attrs);
+
+                    //assert
+                    assert.isTrue(mock.calledWith(tag, attrs));
+
+                    mock.restore();
+                },
+                &quot;when reference node provided, then dojo/dom-construct::place() called with correct args&quot;: function () {
+                    //arrange
+                    var tag = document.createElement(&quot;div&quot;),
+                        reference = document.createElement(&quot;h1&quot;),
+                        position = &quot;only&quot;,
+                        mock = sinon.spy(domConstruct, &quot;place&quot;);
+
+                    //act
+                    domConstruct.create(tag, null, reference, position);
+
+                    //assert
+                    assert.isTrue(mock.calledWith(tag, reference, position));
+
+                    mock.restore();
+                },
+                &quot;when reference node not part of global document, then new element created in correct context&quot;: function () {
+                    //arrange
+                    var iframe = document.createElement(&quot;iframe&quot;);
+
+                    document.body.appendChild(iframe);
+                    tagType = &quot;div&quot;,
+                    reference = iframe.contentDocument.createElement(&quot;h1&quot;),
+                    position = &quot;only&quot;;
+
+                    //act
+                    var result = domConstruct.create(tagType, null, reference, position);
+
+                    //assert
+                    assert.equal(result.ownerDocument, iframe.contentDocument);
+                }
+            };
+        })(),
+        &quot;empty&quot;: (function () {
+            return {
+                &quot;when given a node&#039;s id, then the related node is emptied&quot;: function () {
+                    //arrange
+                    var container = document.createElement(&quot;div&quot;),
+                        child = document.createElement(&quot;button&quot;),
+                        id = getId();
+
+                    container.id = id;
+                    container.appendChild(child);
+                    document.body.appendChild(container);
+
+                    //act
+                    domConstruct.empty(id);
+
+                    //assert
+                    assert.equal(container.children.length, 0);
+
+                },
+                &quot;when given a node, then it is emptied&quot;: function () {
+                    //arrange
+                    var container = document.createElement(&quot;div&quot;),
+                        child = document.createElement(&quot;button&quot;);
+
+                    container.appendChild(child);
+
+                    //act
+                    domConstruct.empty(container);
+
+                    //assert
+                    assert.equal(container.children.length, 0);
+                },
+                &quot;when given an svg element, then it is emptied&quot;: function () {
+                    //arrange
+                    var container = document.createElement(&quot;div&quot;),
+                        svg = document.createElementNS(&quot;http://www.w3.org/2000/svg&quot;, &quot;svg&quot;);
+
+                    svg.innerHTML = &quot;&lt;rect&gt;&lt;/rect&gt;&quot;;
+
+                    //act
+                    domConstruct.empty(svg);
+
+                    //assert
+                    assert.equal(svg.children.length, 0);
+                }
+            };
+        })(),
+        &quot;destroy&quot;: (function () {
+            return {
+                &quot;when given a node&#039;s id, then it is removed&quot;: function () {
+                    //arrange
+                    var node = document.createElement(&quot;h1&quot;),
+                        container = document.createElement(&quot;div&quot;),
+                        id = getId();
+
+                    node.id = id;
+                    document.body.appendChild(container);
+                    container.appendChild(node);
+
+                    //act
+                    domConstruct.destroy(id);
+
+                    //assert
+                    assert.equal(container.children.length, 0);
+                },
+                &quot;when given a node, then it is removed&quot;: function () {
+                    //arrange
+                    var node = document.createElement(&quot;h1&quot;),
+                        container = document.createElement(&quot;div&quot;);
+
+                    document.body.appendChild(container);
+                    container.appendChild(node);
+
+                    //act
+                    domConstruct.destroy(node);
+
+                    //assert
+                    assert.equal(container.children.length, 0);
+                }
+            };
+        })(),
+        &quot;validation tests&quot;: (function () {
+            var TEST_POSITION = 2;
+            var lastHtml = &quot;&lt;div id=&#039;last&#039;&gt;&lt;h1&gt;First&lt;/h1&gt;&lt;/div&gt;&quot;;
+            var firstHtml = &quot;&lt;div id=&#039;first&#039;&gt;&lt;h1&gt;First&lt;/h1&gt;&lt;/div&gt;&quot;;
+            var beforeHtml = &quot;&lt;div id=&#039;before&#039;&gt;&lt;/div&gt;&quot;;
+            var afterHtml = &quot;&lt;div id=&#039;after&#039;&gt;&lt;/div&gt;&quot;;
+            var replaceHtml = &quot;&lt;div id=&#039;replace&#039;&gt;&lt;/div&gt;&quot;;
+            var onlyHtml = &quot;&lt;div id=&#039;only&#039;&gt;&lt;h1&gt;first&lt;/h1&gt;&lt;/div&gt;&quot;;
+
+            var posHtml = &quot;&lt;div id=&#039;pos&#039;&gt;&lt;div&gt;first&lt;/div&gt;&lt;div&gt;second&lt;/div&gt;&lt;div&gt;last&lt;/div&gt;&lt;/div&gt;&quot;;
+
+            var HTMLString = &quot;&lt;div id=\&quot;test\&quot;&gt;Test&lt;/div&gt;&quot;;
+
+            var nodes = {};
+            var child;
+            var fragment;
+
+            function clearTarget() {
+                document.body.innerHTML = &quot;&quot;;
+                child = domConstruct.toDom(HTMLString);
+                nodes.last = domConstruct.toDom(lastHtml);
+                nodes.first = domConstruct.toDom(firstHtml);
+                nodes.before = domConstruct.toDom(beforeHtml);
+                nodes.after = domConstruct.toDom(afterHtml);
+                nodes.replace = domConstruct.toDom(replaceHtml);
+                nodes.only = domConstruct.toDom(onlyHtml);
+                nodes.pos = domConstruct.toDom(posHtml);
+                document.body.appendChild(nodes.last);
+                document.body.appendChild(nodes.first);
+                document.body.appendChild(nodes.before);
+                document.body.appendChild(nodes.after);
+                document.body.appendChild(nodes.replace);
+                document.body.appendChild(nodes.only);
+                document.body.appendChild(nodes.pos);
+                fragment = document.createDocumentFragment();
+                fragment.appendChild(document.createElement(&quot;div&quot;));
+                fragment.appendChild(document.createElement(&quot;div&quot;));
+                fragment.appendChild(document.createElement(&quot;div&quot;));
+            }
+
+            function elementsEqual(elementA, elementB) {
+                return elementA.id === elementB.id &amp;&amp;
+                    elementA.tagName === elementB.tagName &amp;&amp;
+                    elementA.innerHTML === elementB.innerHTML;
+            }
+
+            return {
+                beforeEach: clearTarget,
+                &quot;last - place html string with node reference&quot;: function () {
+                    domConstruct.place(HTMLString, nodes.last);
+                    assert.isTrue(elementsEqual(child, nodes.last.lastChild));
+                },
+                &quot;last - place html string with id reference&quot;: function () {
+                    domConstruct.place(HTMLString, &quot;last&quot;);
+                    assert.isTrue(elementsEqual(child, nodes.last.lastChild));
+                },
+                &quot;last - place html string with fragment reference&quot;: function () {
+                    domConstruct.place(HTMLString, fragment);
+                    assert.isTrue(elementsEqual(child, fragment.lastChild));
+                },
+                &quot;last - place node with node reference&quot;: function () {
+                    domConstruct.place(child, nodes.last);
+                    assert.equal(nodes.last.lastChild, child);
+                },
+                &quot;last - place node with id reference&quot;: function () {
+                    domConstruct.place(child, &quot;last&quot;);
+                    assert.equal(nodes.last.lastChild, child);
+                },
+                &quot;last - place node with fragment reference&quot;: function () {
+                    domConstruct.place(child, fragment);
+                    assert.equal(fragment.lastChild, child);
+                },
+                &quot;first - place html string with node reference&quot;: function () {
+                    domConstruct.place(HTMLString, nodes.first, &quot;first&quot;);
+                    assert.isTrue(elementsEqual(child, nodes.first.firstChild));
+                },
+                &quot;first - place html string with id reference&quot;: function () {
+                    domConstruct.place(HTMLString, &quot;first&quot;, &quot;first&quot;);
+                    assert.isTrue(elementsEqual(child, nodes.first.firstChild));
+                },
+                &quot;first - place html string with fragment reference&quot;: function () {
+                    domConstruct.place(HTMLString, fragment, &quot;first&quot;);
+                    assert.isTrue(elementsEqual(child, fragment.firstChild));
+                },
+                &quot;first - place node with node reference&quot;: function () {
+                    domConstruct.place(child, nodes.first, &quot;first&quot;);
+                    assert.equal( nodes.first.firstChild, child);
+                },
+                &quot;first - place node with id reference&quot;: function () {
+                    domConstruct.place(child, &quot;first&quot;, &quot;first&quot;);
+                    assert.equal(nodes.first.firstChild, child);
+                },
+                &quot;first - place node with fragment reference&quot;: function () {
+                    domConstruct.place(child, fragment, &quot;first&quot;);
+                    assert.equal(fragment.firstChild, child);
+                },
+                &quot;before - place html string with node reference&quot;: function () {
+                    domConstruct.place(HTMLString, nodes.before, &quot;before&quot;);
+                    assert.isTrue(elementsEqual(child, nodes.before.previousSibling));
+                },
+                &quot;before - place html string with id reference&quot;: function () {
+                    domConstruct.place(HTMLString, &quot;before&quot;, &quot;before&quot;);
+                    assert.isTrue(elementsEqual(child, nodes.before.previousSibling));
+                },
+                &quot;before - place node with node reference&quot;: function () {
+                    domConstruct.place(child, nodes.before, &quot;before&quot;);
+                    assert.equal(nodes.before.previousSibling, child);
+                },
+                &quot;before - place node with id reference&quot;: function () {
+                    domConstruct.place(child, &quot;before&quot;, &quot;before&quot;);
+                    assert.equal(nodes.before.previousSibling, child);
+                },
+                &quot;after - place html string with node reference&quot;: function () {
+                    domConstruct.place(HTMLString, nodes.after, &quot;after&quot;);
+                    assert.isTrue(elementsEqual(child, nodes.after.nextSibling));
+                },
+                &quot;after - place html string with id reference&quot;: function () {
+                    domConstruct.place(HTMLString, &quot;after&quot;, &quot;after&quot;);
+                    assert.isTrue(elementsEqual(child, nodes.after.nextSibling));
+                },
+                &quot;after - place node with node reference&quot;: function () {
+                    domConstruct.place(child, nodes.after, &quot;after&quot;);
+                    assert.equal(nodes.after.nextSibling, child);
+                },
+                &quot;after - place node with id reference&quot;: function () {
+                    domConstruct.place(child, &quot;after&quot;, &quot;after&quot;);
+                    assert.equal(nodes.after.nextSibling, child);
+                },
+                &quot;replace - place html string with node reference&quot;: function () {
+                    domConstruct.place(HTMLString, nodes.replace, &quot;replace&quot;);
+                    assert.equal(undefined, document.getElementById(&quot;replace&quot;));
+                    assert.isTrue(elementsEqual(child, document.getElementById(&#039;test&#039;)));
+                },
+                &quot;replace - place html string with id reference&quot;: function () {
+                    domConstruct.place(HTMLString, &quot;replace&quot;, &quot;replace&quot;);
+                    assert.equal(undefined, document.getElementById(&quot;replace&quot;));
+                    assert.isTrue(elementsEqual(child, document.getElementById(&#039;test&#039;)));
+                },
+                &quot;replace - place node with node reference&quot;: function () {
+                    domConstruct.place(child, nodes.replace, &quot;replace&quot;);
+                    assert.equal(document.getElementById(&quot;replace&quot;), undefined);
+                    assert.equal(child, document.getElementById(&#039;test&#039;));
+                },
+                &quot;replace - place node with id reference&quot;: function () {
+                    domConstruct.place(child, &quot;replace&quot;, &quot;replace&quot;);
+                    assert.equal(undefined, document.getElementById(&quot;replace&quot;));
+                    assert.equal(document.getElementById(&#039;test&#039;), child);
+                },
+                &quot;only - place html string with node reference&quot;: function () {
+                    domConstruct.place(HTMLString, nodes.only, &quot;only&quot;);
+                    assert.equal( 1, nodes.only.children.length);
+                    assert.isTrue(elementsEqual(child, nodes.only.firstChild));
+                },
+                &quot;only - place html string with id reference&quot;: function () {
+                    domConstruct.place(HTMLString, &quot;only&quot;, &quot;only&quot;);
+                    assert.equal(1, nodes.only.children.length);
+                    assert.isTrue(elementsEqual(child, nodes.only.firstChild));
+                },
+                setUp: clearTarget,
+                &quot;only - place html string with fragment reference&quot;: function () {
+                    domConstruct.place(HTMLString, fragment, &quot;only&quot;);
+                    assert.equal(1, fragment.childNodes.length);
+                    assert.isTrue(elementsEqual(child, fragment.firstChild));
+                },
+                &quot;only - place node with node reference&quot;: function () {
+                    domConstruct.place(child, nodes.only, &quot;only&quot;);
+                    assert.equal(nodes.only.firstChild, child);
+                    assert.equal(nodes.only.children.length, 1);
+                },
+                &quot;only - place node with id reference&quot;: function () {
+                    domConstruct.place(child, &quot;only&quot;, &quot;only&quot;);
+                    assert.equal(nodes.only.firstChild, child);
+                    assert.equal(nodes.only.children.length, 1);
+                },
+                &quot;only - place node with fragment reference&quot;: function () {
+                    domConstruct.place(child, fragment, &quot;only&quot;);
+                    assert.equal(1, fragment.childNodes.length);
+                    assert.equal(fragment.firstChild, child);
+                },
+                &quot;pos - place html string with node reference&quot;: function () {
+                    domConstruct.place(HTMLString, nodes.pos, TEST_POSITION);
+                    assert.isTrue(elementsEqual(child, nodes.pos.children[TEST_POSITION]));
+                },
+                &quot;pos - place html string with id reference&quot;: function () {
+                    domConstruct.place(HTMLString, &quot;pos&quot;, TEST_POSITION);
+                    assert.isTrue(elementsEqual(child, nodes.pos.children[TEST_POSITION]));
+                },
+                &quot;pos - place html string with fragment reference&quot;: function () {
+                    domConstruct.place(HTMLString, fragment, TEST_POSITION);
+                    assert.isTrue(elementsEqual(child, fragment.childNodes[TEST_POSITION]));
+                },
+                &quot;pos - place node with node reference&quot;: function () {
+                    domConstruct.place(child, nodes.pos, TEST_POSITION);
+                    assert.equal(nodes.pos.children[TEST_POSITION], child);
+                },
+                &quot;pos - place node with id reference&quot;: function () {
+                    domConstruct.place(child, &quot;pos&quot;, TEST_POSITION);
+                    assert.equal(nodes.pos.children[TEST_POSITION], child);
+                },
+                &quot;pos - place node with fragment reference&quot;: function () {
+                    domConstruct.place(child, fragment, TEST_POSITION);
+                    assert.equal(fragment.childNodes[TEST_POSITION], child);
+                }
+            }
+        })()
+    });
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

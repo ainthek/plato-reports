@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">76.77</p>
+      <p class="stat">76.15</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">280</p>
+      <p class="stat">362</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">29.58</p>
+      <p class="stat">37.17</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">3.02</p>
+      <p class="stat">3.94</p>
     </div>
   </div>
 </div>
@@ -92,7 +92,6 @@
     <textarea id="file-source" class="col-md-12">&#039;use strict&#039;
 
 var server = require(&#039;./server&#039;)
-  , events = require(&#039;events&#039;)
   , stream = require(&#039;stream&#039;)
   , fs = require(&#039;fs&#039;)
   , request = require(&#039;../index&#039;)
@@ -172,7 +171,7 @@ tape(&#039;piping to a request object&#039;, function(t) {
   }, function(err, res, body) {
     t.equal(err, null)
     t.equal(res.statusCode, 200)
-    t.equal(body, &#039;OK&#039;)
+    t.equal(body, &#039;mydata&#039;)
     t.end()
   })
   mydata.pipe(r1)
@@ -182,8 +181,9 @@ tape(&#039;piping to a request object&#039;, function(t) {
 })
 
 tape(&#039;piping to a request object with a json body&#039;, function(t) {
-  s.once(&#039;/push-json&#039;, server.createPostValidator(&#039;{&quot;foo&quot;:&quot;bar&quot;}&#039;, &#039;application/json&#039;))
-
+  var obj = {foo: &#039;bar&#039;}
+  var json = JSON.stringify(obj)
+  s.once(&#039;/push-json&#039;, server.createPostValidator(json, &#039;application/json&#039;))
   var mybodydata = new stream.Stream()
   mybodydata.readable = true
 
@@ -193,7 +193,7 @@ tape(&#039;piping to a request object with a json body&#039;, function(t) {
   }, function(err, res, body) {
     t.equal(err, null)
     t.equal(res.statusCode, 200)
-    t.equal(body, &#039;OK&#039;)
+    t.deepEqual(body, obj)
     t.end()
   })
   mybodydata.pipe(r2)
@@ -223,16 +223,97 @@ tape(&#039;piping from a request object&#039;, function(t) {
   }
 })
 
-tape(&#039;piping from a file&#039;, function(t) {
-  s.once(&#039;/pushjs&#039;, function(req, res) {
-    if (req.method === &#039;PUT&#039;) {
-      t.equal(req.headers[&#039;content-type&#039;], &#039;application/javascript&#039;)
-      t.end()
-      res.end()
+tape(&#039;pause when piping from a request object&#039;, function(t) {
+  s.once(&#039;/chunks&#039;, function(req, res) {
+    res.writeHead(200, {
+      &#039;content-type&#039;: &#039;text/plain&#039;
+    })
+    res.write(&#039;Chunk 1&#039;)
+    setTimeout(function() { res.end(&#039;Chunk 2&#039;) }, 10)
+  })
+
+  var chunkNum = 0
+  var paused = false
+  request({
+    url: s.url + &#039;/chunks&#039;
+  })
+    .on(&#039;data&#039;, function(chunk) {
+      var self = this
+
+      t.notOk(paused, &#039;Only receive data when not paused&#039;)
+
+      ++chunkNum
+      if (chunkNum === 1) {
+        t.equal(chunk.toString(), &#039;Chunk 1&#039;)
+        self.pause()
+        paused = true
+        setTimeout(function() {
+          paused = false
+          self.resume()
+        }, 100)
+      } else {
+        t.equal(chunk.toString(), &#039;Chunk 2&#039;)
+      }
+    })
+    .on(&#039;end&#039;, t.end.bind(t))
+})
+
+tape(&#039;pause before piping from a request object&#039;, function(t) {
+  s.once(&#039;/pause-before&#039;, function(req, res) {
+    res.writeHead(200, {
+      &#039;content-type&#039;: &#039;text/plain&#039;
+    })
+    res.end(&#039;Data&#039;)
+  })
+
+  var paused = true
+  var r = request({
+    url: s.url + &#039;/pause-before&#039;
+  })
+  r.pause()
+  r.on(&#039;data&#039;, function(data) {
+    t.notOk(paused, &#039;Only receive data when not paused&#039;)
+    t.equal(data.toString(), &#039;Data&#039;)
+  })
+  r.on(&#039;end&#039;, t.end.bind(t))
+
+  setTimeout(function() {
+    paused = false
+    r.resume()
+  }, 100)
+})
+
+var fileContents = fs.readFileSync(__filename).toString()
+function testPipeFromFile(testName, hasContentLength) {
+  tape(testName, function(t) {
+    s.once(&#039;/pushjs&#039;, function(req, res) {
+      if (req.method === &#039;PUT&#039;) {
+        t.equal(req.headers[&#039;content-type&#039;], &#039;application/javascript&#039;)
+        t.equal(
+          req.headers[&#039;content-length&#039;],
+          (hasContentLength ? &#039;&#039; + fileContents.length : undefined))
+        var body = &#039;&#039;
+        req.on(&#039;data&#039;, function(data) {
+          body += data
+        })
+        req.on(&#039;end&#039;, function() {
+          t.equal(body, fileContents)
+          t.end()
+        })
+        res.end()
+      }
+    })
+    var r = request.put(s.url + &#039;/pushjs&#039;)
+    fs.createReadStream(__filename).pipe(r)
+    if (hasContentLength) {
+      r.setHeader(&#039;content-length&#039;, fileContents.length)
     }
   })
-  fs.createReadStream(__filename).pipe(request.put(s.url + &#039;/pushjs&#039;))
-})
+}
+
+// TODO Piping from a file does not send content-length header
+testPipeFromFile(&#039;piping from a file&#039;, false)
+testPipeFromFile(&#039;piping from a file with content-length&#039;, true)
 
 tape(&#039;piping to and from same URL&#039;, function(t) {
   s.once(&#039;catDone&#039;, function(req, res, body) {
@@ -308,7 +389,7 @@ tape(&#039;piping after response&#039;, function(t) {
 
 tape(&#039;piping through a redirect&#039;, function(t) {
   s.once(&#039;/forward1&#039;, function(req, res) {
-   res.writeHead(302, { location: &#039;/forward2&#039; })
+    res.writeHead(302, { location: &#039;/forward2&#039; })
     res.end()
   })
   s.once(&#039;/forward2&#039;, function(req, res) {
@@ -366,8 +447,9 @@ tape(&#039;request.pipefilter is called correctly&#039;, function(t) {
 })
 
 tape(&#039;cleanup&#039;, function(t) {
-  s.close()
-  t.end()
+  s.close(function() {
+    t.end()
+  })
 })</textarea>
   </div>
 </div>

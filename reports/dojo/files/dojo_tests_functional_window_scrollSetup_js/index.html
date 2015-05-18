@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/functional/window/scrollSetup.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/functional/window/scrollSetup.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">67.79</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">110</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">19.55</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.94</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">require([
+	&#039;dojo/_base/array&#039;,
+	&#039;dojo/Deferred&#039;,
+	&#039;dojo/promise/all&#039;,
+	&#039;dojo/string&#039;,
+	&#039;dojo/window&#039;,
+	&#039;dojo/dom-geometry&#039;,
+	&#039;dojo/_base/window&#039;,
+	&#039;dojo/on&#039;,
+	&#039;dojo/query&#039;,
+	&#039;./iframe_content/scrollDocuments.js&#039;,
+	&#039;dojo/text!./iframe_content/scrollItem.html&#039;,
+	&#039;dojo/domReady!&#039;
+], function (
+	arrayUtil,
+	Deferred,
+	all,
+	string,
+	winUtils,
+	domGeo,
+	baseWin,
+	on,
+	query,
+	docs,
+	scrollItemTemplate
+) {
+	// This script runs in the functional testing page. It renders all of the
+	// document layout	scenarios and hooks up events for the test runner.
+
+	var promises = [];
+
+	function isInViewport(win, element) {
+		var rect = element.getBoundingClientRect();
+		var documentElement = win.document.documentElement || {};
+		var viewPortHeight = win.innerHeight || documentElement.clientHeight || win.document.body.clientHeight;
+		var viewPortWidth = win.innerWidth || documentElement.clientWidth || win.document.body.clientWidth;
+		return (rect.bottom &lt;= viewPortHeight || rect.top &lt; viewPortHeight) &amp;&amp; rect.right &lt;= viewPortWidth;
+	}
+
+	// update the input elements so the test runner and inspect the output
+	function updateCalculations(win, rootElement, targetElement, setName, hasScrolled) {
+		var inView = isInViewport(win, targetElement);
+		query(&#039;.&#039; + setName, rootElement)[0].value = inView ? 1 : 0;
+		query(&#039;.hasScrolled&#039;, rootElement)[0].value = hasScrolled ? 1 : 0;
+	}
+
+	function createIframe(html, iframeRoot, root) {
+		var dfd = new Deferred();
+		var iframe = document.createElement(&#039;iframe&#039;);
+		var iframeDoc;
+		var iframeWin;
+
+		iframe.frameBorder = &#039;0&#039;;
+		iframe.allowTransparency = &#039;true&#039;;
+
+		iframeRoot.appendChild(iframe);
+
+		iframeWin = iframe.contentWindow.window;
+		iframeDoc = iframeWin.document;
+
+		try {
+			iframeDoc.open();
+		}
+		catch (e) {
+			iframe.src = &#039;javascript:var d=document.open();d.domain=&quot;&#039; + document.domain + &#039;&quot;;void(0);&#039;;
+			iframeDoc.open();
+		}
+
+		// The iframe will call this function to let us know its ready for
+		// testing.
+		iframeWin.ready = function () {
+			var target = iframeDoc.getElementById(&#039;it&#039;);
+			var winScrollBefore = baseWin.withGlobal(iframeWin, &#039;docScroll&#039;, domGeo, []);
+
+			updateCalculations(iframeWin, root, target, &#039;before&#039;, false);
+
+			on(query(&#039;.scrollBtn&#039;, root)[0], &#039;click&#039;, function () {
+				var hasScrolled;
+				var winScrollAfter;
+				winUtils.scrollIntoView(target);
+				winScrollAfter = baseWin.withGlobal(iframeWin, &#039;docScroll&#039;, domGeo, []);
+				hasScrolled = (winScrollBefore.y !== winScrollAfter.y || winScrollBefore.x !== winScrollAfter.x);
+				updateCalculations(iframeWin, root, target, &#039;after&#039;, hasScrolled);
+			});
+
+			dfd.resolve();
+		};
+
+		iframeDoc.write(html);
+		iframeDoc.close();
+
+		promises.push(dfd.promise);
+	}
+
+	arrayUtil.forEach(docs, function (doc) {
+		var html = string.substitute(scrollItemTemplate, {
+			label: doc.label,
+			testId: doc.id
+		});
+		var div = document.createElement(&#039;div&#039;);
+		div.innerHTML = html;
+		document.body.appendChild(div);
+		createIframe(doc.html, query(&#039;.iframeRoot&#039;, div)[0], div);
+	});
+
+	all(promises).then(function () {
+		// signal to intern we are ready to test
+		window.ready = true;
+	});
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/unit/store/JsonRest.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/unit/store/JsonRest.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">69.25</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">211</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">23.06</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.94</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+	&#039;intern!object&#039;,
+	&#039;intern/chai!assert&#039;,
+	&#039;dojo/Deferred&#039;,
+	&#039;dojo/_base/lang&#039;,
+	&#039;dojo/_base/array&#039;,
+	&#039;./support/xhrStub&#039;,
+	&#039;require&#039;,
+	&#039;sinon&#039;
+], function (registerSuite, assert, Deferred, lang, array, xhrStub, require, sinon) {
+	var globalHeaders = {
+		&#039;test-global-header-a&#039;: true,
+		&#039;test-global-header-b&#039;: &#039;yes&#039;
+	};
+
+	var requestHeaders = {
+		&#039;test-local-header-a&#039;: true,
+		&#039;test-local-header-b&#039;: &#039;yes&#039;,
+		&#039;test-override&#039;: &#039;overridden&#039;
+	};
+
+	var store;
+	var JsonRest;
+
+	function assertHeaders(xhrHeaders) {
+		var expectedHeaders = Array.prototype.slice.call(arguments, 1);
+
+		expectedHeaders.push(globalHeaders);
+		array.forEach(expectedHeaders, function (headers) {
+			for (var key in headers) {
+				if (headers.hasOwnProperty(key)) {
+					assert.propertyVal(xhrHeaders, key, headers[key]);
+				}
+			}
+		});
+	}
+
+	registerSuite({
+		name: &#039;dojo/store/JsonRest&#039;,
+
+		setup: function () {
+			var dfd = new Deferred();
+
+			require({
+				map: {
+					&#039;testing/store/JsonRest&#039;: {
+						&#039;testing/_base/xhr&#039;: require.toAbsMid(&#039;./support/xhrStub&#039;)
+					}
+				}
+			}, [ &#039;testing/store/JsonRest&#039; ], function (_JsonRest) {
+				JsonRest = _JsonRest;
+				dfd.resolve();
+			});
+
+			return dfd.promise;
+		},
+
+		beforeEach: function () {
+			xhrStub.reset();
+			xhrStub.objectToQuery = sinon.stub();
+
+			store = new JsonRest({
+				target: require.toUrl(&#039;dojo/tests/store/x.y&#039;).match(/(.+)x\.y$/)[1],
+				headers: lang.mixin({ &#039;test-override&#039;: false }, globalHeaders)
+			});
+		},
+
+		&#039;.get&#039;: {
+			beforeEach: function () {
+				var data = {
+					id: &#039;node1.1&#039;,
+					name: &#039;node1.1&#039;,
+					someProperty: &#039;somePropertyA1&#039;,
+					children: [
+						{ $ref: &#039;node1.1.1&#039;, name: &#039;node1.1.1&#039; },
+						{ $ref: &#039;node1.1.2&#039;, name: &#039;node1.1.2&#039; }
+					]
+				};
+				var dfd = new Deferred();
+
+				dfd.resolve(data);
+				xhrStub.returns(dfd);
+			},
+
+			test: function () {
+				var dfd = this.async();
+				var expectedName = &#039;node1.1&#039;;
+
+				store.get(expectedName).then(dfd.callback(function (object) {
+					assert.equal(object.name, expectedName);
+					assert.equal(object.someProperty, &#039;somePropertyA1&#039;);
+				}), lang.hitch(dfd, &#039;reject&#039;));
+			},
+
+			&#039;headers provided as object&#039;: function () {
+				var xhrOptions;
+
+				store.get(&#039;destinationUrl&#039;, requestHeaders);
+				xhrOptions = xhrStub.lastCall.args[1];
+
+				assertHeaders(xhrOptions.headers, requestHeaders);
+			},
+
+			&#039;headers provided in options&#039;: function () {
+				var xhrOptions;
+
+				store.get(&#039;destinationUrl&#039;, { headers: requestHeaders });
+				xhrOptions = xhrStub.lastCall.args[1];
+
+				assertHeaders(xhrOptions.headers, requestHeaders);
+			}
+		},
+
+		&#039;.query&#039;: {
+			beforeEach: function () {
+				var data = [
+					{ id: &#039;node1&#039;, name: &#039;node1&#039;, someProperty: &#039;somePropertyA&#039;, children: [
+						{ $ref: &#039;node1.1&#039;, name: &#039;node1.1&#039;, children: true },
+						{ $ref: &#039;node1.2&#039;, name: &#039;node1.2&#039; }
+					] },
+					{ id: &#039;node2&#039;, name: &#039;node2&#039;, someProperty: &#039;somePropertyB&#039; },
+					{ id: &#039;node3&#039;, name: &#039;node3&#039;, someProperty: &#039;somePropertyC&#039; },
+					{ id: &#039;node4&#039;, name: &#039;node4&#039;, someProperty: &#039;somePropertyA&#039; },
+					{ id: &#039;node5&#039;, name: &#039;node5&#039;, someProperty: &#039;somePropertyB&#039; }
+				];
+				var dfd = new Deferred();
+
+				dfd.resolve(data);
+				xhrStub.returns(dfd);
+			},
+
+			test: function () {
+				var dfd = this.async();
+
+				store.query(&#039;treeTestRoot&#039;).then(dfd.callback(function (results) {
+					var object = results[0];
+					assert.equal(object.name, &#039;node1&#039;);
+					assert.equal(object.someProperty, &#039;somePropertyA&#039;);
+				}), lang.hitch(dfd, &#039;reject&#039;));
+			},
+
+			&#039;result iteration&#039;: function () {
+				var dfd = this.async();
+
+				store.query(&#039;treeTestRoot&#039;).forEach(function (object, index) {
+					var expectedName = &#039;node&#039; + (index + 1);
+
+					assert.equal(object.name, expectedName);
+				}).then(lang.hitch(dfd, &#039;resolve&#039;), lang.hitch(dfd, &#039;reject&#039;));
+			},
+
+			&#039;headers provided in options with range elements&#039;: function () {
+				var expectedRangeHeaders = { &#039;X-Range&#039;: &#039;items=20-61&#039;, &#039;Range&#039;: &#039;items=20-61&#039; };
+				var xhrOptions;
+
+				store.query({}, { headers: requestHeaders, start: 20, count: 42 });
+				xhrOptions = xhrStub.lastCall.args[1];
+
+				assertHeaders(xhrOptions.headers, requestHeaders, expectedRangeHeaders);
+			}
+		},
+
+		&#039;.remove&#039;: {
+			&#039;headers provied in options&#039;: function () {
+				var xhrOptions;
+
+				store.remove(&#039;destinationUrl&#039;, { headers: requestHeaders });
+				xhrOptions = xhrStub.lastCall.args[1];
+
+				assertHeaders(xhrOptions.headers, requestHeaders);
+			}
+		},
+
+		&#039;.put&#039;: {
+			&#039;headers provided in options&#039;: function () {
+				var xhrOptions;
+
+				store.put({}, { headers: requestHeaders });
+				xhrOptions = xhrStub.lastCall.args[1];
+
+				assertHeaders(xhrOptions.headers, requestHeaders);
+			}
+		},
+
+		&#039;.add&#039;: {
+			&#039;headers provided in options&#039;: function () {
+				var xhrOptions;
+
+				store.add({}, { headers: requestHeaders });
+				xhrOptions = xhrStub.lastCall.args[1];
+
+				assertHeaders(xhrOptions.headers, requestHeaders);
+			}
+		},
+
+		&#039;._getTarget&#039;: {
+			&#039;without slash&#039;: function () {
+				store.target = store.target.slice(0, -1);
+				assert.equal(store.target + &#039;/foo&#039;, store._getTarget(&#039;foo&#039;));
+			},
+			&#039;with slash&#039;: function () {
+				assert.equal(store.target + &#039;foo&#039;, store._getTarget(&#039;foo&#039;));
+			}
+		},
+
+		teardown: function () {
+			// prevent accidental reuse after test completion
+			xhrStub.throws(new Error(&#039;this is a stub function&#039;));
+		}
+	});
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/unit/dom-style.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/unit/dom-style.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">66.49</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">450</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">55.76</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">3.11</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+    &#039;intern!object&#039;,
+    &#039;intern/chai!assert&#039;,
+    &#039;sinon&#039;,
+    &#039;dojo/sniff&#039;,
+    &#039;../../dom-style&#039;,
+    &#039;../../dom-construct&#039;
+], function (registerSuite, assert, sinon, has, domStyle, domConstruct) {
+    var baseId = &quot;dom-style&quot;,
+        uniqueId = 0;
+
+    function getId() {
+        return baseId + uniqueId++;
+    }
+
+    var container;
+
+    registerSuite({
+        name: &#039;dojo/dom-style&#039;,
+
+        setup: function() {
+            container = document.createElement(&quot;div&quot;);
+            document.body.appendChild(container);
+        },
+
+        teardown: function() {
+            document.body.removeChild(container);
+        },
+
+        &quot;getComputedStyle()&quot;: {
+                &quot;gets expected result&quot;: function () {
+                    //arrange
+                    var node = document.createElement(&quot;div&quot;),
+                        map = {
+                            position: &quot;relative&quot;,
+                            width: &quot;100px&quot;,
+                            height: &quot;125px&quot;
+                        };
+
+                    for (var i in map) {
+                        node.style[i] = map[i];
+                    }
+
+                    container.appendChild(node);
+
+                    //act
+                    var result = domStyle.getComputedStyle(node);
+
+                    //assert
+                    for (var i in map) {
+                        assert.equal(result[i], map[i]);
+                    }
+                }
+            },
+        &quot;toPixelValue()&quot;: {
+                &quot;node + undefined&quot;: function () {
+                    //arrange
+                    var node = document.createElement(&quot;div&quot;);
+
+                    container.appendChild(node);
+
+                    //act
+                    var result = domStyle.toPixelValue(node, undefined);
+
+                    //assert
+                    assert.equal(result, 0);
+
+                },
+                &quot;node + &#039;medium&#039;&quot;: function () {
+                    //arrange
+                    if (!has(&quot;ie&quot;)) {
+                        this.skip(&quot;IE Only&quot;);
+                    }
+
+                    var node = document.createElement(&quot;div&quot;);
+
+                    //act
+                    var result = domStyle.toPixelValue(node, &quot;medium&quot;);
+
+                    //assert
+                    assert.equal(result, 4);
+
+                },
+                &quot;node + &#039;##px&#039;&quot;: function () {
+                    //arrange
+                    var node = document.createElement(&quot;div&quot;),
+                        value = 42;
+
+                    //act
+                    var result = domStyle.toPixelValue(node, value + &quot;px&quot;);
+
+                    //assert
+                    assert.equal(result, value);
+                }
+            },
+        &quot;get()&quot;: {
+                &quot;string + string&quot;: function () {
+                    //arrange
+                    var node = document.createElement(&quot;div&quot;),
+                        id = getId(),
+                        style = &quot;width&quot;,
+                        value = 42;
+
+                    container.appendChild(node);
+                    node.id = id;
+                    node.style[style] = value + &quot;px&quot;;
+
+                    //act
+                    var result = domStyle.get(node, style);
+
+                    //assert
+                    assert.equal(result, value);
+
+                },
+                &quot;node + string&quot;: function () {
+                    //arrange
+                    var node = document.createElement(&quot;div&quot;),
+                        style = &quot;width&quot;,
+                        value = 42;
+
+                    container.appendChild(node);
+                    node.style[style] = value + &quot;px&quot;;
+
+                    //act
+                    var result = domStyle.get(node, style);
+
+                    //assert
+                    assert.equal(result, value);
+                },
+                &quot;node + &#039;opacity&#039;&quot;: function () {
+                    if (has(&quot;ie&quot;) &lt; 9 || (has(&quot;ie&quot;) &lt; 10 &amp;&amp; has(&quot;quirks&quot;))) {
+                        this.skip(&quot;skipped for IE 8- &amp;&amp; IE 9, 10 in quirks&quot;)
+                    } else {
+                        //arrange
+                        var node = document.createElement(&quot;div&quot;),
+                            style = &quot;opacity&quot;,
+                            value = 0.3;
+
+                        container.appendChild(node);
+                        node.style[style] = value;
+
+                        //act
+                        var result = domStyle.get(node, style);
+
+                        //assert
+                        assert.equal(parseFloat(result).toFixed(4), value.toFixed(4));
+                    }
+                },
+                &quot;node + alias of float&quot;: function () {
+                    //arrange
+                    var styles =
+                        [
+                            &quot;cssFloat&quot;,
+                            &quot;styleFloat&quot;,
+                            &quot;float&quot;
+                        ],
+                        node = document.createElement(&quot;div&quot;),
+                        value = &#039;right&#039;;
+
+                    container.appendChild(node);
+                    node.style.cssFloat = value;
+
+                    for (var i in styles) {
+                        //act
+                        var result = domStyle.get(node, styles[i]);
+
+                        //assert
+                        assert.equal(result, value);
+                    }
+
+                },
+                &quot;node + height when height:&#039;auto&#039;&quot;: function () {
+                    //arrange
+                    var node = document.createElement(&quot;div&quot;),
+                        style = &quot;width&quot;,
+                        value = &quot;auto&quot;;
+
+                    container.appendChild(node);
+                    node.style[style] = value;
+
+                    //act
+                    var result = domStyle.get(node, style);
+
+                    //assert
+                    assert.notEqual(result, value);
+                    assert.isNumber(result);
+                },
+                &quot;node + width when width:&#039;auto&#039;&quot;: function () {
+                    //arrange
+                    var node = document.createElement(&quot;div&quot;),
+                        style = &quot;height&quot;,
+                        value = &quot;auto&quot;;
+
+                    container.appendChild(node);
+                    node.style[style] = value;
+
+                    //act
+                    var result = domStyle.get(node, style);
+
+                    //assert
+                    assert.notEqual(result, value);
+                    assert.isNumber(result);
+                },
+                &quot;node + &#039;fontWeight&#039; when fontWeight = 400&quot;: function () {
+                    //arrange
+                    if (has(&quot;ie&quot;) || has(&quot;trident&quot;)) {
+                        var node = document.createElement(&quot;div&quot;),
+                            style = &quot;fontweight&quot;,
+                            value = 400;
+
+                        container.appendChild(node);
+                        node.style[style] = value;
+
+                        //act
+                        var result = domStyle.get(node, style);
+
+                        //assert
+                        assert.equal(result, &quot;normal&quot;);
+                    } else {
+                        this.skip(&quot;for has(&#039;ie&#039;) and has(&#039;trident&#039;) only&quot;);
+                    }
+                },
+                &quot;node + &#039;fontWeight&#039; when fontWeight = 700&quot;: function () {
+                    //arrange
+                    if (!has(&quot;ie&quot;) &amp;&amp; !has(&quot;trident&quot;)) {
+                        this.skip(&quot;for has(&#039;ie&#039;) and has(&#039;trident&#039;) only&quot;);
+                    } else {
+                        var node = document.createElement(&quot;div&quot;),
+                            style = &quot;fontweight&quot;,
+                            value = 700;
+
+                        container.appendChild(node);
+                        node.style[style] = value;
+
+                        //act
+                        var result = domStyle.get(node, style);
+
+                        //assert
+                        assert.equal(result, &quot;bold&quot;);
+                    }
+                },
+                &quot;node + style with measurement returned as number of px&quot;: function () {
+                    //arrange
+                    var styles =
+                        [
+                            &quot;margin&quot;,
+                            &quot;padding&quot;,
+                            &quot;left&quot;,
+                            &quot;top&quot;,
+                            &quot;width&quot;,
+                            &quot;height&quot;,
+                            &quot;max-width&quot;,
+                            &quot;min-width&quot;,
+                            &quot;offset-width&quot;
+                        ],
+                        node = document.createElement(&quot;div&quot;),
+                        value = 10;
+
+                    container.appendChild(node);
+
+                    for (var i in styles) {
+                        node.style[styles[i]] = value + &quot;px&quot;;
+
+                        //act
+                        var result = domStyle.get(node, styles[i]);
+
+                        //assert
+                        assert.equal(result, value);
+
+                    }
+
+                },
+                &quot;node&quot;: function () {
+                    //arrange
+                    var node = document.createElement(&quot;div&quot;),
+                        map = {
+                            position: &quot;relative&quot;,
+                            width: &quot;100px&quot;,
+                            height: &quot;125px&quot;
+                        };
+
+                    for (var i in map) {
+                        node.style[i] = map[i];
+                    }
+
+                    container.appendChild(node);
+
+                    //act
+                    var result = domStyle.get(node);
+
+                    //assert
+                    for (var i in map) {
+                        assert.equal(result[i], map[i]);
+                    }
+                }
+            },
+        &quot;set()&quot;: {
+                &quot;string + string + string&quot;: function () {
+                    //arrange
+                    var node = document.createElement(&quot;div&quot;),
+                        id = getId(),
+                        style = &quot;width&quot;,
+                        value = &quot;10px&quot;;
+
+                    container.appendChild(node);
+
+                    node.id = id;
+
+                    //act
+                    domStyle.set(id, style, value);
+
+                    //assert
+                    assert.equal(node.style[style], value);
+                },
+                &quot;node + string + string&quot;: function () {
+                    //arrange
+                    var node = document.createElement(&quot;div&quot;),
+                        style = &quot;width&quot;,
+                        value = &quot;10px&quot;;
+
+                    container.appendChild(node);
+
+                    //act
+                    domStyle.set(node, style, value);
+
+                    //assert
+                    assert.equal(node.style[style], value);
+                },
+                &quot;node + map&quot;: function () {
+
+                    //arrange
+                    var node = document.createElement(&quot;div&quot;),
+                        map = {
+                            position: &quot;relative&quot;,
+                            width: &quot;100px&quot;,
+                            height: &quot;125px&quot;
+                        };
+
+                    container.appendChild(node);
+
+                    //act
+                    domStyle.set(node, map);
+
+                    //assert
+                    for (var i in map) {
+                        assert.equal(node.style[i], map[i]);
+                    }
+                },
+                &quot;node + aliases of float&quot;: function () {
+                    //arrange
+                    var styles =
+                        [
+                            &quot;cssFloat&quot;,
+                            &quot;styleFloat&quot;,
+                            &quot;float&quot;
+                        ],
+                        node = document.createElement(&quot;div&quot;),
+                        value = &quot;right&quot;;
+
+                    container.appendChild(node);
+                    node.style.float = value;
+
+                    for (var i in styles) {
+                        //act
+                        domStyle.set(node, styles[i], value);
+
+                        //assert
+                        assert.equal(node.style.cssFloat, value);
+
+                        node.style.cssFloat = &quot;none&quot;;
+                    }
+                },
+                &quot;node + opacity + number&quot;: function() {
+                    //arrange
+                    var node = document.createElement(&quot;div&quot;),
+                        style = &quot;opacity&quot;,
+                        value = 0.3
+
+                    container.appendChild(node);
+
+                    //act
+                    domStyle.set(node, style, value);
+
+                    //assert
+                    assert.equal(node.style[style], value);
+                },
+                &quot;node&quot;: function () {
+                    //arrange
+                    var node = document.createElement(&quot;div&quot;),
+                        map = {
+                            position: &quot;relative&quot;,
+                            width: &quot;100px&quot;,
+                            height: &quot;125px&quot;
+                        };
+
+                    for (var i in map) {
+                        node.style[i] = map[i];
+                    }
+
+                    container.appendChild(node);
+
+                    //act
+                    var result = domStyle.set(node);
+
+                    //assert
+                    for (var i in map) {
+                        assert.equal(result[i], map[i]);
+                    }
+                }
+            },
+        &quot;validation tests&quot;: (function () {
+            var container,
+                node,
+                trow;
+
+            return {
+                setup: function () {
+                    container = document.createElement(&quot;div&quot;);
+                    node = domConstruct.toDom(&#039;&lt;div style=&quot;padding: 1px 2px 3px 4px;&quot;&gt;&lt;/div&gt;&#039;);
+                    var table = domConstruct.toDom(&#039;&lt;table&gt;&lt;tbody&gt;&lt;tr id=&quot;trow&quot;&gt;&lt;td&gt;Col A&lt;/td&gt;&lt;td&gt;Col B&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&#039;);
+
+                    document.body.appendChild(container);
+                    container.appendChild(node);
+                    container.appendChild(table);
+
+                    trow = document.getElementById(&quot;trow&quot;);
+                },
+                teardown: function () {
+                    document.body.removeChild(container);
+                },
+                &quot;getComputedStyle&quot;: function () {
+                    var s = domStyle.getComputedStyle(node);
+                    assert.isTrue(s !== null);
+                    // Create a node on the fly,
+                    // IE &lt; 9 has issue with currentStyle when creating elements on the fly.
+                    node = document.createElement(&#039;div&#039;);
+                    domStyle.set(node, &#039;nodeStyle&#039;);
+                    s = domStyle.getComputedStyle(node);
+                    assert.isTrue(s !== null);
+                },
+                &quot;getWidth&quot;: function () {
+                    // see http://bugs.dojotoolkit.org/ticket/17962
+                    var rowWidth = domStyle.get(trow, &quot;width&quot;);
+                    assert.isTrue(rowWidth &gt; 0, &quot;width: &quot; + rowWidth);
+                }
+
+            };
+        })(),
+    });
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

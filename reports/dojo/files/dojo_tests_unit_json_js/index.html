@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/unit/json.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/unit/json.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">81.40</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">162</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">20.48</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.39</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+	&#039;intern!object&#039;,
+	&#039;intern/chai!assert&#039;,
+	&#039;../../json&#039;
+], function (registerSuite, assert, json) {
+	registerSuite({
+		name: &#039;dojo/json&#039;,
+
+		&#039;.parse&#039;: {
+			&#039;simple string&#039;: function () {
+				assert.deepEqual(json.parse(&#039;{&quot;foo&quot;:&quot;bar&quot;}&#039;), { foo: &#039;bar&#039; });
+			},
+
+			&#039;simple true&#039;: function () {
+				assert.deepEqual(json.parse(&#039;{&quot;foo&quot;:true}&#039;), { foo: true });
+			},
+
+			&#039;simple false&#039;: function () {
+				assert.deepEqual(json.parse(&#039;{&quot;foo&quot;:false}&#039;), { foo: false });
+			},
+
+			&#039;simple null&#039;: function () {
+				assert.deepEqual(json.parse(&#039;{&quot;foo&quot;:null}&#039;), { foo: null });
+			},
+
+			&#039;simple number&#039;: function () {
+				assert.deepEqual(json.parse(&#039;{&quot;foo&quot;:3.3}&#039;), { foo: 3.3 });
+			},
+
+			&#039;strict string&#039;: function () {
+				assert.deepEqual(json.parse(&#039;{&quot;foo&quot;:&quot;bar&quot;}&#039;, true), { foo: &#039;bar&#039; });
+			},
+
+			&#039;strict empty string&#039;: function () {
+				assert.deepEqual(json.parse(&#039;{&quot;foo&quot;:&quot;&quot;}&#039;, true), { foo: &#039;&#039; });
+			},
+
+			&#039;strict escaped string&#039;: function () {
+				assert.deepEqual(json.parse(&#039;{&quot;foo&quot;:&quot;b\\n\\t\\&quot;ar()&quot;}&#039;, true), { foo: &#039;b\n\t\&quot;ar()&#039; });
+			},
+
+			&#039;strict true&#039;: function () {
+				assert.deepEqual(json.parse(&#039;{&quot;foo&quot;:true}&#039;, true), { foo: true });
+			},
+
+			&#039;strict false&#039;: function () {
+				assert.deepEqual(json.parse(&#039;{&quot;foo&quot;:false}&#039;, true), { foo: false });
+			},
+
+			&#039;strict null&#039;: function () {
+				assert.deepEqual(json.parse(&#039;{&quot;foo&quot;:null}&#039;, true), { foo: null });
+			},
+
+			&#039;strict number&#039;: function () {
+				assert.deepEqual(json.parse(&#039;{&quot;foo&quot;:3.3}&#039;, true), { foo: 3.3 });
+			},
+
+			&#039;strict negative number&#039;: function () {
+				assert.deepEqual(json.parse(&#039;{&quot;foo&quot;:-3.3}&#039;, true), { foo: -3.3 });
+			},
+
+			&#039;strict negative exponent&#039;: function () {
+				assert.deepEqual(json.parse(&#039;{&quot;foo&quot;:3.3e-33}&#039;, true), { foo: 3.3e-33 });
+			},
+
+			&#039;strict exponent&#039;: function () {
+				assert.deepEqual(json.parse(&#039;{&quot;foo&quot;:3.3e33}&#039;, true), { foo: 3.3e33 });
+			},
+
+			&#039;strict array&#039;: function () {
+				assert.deepEqual(json.parse(&#039;{&quot;foo&quot;:[3,true,[]]}&#039;, true), { foo: [3, true, []] });
+			},
+
+			&#039;bad call throws&#039;: function () {
+				assert.throws(function () {
+					json.parse(&#039;{&quot;foo&quot;:alert()}&#039;, true);
+				});
+			},
+
+			&#039;bad math throws&#039;: function () {
+				assert.throws(function () {
+					json.parse(&#039;{&quot;foo&quot;:3+4}&#039;, true);
+				});
+			},
+
+			&#039;bad array index throws&#039;: function () {
+				assert.throws(function () {
+					json.parse(&#039;{&quot;foo&quot;:&quot;bar&quot;}[3]&#039;, true);
+				});
+			},
+
+			&#039;unquoted object key throws&#039;: function () {
+				assert.throws(function () {
+					json.parse(&#039;{foo:&quot;bar&quot;}&#039;, true);
+				});
+			},
+
+			&#039;unclosed array throws&#039;: function () {
+				assert.throws(function () {
+					json.parse(&#039;[&#039;, true);
+				});
+			},
+
+			&#039;closing an unopened object literal throws&#039;: function () {
+				assert.throws(function () {
+					json.parse(&#039;}&#039;, true);
+				});
+			},
+
+			&#039;malformed array throws&#039;: function () {
+				assert.throws(function () {
+					json.parse(&#039;[&quot;foo&quot;:&quot;bar&quot;]&#039;);
+				});
+			}
+		},
+
+		&#039;.stringify&#039;: {
+			&#039;string&#039;: function () {
+				assert.equal(json.stringify({&#039;foo&#039;: &#039;bar&#039;}), &#039;{&quot;foo&quot;:&quot;bar&quot;}&#039;);
+			},
+
+			&#039;null&#039;: function () {
+				assert.equal(json.stringify({&#039;foo&#039;: null}), &#039;{&quot;foo&quot;:null}&#039;);
+			},
+
+			&#039;function&#039;: function () {
+				assert.equal(json.stringify({&#039;foo&#039;: function () {}}), &#039;{}&#039;);
+			},
+
+			&#039;NaN&#039;: function () {
+				assert.equal(json.stringify({&#039;foo&#039;: NaN}), &#039;{&quot;foo&quot;:null}&#039;);
+			},
+
+			&#039;Infinity&#039;: function () {
+				assert.equal(json.stringify({&#039;foo&#039;: Infinity}), &#039;{&quot;foo&quot;:null}&#039;);
+			},
+
+			&#039;date&#039;: function () {
+				// there is differences in how many decimals of accuracies in seconds in how Dates
+				// are serialized between browsers
+				assert.match(json.parse(json.stringify({&#039;foo&#039;: new Date(1)})).foo, /1970-01-01T00:00:00.*Z/);
+			},
+
+			&#039;inherited object&#039;: function () {
+				function FooBar() {
+					this.foo = &#039;foo&#039;;
+				}
+
+				FooBar.prototype.bar = &#039;bar&#039;;
+				assert.equal(json.stringify(new FooBar()), &#039;{&quot;foo&quot;:&quot;foo&quot;}&#039;);
+			},
+
+			&#039;toJson&#039;: function () {
+				/* jshint unused:false */
+				var obj = {foo: {toJSON: function () {
+					return {name: &#039;value&#039;};
+				}}};
+				assert.equal(json.stringify(obj), &#039;{&quot;foo&quot;:{&quot;name&quot;:&quot;value&quot;}}&#039;);
+			}
+		}
+	});
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

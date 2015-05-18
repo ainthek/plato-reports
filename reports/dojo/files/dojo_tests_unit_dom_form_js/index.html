@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/unit/dom-form.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/unit/dom-form.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">62.33</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">162</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">15.84</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.89</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+	&#039;intern!object&#039;,
+	&#039;intern/chai!assert&#039;,
+	&#039;../../dom-form&#039;,
+	&#039;dojo/dom&#039;,
+	&#039;dojo/dom-construct&#039;,
+	&#039;dojo/json&#039;
+], function (registerSuite, assert, domForm, dom, domConstruct, JSON) {
+	var formContainer;
+
+	var f1 = {
+		blah: &#039;blah&#039;
+	};
+	var f1_query = &#039;blah=blah&#039;;
+	var f2 = {
+		blah: &#039;blah&#039;,
+		multi: [ &#039;thud&#039;, &#039;thonk&#039; ],
+		textarea: &#039;textarea_value&#039;
+	};
+	var f2_query = &#039;blah=blah&amp;multi=thud&amp;multi=thonk&amp;textarea=textarea_value&#039;;
+	var f3 = {
+		spaces: &#039;string with spaces&#039;
+	};
+	var f3_query = &#039;spaces=string%20with%20spaces&#039;;
+	var f4 = {
+		action: &#039;Form with input named action&#039;
+	};
+	var f4_query = &#039;action=Form%20with%20input%20named%20action&#039;;
+	var f5 = {
+		&#039;blåh&#039;: &#039;bláh&#039;
+	};
+	var f5_query = &#039;bl%C3%A5h=bl%C3%A1h&#039;;
+	var f6 = {
+		cb_group: &#039;foo&#039;,
+		radio_group: &#039;bam&#039;
+	};
+	var f6_query = &#039;cb_group=foo&amp;radio_group=bam&#039;;
+	var f6_1 = {
+		cb_group: &#039;boo&#039;,
+		radio_group: &#039;baz&#039;
+	};
+	var f6_2 = {
+		cb_group: [&#039;foo&#039;, &#039;boo&#039;],
+		radio_group: &#039;baz&#039;
+	};
+	registerSuite({
+		name: &#039;dojo/dom-form&#039;,
+
+		setup: function () {
+			formContainer = domConstruct.place(&#039;&lt;div&gt;&#039; +
+				&#039;&lt;form id=&quot;f1&quot; style=&quot;border: 1px solid black;&quot;&gt;&#039; +
+					&#039;&lt;input id=&quot;f1_blah&quot; type=&quot;text&quot; name=&quot;blah&quot; value=&quot;blah&quot;&gt;&#039; +
+					&#039;&lt;input id=&quot;f1_no_value&quot; type=&quot;text&quot; name=&quot;no_value&quot; value=&quot;blah&quot; disabled&gt;&#039; +
+					&#039;&lt;input  id=&quot;f1_no_value2&quot; type=&quot;button&quot; name=&quot;no_value2&quot; value=&quot;blah&quot;&gt;&#039; +
+				&#039;&lt;/form&gt;&#039; +
+				&#039;&lt;form id=&quot;f2&quot; style=&quot;border: 1px solid black;&quot;&gt;&#039; +
+					&#039;&lt;input id=&quot;f2_blah&quot; type=&quot;text&quot; name=&quot;blah&quot; value=&quot;blah&quot;&gt;&#039; +
+					&#039;&lt;input id=&quot;f2_no_value&quot; type=&quot;text&quot; name=&quot;no_value&quot; value=&quot;blah&quot; disabled&gt;&#039; +
+					&#039;&lt;input  id=&quot;f2_no_value2&quot; type=&quot;button&quot; name=&quot;no_value2&quot; value=&quot;blah&quot;&gt;&#039; +
+					&#039;&lt;select  id=&quot;f2_multi&quot; type=&quot;select&quot; multiple name=&quot;multi&quot; size=&quot;5&quot;&gt;&#039; +
+						&#039;&lt;option value=&quot;blah&quot;&gt;blah&lt;/option&gt;&#039; +
+						&#039;&lt;option value=&quot;thud&quot; selected&gt;thud&lt;/option&gt;&#039; +
+						&#039;&lt;option value=&quot;thonk&quot; selected&gt;thonk&lt;/option&gt;&#039; +
+					&#039;&lt;/select&gt;&#039; +
+					&#039;&lt;textarea id=&quot;f2_textarea&quot; name=&quot;textarea&quot;&gt;textarea_value&lt;/textarea&gt;&#039; +
+					&#039;&lt;button id=&quot;f2_button1&quot; name=&quot;button1&quot; value=&quot;buttonValue1&quot;&gt;This is a button that should not be in formToObject.&lt;/button&gt;&#039; +
+					&#039;&lt;input id=&quot;f2_fileParam1&quot; type=&quot;file&quot; name=&quot;fileParam1&quot; value=&quot;fileValue1&quot;&gt; File input should not show up in formToObject.&#039; +
+				&#039;&lt;/form&gt;&#039; +
+				&#039;&lt;form id=&quot;f3&quot; style=&quot;border: 1px solid black;&quot;&gt;&#039; +
+					&#039;&lt;input id=&quot;f3_spaces&quot; type=&quot;hidden&quot; name=&quot;spaces&quot; value=&quot;string with spaces&quot;&gt;&#039; +
+				&#039;&lt;/form&gt;&#039; +
+				&#039;&lt;form id=&quot;f4&quot; style=&quot;border: 1px solid black;&quot; action=&quot;xhrDummyMethod.php&quot;&gt;&#039; +
+					&#039;&lt;input id=&quot;f4_action&quot; type=&quot;hidden&quot; name=&quot;action&quot; value=&quot;Form with input named action&quot;&gt;&#039; +
+				&#039;&lt;/form&gt;&#039; +
+				&#039;&lt;form id=&quot;f5&quot; style=&quot;border: 1px solid black;&quot;&gt;&#039; +
+					&#039;&lt;input id=&quot;f5_blah&quot; type=&quot;text&quot; name=&quot;blåh&quot; value=&quot;bláh&quot;&gt;&#039; +
+					&#039;&lt;input id=&quot;f5_no_value&quot; type=&quot;text&quot; name=&quot;no_value&quot; value=&quot;blah&quot; disabled&gt;&#039; +
+					&#039;&lt;input id=&quot;f5_no_value2&quot; type=&quot;button&quot; name=&quot;no_value2&quot; value=&quot;blah&quot;&gt;&#039; +
+				&#039;&lt;/form&gt;&#039; +
+				&#039;&lt;form id=&quot;f6&quot; style=&quot;border: 1px solid black;&quot;&gt;&#039; +
+					&#039;&lt;input id=&quot;f6_checkbox1&quot; type=&quot;checkbox&quot; name=&quot;cb_group&quot; value=&quot;foo&quot; checked&gt;&#039; +
+					&#039;&lt;input id=&quot;f6_checkbox2&quot; type=&quot;checkbox&quot; name=&quot;cb_group&quot; value=&quot;boo&quot;&gt;&#039; +
+					&#039;&lt;input id=&quot;f6_radio1&quot; type=&quot;radio&quot; name=&quot;radio_group&quot; value=&quot;baz&quot;&gt;&#039; +
+					&#039;&lt;input id=&quot;f6_radio2&quot; type=&quot;radio&quot; name=&quot;radio_group&quot; value=&quot;bam&quot; checked&gt;&#039; +
+				&#039;&lt;/form&gt;&#039; +
+			&#039;&lt;/div&gt;&#039;, document.body);
+		},
+
+		teardown: function () {
+			domConstruct.destroy(formContainer);
+			formContainer = null;
+		},
+
+		&#039;.fieldToObject&#039;: {
+			&#039;ids&#039;: function () {
+				assert.strictEqual(domForm.fieldToObject(&#039;f1_no_value&#039;), null);
+				assert.strictEqual(domForm.fieldToObject(&#039;f1_no_value2&#039;), &#039;blah&#039;);
+				assert.deepEqual(domForm.fieldToObject(&#039;f2_multi&#039;), f2.multi);
+				assert.strictEqual(domForm.fieldToObject(&#039;f2_textarea&#039;), f2.textarea);
+				assert.strictEqual(domForm.fieldToObject(&#039;f2_fileParam1&#039;), &#039;&#039;);
+				assert.strictEqual(domForm.fieldToObject(&#039;f4_action&#039;), f4.action);
+				assert.strictEqual(domForm.fieldToObject(&#039;f6_checkbox1&#039;), &#039;foo&#039;);
+				assert.strictEqual(domForm.fieldToObject(&#039;f6_checkbox2&#039;), null);
+				assert.strictEqual(domForm.fieldToObject(&#039;f6_radio1&#039;), null);
+				assert.strictEqual(domForm.fieldToObject(&#039;f6_radio2&#039;), &#039;bam&#039;);
+			},
+
+			&#039;nodes&#039;: function () {
+				assert.strictEqual(domForm.fieldToObject(dom.byId(&#039;f1_no_value&#039;)), null);
+				assert.strictEqual(domForm.fieldToObject(dom.byId(&#039;f1_no_value2&#039;)), &#039;blah&#039;);
+				assert.deepEqual(domForm.fieldToObject(dom.byId(&#039;f2_multi&#039;)), f2.multi);
+				assert.strictEqual(domForm.fieldToObject(dom.byId(&#039;f2_textarea&#039;)), f2.textarea);
+				assert.strictEqual(domForm.fieldToObject(dom.byId(&#039;f2_fileParam1&#039;)), &#039;&#039;);
+				assert.strictEqual(domForm.fieldToObject(dom.byId(&#039;f4_action&#039;)), f4.action);
+				assert.strictEqual(domForm.fieldToObject(dom.byId(&#039;f6_checkbox1&#039;)), &#039;foo&#039;);
+				assert.strictEqual(domForm.fieldToObject(dom.byId(&#039;f6_checkbox2&#039;)), null);
+				assert.strictEqual(domForm.fieldToObject(dom.byId(&#039;f6_radio1&#039;)), null);
+				assert.strictEqual(domForm.fieldToObject(dom.byId(&#039;f6_radio2&#039;)), &#039;bam&#039;);
+			}
+		},
+
+		&#039;.toObject&#039;: function () {
+			assert.deepEqual(domForm.toObject(&#039;f1&#039;), f1);
+			assert.deepEqual(domForm.toObject(&#039;f2&#039;), f2);
+			assert.deepEqual(domForm.toObject(&#039;f3&#039;), f3);
+			assert.deepEqual(domForm.toObject(&#039;f4&#039;), f4);
+			assert.deepEqual(domForm.toObject(&#039;f5&#039;), f5);
+			assert.deepEqual(domForm.toObject(&#039;f6&#039;), f6);
+
+			dom.byId(&#039;f6_checkbox1&#039;).checked = false;
+			dom.byId(&#039;f6_checkbox2&#039;).checked = true;
+			dom.byId(&#039;f6_radio1&#039;).checked = true;
+			assert.deepEqual(domForm.toObject(&#039;f6&#039;), f6_1);
+
+			dom.byId(&#039;f6_checkbox1&#039;).checked = true;
+			assert.deepEqual(domForm.toObject(&#039;f6&#039;), f6_2);
+
+			// reset to defaults
+			dom.byId(&#039;f6_checkbox1&#039;).checked = true;
+			dom.byId(&#039;f6_checkbox2&#039;).checked = false;
+			dom.byId(&#039;f6_radio2&#039;).checked = true;
+		},
+
+		&#039;.toQuery&#039;: function () {
+			assert.strictEqual(domForm.toQuery(&#039;f1&#039;), f1_query);
+			assert.strictEqual(domForm.toQuery(&#039;f2&#039;), f2_query);
+			assert.strictEqual(domForm.toQuery(&#039;f3&#039;), f3_query);
+			assert.strictEqual(domForm.toQuery(&#039;f4&#039;), f4_query);
+			assert.strictEqual(domForm.toQuery(&#039;f5&#039;), f5_query);
+			assert.strictEqual(domForm.toQuery(&#039;f6&#039;), f6_query);
+		},
+
+		&#039;.toJson&#039;: function () {
+			assert.deepEqual(JSON.parse(domForm.toJson(&#039;f1&#039;)), f1);
+			assert.deepEqual(JSON.parse(domForm.toJson(&#039;f2&#039;)), f2);
+			assert.deepEqual(JSON.parse(domForm.toJson(&#039;f3&#039;)), f3);
+			assert.deepEqual(JSON.parse(domForm.toJson(&#039;f4&#039;)), f4);
+			assert.deepEqual(JSON.parse(domForm.toJson(&#039;f5&#039;)), f5);
+			assert.deepEqual(JSON.parse(domForm.toJson(&#039;f6&#039;)), f6);
+		}
+	});
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

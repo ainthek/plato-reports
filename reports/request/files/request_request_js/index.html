@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">55.52</p>
+      <p class="stat">56.95</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">1825</p>
+      <p class="stat">1573</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">125.12</p>
+      <p class="stat">117.18</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">22.80</p>
+      <p class="stat">18.58</p>
     </div>
   </div>
 </div>
@@ -101,11 +101,9 @@ var http = require(&#039;http&#039;)
   , zlib = require(&#039;zlib&#039;)
   , helpers = require(&#039;./lib/helpers&#039;)
   , bl = require(&#039;bl&#039;)
-  , oauth = require(&#039;oauth-sign&#039;)
   , hawk = require(&#039;hawk&#039;)
   , aws = require(&#039;aws-sign2&#039;)
   , httpSignature = require(&#039;http-signature&#039;)
-  , uuid = require(&#039;node-uuid&#039;)
   , mime = require(&#039;mime-types&#039;)
   , tunnel = require(&#039;tunnel-agent&#039;)
   , stringstream = require(&#039;stringstream&#039;)
@@ -114,13 +112,14 @@ var http = require(&#039;http&#039;)
   , FormData = require(&#039;form-data&#039;)
   , cookies = require(&#039;./lib/cookies&#039;)
   , copy = require(&#039;./lib/copy&#039;)
-  , debug = require(&#039;./lib/debug&#039;)
-  , net = require(&#039;net&#039;)
-  , CombinedStream = require(&#039;combined-stream&#039;)
-  , isstream = require(&#039;isstream&#039;)
+  , getProxyFromURI = require(&#039;./lib/getProxyFromURI&#039;)
+  , Har = require(&#039;./lib/har&#039;).Har
+  , Auth = require(&#039;./lib/auth&#039;).Auth
+  , OAuth = require(&#039;./lib/oauth&#039;).OAuth
+  , Multipart = require(&#039;./lib/multipart&#039;).Multipart
+  , Redirect = require(&#039;./lib/redirect&#039;).Redirect
 
 var safeStringify = helpers.safeStringify
-  , md5 = helpers.md5
   , isReadStream = helpers.isReadStream
   , toBase64 = helpers.toBase64
   , defer = helpers.defer
@@ -128,7 +127,6 @@ var safeStringify = helpers.safeStringify
 
 
 var globalPool = {}
-  , isUrl = /^https?:/
 
 var defaultProxyHeaderWhiteList = [
   &#039;accept&#039;,
@@ -223,21 +221,52 @@ function constructProxyHeaderWhiteList(headers, proxyHeaderWhiteList) {
     }, {})
 }
 
-function construcTunnelOptions(request) {
+function getTunnelOption(self, options) {
+  // Tunnel HTTPS by default, or if a previous request in the redirect chain
+  // was tunneled.  Allow the user to override this setting.
+
+  // If self.tunnel is already set (because this is a redirect), use the
+  // existing value.
+  if (typeof self.tunnel !== &#039;undefined&#039;) {
+    return self.tunnel
+  }
+
+  // If options.tunnel is set (the user specified a value), use it.
+  if (typeof options.tunnel !== &#039;undefined&#039;) {
+    return options.tunnel
+  }
+
+  // If the destination is HTTPS, tunnel.
+  if (self.uri.protocol === &#039;https:&#039;) {
+    return true
+  }
+
+  // Otherwise, leave tunnel unset, because if a later request in the redirect
+  // chain is HTTPS then that request (and any subsequent ones) should be
+  // tunneled.
+  return undefined
+}
+
+function constructTunnelOptions(request) {
   var proxy = request.proxy
 
   var tunnelOptions = {
-    proxy: {
-      host: proxy.hostname,
-      port: +proxy.port,
-      proxyAuth: proxy.auth,
-      headers: request.proxyHeaders
+    proxy : {
+      host      : proxy.hostname,
+      port      : +proxy.port,
+      proxyAuth : proxy.auth,
+      headers   : request.proxyHeaders
     },
-    rejectUnauthorized: request.rejectUnauthorized,
-    headers: request.headers,
-    ca: request.ca,
-    cert: request.cert,
-    key: request.key
+    headers            : request.headers,
+    ca                 : request.ca,
+    cert               : request.cert,
+    key                : request.key,
+    passphrase         : request.passphrase,
+    pfx                : request.pfx,
+    ciphers            : request.ciphers,
+    rejectUnauthorized : request.rejectUnauthorized,
+    secureOptions      : request.secureOptions,
+    secureProtocol     : request.secureProtocol
   }
 
   return tunnelOptions
@@ -254,60 +283,6 @@ function getTunnelFn(request) {
   var proxy = request.proxy
   var tunnelFnName = constructTunnelFnName(uri, proxy)
   return tunnel[tunnelFnName]
-}
-
-// Decide the proper request proxy to use based on the request URI object and the
-// environmental variables (NO_PROXY, HTTP_PROXY, etc.)
-function getProxyFromURI(uri) {
-  // respect NO_PROXY environment variables (see: http://lynx.isc.org/current/breakout/lynx_help/keystrokes/environments.html)
-  var noProxy = process.env.NO_PROXY || process.env.no_proxy || null
-
-  // easy case first - if NO_PROXY is &#039;*&#039;
-  if (noProxy === &#039;*&#039;) {
-    return null
-  }
-
-  // otherwise, parse the noProxy value to see if it applies to the URL
-  if (noProxy !== null) {
-    var noProxyItem, hostname, port, noProxyItemParts, noProxyHost, noProxyPort, noProxyList
-
-    // canonicalize the hostname, so that &#039;oogle.com&#039; won&#039;t match &#039;google.com&#039;
-    hostname = uri.hostname.replace(/^\.*/, &#039;.&#039;).toLowerCase()
-    noProxyList = noProxy.split(&#039;,&#039;)
-
-    for (var i = 0, len = noProxyList.length; i &lt; len; i++) {
-      noProxyItem = noProxyList[i].trim().toLowerCase()
-
-      // no_proxy can be granular at the port level, which complicates things a bit.
-      if (noProxyItem.indexOf(&#039;:&#039;) &gt; -1) {
-        noProxyItemParts = noProxyItem.split(&#039;:&#039;, 2)
-        noProxyHost = noProxyItemParts[0].replace(/^\.*/, &#039;.&#039;)
-        noProxyPort = noProxyItemParts[1]
-        port = uri.port || (uri.protocol === &#039;https:&#039; ? &#039;443&#039; : &#039;80&#039;)
-
-        // we&#039;ve found a match - ports are same and host ends with no_proxy entry.
-        if (port === noProxyPort &amp;&amp; hostname.indexOf(noProxyHost) === hostname.length - noProxyHost.length) {
-          return null
-        }
-      } else {
-        noProxyItem = noProxyItem.replace(/^\.*/, &#039;.&#039;)
-        var isMatchedAt = hostname.indexOf(noProxyItem)
-        if (isMatchedAt &gt; -1 &amp;&amp; isMatchedAt === hostname.length - noProxyItem.length) {
-          return null
-        }
-      }
-    }
-  }
-
-  // check for HTTP(S)_PROXY environment variables
-  if (uri.protocol === &#039;http:&#039;) {
-      return process.env.HTTP_PROXY || process.env.http_proxy || null
-  } else if (uri.protocol === &#039;https:&#039;) {
-      return process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY || process.env.http_proxy || null
-  }
-
-  // return null if all else fails (What uri protocol are you using then?)
-  return null
 }
 
 // Function for properly handling a connection error
@@ -353,7 +328,6 @@ function rfc3986 (str) {
 }
 
 function Request (options) {
-  // if tunnel property of options was not given default to false
   // if given the method property in options, set property explicitMethod to true
 
   // extend the Request instance with any non-reserved properties
@@ -362,6 +336,13 @@ function Request (options) {
   // call init
 
   var self = this
+
+  // start with HAR, then override with additional options
+  if (options.har) {
+    self._har = new Har(self)
+    options = self._har.options(options)
+  }
+
   stream.Stream.call(self)
   var reserved = Object.keys(Request.prototype)
   var nonReserved = filterForNonReserved(reserved, options)
@@ -372,64 +353,54 @@ function Request (options) {
 
   self.readable = true
   self.writable = true
-  if (typeof options.tunnel === &#039;undefined&#039;) {
-    options.tunnel = false
-  }
   if (options.method) {
     self.explicitMethod = true
   }
-  self.canTunnel = options.tunnel !== false &amp;&amp; tunnel
+  self._auth = new Auth(self)
+  self._oauth = new OAuth(self)
+  self._multipart = new Multipart(self)
+  self._redirect = new Redirect(self)
   self.init(options)
 }
 
 util.inherits(Request, stream.Stream)
 
-Request.prototype.setupTunnel = function () {
-  // Set up the tunneling agent if necessary
-  // Only send the proxy whitelisted header names.
-  // Turn on tunneling for the rest of request.
+// Debugging
+Request.debug = process.env.NODE_DEBUG &amp;&amp; /\brequest\b/.test(process.env.NODE_DEBUG)
+function debug() {
+  if (Request.debug) {
+    console.error(&#039;REQUEST %s&#039;, util.format.apply(util, arguments))
+  }
+}
 
+Request.prototype.setupTunnel = function () {
   var self = this
 
   if (typeof self.proxy === &#039;string&#039;) {
     self.proxy = url.parse(self.proxy)
   }
 
-  if (!self.proxy) {
+  if (!self.proxy || !self.tunnel) {
     return false
   }
 
-  if (!self.tunnel &amp;&amp; self.uri.protocol !== &#039;https:&#039;) {
-    return false
-  }
-
-  // Always include `defaultProxyHeaderExclusiveList`
-
-  if (!self.proxyHeaderExclusiveList) {
-    self.proxyHeaderExclusiveList = []
-  }
-
+  // Setup Proxy Header Exclusive List and White List
+  self.proxyHeaderExclusiveList = self.proxyHeaderExclusiveList || []
+  self.proxyHeaderWhiteList = self.proxyHeaderWhiteList || defaultProxyHeaderWhiteList
   var proxyHeaderExclusiveList = self.proxyHeaderExclusiveList.concat(defaultProxyHeaderExclusiveList)
-
-  // Treat `proxyHeaderExclusiveList` as part of `proxyHeaderWhiteList`
-
-  if (!self.proxyHeaderWhiteList) {
-    self.proxyHeaderWhiteList = defaultProxyHeaderWhiteList
-  }
-
   var proxyHeaderWhiteList = self.proxyHeaderWhiteList.concat(proxyHeaderExclusiveList)
 
-  var proxyHost = constructProxyHost(self.uri)
+  // Setup Proxy Headers and Proxy Headers Host
+  // Only send the Proxy White Listed Header names
   self.proxyHeaders = constructProxyHeaderWhiteList(self.headers, proxyHeaderWhiteList)
-  self.proxyHeaders.host = proxyHost
-
+  self.proxyHeaders.host = constructProxyHost(self.uri)
   proxyHeaderExclusiveList.forEach(self.removeHeader, self)
 
+  // Set Agent from Tunnel Data
   var tunnelFn = getTunnelFn(self)
-  var tunnelOptions = construcTunnelOptions(self)
-
+  var tunnelOptions = constructTunnelOptions(self)
   self.agent = tunnelFn(tunnelOptions)
-  self.tunnel = true
+
   return true
 }
 
@@ -443,15 +414,31 @@ Request.prototype.init = function (options) {
   }
   self.headers = self.headers ? copy(self.headers) : {}
 
+  // Delete headers with value undefined since they break
+  // ClientRequest.OutgoingMessage.setHeader in node 0.12
+  for (var headerName in self.headers) {
+    if (typeof self.headers[headerName] === &#039;undefined&#039;) {
+      delete self.headers[headerName]
+    }
+  }
+
   caseless.httpify(self, self.headers)
 
   if (!self.method) {
     self.method = options.method || &#039;GET&#039;
   }
-  self.localAddress = options.localAddress
+  if (!self.localAddress) {
+    self.localAddress = options.localAddress
+  }
 
   if (!self.qsLib) {
     self.qsLib = (options.useQuerystring ? querystring : qs)
+  }
+  if (!self.qsParseOptions) {
+    self.qsParseOptions = options.qsParseOptions
+  }
+  if (!self.qsStringifyOptions) {
+    self.qsStringifyOptions = options.qsStringifyOptions
   }
 
   debug(options)
@@ -481,13 +468,45 @@ Request.prototype.init = function (options) {
     delete self.url
   }
 
-  // A URI is needed by this point, throw if we haven&#039;t been able to get one
+  // If there&#039;s a baseUrl, then use it as the base URL (i.e. uri must be
+  // specified as a relative path and is appended to baseUrl).
+  if (self.baseUrl) {
+    if (typeof self.baseUrl !== &#039;string&#039;) {
+      return self.emit(&#039;error&#039;, new Error(&#039;options.baseUrl must be a string&#039;))
+    }
+
+    if (typeof self.uri !== &#039;string&#039;) {
+      return self.emit(&#039;error&#039;, new Error(&#039;options.uri must be a string when using options.baseUrl&#039;))
+    }
+
+    if (self.uri.indexOf(&#039;//&#039;) === 0 || self.uri.indexOf(&#039;://&#039;) !== -1) {
+      return self.emit(&#039;error&#039;, new Error(&#039;options.uri must be a path when using options.baseUrl&#039;))
+    }
+
+    // Handle all cases to make sure that there&#039;s only one slash between
+    // baseUrl and uri.
+    var baseUrlEndsWithSlash = self.baseUrl.lastIndexOf(&#039;/&#039;) === self.baseUrl.length - 1
+    var uriStartsWithSlash = self.uri.indexOf(&#039;/&#039;) === 0
+
+    if (baseUrlEndsWithSlash &amp;&amp; uriStartsWithSlash) {
+      self.uri = self.baseUrl + self.uri.slice(1)
+    } else if (baseUrlEndsWithSlash || uriStartsWithSlash) {
+      self.uri = self.baseUrl + self.uri
+    } else if (self.uri === &#039;&#039;) {
+      self.uri = self.baseUrl
+    } else {
+      self.uri = self.baseUrl + &#039;/&#039; + self.uri
+    }
+    delete self.baseUrl
+  }
+
+  // A URI is needed by this point, emit error if we haven&#039;t been able to get one
   if (!self.uri) {
     return self.emit(&#039;error&#039;, new Error(&#039;options.uri is a required argument&#039;))
   }
 
   // If a string URI/URL was given, parse it into a URL object
-  if(typeof self.uri === &#039;string&#039;) {
+  if (typeof self.uri === &#039;string&#039;) {
     self.uri = url.parse(self.uri)
   }
 
@@ -497,7 +516,7 @@ Request.prototype.init = function (options) {
   }
 
   // Support Unix Sockets
-  if(self.uri.host === &#039;unix&#039;) {
+  if (self.uri.host === &#039;unix&#039;) {
     // Get the socket &amp; request paths from the URL
     var unixParts = self.uri.path.split(&#039;:&#039;)
       , host = unixParts[0]
@@ -515,12 +534,11 @@ Request.prototype.init = function (options) {
     self.rejectUnauthorized = false
   }
 
-  if(!self.hasOwnProperty(&#039;proxy&#039;)) {
+  if (!self.hasOwnProperty(&#039;proxy&#039;)) {
     self.proxy = getProxyFromURI(self.uri)
   }
 
-  // Pass in `tunnel:true` to *always* tunnel through proxies
-  self.tunnel = !!options.tunnel
+  self.tunnel = getTunnelOption(self, options)
   if (self.proxy) {
     self.setupTunnel()
   }
@@ -542,16 +560,7 @@ Request.prototype.init = function (options) {
     return self.emit(&#039;error&#039;, new Error(message))
   }
 
-  self._redirectsFollowed = self._redirectsFollowed || 0
-  self.maxRedirects = (self.maxRedirects !== undefined) ? self.maxRedirects : 10
-  self.allowRedirect = (typeof self.followRedirect === &#039;function&#039;) ? self.followRedirect : function(response) {
-    return true
-  }
-  self.followRedirects = (self.followRedirect !== undefined) ? !!self.followRedirect : true
-  self.followAllRedirects = (self.followAllRedirects !== undefined) ? self.followAllRedirects : false
-  if (self.followRedirects || self.followAllRedirects) {
-    self.redirects = self.redirects || []
-  }
+  self._redirect.onRequest()
 
   self.setHost = false
   if (!self.hasHeader(&#039;host&#039;)) {
@@ -624,10 +633,6 @@ Request.prototype.init = function (options) {
   }
 
   // Auth must happen last in case signing is dependent on other headers
-  if (options.oauth) {
-    self.oauth(options.oauth)
-  }
-
   if (options.aws) {
     self.aws(options.aws)
   }
@@ -661,12 +666,12 @@ Request.prototype.init = function (options) {
   }
 
   if (self.uri.auth &amp;&amp; !self.hasHeader(&#039;authorization&#039;)) {
-    var uriAuthPieces = self.uri.auth.split(&#039;:&#039;).map(function(item){ return querystring.unescape(item) })
+    var uriAuthPieces = self.uri.auth.split(&#039;:&#039;).map(function(item) { return querystring.unescape(item) })
     self.auth(uriAuthPieces[0], uriAuthPieces.slice(1).join(&#039;:&#039;), true)
   }
 
   if (!self.tunnel &amp;&amp; self.proxy &amp;&amp; self.proxy.auth &amp;&amp; !self.hasHeader(&#039;proxy-authorization&#039;)) {
-    var proxyAuthPieces = self.proxy.auth.split(&#039;:&#039;).map(function(item){
+    var proxyAuthPieces = self.proxy.auth.split(&#039;:&#039;).map(function(item) {
       return querystring.unescape(item)
     })
     var authHeader = &#039;Basic &#039; + toBase64(proxyAuthPieces.join(&#039;:&#039;))
@@ -681,8 +686,12 @@ Request.prototype.init = function (options) {
     self.json(options.json)
   }
   if (options.multipart) {
-    self.boundary = uuid()
     self.multipart(options.multipart)
+  }
+
+  if (options.time) {
+    self.timing = true
+    self.elapsedTime = self.elapsedTime || 0
   }
 
   if (self.body) {
@@ -704,8 +713,14 @@ Request.prototype.init = function (options) {
         self.setHeader(&#039;content-length&#039;, length)
       }
     } else {
-      throw new Error(&#039;Argument error, options.body.&#039;)
+      self.emit(&#039;error&#039;, new Error(&#039;Argument error, options.body.&#039;))
     }
+  }
+
+  if (options.oauth) {
+    self.oauth(options.oauth)
+  } else if (self._oauth.params &amp;&amp; self.hasHeader(&#039;authorization&#039;)) {
+    self.oauth(self._oauth.params)
   }
 
   var protocol = self.proxy &amp;&amp; !self.tunnel ? self.proxy.protocol : self.uri.protocol
@@ -744,7 +759,7 @@ Request.prototype.init = function (options) {
 
   self.on(&#039;pipe&#039;, function (src) {
     if (self.ntick &amp;&amp; self._started) {
-      throw new Error(&#039;You cannot pipe to this stream after the outbound request has started.&#039;)
+      self.emit(&#039;error&#039;, new Error(&#039;You cannot pipe to this stream after the outbound request has started.&#039;))
     }
     self.src = src
     if (isReadStream(src)) {
@@ -779,10 +794,15 @@ Request.prototype.init = function (options) {
 
     var end = function () {
       if (self._form) {
-        self._form.pipe(self)
+        if (!self._auth.hasAuth) {
+          self._form.pipe(self)
+        }
+        else if (self._auth.hasAuth &amp;&amp; self._auth.sentAuth) {
+          self._form.pipe(self)
+        }
       }
-      if (self._multipart) {
-        self._multipart.pipe(self)
+      if (self._multipart &amp;&amp; self._multipart.chunked) {
+        self._multipart.body.pipe(self)
       }
       if (self.body) {
         if (Array.isArray(self.body)) {
@@ -797,6 +817,10 @@ Request.prototype.init = function (options) {
         console.warn(&#039;options.requestBodyStream is deprecated, please pass the request object to stream.pipe.&#039;)
         self.requestBodyStream.pipe(self)
       } else if (!self.src) {
+        if (self._auth.hasAuth &amp;&amp; !self._auth.sentAuth) {
+          self.end()
+          return
+        }
         if (self.method !== &#039;GET&#039; &amp;&amp; typeof self.method !== &#039;undefined&#039;) {
           self.setHeader(&#039;content-length&#039;, 0)
         }
@@ -909,6 +933,14 @@ Request.prototype.getNewAgent = function () {
     options.cert = self.cert
   }
 
+  if (self.pfx) {
+    options.pfx = self.pfx
+  }
+
+  if (self.passphrase) {
+    options.passphrase = self.passphrase
+  }
+
   var poolKey = &#039;&#039;
 
   // different types of agents are in different pools
@@ -939,7 +971,17 @@ Request.prototype.getNewAgent = function () {
     }
 
     if (options.cert) {
+      if (poolKey) {
+        poolKey += &#039;:&#039;
+      }
       poolKey += options.cert.toString(&#039;ascii&#039;) + options.key.toString(&#039;ascii&#039;)
+    }
+
+    if (options.pfx) {
+      if (poolKey) {
+        poolKey += &#039;:&#039;
+      }
+      poolKey += options.pfx.toString(&#039;ascii&#039;)
     }
 
     if (options.ciphers) {
@@ -1010,20 +1052,26 @@ Request.prototype.start = function () {
   delete reqOptions.auth
 
   debug(&#039;make request&#039;, self.uri.href)
+
   self.req = self.httpModule.request(reqOptions)
 
+  if (self.timing) {
+    self.startTime = new Date().getTime()
+  }
+
   if (self.timeout &amp;&amp; !self.timeoutTimer) {
+    var timeout = self.timeout &lt; 0 ? 0 : self.timeout
     self.timeoutTimer = setTimeout(function () {
       self.abort()
       var e = new Error(&#039;ETIMEDOUT&#039;)
       e.code = &#039;ETIMEDOUT&#039;
       self.emit(&#039;error&#039;, e)
-    }, self.timeout)
+    }, timeout)
 
     // Set additional timeout on socket - in case if remote
     // server freeze after sending headers
     if (self.req.setTimeout) { // only works on node 0.6+
-      self.req.setTimeout(self.timeout, function () {
+      self.req.setTimeout(timeout, function () {
         if (self.req) {
           self.req.abort()
           var e = new Error(&#039;ESOCKETTIMEDOUT&#039;)
@@ -1074,6 +1122,11 @@ Request.prototype.onRequestResponse = function (response) {
   var self = this
   debug(&#039;onRequestResponse&#039;, self.uri.href, response.statusCode, response.headers)
   response.on(&#039;end&#039;, function() {
+    if (self.timing) {
+      self.elapsedTime += (new Date().getTime() - self.startTime)
+      debug(&#039;elapsed time&#039;, self.elapsedTime)
+      response.elapsedTime = self.elapsedTime
+    }
     debug(&#039;response end&#039;, self.uri.href, response.statusCode, response.headers)
   })
 
@@ -1086,12 +1139,6 @@ Request.prototype.onRequestResponse = function (response) {
     debug(&#039;aborted&#039;, self.uri.href)
     response.resume()
     return
-  }
-  if (self._paused) {
-    response.pause()
-  } else if (response.resume) {
-    // response.resume should be defined, but check anyway before calling. Workaround for browserify.
-    response.resume()
   }
 
   self.response = response
@@ -1145,167 +1192,9 @@ Request.prototype.onRequestResponse = function (response) {
     }
   }
 
-  var redirectTo = null
-  if (response.statusCode &gt;= 300 &amp;&amp; response.statusCode &lt; 400 &amp;&amp; response.caseless.has(&#039;location&#039;)) {
-    var location = response.caseless.get(&#039;location&#039;)
-    debug(&#039;redirect&#039;, location)
-
-    if (self.followAllRedirects) {
-      redirectTo = location
-    } else if (self.followRedirects) {
-      switch (self.method) {
-        case &#039;PATCH&#039;:
-        case &#039;PUT&#039;:
-        case &#039;POST&#039;:
-        case &#039;DELETE&#039;:
-          // Do not follow redirects
-          break
-        default:
-          redirectTo = location
-          break
-      }
-    }
-  } else if (response.statusCode === 401 &amp;&amp; self._hasAuth &amp;&amp; !self._sentAuth) {
-    var authHeader = response.caseless.get(&#039;www-authenticate&#039;)
-    var authVerb = authHeader &amp;&amp; authHeader.split(&#039; &#039;)[0].toLowerCase()
-    debug(&#039;reauth&#039;, authVerb)
-
-    switch (authVerb) {
-      case &#039;basic&#039;:
-        self.auth(self._user, self._pass, true)
-        redirectTo = self.uri
-        break
-
-      case &#039;bearer&#039;:
-        self.auth(null, null, true, self._bearer)
-        redirectTo = self.uri
-        break
-
-      case &#039;digest&#039;:
-        // TODO: More complete implementation of RFC 2617.
-        //   - check challenge.algorithm
-        //   - support algorithm=&quot;MD5-sess&quot;
-        //   - handle challenge.domain
-        //   - support qop=&quot;auth-int&quot; only
-        //   - handle Authentication-Info (not necessarily?)
-        //   - check challenge.stale (not necessarily?)
-        //   - increase nc (not necessarily?)
-        // For reference:
-        // http://tools.ietf.org/html/rfc2617#section-3
-        // https://github.com/bagder/curl/blob/master/lib/http_digest.c
-
-        var challenge = {}
-        var re = /([a-z0-9_-]+)=(?:&quot;([^&quot;]+)&quot;|([a-z0-9_-]+))/gi
-        for (;;) {
-          var match = re.exec(authHeader)
-          if (!match) {
-            break
-          }
-          challenge[match[1]] = match[2] || match[3]
-        }
-
-        var ha1 = md5(self._user + &#039;:&#039; + challenge.realm + &#039;:&#039; + self._pass)
-        var ha2 = md5(self.method + &#039;:&#039; + self.uri.path)
-        var qop = /(^|,)\s*auth\s*($|,)/.test(challenge.qop) &amp;&amp; &#039;auth&#039;
-        var nc = qop &amp;&amp; &#039;00000001&#039;
-        var cnonce = qop &amp;&amp; uuid().replace(/-/g, &#039;&#039;)
-        var digestResponse = qop ? md5(ha1 + &#039;:&#039; + challenge.nonce + &#039;:&#039; + nc + &#039;:&#039; + cnonce + &#039;:&#039; + qop + &#039;:&#039; + ha2) : md5(ha1 + &#039;:&#039; + challenge.nonce + &#039;:&#039; + ha2)
-        var authValues = {
-          username: self._user,
-          realm: challenge.realm,
-          nonce: challenge.nonce,
-          uri: self.uri.path,
-          qop: qop,
-          response: digestResponse,
-          nc: nc,
-          cnonce: cnonce,
-          algorithm: challenge.algorithm,
-          opaque: challenge.opaque
-        }
-
-        authHeader = []
-        for (var k in authValues) {
-          if (authValues[k]) {
-            if (k === &#039;qop&#039; || k === &#039;nc&#039; || k === &#039;algorithm&#039;) {
-              authHeader.push(k + &#039;=&#039; + authValues[k])
-            } else {
-              authHeader.push(k + &#039;=&quot;&#039; + authValues[k] + &#039;&quot;&#039;)
-            }
-          }
-        }
-        authHeader = &#039;Digest &#039; + authHeader.join(&#039;, &#039;)
-        self.setHeader(&#039;authorization&#039;, authHeader)
-        self._sentAuth = true
-
-        redirectTo = self.uri
-        break
-    }
-  }
-
-  if (redirectTo &amp;&amp; self.allowRedirect.call(self, response)) {
-    debug(&#039;redirect to&#039;, redirectTo)
-
-    // ignore any potential response body.  it cannot possibly be useful
-    // to us at this point.
-    if (self._paused) {
-      response.resume()
-    }
-
-    if (self._redirectsFollowed &gt;= self.maxRedirects) {
-      self.emit(&#039;error&#039;, new Error(&#039;Exceeded maxRedirects. Probably stuck in a redirect loop &#039; + self.uri.href))
-      return
-    }
-    self._redirectsFollowed += 1
-
-    if (!isUrl.test(redirectTo)) {
-      redirectTo = url.resolve(self.uri.href, redirectTo)
-    }
-
-    var uriPrev = self.uri
-    self.uri = url.parse(redirectTo)
-
-    // handle the case where we change protocol from https to http or vice versa
-    if (self.uri.protocol !== uriPrev.protocol) {
-      self._updateProtocol()
-    }
-
-    self.redirects.push(
-      { statusCode : response.statusCode
-      , redirectUri: redirectTo
-      }
-    )
-    if (self.followAllRedirects &amp;&amp; response.statusCode !== 401 &amp;&amp; response.statusCode !== 307) {
-      self.method = &#039;GET&#039;
-    }
-    // self.method = &#039;GET&#039; // Force all redirects to use GET || commented out fixes #215
-    delete self.src
-    delete self.req
-    delete self.agent
-    delete self._started
-    if (response.statusCode !== 401 &amp;&amp; response.statusCode !== 307) {
-      // Remove parameters from the previous response, unless this is the second request
-      // for a server that requires digest authentication.
-      delete self.body
-      delete self._form
-      if (self.headers) {
-        self.removeHeader(&#039;host&#039;)
-        self.removeHeader(&#039;content-type&#039;)
-        self.removeHeader(&#039;content-length&#039;)
-        if (self.uri.hostname !== self.originalHost.split(&#039;:&#039;)[0]) {
-          // Remove authorization if changing hostnames (but not if just
-          // changing ports or protocols).  This matches the behavior of curl:
-          // https://github.com/bagder/curl/blob/6beb0eee/lib/http.c#L710
-          self.removeHeader(&#039;authorization&#039;)
-        }
-      }
-    }
-
-    self.emit(&#039;redirect&#039;)
-
-    self.init()
+  if (self._redirect.onResponse(response)) {
     return // Ignore the rest of the response
   } else {
-    self._redirectsFollowed = self._redirectsFollowed || 0
     // Be a good stream and emit end when the response is finished.
     // Hack to emit end on close because of a core bug that never fires end
     response.on(&#039;close&#039;, function () {
@@ -1318,38 +1207,44 @@ Request.prototype.onRequestResponse = function (response) {
       self._ended = true
     })
 
-    var dataStream
+    var responseContent
     if (self.gzip) {
       var contentEncoding = response.headers[&#039;content-encoding&#039;] || &#039;identity&#039;
       contentEncoding = contentEncoding.trim().toLowerCase()
 
       if (contentEncoding === &#039;gzip&#039;) {
-        dataStream = zlib.createGunzip()
-        response.pipe(dataStream)
+        responseContent = zlib.createGunzip()
+        response.pipe(responseContent)
       } else {
         // Since previous versions didn&#039;t check for Content-Encoding header,
         // ignore any invalid values to preserve backwards-compatibility
         if (contentEncoding !== &#039;identity&#039;) {
           debug(&#039;ignoring unrecognized Content-Encoding &#039; + contentEncoding)
         }
-        dataStream = response
+        responseContent = response
       }
     } else {
-      dataStream = response
+      responseContent = response
     }
 
     if (self.encoding) {
       if (self.dests.length !== 0) {
         console.error(&#039;Ignoring encoding parameter as this stream is being piped to another stream which makes the encoding option invalid.&#039;)
-      } else if (dataStream.setEncoding) {
-        dataStream.setEncoding(self.encoding)
+      } else if (responseContent.setEncoding) {
+        responseContent.setEncoding(self.encoding)
       } else {
         // Should only occur on node pre-v0.9.4 (joyent/node@9b5abe5) with
         // zlib streams.
         // If/When support for 0.9.4 is dropped, this should be unnecessary.
-        dataStream = dataStream.pipe(stringstream(self.encoding))
+        responseContent = responseContent.pipe(stringstream(self.encoding))
       }
     }
+
+    if (self._paused) {
+      responseContent.pause()
+    }
+
+    self.responseContent = responseContent
 
     self.emit(&#039;response&#039;, response)
 
@@ -1357,17 +1252,17 @@ Request.prototype.onRequestResponse = function (response) {
       self.pipeDest(dest)
     })
 
-    dataStream.on(&#039;data&#039;, function (chunk) {
+    responseContent.on(&#039;data&#039;, function (chunk) {
       self._destdata = true
       self.emit(&#039;data&#039;, chunk)
     })
-    dataStream.on(&#039;end&#039;, function (chunk) {
+    responseContent.on(&#039;end&#039;, function (chunk) {
       self.emit(&#039;end&#039;, chunk)
     })
-    dataStream.on(&#039;error&#039;, function (error) {
+    responseContent.on(&#039;error&#039;, function (error) {
       self.emit(&#039;error&#039;, error)
     })
-    dataStream.on(&#039;close&#039;, function () {self.emit(&#039;close&#039;)})
+    responseContent.on(&#039;close&#039;, function () {self.emit(&#039;close&#039;)})
 
     if (self.callback) {
       var buffer = bl()
@@ -1408,17 +1303,19 @@ Request.prototype.onRequestResponse = function (response) {
         if (self._json) {
           try {
             response.body = JSON.parse(response.body, self._jsonReviver)
-          } catch (e) {}
+          } catch (e) {
+            // empty
+          }
         }
         debug(&#039;emitting complete&#039;, self.uri.href)
-        if(typeof response.body === &#039;undefined&#039; &amp;&amp; !self._json) {
+        if (typeof response.body === &#039;undefined&#039; &amp;&amp; !self._json) {
           response.body = self.encoding === null ? new Buffer(0) : &#039;&#039;
         }
         self.emit(&#039;complete&#039;, response, response.body)
       })
     }
     //if no callback
-    else{
+    else {
       self.on(&#039;end&#039;, function () {
         if (self._aborted) {
           debug(&#039;aborted&#039;, self.uri.href)
@@ -1488,7 +1385,7 @@ Request.prototype.qs = function (q, clobber) {
   var self = this
   var base
   if (!clobber &amp;&amp; self.uri.query) {
-    base = self.qsLib.parse(self.uri.query)
+    base = self.qsLib.parse(self.uri.query, self.qsParseOptions)
   } else {
     base = {}
   }
@@ -1497,11 +1394,11 @@ Request.prototype.qs = function (q, clobber) {
     base[i] = q[i]
   }
 
-  if (self.qsLib.stringify(base) === &#039;&#039;){
+  if (self.qsLib.stringify(base, self.qsStringifyOptions) === &#039;&#039;) {
     return self
   }
 
-  var qs = self.qsLib.stringify(base)
+  var qs = self.qsLib.stringify(base, self.qsStringifyOptions)
 
   self.uri = url.parse(self.uri.href.split(&#039;?&#039;)[0] + &#039;?&#039; + rfc3986(qs))
   self.url = self.uri
@@ -1513,80 +1410,30 @@ Request.prototype.form = function (form) {
   var self = this
   if (form) {
     self.setHeader(&#039;content-type&#039;, &#039;application/x-www-form-urlencoded&#039;)
-    self.body = (typeof form === &#039;string&#039;) ? form.toString(&#039;utf8&#039;) : self.qsLib.stringify(form).toString(&#039;utf8&#039;)
+    self.body = (typeof form === &#039;string&#039;)
+      ? form.toString(&#039;utf8&#039;)
+      : self.qsLib.stringify(form, self.qsStringifyOptions).toString(&#039;utf8&#039;)
     self.body = rfc3986(self.body)
     return self
   }
   // create form-data object
   self._form = new FormData()
+  self._form.on(&#039;error&#039;, function(err) {
+    err.message = &#039;form-data: &#039; + err.message
+    self.emit(&#039;error&#039;, err)
+    self.abort()
+  })
   return self._form
 }
 Request.prototype.multipart = function (multipart) {
   var self = this
 
-  var chunked = false
-  var _multipart = multipart.data || multipart
+  self._multipart.onRequest(multipart)
 
-  if (!_multipart.forEach) {
-    throw new Error(&#039;Argument error, options.multipart.&#039;)
+  if (!self._multipart.chunked) {
+    self.body = self._multipart.body
   }
 
-  if (self.getHeader(&#039;transfer-encoding&#039;) === &#039;chunked&#039;) {
-    chunked = true
-  }
-  if (multipart.chunked !== undefined) {
-    chunked = multipart.chunked
-  }
-  if (!chunked) {
-    _multipart.forEach(function (part) {
-      if(typeof part.body === &#039;undefined&#039;) {
-        throw new Error(&#039;Body attribute missing in multipart.&#039;)
-      }
-      if (isstream(part.body)) {
-        chunked = true
-      }
-    })
-  }
-
-  if (chunked &amp;&amp; !self.hasHeader(&#039;transfer-encoding&#039;)) {
-    self.setHeader(&#039;transfer-encoding&#039;, &#039;chunked&#039;)
-  }
-
-  var headerName = self.hasHeader(&#039;content-type&#039;)
-  if (!headerName || self.headers[headerName].indexOf(&#039;multipart&#039;) === -1) {
-    self.setHeader(&#039;content-type&#039;, &#039;multipart/related; boundary=&#039; + self.boundary)
-  } else {
-    self.setHeader(headerName, self.headers[headerName].split(&#039;;&#039;)[0] + &#039;; boundary=&#039; + self.boundary)
-  }
-
-  var parts = chunked ? new CombinedStream() : []
-  function add (part) {
-    return chunked ? parts.append(part) : parts.push(new Buffer(part))
-  }
-
-  if (self.preambleCRLF) {
-    add(&#039;\r\n&#039;)
-  }
-
-  _multipart.forEach(function (part) {
-    var body = part.body
-    var preamble = &#039;--&#039; + self.boundary + &#039;\r\n&#039;
-    Object.keys(part).forEach(function (key) {
-      if (key === &#039;body&#039;) { return }
-      preamble += key + &#039;: &#039; + part[key] + &#039;\r\n&#039;
-    })
-    preamble += &#039;\r\n&#039;
-    add(preamble)
-    add(body)
-    add(&#039;\r\n&#039;)
-  })
-  add(&#039;--&#039; + self.boundary + &#039;--&#039;)
-
-  if (self.postambleCRLF) {
-    add(&#039;\r\n&#039;)
-  }
-
-  self[chunked ? &#039;_multipart&#039; : &#039;body&#039;] = parts
   return self
 }
 Request.prototype.json = function (val) {
@@ -1601,15 +1448,15 @@ Request.prototype.json = function (val) {
     if (self.body !== undefined) {
       if (!/^application\/x-www-form-urlencoded\b/.test(self.getHeader(&#039;content-type&#039;))) {
         self.body = safeStringify(self.body)
+      } else {
+        self.body = rfc3986(self.body)
       }
-      self.body = rfc3986(self.body)
       if (!self.hasHeader(&#039;content-type&#039;)) {
         self.setHeader(&#039;content-type&#039;, &#039;application/json&#039;)
       }
     }
   } else {
     self.body = safeStringify(val)
-    self.body = rfc3986(self.body)
     if (!self.hasHeader(&#039;content-type&#039;)) {
       self.setHeader(&#039;content-type&#039;, &#039;application/json&#039;)
     }
@@ -1639,36 +1486,14 @@ Request.prototype.getHeader = function (name, headers) {
   })
   return result
 }
-var getHeader = Request.prototype.getHeader
 
 Request.prototype.auth = function (user, pass, sendImmediately, bearer) {
   var self = this
-  if (bearer !== undefined) {
-    self._bearer = bearer
-    self._hasAuth = true
-    if (sendImmediately || typeof sendImmediately === &#039;undefined&#039;) {
-      if (typeof bearer === &#039;function&#039;) {
-        bearer = bearer()
-      }
-      self.setHeader(&#039;authorization&#039;, &#039;Bearer &#039; + bearer)
-      self._sentAuth = true
-    }
-    return self
-  }
-  if (typeof user !== &#039;string&#039; || (pass !== undefined &amp;&amp; typeof pass !== &#039;string&#039;)) {
-    throw new Error(&#039;auth() received invalid user or password&#039;)
-  }
-  self._user = user
-  self._pass = pass
-  self._hasAuth = true
-  var header = typeof pass !== &#039;undefined&#039; ? user + &#039;:&#039; + pass : user
-  if (sendImmediately || typeof sendImmediately === &#039;undefined&#039;) {
-    self.setHeader(&#039;authorization&#039;, &#039;Basic &#039; + toBase64(header))
-    self._sentAuth = true
-  }
+
+  self._auth.onRequest(user, pass, sendImmediately, bearer)
+
   return self
 }
-
 Request.prototype.aws = function (opts, now) {
   var self = this
 
@@ -1706,7 +1531,7 @@ Request.prototype.httpSignature = function (opts) {
   var self = this
   httpSignature.signRequest({
     getHeader: function(header) {
-      return getHeader(header, self.headers)
+      return self.getHeader(header, self.headers)
     },
     setHeader: function(header, value) {
       self.setHeader(header, value)
@@ -1718,100 +1543,23 @@ Request.prototype.httpSignature = function (opts) {
 
   return self
 }
-
 Request.prototype.hawk = function (opts) {
   var self = this
   self.setHeader(&#039;Authorization&#039;, hawk.client.header(self.uri, self.method, opts).field)
 }
-
 Request.prototype.oauth = function (_oauth) {
   var self = this
-  var form, query, contentType = &#039;&#039;, formContentType = &#039;application/x-www-form-urlencoded&#039;
 
-  if (self.hasHeader(&#039;content-type&#039;) &amp;&amp;
-      self.getHeader(&#039;content-type&#039;).slice(0, formContentType.length) === formContentType) {
-    contentType = formContentType
-    form = self.body
-  }
-  if (self.uri.query) {
-    query = self.uri.query
-  }
-
-  var transport = _oauth.transport_method || &#039;header&#039;
-  if (transport === &#039;body&#039; &amp;&amp; (
-      self.method !== &#039;POST&#039; || contentType !== formContentType)) {
-
-    throw new Error(&#039;oauth.transport_method of \&#039;body\&#039; requires \&#039;POST\&#039; &#039; +
-      &#039;and content-type \&#039;&#039; + formContentType + &#039;\&#039;&#039;)
-  }
-
-  delete _oauth.transport_method
-
-  var oa = {}
-  for (var i in _oauth) {
-    oa[&#039;oauth_&#039; + i] = _oauth[i]
-  }
-  if (&#039;oauth_realm&#039; in oa) {
-    delete oa.oauth_realm
-  }
-  if (!oa.oauth_version) {
-    oa.oauth_version = &#039;1.0&#039;
-  }
-  if (!oa.oauth_timestamp) {
-    oa.oauth_timestamp = Math.floor( Date.now() / 1000 ).toString()
-  }
-  if (!oa.oauth_nonce) {
-    oa.oauth_nonce = uuid().replace(/-/g, &#039;&#039;)
-  }
-  if (!oa.oauth_signature_method) {
-    oa.oauth_signature_method = &#039;HMAC-SHA1&#039;
-  }
-
-  var consumer_secret_or_private_key = oa.oauth_consumer_secret || oa.oauth_private_key
-  delete oa.oauth_consumer_secret
-  delete oa.oauth_private_key
-  var token_secret = oa.oauth_token_secret
-  delete oa.oauth_token_secret
-
-  var baseurl = self.uri.protocol + &#039;//&#039; + self.uri.host + self.uri.pathname
-  var params = self.qsLib.parse([].concat(query, form, self.qsLib.stringify(oa)).join(&#039;&amp;&#039;))
-
-  var signature = oauth.sign(
-    oa.oauth_signature_method,
-    self.method,
-    baseurl,
-    params,
-    consumer_secret_or_private_key,
-    token_secret)
-
-  var buildSortedParams = function (sep, wrap) {
-    wrap = wrap || &#039;&#039;
-    return Object.keys(oa).sort().map(function (i) {
-      return i + &#039;=&#039; + wrap + oauth.rfc3986(oa[i]) + wrap
-    }).join(sep) + sep + &#039;oauth_signature=&#039; + wrap + oauth.rfc3986(signature) + wrap
-  }
-
-  if (transport === &#039;header&#039;) {
-    var realm = _oauth.realm ? &#039;realm=&quot;&#039; + _oauth.realm + &#039;&quot;,&#039; : &#039;&#039;
-    self.setHeader(&#039;Authorization&#039;, &#039;OAuth &#039; + realm + buildSortedParams(&#039;,&#039;, &#039;&quot;&#039;))
-  }
-  else if (transport === &#039;query&#039;) {
-    self.path += (query ? &#039;&amp;&#039; : &#039;?&#039;) + buildSortedParams(&#039;&amp;&#039;)
-  }
-  else if (transport === &#039;body&#039;) {
-    self.body = (form ? form + &#039;&amp;&#039; : &#039;&#039;) + buildSortedParams(&#039;&amp;&#039;)
-  }
-  else {
-    throw new Error(&#039;oauth.transport_method invalid&#039;)
-  }
+  self._oauth.onRequest(_oauth)
 
   return self
 }
+
 Request.prototype.jar = function (jar) {
   var self = this
   var cookies
 
-  if (self._redirectsFollowed === 0) {
+  if (self._redirect.redirectsFollowed === 0) {
     self.originalCookieHeader = self.getHeader(&#039;cookie&#039;)
   }
 
@@ -1848,9 +1596,9 @@ Request.prototype.pipe = function (dest, opts) {
 
   if (self.response) {
     if (self._destdata) {
-      throw new Error(&#039;You cannot pipe after data has been emitted from the response.&#039;)
+      self.emit(&#039;error&#039;, new Error(&#039;You cannot pipe after data has been emitted from the response.&#039;))
     } else if (self._ended) {
-      throw new Error(&#039;You cannot pipe after the response has been ended.&#039;)
+      self.emit(&#039;error&#039;, new Error(&#039;You cannot pipe after the response has been ended.&#039;))
     } else {
       stream.Stream.prototype.pipe.call(self, dest, opts)
       self.pipeDest(dest)
@@ -1881,18 +1629,18 @@ Request.prototype.end = function (chunk) {
 }
 Request.prototype.pause = function () {
   var self = this
-  if (!self.response) {
+  if (!self.responseContent) {
     self._paused = true
   } else {
-    self.response.pause.apply(self.response, arguments)
+    self.responseContent.pause.apply(self.responseContent, arguments)
   }
 }
 Request.prototype.resume = function () {
   var self = this
-  if (!self.response) {
+  if (!self.responseContent) {
     self._paused = false
   } else {
-    self.response.resume.apply(self.response, arguments)
+    self.responseContent.resume.apply(self.responseContent, arguments)
   }
 }
 Request.prototype.destroy = function () {

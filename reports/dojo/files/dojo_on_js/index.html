@@ -141,7 +141,7 @@
 		//		event.
 		// description:
 		//		To listen for &quot;click&quot; events on a button node, we can do:
-		//		|	define([&quot;dojo/on&quot;], function(listen){
+		//		|	define([&quot;dojo/on&quot;], function(on){
 		//		|		on(button, &quot;click&quot;, clickHandler);
 		//		|		...
 		//		Evented JavaScript objects can also have their own events.
@@ -150,7 +150,7 @@
 		//		And then we could publish a &quot;foo&quot; event:
 		//		|	on.emit(obj, &quot;foo&quot;, {key: &quot;value&quot;});
 		//		We can use extension events as well. For example, you could listen for a tap gesture:
-		//		|	define([&quot;dojo/on&quot;, &quot;dojo/gesture/tap&quot;, function(listen, tap){
+		//		|	define([&quot;dojo/on&quot;, &quot;dojo/gesture/tap&quot;, function(on, tap){
 		//		|		on(button, tap, tapHandler);
 		//		|		...
 		//		which would trigger fooHandler. Note that for a simple object this is equivalent to calling:
@@ -329,7 +329,7 @@
 		//		Indicates if children elements of the selector should be allowed. This defaults to 
 		//		true
 		// example:
-		// |	require([&quot;dojo/on&quot;, &quot;dojo/mouse&quot;, &quot;dojo/query!css2&quot;], function(listen, mouse){
+		// |	require([&quot;dojo/on&quot;, &quot;dojo/mouse&quot;, &quot;dojo/query!css2&quot;], function(on, mouse){
 		// |		on(node, on.selector(&quot;.my-class&quot;, mouse.enter), handlerForMyHover);
 		return function(target, listener){
 			// if the selector is function, use it to select the node, otherwise use the matches method

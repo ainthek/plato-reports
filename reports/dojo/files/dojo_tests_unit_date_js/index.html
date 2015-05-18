@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/unit/date.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/unit/date.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">60.04</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">590</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">104.42</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">7.13</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+	&#039;intern!object&#039;,
+	&#039;intern/chai!assert&#039;,
+	&#039;../../date&#039;
+], function (registerSuite, assert, date) {
+	function assertDateEqual(date1, date2) {
+		assert.instanceOf(date1, Date);
+		assert.instanceOf(date2, Date);
+		assert.strictEqual(date1.getTime(), date2.getTime());
+	}
+
+	registerSuite({
+		name: &#039;dojo/date&#039;,
+
+		&#039;.getDaysInMonth&#039;: {
+			&#039;not February&#039;: function () {
+				assert.strictEqual(date.getDaysInMonth(new Date(2014, 0, 1)), 31);
+				assert.strictEqual(date.getDaysInMonth(new Date(2014, 2, 1)), 31);
+				assert.strictEqual(date.getDaysInMonth(new Date(2014, 3, 1)), 30);
+				assert.strictEqual(date.getDaysInMonth(new Date(2014, 4, 1)), 31);
+				assert.strictEqual(date.getDaysInMonth(new Date(2014, 5, 1)), 30);
+				assert.strictEqual(date.getDaysInMonth(new Date(2014, 6, 1)), 31);
+				assert.strictEqual(date.getDaysInMonth(new Date(2014, 7, 1)), 31);
+				assert.strictEqual(date.getDaysInMonth(new Date(2014, 8, 1)), 30);
+				assert.strictEqual(date.getDaysInMonth(new Date(2014, 9, 1)), 31);
+				assert.strictEqual(date.getDaysInMonth(new Date(2014, 10, 1)), 30);
+				assert.strictEqual(date.getDaysInMonth(new Date(2014, 11, 1)), 31);
+			},
+			&#039;Februarys&#039;: function () {
+				assert.strictEqual(date.getDaysInMonth(new Date(2014, 1, 1)), 28);
+				assert.strictEqual(date.getDaysInMonth(new Date(2004, 1, 1)), 29);
+				assert.strictEqual(date.getDaysInMonth(new Date(2000, 1, 1)), 29);
+				assert.strictEqual(date.getDaysInMonth(new Date(1900, 1, 1)), 28);
+				assert.strictEqual(date.getDaysInMonth(new Date(1800, 1, 1)), 28);
+				assert.strictEqual(date.getDaysInMonth(new Date(1700, 1, 1)), 28);
+				assert.strictEqual(date.getDaysInMonth(new Date(1600, 1, 1)), 29);
+			}
+		},
+
+		&#039;.isLeapYear&#039;: {
+			&#039;leap years&#039;: function () {
+				assert.isFalse(date.isLeapYear(new Date(2014, 0, 1)));
+				assert.isTrue(date.isLeapYear(new Date(2012, 0, 1)));
+				assert.isTrue(date.isLeapYear(new Date(2000, 0, 1)));
+				assert.isFalse(date.isLeapYear(new Date(1900, 0, 1)));
+				assert.isFalse(date.isLeapYear(new Date(1800, 0, 1)));
+				assert.isFalse(date.isLeapYear(new Date(1700, 0, 1)));
+				assert.isTrue(date.isLeapYear(new Date(1600, 0, 1)));
+			}
+		},
+
+		// The getTimezone function pulls from either the date&#039;s toString or
+		// toLocaleString method -- it&#039;s really just a string-processing
+		// function (assuming the Date obj passed in supporting both toString
+		// and toLocaleString) and as such can be tested for multiple browsers
+		// by manually settting up fake Date objects with the actual strings
+		// produced by various browser/OS combinations.
+		// FIXME: the function and tests are not localized.
+		&#039;.getTimezoneName&#039;: (function () {
+			var dt;
+
+			// Create a fake Date object with toString and toLocaleString
+			// results manually set to simulate tests for multiple browsers
+			function FakeDate(str, strLocale) {
+				this.str = str || &#039;&#039;;
+				this.strLocale = strLocale || &#039;&#039;;
+				this.toString = function () {
+					return this.str;
+				};
+				this.toLocaleString = function () {
+					return this.strLocale;
+				};
+			}
+
+			return {
+				setup: function () {
+					dt = new FakeDate();
+				},
+
+				&#039;FF 1.5 Ubuntu Linux (Breezy)&#039;: function () {
+					dt.str = &#039;Sun Sep 17 2006 22:25:51 GMT-0500 (CDT)&#039;;
+					dt.strLocale = &#039;Sun 17 Sep 2006 10:25:51 PM CDT&#039;;
+					assert.strictEqual(date.getTimezoneName(dt), &#039;CDT&#039;);
+				},
+
+				&#039;Safari 2.0 Mac OS X 10.4&#039;: function () {
+					dt.str = &#039;Sun Sep 17 2006 22:55:01 GMT-0500&#039;;
+					dt.strLocale = &#039;September 17, 2006 10:55:01 PM CDT&#039;;
+					assert.strictEqual(date.getTimezoneName(dt), &#039;CDT&#039;);
+				},
+
+				&#039;FF 1.5 Mac OS X 10.4&#039;: function () {
+					dt.str = &#039;Sun Sep 17 2006 22:57:18 GMT-0500 (CDT)&#039;;
+					dt.strLocale = &#039;Sun Sep 17 22:57:18 2006&#039;;
+					assert.strictEqual(date.getTimezoneName(dt), &#039;CDT&#039;);
+				},
+
+				&#039;Opera 9 Mac OS X 10.4&#039;: function () {
+					// no TZ data expect empty string return
+					dt.str = &#039;Sun, 17 Sep 2006 22:58:06 GMT-0500&#039;;
+					dt.strLocale = &#039;Sunday September 17, 22:58:06 GMT-0500 2006&#039;;
+					assert.strictEqual(date.getTimezoneName(dt), &#039;&#039;);
+				},
+
+				&#039;IE 6 Windows XP&#039;: function () {
+					dt.str = &#039;Mon Sep 18 11:21:07 CDT 2006&#039;;
+					dt.strLocale = &#039;Monday, September 18, 2006 11:21:07 AM&#039;;
+					assert.strictEqual(date.getTimezoneName(dt), &#039;CDT&#039;);
+				},
+
+				&#039;Opera 9 Ubuntu Linux (Breezy)&#039;: function () {
+					// no TZ data expect empty string return
+					dt.str = &#039;Mon, 18 Sep 2006 13:30:32 GMT-0500&#039;;
+					dt.strLocale = &#039;Monday September 18, 13:30:32 GMT-0500 2006&#039;;
+					assert.strictEqual(date.getTimezoneName(dt), &#039;&#039;);
+				},
+
+				&#039;IE 5.5 Windows 2000&#039;: function () {
+					dt.str = &#039;Mon Sep 18 13:49:22 CDT 2006&#039;;
+					dt.strLocale = &#039;Monday, September 18, 2006 1:49:22 PM&#039;;
+					assert.strictEqual(date.getTimezoneName(dt), &#039;CDT&#039;);
+				}
+			};
+		})(),
+
+		&#039;.compare&#039;: function () {
+			var d1 = new Date();
+			d1.setHours(0);
+			var d2 = new Date();
+			d2.setFullYear(2005);
+			d2.setHours(12);
+
+			assert.strictEqual(date.compare(d1, d1), 0);
+			assert.strictEqual(date.compare(d1, d2, &#039;date&#039;), 1);
+			assert.strictEqual(date.compare(d2, d1, &#039;date&#039;), -1);
+			assert.strictEqual(date.compare(d1, d2, &#039;time&#039;), -1);
+			assert.strictEqual(date.compare(d1, d2, &#039;datetime&#039;), 1);
+		},
+
+		&#039;.add&#039;: {
+			&#039;year&#039;: function () {
+				var interval = &#039;year&#039;;
+				var dateA;
+				var dateB;
+
+				dateA = new Date(2005, 11, 27);
+				dateB = new Date(2006, 11, 27);
+				assertDateEqual(date.add(dateA, interval, 1), dateB);
+
+				dateA = new Date(2005, 11, 27);
+				dateB = new Date(2004, 11, 27);
+				assertDateEqual(date.add(dateA, interval, -1), dateB);
+
+				dateA = new Date(2000, 1, 29);
+				dateB = new Date(2001, 1, 28);
+				assertDateEqual(date.add(dateA, interval, 1), dateB);
+
+				dateA = new Date(2000, 1, 29);
+				dateB = new Date(2005, 1, 28);
+				assertDateEqual(date.add(dateA, interval, 5), dateB);
+
+				dateA = new Date(1900, 11, 31);
+				dateB = new Date(1930, 11, 31);
+				assertDateEqual(date.add(dateA, interval, 30), dateB);
+
+				dateA = new Date(1995, 11, 31);
+				dateB = new Date(2030, 11, 31);
+				assertDateEqual(date.add(dateA, interval, 35), dateB);
+			},
+
+			&#039;quarter&#039;: function () {
+				var interval = &#039;quarter&#039;;
+				var dateA;
+				var dateB;
+
+				dateA = new Date(2000, 0, 1);
+				dateB = new Date(2000, 3, 1);
+				assertDateEqual(date.add(dateA, interval, 1), dateB);
+
+				dateA = new Date(2000, 1, 29);
+				dateB = new Date(2000, 7, 29);
+				assertDateEqual(date.add(dateA, interval, 2), dateB);
+
+				dateA = new Date(2000, 1, 29);
+				dateB = new Date(2001, 1, 28);
+				assertDateEqual(date.add(dateA, interval, 4), dateB);
+			},
+
+			&#039;month&#039;: function () {
+				var interval = &#039;month&#039;;
+				var dateA;
+				var dateB;
+
+				dateA = new Date(2000, 0, 1);
+				dateB = new Date(2000, 1, 1);
+				assertDateEqual(date.add(dateA, interval, 1), dateB);
+
+				dateA = new Date(2000, 0, 31);
+				dateB = new Date(2000, 1, 29);
+				assertDateEqual(date.add(dateA, interval, 1), dateB);
+
+				dateA = new Date(2000, 1, 29);
+				dateB = new Date(2001, 1, 28);
+				assertDateEqual(date.add(dateA, interval, 12), dateB);
+			},
+
+			&#039;week&#039;: function () {
+				var interval = &#039;week&#039;;
+				var dateA;
+				var dateB;
+
+				dateA = new Date(2000, 0, 1);
+				dateB = new Date(2000, 0, 8);
+				assertDateEqual(date.add(dateA, interval, 1), dateB);
+			},
+
+			&#039;day&#039;: function () {
+				var interval = &#039;day&#039;;
+				var dateA;
+				var dateB;
+
+				dateA = new Date(2000, 0, 1);
+				dateB = new Date(2000, 0, 2);
+				assertDateEqual(date.add(dateA, interval, 1), dateB);
+
+				dateA = new Date(2001, 0, 1);
+				dateB = new Date(2002, 0, 1);
+				assertDateEqual(date.add(dateA, interval, 365), dateB);
+
+				dateA = new Date(2000, 0, 1);
+				dateB = new Date(2001, 0, 1);
+				assertDateEqual(date.add(dateA, interval, 366), dateB);
+
+				dateA = new Date(2000, 1, 28);
+				dateB = new Date(2000, 1, 29);
+				assertDateEqual(date.add(dateA, interval, 1), dateB);
+
+				dateA = new Date(2001, 1, 28);
+				dateB = new Date(2001, 2, 1);
+				assertDateEqual(date.add(dateA, interval, 1), dateB);
+
+				dateA = new Date(2000, 2, 1);
+				dateB = new Date(2000, 1, 29);
+				assertDateEqual(date.add(dateA, interval, -1), dateB);
+
+				dateA = new Date(2001, 2, 1);
+				dateB = new Date(2001, 1, 28);
+				assertDateEqual(date.add(dateA, interval, -1), dateB);
+
+				dateA = new Date(2000, 0, 1);
+				dateB = new Date(1999, 11, 31);
+				assertDateEqual(date.add(dateA, interval, -1), dateB);
+			},
+
+			&#039;weekday&#039;: function () {
+				var interval = &#039;weekday&#039;;
+				var dateA;
+				var dateB;
+
+				// Sat, Jan 1
+				dateA = new Date(2000, 0, 1);
+				// Should be Mon, Jan 3
+				dateB = new Date(2000, 0, 3);
+				assertDateEqual(date.add(dateA, interval, 1), dateB);
+
+				// Sun, Jan 2
+				dateA = new Date(2000, 0, 2);
+				// Should be Mon, Jan 3
+				dateB = new Date(2000, 0, 3);
+				assertDateEqual(date.add(dateA, interval, 1), dateB);
+
+				// Sun, Jan 2
+				dateA = new Date(2000, 0, 2);
+				// Should be Fri, Jan 7
+				dateB = new Date(2000, 0, 7);
+				assertDateEqual(date.add(dateA, interval, 5), dateB);
+
+				// Sun, Jan 2
+				dateA = new Date(2000, 0, 2);
+				// Should be Mon, Jan 10
+				dateB = new Date(2000, 0, 10);
+				assertDateEqual(date.add(dateA, interval, 6), dateB);
+
+				// Mon, Jan 3
+				dateA = new Date(2000, 0, 3);
+				// Should be Mon, Jan 17
+				dateB = new Date(2000, 0, 17);
+				assertDateEqual(date.add(dateA, interval, 10), dateB);
+
+				// Sat, Jan 8
+				dateA = new Date(2000, 0, 8);
+				// Should be Mon, Jan 3
+				dateB = new Date(2000, 0, 3);
+				assertDateEqual(date.add(dateA, interval, -5), dateB);
+
+				// Sun, Jan 9
+				dateA = new Date(2000, 0, 9);
+				// Should be Wed, Jan 5
+				dateB = new Date(2000, 0, 5);
+				assertDateEqual(date.add(dateA, interval, -3), dateB);
+
+				// Sun, Jan 23
+				dateA = new Date(2000, 0, 23);
+				// Should be Fri, Jan 7
+				dateB = new Date(2000, 0, 7);
+				assertDateEqual(date.add(dateA, interval, -11), dateB);
+			},
+
+			&#039;hour&#039;: function () {
+				var interval = &#039;hour&#039;;
+				var dateA;
+				var dateB;
+
+				dateA = new Date(2000, 0, 1, 11);
+				dateB = new Date(2000, 0, 1, 12);
+				assertDateEqual(date.add(dateA, interval, 1), dateB);
+
+				dateA = new Date(2001, 9, 28, 0);
+				dateB = new Date(dateA.getTime() + (60 * 60 * 1000));
+				assertDateEqual(date.add(dateA, interval, 1), dateB);
+
+				dateA = new Date(2001, 9, 28, 23);
+				dateB = new Date(2001, 9, 29, 0);
+				assertDateEqual(date.add(dateA, interval, 1), dateB);
+
+				dateA = new Date(2001, 11, 31, 23);
+				dateB = new Date(2002, 0, 1, 0);
+				assertDateEqual(date.add(dateA, interval, 1), dateB);
+			},
+
+			&#039;minute&#039;: function () {
+				var interval = &#039;minute&#039;;
+				var dateA;
+				var dateB;
+
+				dateA = new Date(2000, 11, 31, 23, 59);
+				dateB = new Date(2001, 0, 1, 0, 0);
+				assertDateEqual(date.add(dateA, interval, 1), dateB);
+
+				dateA = new Date(2000, 11, 27, 12, 2);
+				dateB = new Date(2000, 11, 27, 13, 2);
+				assertDateEqual(date.add(dateA, interval, 60), dateB);
+			},
+
+			&#039;second&#039;: function () {
+				var interval = &#039;second&#039;;
+				var dateA;
+				var dateB;
+
+				dateA = new Date(2000, 11, 31, 23, 59, 59);
+				dateB = new Date(2001, 0, 1, 0, 0, 0);
+				assertDateEqual(date.add(dateA, interval, 1), dateB);
+
+				dateA = new Date(2000, 11, 27, 8, 10, 59);
+				dateB = new Date(2000, 11, 27, 8, 11, 59);
+				assertDateEqual(date.add(dateA, interval, 60), dateB);
+			}
+		},
+
+		&#039;.difference&#039;: {
+			&#039;year&#039;: function () {
+				var interval = &#039;year&#039;;
+				var dateA;
+				var dateB;
+
+				dateA = new Date(2005, 11, 27);
+				dateB = new Date(2006, 11, 27);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 1);
+
+				dateA = new Date(2000, 11, 31);
+				dateB = new Date(2001, 0, 1);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 1);
+			},
+
+			&#039;quarter&#039;: function () {
+				var interval = &#039;quarter&#039;;
+				var dateA;
+				var dateB;
+
+				dateA = new Date(2000, 1, 29);
+				dateB = new Date(2001, 2, 1);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 4);
+
+				dateA = new Date(2000, 11, 1);
+				dateB = new Date(2001, 0, 1);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 1);
+			},
+
+			&#039;month&#039;: function () {
+				var interval = &#039;month&#039;;
+				var dateA;
+				var dateB;
+
+				dateA = new Date(2000, 1, 29);
+				dateB = new Date(2001, 2, 1);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 13);
+
+				dateA = new Date(2000, 11, 1);
+				dateB = new Date(2001, 0, 1);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 1);
+			},
+
+			&#039;week&#039;: function () {
+				var interval = &#039;week&#039;;
+				var dateA;
+				var dateB;
+
+				dateA = new Date(2000, 1, 1);
+				dateB = new Date(2000, 1, 8);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 1);
+
+				dateA = new Date(2000, 1, 28);
+				dateB = new Date(2000, 2, 6);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 1);
+
+				dateA = new Date(2000, 2, 6);
+				dateB = new Date(2000, 1, 28);
+				assert.strictEqual(date.difference(dateA, dateB, interval), -1);
+			},
+
+			&#039;day&#039;: function () {
+				var interval = &#039;day&#039;;
+				var dateA;
+				var dateB;
+
+				dateA = new Date(2000, 1, 29);
+				dateB = new Date(2000, 2, 1);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 1);
+
+				dateA = new Date(2000, 11, 31);
+				dateB = new Date(2001, 0, 1);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 1);
+
+				// DST leap -- check for rounding err
+				// This is dependent on US calendar, but
+				// shouldn&#039;t break in other locales
+				dateA = new Date(2005, 3, 3);
+				dateB = new Date(2005, 3, 4);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 1);
+			},
+
+			&#039;weekday&#039;: function () {
+				var interval = &#039;weekday&#039;;
+				var dateA;
+				var dateB;
+
+				dateA = new Date(2006, 7, 3);
+				dateB = new Date(2006, 7, 11);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 6);
+
+				// Positive diffs
+				dateA = new Date(2006, 7, 4);
+				dateB = new Date(2006, 7, 11);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 5);
+
+				dateA = new Date(2006, 7, 5);
+				dateB = new Date(2006, 7, 11);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 5);
+
+				dateA = new Date(2006, 7, 6);
+				dateB = new Date(2006, 7, 11);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 5);
+
+				dateA = new Date(2006, 7, 7);
+				dateB = new Date(2006, 7, 11);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 4);
+
+				dateA = new Date(2006, 7, 7);
+				dateB = new Date(2006, 7, 13);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 4);
+
+				dateA = new Date(2006, 7, 7);
+				dateB = new Date(2006, 7, 14);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 5);
+
+				dateA = new Date(2006, 7, 7);
+				dateB = new Date(2006, 7, 15);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 6);
+
+				dateA = new Date(2006, 7, 7);
+				dateB = new Date(2006, 7, 28);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 15);
+
+				dateA = new Date(2006, 2, 2);
+				dateB = new Date(2006, 2, 28);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 18);
+
+				// Negative diffs
+				dateA = new Date(2006, 7, 11);
+				dateB = new Date(2006, 7, 4);
+				assert.strictEqual(date.difference(dateA, dateB, interval), -5);
+
+				dateA = new Date(2006, 7, 11);
+				dateB = new Date(2006, 7, 5);
+				assert.strictEqual(date.difference(dateA, dateB, interval), -4);
+
+				dateA = new Date(2006, 7, 11);
+				dateB = new Date(2006, 7, 6);
+				assert.strictEqual(date.difference(dateA, dateB, interval), -4);
+
+				dateA = new Date(2006, 7, 11);
+				dateB = new Date(2006, 7, 7);
+				assert.strictEqual(date.difference(dateA, dateB, interval), -4);
+
+				dateA = new Date(2006, 7, 13);
+				dateB = new Date(2006, 7, 7);
+				assert.strictEqual(date.difference(dateA, dateB, interval), -5);
+
+				dateA = new Date(2006, 7, 14);
+				dateB = new Date(2006, 7, 7);
+				assert.strictEqual(date.difference(dateA, dateB, interval), -5);
+
+				dateA = new Date(2006, 7, 15);
+				dateB = new Date(2006, 7, 7);
+				assert.strictEqual(date.difference(dateA, dateB, interval), -6);
+
+				dateA = new Date(2006, 7, 28);
+				dateB = new Date(2006, 7, 7);
+				assert.strictEqual(date.difference(dateA, dateB, interval), -15);
+
+				dateA = new Date(2006, 2, 28);
+				dateB = new Date(2006, 2, 2);
+				assert.strictEqual(date.difference(dateA, dateB, interval), -18);
+
+				// Sat, Jan 8
+				// Range starts on a Saturday with negative days
+				dateA = new Date(2000, 0, 8);
+				dateB = new Date(2000, 0, 3);
+				assert.strictEqual(date.difference(dateA, dateB, interval), -5);
+
+				// Two days on the same weekend -- no weekday diff
+				dateA = new Date(2006, 7, 5);
+				dateB = new Date(2006, 7, 6);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 0);
+			},
+
+			&#039;hour&#039;: function () {
+				var interval = &#039;hour&#039;;
+				var dateA;
+				var dateB;
+
+				dateA = new Date(2000, 11, 31, 23);
+				dateB = new Date(2001, 0, 1, 0);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 1);
+
+				dateA = new Date(2000, 11, 31, 12);
+				dateB = new Date(2001, 0, 1, 0);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 12);
+			},
+
+			&#039;minute&#039;: function () {
+				var interval = &#039;minute&#039;;
+				var dateA;
+				var dateB;
+
+				dateA = new Date(2000, 11, 31, 23, 59);
+				dateB = new Date(2001, 0, 1, 0, 0);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 1);
+
+				dateA = new Date(2000, 1, 28, 23, 59);
+				dateB = new Date(2000, 1, 29, 0, 0);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 1);
+			},
+
+			&#039;second&#039;: function () {
+				var interval = &#039;second&#039;;
+				var dateA;
+				var dateB;
+
+				dateA = new Date(2000, 11, 31, 23, 59, 59);
+				dateB = new Date(2001, 0, 1, 0, 0, 0);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 1);
+			},
+
+			&#039;millisecond&#039;: function () {
+				var interval = &#039;millisecond&#039;;
+				var dateA;
+				var dateB;
+
+				dateA = new Date(2000, 11, 31, 23, 59, 59, 999);
+				dateB = new Date(2001, 0, 1, 0, 0, 0, 0);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 1);
+
+				dateA = new Date(2000, 11, 31, 23, 59, 59, 0);
+				dateB = new Date(2001, 0, 1, 0, 0, 0, 0);
+				assert.strictEqual(date.difference(dateA, dateB, interval), 1000);
+			}
+		}
+	});
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/functional/_base/loader/xdomain.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/functional/_base/loader/xdomain.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">55.32</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">333</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">51.88</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">3.13</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+	&#039;require&#039;,
+	&#039;intern!object&#039;,
+	&#039;intern/chai!assert&#039;,
+	&#039;./support/loaderTest&#039;
+], function (require, registerSuite, assert, loaderTest) {
+	var built = 1;
+	//&gt;&gt;excludeStart(&quot;srcVersion&quot;, kwArgs.copyTests==&quot;build&quot;);
+
+	built = 0;
+	//&gt;&gt;excludeEnd(&quot;srcVersion&quot;);
+	function createXDomainTest(async, variation) {
+		variation = variation || 2;
+		var expectedSequence;
+		if ((async === &#039;legacyAsync&#039; || built) &amp;&amp; variation === 2) {
+			expectedSequence = [
+				&#039;local1-5&#039;,
+				&#039;local1-17&#039;,
+				&#039;local2-1&#039;,
+				&#039;local2-2&#039;,
+				&#039;local2-3&#039;,
+				&#039;local3-1&#039;,
+				&#039;local3-2&#039;,
+				&#039;local1-1&#039;,
+				&#039;local1-2&#039;,
+				&#039;local1-3&#039;,
+				&#039;local1-dep-1&#039;,
+				&#039;local1-dep-2&#039;,
+				&#039;local1-4&#039;,
+				&#039;local1-6&#039;,
+				&#039;dojo.tests._base.loader.xdomain.local1-runtimeDependent1-1&#039;,
+				&#039;dojo.tests._base.loader.xdomain.local1-runtimeDependent1-2&#039;,
+				&#039;local1-7&#039;,
+				&#039;local1-8&#039;,
+				&#039;dojo.tests._base.loader.xdomain.local1-browser-1&#039;,
+				&#039;dojo.tests._base.loader.xdomain.local1-browser-2&#039;,
+				&#039;dojo.tests._base.loader.xdomain.local1-browser-skip-1&#039;,
+				&#039;local1-9&#039;,
+				&#039;local1-10&#039;,
+				&#039;local1-11&#039;,
+				&#039;local1-12&#039;,
+				&#039;local1-13&#039;,
+				&#039;local1-14&#039;,
+				&#039;local1-15&#039;,
+				&#039;local1-16&#039;,
+				&#039;local1-18&#039;,
+				&#039;local3-3&#039;,
+				&#039;local2-4&#039;
+			];
+		}
+		else if (async === 0 &amp;&amp; variation === 2) {
+			expectedSequence = [
+				&#039;local2-1&#039;,
+				&#039;local2-2&#039;,
+				&#039;local2-3&#039;,
+				&#039;local2-4&#039;,
+				&#039;local1-5&#039;,
+				&#039;local1-17&#039;,
+				&#039;local3-1&#039;,
+				&#039;local3-2&#039;,
+				&#039;local1-1&#039;,
+				&#039;local1-2&#039;,
+				&#039;local1-3&#039;,
+				&#039;local1-dep-1&#039;,
+				&#039;local1-dep-2&#039;,
+				&#039;local1-4&#039;,
+				&#039;local1-6&#039;,
+				&#039;dojo.tests._base.loader.xdomain.local1-runtimeDependent1-1&#039;,
+				&#039;dojo.tests._base.loader.xdomain.local1-runtimeDependent1-2&#039;,
+				&#039;local1-7&#039;,
+				&#039;local1-8&#039;,
+				&#039;dojo.tests._base.loader.xdomain.local1-browser-1&#039;,
+				&#039;dojo.tests._base.loader.xdomain.local1-browser-2&#039;,
+				&#039;dojo.tests._base.loader.xdomain.local1-browser-skip-1&#039;,
+				&#039;local1-9&#039;,
+				&#039;local1-10&#039;,
+				&#039;local1-11&#039;,
+				&#039;local1-12&#039;,
+				&#039;local1-13&#039;,
+				&#039;local1-14&#039;,
+				&#039;local1-15&#039;,
+				&#039;local1-16&#039;,
+				&#039;local1-18&#039;,
+				&#039;local3-3&#039;
+			];
+		}
+		else if ((async === &#039;legacyAsync&#039; || built) &amp;&amp; variation === 1) {
+			expectedSequence = [
+				&#039;local1-5&#039;,
+				&#039;local1-17&#039;,
+				&#039;local1-1&#039;,
+				&#039;local1-2&#039;,
+				&#039;local1-3&#039;,
+				&#039;local1-dep-1&#039;,
+				&#039;local1-dep-2&#039;,
+				&#039;local1-4&#039;,
+				&#039;local1-6&#039;,
+				&#039;dojo.tests._base.loader.xdomain.local1-runtimeDependent1-1&#039;,
+				&#039;dojo.tests._base.loader.xdomain.local1-runtimeDependent1-2&#039;,
+				&#039;local1-7&#039;,
+				&#039;local1-8&#039;,
+				&#039;dojo.tests._base.loader.xdomain.local1-browser-1&#039;,
+				&#039;dojo.tests._base.loader.xdomain.local1-browser-2&#039;,
+				&#039;dojo.tests._base.loader.xdomain.local1-browser-skip-1&#039;,
+				&#039;local1-9&#039;,
+				&#039;local1-10&#039;,
+				&#039;local1-11&#039;,
+				&#039;local1-12&#039;,
+				&#039;local1-13&#039;,
+				&#039;local1-14&#039;,
+				&#039;local1-15&#039;,
+				&#039;local1-16&#039;,
+				&#039;local1-18&#039;
+			];
+		}
+		else if (async === 0 &amp;&amp; variation === 1) {
+			expectedSequence = [
+				&#039;local1-1&#039;,
+				&#039;local1-2&#039;,
+				&#039;local1-3&#039;,
+				&#039;local1-4&#039;,
+				&#039;local1-5&#039;,
+				&#039;local1-6&#039;,
+				&#039;local1-7&#039;,
+				&#039;local1-8&#039;,
+				&#039;local1-9&#039;,
+				&#039;local1-10&#039;,
+				&#039;local1-11&#039;,
+				&#039;local1-12&#039;,
+				&#039;local1-13&#039;,
+				&#039;local1-14&#039;,
+				&#039;local1-15&#039;,
+				&#039;local1-16&#039;,
+				&#039;local1-17&#039;,
+				&#039;local1-18&#039;,
+				&#039;local1-dep-1&#039;,
+				&#039;local1-dep-2&#039;,
+				&#039;dojo.tests._base.loader.xdomain.local1-runtimeDependent1-1&#039;,
+				&#039;dojo.tests._base.loader.xdomain.local1-runtimeDependent1-2&#039;,
+				&#039;dojo.tests._base.loader.xdomain.local1-browser-1&#039;,
+				&#039;dojo.tests._base.loader.xdomain.local1-browser-2&#039;,
+				&#039;dojo.tests._base.loader.xdomain.local1-browser-skip-1&#039;
+			];
+		}
+		return loaderTest(
+			require.toUrl(&#039;./index.html&#039;),
+			{
+				async: async || 0,
+				packages: [
+					{ name: &#039;dojo&#039;, location: &#039;node_modules/dojo&#039; },
+					{ name: &#039;testing&#039;, location: &#039;.&#039; }
+				],
+				map: {
+					&#039;*&#039;: {
+						&#039;dojo/tests&#039;: &#039;testing/tests/functional&#039;
+					}
+				}
+			},
+			[
+				function (async, variation, callback) {
+					function makeResults(actual, expected, message) {
+						return {
+							actual: actual,
+							expected: expected,
+							message: message
+						};
+					}
+
+					var xdomainExecSequence = window.xdomainExecSequence = [];
+					var xdomainLog = window.xdomainLog = [];
+
+					define(&#039;dijit&#039;, [ &#039;dojo&#039; ], function (dojo) {
+						return dojo.dijit;
+					});
+					define(&#039;dojox&#039;, [ &#039;dojo&#039; ], function (dojo) {
+						return dojo.dojox;
+					});
+
+					require([ &#039;dojo&#039;, &#039;dojo/ready&#039; ], function (dojo, ready) {
+						if (!(&#039;legacyMode&#039; in require)) {
+							callback(JSON.stringify({
+								tests: [makeResults(define.vendor, &#039;dojotoolkit.org&#039;)],
+								sequence: xdomainExecSequence
+							}));
+							return;
+						}
+
+						require.isXdUrl = function (url) {
+							return !/loader\/xdomain/.test(url) &amp;&amp; !/syncBundle/.test(url);
+						};
+
+						if (variation === 1) {
+							dojo.require(&#039;dojo.tests._base.loader.xdomain.local1&#039;);
+
+							if (async === 0) {
+								xdomainLog.push(11, dojo.tests._base.loader.xdomain.local1 === &#039;stepOnLocal1&#039;);
+								xdomainLog.push(12, dojo.require(&#039;dojo.tests._base.loader.xdomain.local1&#039;) === &#039;stepOnLocal1&#039;);
+								xdomainLog.push(13, require(&#039;dojo/tests/_base/loader/xdomain/local1&#039;) === &#039;stepOnLocal1&#039;);
+							}
+							else {
+								xdomainLog.push(11, dojo.getObject(&#039;dojo.tests._base.loader.xdomain.local1&#039;) === undefined);
+							}
+						}
+						else {
+							dojo.require(&#039;dojo.tests._base.loader.xdomain.local2&#039;);
+							if (async === 0) {
+								xdomainLog.push(11, dojo.tests._base.loader.xdomain.local2.status === &#039;local2-loaded&#039;);
+								xdomainLog.push(12, dojo.require(&#039;dojo.tests._base.loader.xdomain.local2&#039;).status === &#039;local2-loaded&#039;);
+								xdomainLog.push(13, require(&#039;dojo/tests/_base/loader/xdomain/local2&#039;).status === &#039;local2-loaded&#039;);
+							}
+							else {
+								xdomainLog.push(11, dojo.getObject(&#039;dojo.tests._base.loader.xdomain.local2&#039;) === undefined);
+							}
+
+							xdomainLog.push(16, dojo.getObject(&#039;dojo.tests._base.loader.xdomain.local1&#039;) === undefined);
+
+							if (dojo.isIE !== 6) {
+								try {
+									require(&#039;dojo/tests/_base/loader/xdomain/local1&#039;);
+									xdomainLog.push(19, false);
+								}
+								catch (e) {
+									xdomainLog.push(19, true);
+								}
+							}
+						}
+
+						xdomainLog.push(14, (dojo.hash === undefined));
+						xdomainLog.push(15, (dojo.cookie === undefined));
+						xdomainLog.push(17, dojo.getObject(&#039;dojo.tests._base.loader.xdomain.local3&#039;) === undefined);
+
+						if (dojo.isIE !== 6) {
+							try {
+								require(&#039;dojo/tests/_base/loader/xdomain/local3&#039;);
+								xdomainLog.push(18, false);
+							}
+							catch (e) {
+								xdomainLog.push(18, true);
+							}
+						}
+
+						ready(function () {
+							var results = [], throwTest = false;
+							for (var i = 0; i &lt; xdomainLog.length; i += 2) {
+								results.push(makeResults(!!xdomainLog[i + 1], true, &#039;failed at id = &#039; + xdomainLog[i]));
+							}
+
+							results.push(makeResults(dojo.tests._base.loader.xdomain.local1, &#039;stepOnLocal1&#039;));
+							results.push(makeResults(dojo.getObject(&#039;dojo.tests._base.loader.xdomain.local1&#039;), &#039;stepOnLocal1&#039;));
+							results.push(makeResults(dojo.require(&#039;dojo.tests._base.loader.xdomain.local1&#039;), &#039;stepOnLocal1&#039;));
+							results.push(makeResults(require(&#039;dojo/tests/_base/loader/xdomain/local1&#039;), &#039;stepOnLocal1&#039;));
+
+							results.push(makeResults(dojo.tests._base.loader.xdomain.local1SteppedOn, &#039;stepOn1SteppedOn&#039;));
+							results.push(makeResults(dojo.getObject(&#039;dojo.tests._base.loader.xdomain.local1SteppedOn&#039;), &#039;stepOn1SteppedOn&#039;));
+							results.push(makeResults(dojo.require(&#039;dojo.tests._base.loader.xdomain.local1SteppedOn&#039;), &#039;stepOn1SteppedOn&#039;));
+							results.push(makeResults(require(&#039;dojo/tests/_base/loader/xdomain/local1SteppedOn&#039;), &#039;stepOn1SteppedOn&#039;));
+
+							results.push(makeResults(dojo.tests._base.loader.xdomain.local1NotSteppedOn.status, &#039;local1NotSteppedOn&#039;));
+							results.push(makeResults(dojo.getObject(&#039;dojo.tests._base.loader.xdomain.local1NotSteppedOn.status&#039;), &#039;local1NotSteppedOn&#039;));
+							results.push(makeResults(dojo.require(&#039;dojo.tests._base.loader.xdomain.local1NotSteppedOn&#039;).status, &#039;local1NotSteppedOn&#039;));
+							results.push(makeResults(require(&#039;dojo/tests/_base/loader/xdomain/local1NotSteppedOn&#039;).status, &#039;local1NotSteppedOn&#039;));
+
+							results.push(makeResults(dojo.tests._base.loader.xdomain[&#039;local1-dep&#039;].status, &#039;dojo.tests._base.loader.xdomain.local1-dep-ok&#039;));
+							results.push(makeResults(dojo.getObject(&#039;dojo.tests._base.loader.xdomain.local1-dep.status&#039;), &#039;dojo.tests._base.loader.xdomain.local1-dep-ok&#039;));
+							results.push(makeResults(dojo.require(&#039;dojo.tests._base.loader.xdomain.local1-dep&#039;).status, &#039;dojo.tests._base.loader.xdomain.local1-dep-ok&#039;));
+							results.push(makeResults(require(&#039;dojo/tests/_base/loader/xdomain/local1-dep&#039;).status, &#039;dojo.tests._base.loader.xdomain.local1-dep-ok&#039;));
+
+							results.push(makeResults(dojo.tests._base.loader.xdomain[&#039;local1-runtimeDependent1&#039;].status, &#039;dojo.tests._base.loader.xdomain.local1-runtimeDependent1-ok&#039;));
+							results.push(makeResults(dojo.getObject(&#039;dojo.tests._base.loader.xdomain.local1-runtimeDependent1.status&#039;), &#039;dojo.tests._base.loader.xdomain.local1-runtimeDependent1-ok&#039;));
+							results.push(makeResults(dojo.require(&#039;dojo.tests._base.loader.xdomain.local1-runtimeDependent1&#039;).status, &#039;dojo.tests._base.loader.xdomain.local1-runtimeDependent1-ok&#039;));
+							results.push(makeResults(require(&#039;dojo/tests/_base/loader/xdomain/local1-runtimeDependent1&#039;).status, &#039;dojo.tests._base.loader.xdomain.local1-runtimeDependent1-ok&#039;));
+
+							results.push(makeResults(dojo.getObject(&#039;dojo.tests._base.loader.xdomain.local1-runtimeDependent&#039;).status, &#039;ok&#039;));
+
+							results.push(makeResults(dojo.tests._base.loader.xdomain[&#039;local1-runtimeDependent2&#039;], undefined));
+							results.push(makeResults(dojo.getObject(&#039;dojo.tests._base.loader.xdomain.local1-runtimeDependent2&#039;), undefined));
+
+							try {
+								require(&#039;dojo/tests/_base/loader/xdomain/local1/runtimeDependent2&#039;);
+							} catch (e) {
+								throwTest = true;
+							}
+							results.push(makeResults(throwTest, true));
+
+							results.push(makeResults(dojo.tests._base.loader.xdomain[&#039;local1-browser&#039;].status, &#039;dojo.tests._base.loader.xdomain.local1-browser-ok&#039;));
+							results.push(makeResults(dojo.getObject(&#039;dojo.tests._base.loader.xdomain.local1-browser.status&#039;), &#039;dojo.tests._base.loader.xdomain.local1-browser-ok&#039;));
+							results.push(makeResults(dojo.require(&#039;dojo.tests._base.loader.xdomain.local1-browser&#039;).status, &#039;dojo.tests._base.loader.xdomain.local1-browser-ok&#039;));
+							results.push(makeResults(require(&#039;dojo/tests/_base/loader/xdomain/local1-browser&#039;).status, &#039;dojo.tests._base.loader.xdomain.local1-browser-ok&#039;));
+
+							results.push(makeResults(!!dojo.cookie, true));
+							results.push(makeResults(dojo.getObject(&#039;dojo.cookie&#039;), dojo.cookie));
+							results.push(makeResults(require(&#039;dojo/cookie&#039;), dojo.cookie));
+
+							if (variation !== 1) {
+								results.push(makeResults(!!dojo.hash, true));
+								results.push(makeResults(dojo.getObject(&#039;dojo.hash&#039;), dojo.hash));
+								results.push(makeResults(require(&#039;dojo/hash&#039;), dojo.hash));
+							}
+
+							callback(JSON.stringify({
+								tests: results,
+								sequence: xdomainExecSequence
+							}));
+						});
+					});
+				},
+				[ async, variation ]
+			],
+			function (data) {
+				data = JSON.parse(data);
+				var test;
+				while ((test = data.tests.shift())) {
+					if (typeof test.actual === &#039;object&#039;) {
+						assert.deepEqual(test.actual, test.expected, test.message);
+					}
+					else {
+						assert.strictEqual(test.actual, test.expected, test.message);
+					}
+				}
+				assert.deepEqual(data.sequence, expectedSequence);
+			}
+		);
+	}
+
+	registerSuite({
+		name: &#039;dojo/_base/loader - xdomain&#039;,
+
+		&#039;sync 1&#039;: createXDomainTest(0, 1),
+		&#039;sync 2&#039;: createXDomainTest(0, 2),
+		&#039;async 1&#039;: createXDomainTest(&#039;legacyAsync&#039;, 1),
+		&#039;async 2&#039;: createXDomainTest(&#039;legacyAsync&#039;, 2)
+	});
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

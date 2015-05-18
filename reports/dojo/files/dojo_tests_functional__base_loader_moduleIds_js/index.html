@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/functional/_base/loader/moduleIds.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/functional/_base/loader/moduleIds.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">62.23</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">268</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">31.52</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">3.32</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/*jshint -W101*/
+define([
+	&#039;require&#039;,
+	&#039;intern!object&#039;,
+	&#039;intern/chai!assert&#039;,
+	&#039;./support/loaderTest&#039;
+], function (require, registerSuite, assert, loaderTest) {
+
+	function checkResults(data) {
+		data = JSON.parse(data);
+		var test;
+		while ((test = data.shift())) {
+			assert.strictEqual(test.actual, test.expected);
+		}
+	}
+
+	registerSuite({
+		name: &#039;dojo/_base/loader/moduleIds&#039;,
+
+		testModuleIds: loaderTest(
+			require.toUrl(&#039;./index.html&#039;),
+			{
+				async: 1,
+				packages: [
+					{
+						// canonical...
+						name: &#039;pack1&#039;,
+						location: &#039;../packages/pack1Root&#039;
+					},
+					{
+						// nonstandard main
+						name: &#039;pack2&#039;,
+						main: &#039;pack2Main&#039;,
+						location: &#039;/pack2Root&#039;
+					},
+					{
+						// nonstandard main
+						name: &#039;pack3&#039;,
+						main: &#039;public/main&#039;,
+						location: &#039;/pack3Root&#039;
+					}
+				]
+			},
+			function (callback) {
+				function get(mid, refmod) {
+					return require.getModuleInfo(mid, refmod, require.packs, require.modules, &#039;../../dojo/&#039;,
+						require.mapProgs, require.pathsMapProg, 1);
+				}
+
+				var data = [];
+
+				function check(result, expectedPid, expectedMidSansPid, expectedUrl) {
+					data.push({ actual: result.pid, expected: expectedPid });
+					data.push({ actual: result.mid, expected: expectedPid + &#039;/&#039; + expectedMidSansPid });
+					data.push({ actual: result.url, expected: expectedUrl + &#039;.js&#039; });
+				}
+
+				// non-relative module id resolution...
+				var pack1Root = &#039;../../packages/pack1Root/&#039;;
+
+				// the various mains...
+				check(get(&#039;pack1&#039;), &#039;pack1&#039;, &#039;main&#039;, pack1Root + &#039;main&#039;);
+				check(get(&#039;pack2&#039;), &#039;pack2&#039;, &#039;pack2Main&#039;, &#039;/pack2Root/pack2Main&#039;);
+				check(get(&#039;pack3&#039;), &#039;pack3&#039;, &#039;public/main&#039;, &#039;/pack3Root/public/main&#039;);
+
+				// modules...
+				check(get(&#039;pack1/myModule&#039;), &#039;pack1&#039;, &#039;myModule&#039;, pack1Root + &#039;myModule&#039;);
+				check(get(&#039;pack2/myModule&#039;), &#039;pack2&#039;, &#039;myModule&#039;, &#039;/pack2Root/myModule&#039;);
+				check(get(&#039;pack3/myModule&#039;), &#039;pack3&#039;, &#039;myModule&#039;, &#039;/pack3Root/myModule&#039;);
+
+				// relative module id resolution; relative to module in top-level
+				var refmod = {mid: &#039;pack1/main&#039;, pack: require.packs.pack1};
+				check(get(&#039;.&#039;, refmod), &#039;pack1&#039;, &#039;main&#039;, pack1Root + &#039;main&#039;);
+				check(get(&#039;./myModule&#039;, refmod), &#039;pack1&#039;, &#039;myModule&#039;, pack1Root + &#039;myModule&#039;);
+				check(get(&#039;./myModule/mySubmodule&#039;, refmod), &#039;pack1&#039;, &#039;myModule/mySubmodule&#039;, pack1Root + &#039;myModule/mySubmodule&#039;);
+
+				// relative module id resolution; relative to module
+				refmod = { mid: &#039;pack1/sub/publicModule&#039;, pack: require.packs.pack1 };
+				check(get(&#039;.&#039;, refmod), &#039;pack1&#039;, &#039;sub&#039;, pack1Root + &#039;sub&#039;);
+				check(get(&#039;./myModule&#039;, refmod), &#039;pack1&#039;, &#039;sub/myModule&#039;, pack1Root + &#039;sub/myModule&#039;);
+				check(get(&#039;..&#039;, refmod), &#039;pack1&#039;, &#039;main&#039;, pack1Root + &#039;main&#039;);
+				check(get(&#039;../myModule&#039;, refmod), &#039;pack1&#039;, &#039;myModule&#039;, pack1Root + &#039;myModule&#039;);
+				check(get(&#039;../util/myModule&#039;, refmod), &#039;pack1&#039;, &#039;util/myModule&#039;, pack1Root + &#039;util/myModule&#039;);
+
+				callback(JSON.stringify(data));
+			},
+			checkResults
+		),
+
+		baseUrl: loaderTest(
+			require.toUrl(&#039;./index.html&#039;),
+			{
+				async: 1,
+				packages: [
+					{ name: &#039;dojo&#039;, location: &#039;node_modules/dojo&#039; }
+				]
+			},
+			function (callback) {
+				require([&#039;dojo&#039;], function (dojo) {
+					callback({
+						originalBaseUrl: dojo.config.baseUrl || &#039;./&#039;,
+						baseUrl: dojo.baseUrl
+					});
+				});
+			},
+			function (data) {
+				assert.strictEqual(data.originalBaseUrl, data.baseUrl);
+			}
+		),
+
+		moduleUrl: loaderTest(
+			require.toUrl(&#039;./index.html&#039;),
+			{
+				async: 1,
+				packages: [
+					{ name: &#039;dojo&#039;, location: &#039;node_modules/dojo&#039; }
+				]
+			},
+			function (callback) {
+				require([&#039;dojo&#039;], function (dojo) {
+					callback({
+						expected: require.toUrl(&#039;base/tests/myTest.html&#039;),
+						moduleUrl1: dojo.moduleUrl(),
+						moduleUrl2: dojo.moduleUrl(null),
+						moduleUrl3: dojo.moduleUrl(null, &#039;myTest.html&#039;),
+						moduleUrl4: dojo.moduleUrl(&#039;base.tests&#039;),
+						moduleUrl5: dojo.moduleUrl(&#039;base.tests&#039;, &#039;myTest.html&#039;)
+					});
+				});
+			},
+			function (data) {
+				var expected = data.expected;
+				assert.isNull(data.moduleUrl1);
+				assert.isNull(data.moduleUrl2);
+				assert.isNull(data.moduleUrl3);
+
+				// note we expect a trailing slash
+				assert.strictEqual(expected.substring(0, expected.length - 11), data.moduleUrl4);
+				assert.strictEqual(expected, data.moduleUrl5);
+			}
+		),
+
+		modulePaths: loaderTest(
+			require.toUrl(&#039;./index.html&#039;),
+			{
+				async: 1,
+				packages: [
+					{ name: &#039;dojo&#039;, location: &#039;node_modules/dojo&#039; }
+				]
+			},
+			function (callback) {
+				require([&#039;dojo&#039;], function (dojo) {
+					dojo.registerModulePath(&#039;mycoolmod&#039;, &#039;../some/path/mycoolpath&#039;);
+					dojo.registerModulePath(&#039;mycoolmod.widget&#039;,
+						&#039;http://some.domain.com/another/path/mycoolpath/widget&#039;);
+
+					callback({
+						expectedUtilUrl: require.compactPath(require.baseUrl + &#039;../some/path/mycoolpath/util/&#039;),
+						moduleUrl1: dojo.moduleUrl(&#039;mycoolmod.util&#039;),
+						moduleUrl2: dojo.moduleUrl(&#039;mycoolmod.widget&#039;),
+						moduleUrl3: dojo.moduleUrl(&#039;mycoolmod.widget.thingy&#039;)
+					});
+				});
+			},
+			function (data) {
+				assert.strictEqual(data.moduleUrl1, data.expectedUtilUrl);
+				assert.strictEqual(data.moduleUrl2, &#039;http://some.domain.com/another/path/mycoolpath/widget/&#039;);
+				assert.strictEqual(data.moduleUrl3,
+					&#039;http://some.domain.com/another/path/mycoolpath/widget/thingy/&#039;);
+			}
+		),
+
+		moduleUrls: loaderTest(
+			require.toUrl(&#039;./index.html&#039;),
+			{
+				async: 1,
+				packages: [
+					{ name: &#039;dojo&#039;, location: &#039;node_modules/dojo&#039; }
+				]
+			},
+			function (callback) {
+				var data = [];
+
+				function check(actual, expected) {
+					data.push({
+						actual: actual,
+						expected: expected
+					});
+				}
+
+				require([&#039;dojo&#039;, &#039;dojo/_base/url&#039;], function (dojo) {
+					dojo.registerModulePath(&#039;mycoolmod&#039;, &#039;some/path/mycoolpath&#039;);
+					dojo.registerModulePath(&#039;mycoolmod2&#039;, &#039;/some/path/mycoolpath2&#039;);
+					dojo.registerModulePath(&#039;mycoolmod.widget&#039;, &#039;http://some.domain.com/another/path/mycoolpath/widget&#039;);
+					dojo.registerModulePath(&#039;ipv4.widget&#039;, &#039;http://ipv4user:ipv4passwd@some.domain.com:2357/another/path/ipv4/widget&#039;);
+					dojo.registerModulePath(&#039;ipv6.widget&#039;, &#039;ftp://ipv6user:ipv6passwd@[::2001:0db8:3c4d:0015:0:0:abcd:ef12]:1113/another/path/ipv6/widget&#039;);
+					dojo.registerModulePath(&#039;ipv6.widget2&#039;, &#039;https://[0:0:0:0:0:1]/another/path/ipv6/widget2&#039;);
+
+					var basePrefix = require.baseUrl;
+
+					check(dojo.moduleUrl(&#039;mycoolmod&#039;, &#039;my/favorite.html&#039;),
+						require.compactPath(basePrefix + &#039;some/path/mycoolpath/my/favorite.html&#039;));
+					check(dojo.moduleUrl(&#039;mycoolmod&#039;, &#039;my/favorite.html&#039;),
+						require.compactPath(basePrefix + &#039;some/path/mycoolpath/my/favorite.html&#039;));
+					check(dojo.moduleUrl(&#039;mycoolmod2&#039;, &#039;my/favorite.html&#039;),
+						&#039;/some/path/mycoolpath2/my/favorite.html&#039;);
+
+					check(dojo.moduleUrl(&#039;mycoolmod2.my&#039;, &#039;favorite.html&#039;),
+						&#039;/some/path/mycoolpath2/my/favorite.html&#039;);
+
+					check(dojo.moduleUrl(&#039;mycoolmod.widget&#039;, &#039;my/favorite.html&#039;),
+						&#039;http://some.domain.com/another/path/mycoolpath/widget/my/favorite.html&#039;);
+
+					check(dojo.moduleUrl(&#039;mycoolmod.widget.my&#039;, &#039;favorite.html&#039;),
+						&#039;http://some.domain.com/another/path/mycoolpath/widget/my/favorite.html&#039;);
+
+					// individual component testing
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv4.widget&#039;, &#039;components.html&#039;))).uri,
+						&#039;http://ipv4user:ipv4passwd@some.domain.com:2357/another/path/ipv4/widget/components.html&#039;);
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv4.widget&#039;, &#039;components.html&#039;))).scheme, &#039;http&#039;);
+
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv4.widget&#039;, &#039;components.html&#039;))).authority,
+						&#039;ipv4user:ipv4passwd@some.domain.com:2357&#039;);
+
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv4.widget&#039;, &#039;components.html&#039;))).user, &#039;ipv4user&#039;);
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv4.widget&#039;, &#039;components.html&#039;))).password, &#039;ipv4passwd&#039;);
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv4.widget&#039;, &#039;components.html&#039;))).host, &#039;some.domain.com&#039;);
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv4.widget&#039;, &#039;components.html&#039;))).port, &#039;2357&#039;);
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv4.widget&#039;, &#039;components.html?query&#039;))).path,
+						&#039;/another/path/ipv4/widget/components.html&#039;);
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv4.widget&#039;, &#039;components.html?q =somequery&#039;))).query, &#039;q =somequery&#039;);
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv4.widget&#039;, &#039;components.html#fragment&#039;))).fragment, &#039;fragment&#039;);
+
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv6.widget&#039;, &#039;components.html&#039;))).uri,
+						&#039;ftp://ipv6user:ipv6passwd@[::2001:0db8:3c4d:0015:0:0:abcd:ef12]:1113/another/path/ipv6/widget/components.html&#039;);
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv6.widget&#039;, &#039;components.html&#039;))).scheme, &#039;ftp&#039;);
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv6.widget&#039;, &#039;components.html&#039;))).authority,
+						&#039;ipv6user:ipv6passwd@[::2001:0db8:3c4d:0015:0:0:abcd:ef12]:1113&#039;);
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv6.widget&#039;, &#039;components.html&#039;))).user, &#039;ipv6user&#039;);
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv6.widget&#039;, &#039;components.html&#039;))).password, &#039;ipv6passwd&#039;);
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv6.widget&#039;, &#039;components.html&#039;))).host,
+						&#039;::2001:0db8:3c4d:0015:0:0:abcd:ef12&#039;);
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv6.widget&#039;, &#039;components.html&#039;))).port, &#039;1113&#039;);
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv6.widget&#039;, &#039;components.html?query&#039;))).path,
+						&#039;/another/path/ipv6/widget/components.html&#039;);
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv6.widget&#039;, &#039;components.html?somequery&#039;))).query, &#039;somequery&#039;);
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv6.widget&#039;, &#039;components.html?somequery#somefragment&#039;))).fragment,
+						&#039;somefragment&#039;);
+
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv6.widget2&#039;, &#039;components.html&#039;))).uri,
+						&#039;https://[0:0:0:0:0:1]/another/path/ipv6/widget2/components.html&#039;);
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv6.widget2&#039;, &#039;components.html&#039;))).scheme, &#039;https&#039;);
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv6.widget2&#039;, &#039;components.html&#039;))).authority, &#039;[0:0:0:0:0:1]&#039;);
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv6.widget2&#039;, &#039;components.html&#039;))).user, null);
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv6.widget2&#039;, &#039;components.html&#039;))).password, null);
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv6.widget2&#039;, &#039;components.html&#039;))).host, &#039;0:0:0:0:0:1&#039;);
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv6.widget2&#039;, &#039;components.html&#039;))).port, null);
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv6.widget2&#039;, &#039;components.html&#039;))).path,
+						&#039;/another/path/ipv6/widget2/components.html&#039;);
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv6.widget2&#039;, &#039;components.html&#039;))).query, null);
+					check((new dojo._Url(dojo.moduleUrl(&#039;ipv6.widget2&#039;, &#039;components.html&#039;))).fragment, null);
+
+					callback(JSON.stringify(data));
+				});
+			},
+			checkResults
+		)
+	});
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

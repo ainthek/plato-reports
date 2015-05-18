@@ -62,7 +62,7 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">15.11</p>
+      <p class="stat">15.18</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
@@ -179,11 +179,11 @@ new Moonboots({
         libraries: [
         ],
         stylesheets: [
-            fixPath(&#039;public/css/bootstrap.css&#039;),
-            fixPath(&#039;public/css/app.css&#039;)
+            fixPath(&#039;stylesheets/bootstrap.css&#039;),
+            fixPath(&#039;stylesheets/app.css&#039;)
         ],
         browserify: {
-            debug: false
+            debug: config.isDev
         },
         beforeBuildJS: function () {
             // This re-builds our template files from jade each time the app&#039;s main
@@ -199,8 +199,8 @@ new Moonboots({
             // and see new styles on refresh.
             if (config.isDev) {
                 stylizer({
-                    infile: fixPath(&#039;public/css/app.styl&#039;),
-                    outfile: fixPath(&#039;public/css/app.css&#039;),
+                    infile: fixPath(&#039;stylesheets/app.styl&#039;),
+                    outfile: fixPath(&#039;stylesheets/app.css&#039;),
                     development: true
                 }, done);
             } else {

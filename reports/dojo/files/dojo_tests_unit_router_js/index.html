@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/unit/router.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/unit/router.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">74.32</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">362</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">33.71</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">3.67</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+	&#039;intern!object&#039;,
+	&#039;intern/chai!assert&#039;,
+	&#039;dojo/_base/array&#039;,
+	&#039;../../hash&#039;,
+	&#039;../../router/RouterBase&#039;
+], function (registerSuite, assert, arrayUtil, hash, RouterBase) {
+
+	// This test uses RouterBase so that we can test a few different
+	// behaviors of the router which require re-initializing a new router
+	var count = 0, a, b, testObject, test,
+		prevented = false, goResult, routeHit,
+		router, handle;
+
+	// Simple helper to make tearDown simpler
+	function removeAll(handles) {
+		arrayUtil.forEach(handles, function (handle) {
+			handle.remove();
+		});
+	}
+
+	function registerRoute(route) {
+		return router.register(route, function () {
+			count++;
+		});
+	}
+
+	registerSuite({
+		name: &#039;dojo/router&#039;,
+
+		after: function () {
+			// reset the hash when everything is done
+			hash(&#039;&#039;);
+		},
+
+		&#039;existence&#039;: {
+			before: function () {
+				hash(&#039;&#039;, true);
+				router = new RouterBase();
+			},
+			&#039;methods&#039;: function () {
+				assert.ok(router.register, &#039;Router has a register&#039;);
+				assert.ok(router.go, &#039;Router has a go&#039;);
+				assert.ok(router.startup, &#039;Router has a startup&#039;);
+				assert.ok(router.destroy, &#039;Router has a destroy&#039;);
+			}
+		},
+		&#039;register&#039;: {
+			before: function () {
+				hash(&#039;&#039;);
+				count = 0;
+				router = new RouterBase();
+			},
+			after: function () {
+				removeAll(handle);
+				count = 0;
+				// NOTE: router.destroy should be fixed to handle
+				// calling destroy without calling started, without erring
+				if (router._started) {
+					router.destroy();
+				}
+			},
+			&#039;handle&#039;: function () {
+				handle = registerRoute(&#039;/foo&#039;);
+				assert.ok(handle.remove, &#039;Handle has a remove&#039;);
+				assert.ok(handle.register, &#039;Handle has a register&#039;);
+			}
+		},
+		&#039;events&#039;: {
+			beforeEach: function () {
+				hash(&#039;&#039;);
+				count = 0;
+				router = new RouterBase();
+			},
+			afterEach: function () {
+				removeAll(handle);
+				count = 0;
+				if (router._started) {
+					router.destroy();
+				}
+			},
+			&#039;before startup&#039;: function () {
+				handle = registerRoute(&#039;/foo&#039;);
+				hash(&#039;/foo&#039;);
+				assert.strictEqual(count, 0, &#039;Count should have been 0, was &#039; + count);
+			},
+			&#039;after startup&#039;: function () {
+				handle = registerRoute(&#039;/foo&#039;);
+				router.startup(&#039;/foo&#039;);
+				assert.strictEqual(count, 1, &#039;Count should have been 1, was &#039; + count);
+			},
+			&#039;change route&#039;: function () {
+				handle = [];
+				handle.push(registerRoute(&#039;/foo&#039;));
+				router.startup(&#039;/foo&#039;);
+				var dfd = this.async();
+				handle.push(router.register(&#039;/bar&#039;, dfd.callback(function () {
+					count++;
+					assert.strictEqual(count, 2, &#039;Count should have been 2, was &#039; + count);
+				})));
+				hash(&#039;/bar&#039;);
+			},
+			&#039;go&#039;: function () {
+				handle = [];
+				handle.push(registerRoute(&#039;/foo&#039;));
+				handle.push(registerRoute(&#039;/bar&#039;));
+				router.startup(&#039;/foo&#039;);
+				router.go(&#039;/bar&#039;);
+				router.go(&#039;/foo&#039;);
+				assert.strictEqual(count, 3, &#039;Count should have been 3, was &#039; + count);
+			},
+			&#039;remove&#039;: function () {
+				handle = registerRoute(&#039;/foo&#039;);
+				router.startup(&#039;&#039;);
+				handle.remove();
+				router.go(&#039;/foo&#039;);
+				assert.strictEqual(count, 0, &#039;Count should have been 0, was &#039; + count);
+			},
+			&#039;regex&#039;: function () {
+				router.startup(&#039;&#039;);
+				handle = registerRoute(/^\/bar$/);
+				router.go(&#039;/bar&#039;);
+				assert.strictEqual(count, 1, &#039;Count should have been 1, was &#039; + count);
+			}
+		},
+		&#039;event object&#039;: {
+			before: function () {
+				hash(&#039;&#039;);
+				count = 0;
+				router = new RouterBase();
+				router.startup(&#039;&#039;);
+			},
+			after: function () {
+				removeAll(handle);
+				count = 0;
+				if (router._started) {
+					router.destroy();
+				}
+			},
+			&#039;structure&#039;: function () {
+				var oldPath, newPath, params, stopImmediatePropagation, preventDefault;
+				handle = router.register(&#039;/checkEventObject/:foo&#039;, function (event) {
+					oldPath = event.oldPath;
+					newPath = event.newPath;
+					params = event.params;
+					stopImmediatePropagation = event.stopImmediatePropagation;
+					preventDefault = event.preventDefault;
+				});
+				router.go(&#039;/checkEventObject/bar&#039;);
+
+				assert.strictEqual(oldPath, &#039;&#039;, &#039;oldPath should be empty string, was &#039; + oldPath);
+				assert.strictEqual(newPath, &#039;/checkEventObject/bar&#039;, &#039;newPath should be /checkEventObject/bar, was &#039; + newPath);
+				assert.ok(params, &#039;params should be a truthy value, was &#039; + params);
+				assert.property(params, &#039;foo&#039;, &#039;params should have a .foo property&#039;);
+				assert.strictEqual(params.foo, &#039;bar&#039;, &#039;params.foo should be bar, was &#039; + params.foo);
+				assert.isFunction(stopImmediatePropagation, &#039;stopImmediatePropagation should be a function, was &#039; + stopImmediatePropagation);
+				assert.isFunction(preventDefault, &#039;preventDefault should be a function, was &#039; + preventDefault);
+			}
+		},
+		&#039;route arguments&#039; : {
+			beforeEach: function () {
+				hash(&#039;&#039;);
+				router = new RouterBase();
+				router.startup(&#039;&#039;);
+			},
+			afterEach: function () {
+				removeAll(handle);
+				if (router._started) {
+					router.destroy();
+				}
+			},
+			&#039;string route&#039;: function () {
+				a = b = null;
+				handle = router.register(&#039;/stringtest/:applied/:arg&#039;, function (event, applied, arg) {
+					a = applied;
+					b = arg;
+				});
+				router.go(&#039;/stringtest/extra/args&#039;);
+
+				assert.strictEqual(a, &#039;extra&#039;, &#039;a should have been extra, was &#039; + a);
+				assert.strictEqual(b, &#039;args&#039;, &#039;b should have been args, was &#039; + b);
+			},
+			&#039;regex route&#039;: function () {
+				a = b = null;
+				handle = router.register(/\/regextest\/(\w+)\/(\w+)/, function (event, applied, arg) {
+					a = applied;
+					b = arg;
+				});
+				router.go(&#039;/regextest/extra/args&#039;);
+
+				assert.strictEqual(a, &#039;extra&#039;, &#039;a should have been extra, was &#039; + a);
+				assert.strictEqual(b, &#039;args&#039;, &#039;b should have been args, was &#039; + b);
+			},
+			&#039;string route, long with placeholders&#039;: function () {
+				testObject = null;
+				handle = router.register(&#039;/path/:to/:some/:long/*thing&#039;, function (event) {
+					testObject = event.params;
+				});
+				router.go(&#039;/path/to/some/long/thing/this/is/in/splat&#039;);
+
+				assert.isObject(testObject, &#039;testObject should have been an object&#039;);
+				assert.strictEqual(testObject.to, &#039;to&#039;, &#039;testObject.to should have been to, was &#039; + testObject.to);
+				assert.strictEqual(testObject.some, &#039;some&#039;, &#039;testObject.some should have been some, was &#039; + testObject.some);
+				assert.strictEqual(testObject[&#039;long&#039;], &#039;long&#039;, &#039;testObject.long should have been long, was &#039; + testObject[&#039;long&#039;]);
+				assert.strictEqual(testObject.thing, &#039;thing/this/is/in/splat&#039;, &#039;testObject.thing should have been thing/this/is/in/splat, was &#039; + testObject.thing);
+			},
+			&#039;string route, numerical with placeholders&#039;: function () {
+				testObject = null;
+				handle = router.register(&#039;/path/:to/:some/:long/*thing&#039;, function (event) {
+					testObject = event.params;
+				});
+				router.go(&#039;/path/1/2/3/4/5/6&#039;);
+
+				assert.isObject(testObject, &#039;testObject should have been an object&#039;);
+				assert.strictEqual(testObject.to, &#039;1&#039;, &#039;testObject.to should have been 1, was &#039; + testObject.to);
+				assert.strictEqual(testObject.some, &#039;2&#039;, &#039;testObject.some should have been 2, was &#039; + testObject.some);
+				assert.strictEqual(testObject[&#039;long&#039;], &#039;3&#039;, &#039;testObject.long should have been 3, was &#039; + testObject[&#039;long&#039;]);
+				assert.strictEqual(testObject.thing, &#039;4/5/6&#039;, &#039;testObject.thing should have been 4/5/6, was &#039; + testObject.thing);
+			}
+		},
+		&#039;route arguments, capture groups&#039;: {
+			beforeEach: function () {
+				testObject = null;
+				hash(&#039;&#039;);
+				router = new RouterBase();
+				router.startup(&#039;&#039;);
+				handle = router.register(/^\/path\/(\w+)\/(\d+)$/, function (event) {
+					testObject = event.params;
+				});
+			},
+			afterEach: function () {
+				removeAll(handle);
+				if (router._started) {
+					router.destroy();
+				}
+			},
+			&#039;full match&#039;: function () {
+				router.go(&#039;/path/abcdef/1234&#039;);
+
+				assert.isArray(testObject, &#039;testObject should have been an array&#039;);
+				assert.strictEqual(testObject[0], &#039;abcdef&#039;, &#039;testObject[0] should have been abcdef, was &#039; + testObject[0]);
+				assert.strictEqual(testObject[1], &#039;1234&#039;, &#039;testObject[1] should have been 1234, was &#039; + testObject[1]);
+			},
+			&#039;no match&#039;: function () {
+				router.go(&#039;/path/abc/def&#039;);
+
+				assert.ok(!testObject, &#039;testObject should have been null&#039;);
+			},
+			&#039;no match alternate&#039;: function () {
+				router.go(&#039;/path/abc123/def&#039;);
+
+				assert.ok(!testObject, &#039;testObject should have been null&#039;);
+			},
+			&#039;full match, alternate&#039;: function () {
+				router.go(&#039;/path/abc123/456&#039;);
+
+				assert.isArray(testObject, &#039;testObject should have been an array&#039;);
+				assert.strictEqual(testObject[0], &#039;abc123&#039;, &#039;testObject[0] should have been abc123, was &#039; + testObject[0]);
+				assert.strictEqual(testObject[1], &#039;456&#039;, &#039;testObject[1] should have been 456, was &#039; + testObject[1]);
+			}
+		},
+		&#039;order and propagation&#039;: {
+			beforeEach: function () {
+				hash(&#039;&#039;);
+				test = &#039;&#039;;
+				handle = [];
+				router = new RouterBase();
+				router.startup(&#039;&#039;);
+			},
+			afterEach: function () {
+				removeAll(handle);
+				if (router._started) {
+					router.destroy();
+				}
+			},
+			&#039;.registerBefore&#039;: function () {
+				handle.push(router.register(&#039;/isBefore&#039;, function () {
+					test += &#039;1&#039;;
+				}));
+				handle.push(router.registerBefore(&#039;/isBefore&#039;, function () {
+					test += &#039;2&#039;;
+				}));
+				handle.push(router.register(&#039;/isBefore&#039;, function () {
+					test += &#039;3&#039;;
+				}));
+				handle.push(router.registerBefore(&#039;/isBefore&#039;, function () {
+					test += &#039;4&#039;;
+				}));
+				handle.push(router.register(&#039;/isBefore&#039;, function () {
+					test += &#039;5&#039;;
+				}));
+				router.go(&#039;/isBefore&#039;);
+
+				assert.strictEqual(test, &#039;42135&#039;, &#039;test should have been 42135, was &#039; + test);
+			},
+			&#039;.stopImmediatePropagation&#039;: function () {
+				handle.push(router.register(&#039;/stopImmediatePropagation&#039;, function () {
+					test += &#039;A&#039;;
+				}));
+				handle.push(router.register(&#039;/stopImmediatePropagation&#039;, function () {
+					test += &#039;B&#039;;
+				}));
+				handle.push(router.register(&#039;/stopImmediatePropagation&#039;, function (event) {
+					event.stopImmediatePropagation();
+					test += &#039;C&#039;;
+				}));
+				handle.push(router.register(&#039;/stopImmediatePropagation&#039;, function () {
+					test += &#039;D&#039;;
+				}));
+				handle.push(router.register(&#039;/stopImmediatePropagation&#039;, function () {
+					test += &#039;E&#039;;
+				}));
+				router.go(&#039;/stopImmediatePropagation&#039;);
+
+				assert.strictEqual(test, &#039;ABC&#039;, &#039;test should have been ABC, was &#039; + test);
+			}
+		},
+		&#039;defaults&#039;: {
+			before: function () {
+				hash(&#039;&#039;);
+				handle = [];
+				router = new RouterBase();
+			},
+			after: function () {
+				removeAll(handle);
+				if (router._started) {
+					router.destroy();
+				}
+			},
+			&#039;.preventDefault&#039;: function () {
+				prevented = false, goResult = false;
+				router.startup(&#039;&#039;);
+				assert.strictEqual(hash(), &#039;&#039;, &#039;hash should be empty&#039;);
+
+				handle.push(router.register(&#039;/preventDefault&#039;, function (event) {
+					event.preventDefault();
+				}));
+				handle.push(router.register(&#039;/allowDefault&#039;, function () {
+					// not preventing default
+				}));
+				goResult = router.go(&#039;/preventDefault&#039;);
+
+				assert.strictEqual(hash(), &#039;&#039;, &#039;hash should still be empty&#039;);
+				assert.ok(!goResult, &#039;goResult should be false&#039;);
+
+				goResult = router.go(&#039;/someOtherPath&#039;);
+
+				assert.strictEqual(hash(), &#039;/someOtherPath&#039;, &#039;hash should be /someOtherPath&#039;);
+				assert.ok(goResult, &#039;goResult should be true&#039;);
+			},
+			&#039;default path&#039;: function () {
+				routeHit = false;
+				handle = router.register(&#039;/default&#039;, function () {
+					routeHit = true;
+				});
+				router.startup(&#039;/default&#039;);
+
+				assert.ok(!routeHit, &#039;Our route was not hit, but should have been&#039;);
+			}
+		}
+	});
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

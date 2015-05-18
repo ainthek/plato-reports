@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">81.65</p>
+      <p class="stat">79.67</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">135</p>
+      <p class="stat">169</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">18.39</p>
+      <p class="stat">24.48</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">1.23</p>
+      <p class="stat">1.53</p>
     </div>
   </div>
 </div>
@@ -107,6 +107,14 @@ s.on(&#039;/redirect/from&#039;, function(req, res) {
 
 s.on(&#039;/redirect/to&#039;, function(req, res) {
   res.end(&#039;ok&#039;)
+})
+
+s.on(&#039;/headers.json&#039;, function(req, res) {
+  res.writeHead(200, {
+    &#039;Content-Type&#039;: &#039;application/json&#039;
+  })
+
+  res.end(JSON.stringify(req.headers))
 })
 
 tape(&#039;setup&#039;, function(t) {
@@ -184,12 +192,21 @@ tape(&#039;upper-case Host header and redirect&#039;, function(t) {
   // Horrible hack to observe the raw data coming to the server (before Node
   // core lower-cases the headers)
   var rawData = &#039;&#039;
+
   s.on(&#039;connection&#039;, function(socket) {
-    var ondata = socket.ondata
-    socket.ondata = function(d, start, end) {
-      rawData += d.slice(start, end).toString()
-      return ondata.apply(this, arguments)
+    if (socket.ondata) {
+      var ondata = socket.ondata
     }
+    function handledata (d, start, end) {
+      if (ondata) {
+        rawData += d.slice(start, end).toString()
+        return ondata.apply(this, arguments)
+      } else {
+        rawData += d
+      }
+    }
+    socket.on(&#039;data&#039;, handledata)
+    socket.ondata = handledata
   })
 
   function checkHostHeader(host) {
@@ -220,9 +237,26 @@ tape(&#039;upper-case Host header and redirect&#039;, function(t) {
   })
 })
 
+tape(&#039;undefined headers&#039;, function(t) {
+  request({
+    url: s.url + &#039;/headers.json&#039;,
+    headers: {
+      &#039;X-TEST-1&#039;: &#039;test1&#039;,
+      &#039;X-TEST-2&#039;: undefined
+    },
+    json: true
+  }, function(err, res, body) {
+    t.equal(err, null)
+    t.equal(body[&#039;x-test-1&#039;], &#039;test1&#039;)
+    t.equal(typeof body[&#039;x-test-2&#039;], &#039;undefined&#039;)
+    t.end()
+  })
+})
+
 tape(&#039;cleanup&#039;, function(t) {
-  s.close()
-  t.end()
+  s.close(function() {
+    t.end()
+  })
 })</textarea>
   </div>
 </div>

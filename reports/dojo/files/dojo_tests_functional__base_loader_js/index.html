@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/functional/_base/loader.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/functional/_base/loader.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">67.64</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">831</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">52.18</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">8.71</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+	&#039;require&#039;,
+	&#039;intern!object&#039;,
+	&#039;intern/chai!assert&#039;,
+	&#039;./loader/support/loaderTest&#039;,
+	&#039;./loader/support/pageReady&#039;,
+	&#039;./loader/requirejs&#039;,
+	&#039;./loader/xdomain&#039;,
+	&#039;./loader/moduleIds&#039;,
+	&#039;./loader/hostenv_webworkers&#039;
+], function (require, registerSuite, assert, loaderTest, pageReady) {
+	registerSuite({
+		name: &#039;dojo/_base/loader&#039;,
+
+		&#039;async with dojo require&#039;: loaderTest(
+			require.toUrl(&#039;./loader/index.html&#039;),
+			{
+				async: true,
+				baseUrl: &#039;.&#039;,
+				packages: [
+					{ name: &#039;dijit&#039;, location: &#039;dijit&#039; },
+					{ name: &#039;dojox&#039;, location: &#039;dojox&#039; },
+					{ name: &#039;dojo&#039;, location: &#039;../../../../node_modules/dojo&#039; },
+					{ name: &#039;test-modules&#039;, location: &#039;.&#039; }
+				]
+			},
+			function (callback) {
+				// dojo must be loaded for legacy modes to work
+				require({ async: &#039;sync&#039; }, [ &#039;dojo&#039; ]);
+
+				// now we can switch to legacy async mode
+				require({ async: &#039;legacyAsync&#039; });
+
+				require([ &#039;test-modules/syncFromAsyncModule&#039; ], function () {
+					callback(window.syncFromAsyncModule);
+				});
+			},
+			function (value) {
+				assert.strictEqual(value, &#039;OK&#039;);
+			}
+		),
+
+		&#039;config&#039;: (function () {
+			function createConfigTest(search, configName) {
+				return loaderTest(
+					require.toUrl(&#039;./loader/config.html&#039;) + &#039;?&#039; + search,
+					[
+						function (configName, callback) {
+							require([
+								&#039;dojo&#039;,
+								&#039;dojo/has&#039;
+							], function (dojo, has) {
+								var config = window[configName];
+								var data = {
+									baseUrl: require.baseUrl,
+									config: config,
+									requireConfig: require.rawConfig,
+									dojoConfig: dojo.config
+								};
+								var hasResults = {};
+								for (var key in config.has) {
+									hasResults[key] = has(key);
+								}
+								data.has = hasResults;
+								callback(data);
+							});
+						},
+						[ configName ]
+					],
+					function (data) {
+						var config = data.config;
+						var requireConfig = data.requireConfig;
+						var dojoConfig = data.dojoConfig;
+
+						assert.strictEqual(requireConfig.baseUrl, config.baseUrl);
+						assert.strictEqual(requireConfig.waitSeconds, config.waitSeconds);
+						assert.strictEqual(requireConfig.locale, config.locale);
+						assert.deepEqual(requireConfig.has, config.has);
+						assert.strictEqual(requireConfig.cats, config.cats);
+						assert.strictEqual(requireConfig.a, config.a);
+						assert.deepEqual(requireConfig.b, config.b);
+						assert.strictEqual(data.baseUrl, config.baseUrl + &#039;/&#039;);
+						for (var key in data.has) {
+							assert.ok(data.has[key]);
+						}
+						assert.isUndefined(require.cats);
+						assert.isUndefined(require.a);
+						assert.isUndefined(require.b);
+
+						assert.strictEqual(dojoConfig.baseUrl, config.baseUrl + &#039;/&#039;);
+						assert.strictEqual(dojoConfig.waitSeconds, config.waitSeconds);
+						assert.strictEqual(dojoConfig.locale, config.locale);
+						assert.strictEqual(dojoConfig.cats, config.cats);
+						assert.strictEqual(dojoConfig.a, config.a);
+						assert.deepEqual(dojoConfig.b, config.b);
+					}
+				);
+			}
+
+			var testMap = {
+				&#039;djConfig&#039;: &#039;_djConfig&#039;,
+				&#039;djConfig-require&#039;: &#039;_djConfig&#039;,
+				&#039;dojoConfig&#039;: &#039;_dojoConfig&#039;,
+				&#039;dojoConfig-djConfig&#039;: &#039;_dojoConfig&#039;,
+				&#039;dojoConfig-require&#039;: &#039;_dojoConfig&#039;,
+				&#039;dojoConfig-djConfig-require&#039;: &#039;_dojoConfig&#039;,
+				&#039;require&#039;: &#039;_require&#039;
+			};
+
+			var tests = {};
+
+			for (var key in testMap) {
+				tests[key] = createConfigTest(key, testMap[key]);
+			}
+
+			return tests;
+		})(),
+
+		&#039;config api&#039;: loaderTest(
+			require.toUrl(&#039;./loader/index.html&#039;),
+			{
+				async: true,
+				isDebug: true,
+				packages: [
+					{ name: &#039;dojo&#039;, location: &#039;node_modules/dojo&#039; }
+				]
+			},
+			function (callback) {
+				require([ &#039;dojo&#039; ], function (dojo) {
+					dojo.ready(function () {
+						var data = { async: {} };
+						var runData;
+
+						function listener1(config, rawConfig) {
+							runData.called1 = true;
+							runData.rawConfig1 = dojo.mixin({}, rawConfig);
+						}
+						function listener2(config, rawConfig) {
+							runData.called2 = true;
+							runData.rawConfig2 = dojo.mixin({}, rawConfig);
+						}
+
+						var handle1 = require.on(&#039;config&#039;, listener1);
+						var handle2 = require.on(&#039;config&#039;, listener2);
+
+						data.call1 = runData = {};
+						require({
+							someFeature: 1
+						});
+
+						handle1.remove();
+
+						data.call2 = runData = {};
+						require({
+							someFeature: 0,
+							someOtherFeature: 1
+						});
+
+						handle2.remove();
+
+						function recordResults(key) {
+							data.async[key] = {
+								async: require.async,
+								legacyMode: require.legacyMode
+							};
+						}
+
+						require({ async: 1 });
+						recordResults(&#039;1&#039;);
+
+						require({ async: true });
+						recordResults(&#039;true&#039;);
+
+						require({ async: 2 });
+						recordResults(&#039;2&#039;);
+
+						require({ async: &#039;nonsense&#039; });
+						recordResults(&#039;nonsense&#039;);
+
+						require({ async: 0 });
+						recordResults(&#039;0&#039;);
+
+						require({ async: false });
+						recordResults(&#039;false&#039;);
+
+						require({ async: &#039;sync&#039; });
+						recordResults(&#039;sync&#039;);
+
+						require({ async: &#039;legacyAsync&#039; });
+						recordResults(&#039;legacyAsync&#039;);
+
+						callback(data);
+					});
+				});
+			},
+			function (data) {
+				var call1 = data.call1;
+				assert.ok(call1.called1);
+				assert.ok(call1.called2);
+				assert.strictEqual(call1.rawConfig1.someFeature, 1);
+				assert.strictEqual(call1.rawConfig2.someFeature, 1);
+
+				var call2 = data.call2;
+				assert.notOk(call2.called1);
+				assert.ok(call2.called2);
+				assert.strictEqual(call2.rawConfig2.someFeature, 0);
+				assert.strictEqual(call2.rawConfig2.someOtherFeature, 1);
+
+				var expected;
+				for (var key in data.async) {
+					expected = {
+						async: false,
+						legacyMode: false
+					};
+					if (key === &#039;legacyAsync&#039;) {
+						expected.legacyMode = &#039;legacyAsync&#039;;
+					}
+					else if (key in { 0: 1, &#039;false&#039;: 1, sync: 1 }) {
+						expected.legacyMode = &#039;sync&#039;;
+					}
+					else {
+						expected.async = true;
+					}
+					assert.deepEqual(data.async[key], expected);
+				}
+			}
+		),
+
+		&#039;config sniff&#039;: (function () {
+			function createSniffTest(url) {
+				return loaderTest(
+					require.toUrl(url),
+					function (callback) {
+						require([&#039;dojo&#039;], function (dojo) {
+							callback({
+								requireConfig: require.rawConfig,
+								dojoConfig: dojo.config,
+								async: require.async,
+								baseUrl: require.baseUrl,
+								cats: require.cats === undefined,
+								a: require.a === undefined,
+								b: require.b === undefined
+							});
+						});
+					},
+					function (data) {
+						var requireConfig = data.requireConfig;
+						var dojoConfig = data.dojoConfig;
+
+						assert.ok(requireConfig.async);
+						assert.strictEqual(requireConfig.baseUrl, &#039;../../../..&#039;);
+						assert.strictEqual(requireConfig.waitSeconds, 6);
+						assert.strictEqual(requireConfig.cats, &#039;dojo-config-dogs&#039;);
+						assert.strictEqual(requireConfig.a, 2);
+						assert.deepEqual(requireConfig.b, [ 3, 4, 5 ]);
+
+						assert.ok(data.async);
+						assert.strictEqual(data.baseUrl, &#039;../../../../&#039;);
+						assert.isTrue(data.cats);
+						assert.isTrue(data.a);
+						assert.isTrue(data.b);
+
+						assert.strictEqual(dojoConfig.baseUrl, &#039;../../../../&#039;);
+						assert.strictEqual(dojoConfig.cats, &#039;dojo-config-dogs&#039;);
+						assert.strictEqual(dojoConfig.a, 2);
+						assert.deepEqual(dojoConfig.b, [ 3, 4, 5 ]);
+					}
+				);
+			}
+
+			return {
+				dojoConfig: createSniffTest(&#039;./loader/config-sniff.html&#039;),
+				djConfig: createSniffTest(&#039;./loader/config-sniff-djConfig.html&#039;)
+			};
+		})(),
+
+		&#039;config has&#039;: pageReady(
+			require.toUrl(&#039;./loader/config-has.html&#039;),
+			function (command) {
+				return command.executeAsync(function (callback) {
+					require([ &#039;dojo/has&#039; ], function (has) {
+						callback({
+							requireConfig: require.rawConfig,
+							has: {
+								&#039;config-someConfigSwitch&#039;: has(&#039;config-someConfigSwitch&#039;),
+								&#039;config-isDebug&#039;: has(&#039;config-isDebug&#039;),
+								&#039;config-anotherConfigSwitch&#039;: has(&#039;config-anotherConfigSwitch&#039;),
+								&#039;some-has-feature&#039;: has(&#039;some-has-feature&#039;)
+							}
+						});
+					});
+				}).then(function (data) {
+					var requireConfig = data.requireConfig;
+					assert.strictEqual(requireConfig.someConfigSwitch, 0);
+					assert.strictEqual(requireConfig.isDebug, 1);
+					assert.strictEqual(requireConfig.anotherConfigSwitch, 2);
+
+					assert.strictEqual(data.has[&#039;config-someConfigSwitch&#039;], 0);
+					assert.strictEqual(data.has[&#039;config-isDebug&#039;], 1);
+					assert.strictEqual(data.has[&#039;config-anotherConfigSwitch&#039;], 2);
+					assert.strictEqual(data.has[&#039;some-has-feature&#039;], 5);
+				}).executeAsync(function (callback) {
+					// setting an existing config variable after boot does *not* affect the has cache
+					require([ &#039;dojo/has&#039; ], function (has) {
+						require({ someConfigSwitch: 3 });
+						callback({
+							requireConfig: require.rawConfig,
+							&#039;config-someConfigSwitch&#039;: has(&#039;config-someConfigSwitch&#039;)
+						});
+					});
+				}).then(function (data) {
+					assert.strictEqual(data.requireConfig.someConfigSwitch, 3);
+					assert.strictEqual(data[&#039;config-someConfigSwitch&#039;], 0);
+				}).executeAsync(function (callback) {
+					// but, we can add new configfeatures any time
+					require([ &#039;dojo/has&#039; ], function (has) {
+						require({ someNewConfigSwitch: 4 });
+						callback({
+							requireConfig: require.rawConfig,
+							&#039;config-someNewConfigSwitch&#039;: has(&#039;config-someNewConfigSwitch&#039;)
+						});
+					});
+				}).then(function (data) {
+					assert.strictEqual(data.requireConfig.someNewConfigSwitch, 4);
+					assert.strictEqual(data[&#039;config-someNewConfigSwitch&#039;], 4);
+				}).executeAsync(function (callback) {
+					// setting an existing has feature via config after boot does *not* affect the has cache
+					require([ &#039;dojo/has&#039; ], function (has) {
+						require({ has: { &#039;some-has-feature&#039;: 6 } });
+						callback({
+							&#039;some-has-feature&#039;: has(&#039;some-has-feature&#039;)
+						});
+					});
+				}).then(function (data) {
+					assert.strictEqual(data[&#039;some-has-feature&#039;], 5);
+				}).executeAsync(function (callback) {
+					// setting an existing has feature via has.add does *not* affect the has cache...
+					require([ &#039;dojo/has&#039; ], function (has) {
+						has.add(&#039;some-has-feature&#039;, 6);
+						callback({
+							&#039;some-has-feature&#039;: has(&#039;some-has-feature&#039;)
+						});
+					});
+				}).then(function (data) {
+					assert.strictEqual(data[&#039;some-has-feature&#039;], 5);
+				}).executeAsync(function (callback) {
+					// ...*unless* you use force...
+					require([ &#039;dojo/has&#039; ], function (has) {
+						has.add(&#039;some-has-feature&#039;, 6, 0, 1);
+						callback({
+							&#039;some-has-feature&#039;: has(&#039;some-has-feature&#039;)
+						});
+					});
+				}).then(function (data) {
+					assert.strictEqual(data[&#039;some-has-feature&#039;], 6);
+				}).executeAsync(function (callback) {
+					// but, we can add new has features any time
+					require([ &#039;dojo/has&#039; ], function (has) {
+						require({ has: { &#039;some-new-has-feature&#039;: 7 } });
+						callback({
+							&#039;some-new-has-feature&#039;: has(&#039;some-new-has-feature&#039;)
+						});
+					});
+				}).then(function (data) {
+					assert.strictEqual(data[&#039;some-new-has-feature&#039;], 7);
+				});
+			}
+		),
+
+		&#039;declare steps on provide&#039;: loaderTest(
+			require.toUrl(&#039;./loader/index.html&#039;),
+			{
+				packages: [
+					{ name: &#039;dojo&#039;, location: &#039;node_modules/dojo&#039; },
+					{ name: &#039;testing&#039;, location: &#039;.&#039; }
+				],
+				map: {
+					&#039;*&#039;: {
+						&#039;dojo/tests&#039;: &#039;testing/tests/functional&#039;
+					}
+				}
+			},
+			function (callback) {
+				require([
+					&#039;dojo&#039;,
+					&#039;dojo/tests/_base/loader/declareStepsOnProvideAmd&#039;
+				], function (dojo, DeclareStepsOnProvideAmd) {
+					var data = {};
+					var instance = new DeclareStepsOnProvideAmd();
+					data.status1 = instance.status();
+
+					// requiring declareStepsOnProvideAmd caused
+					// declareStepsOnProvide to load which loaded *two* modules
+					// and dojo.declare stepped on both of them
+					instance = new (require(&#039;dojo/tests/_base/loader/declareStepsOnProvide1&#039;))();
+					data.status2 = instance.status();
+					callback(data);
+				});
+			},
+			function (data) {
+				assert.strictEqual(data.status1, &#039;OK&#039;);
+				assert.strictEqual(data.status2, &#039;OK-1&#039;);
+			}
+		),
+
+		&#039;publish require result&#039;: (function () {
+			function createPublishTest(publish) {
+				return loaderTest(
+					require.toUrl(&#039;./loader/index.html&#039;),
+					{
+						publishRequireResult: Boolean(publish),
+						packages: [
+							{ name: &#039;dojo&#039;, location: &#039;node_modules/dojo&#039; },
+							{ name: &#039;testing&#039;, location: &#039;.&#039; }
+						],
+						map: {
+							&#039;*&#039;: {
+								&#039;dojo/tests&#039;: &#039;testing/tests/functional&#039;
+							}
+						}
+					},
+					function (callback) {
+						var dojo = window.dojo;
+
+						dojo.setObject(&#039;dojo.tests._base.loader.pub1&#039;, &#039;do-not-mess-with-me&#039;);
+						dojo.require(&#039;dojo.tests._base.loader.pub1&#039;);
+						dojo.require(&#039;dojo.tests._base.loader.pub2&#039;);
+
+						require([ &#039;dojo/has&#039; ], function (has) {
+							callback({
+								pub1: dojo.getObject(&#039;dojo.tests._base.loader.pub1&#039;),
+								pub2Status: dojo.getObject(&#039;dojo.tests._base.loader.pub2&#039;) &amp;&amp;
+									dojo.getObject(&#039;dojo.tests._base.loader.pub2.status&#039;),
+								dojoConfigPublishRequireResult: !!dojo.config.publishRequireResult,
+								hasPublishRequireResult: !!has(&#039;config-publishRequireResult&#039;)
+							});
+						});
+					},
+					function (data) {
+						assert.strictEqual(data.pub1, &#039;do-not-mess-with-me&#039;);
+
+						if (publish) {
+							assert.isTrue(data.hasPublishRequireResult);
+							assert.strictEqual(data.pub2Status, &#039;ok&#039;);
+						}
+						else {
+							assert.isFalse(data.hasPublishRequireResult);
+							assert.isFalse(data.dojoConfigPublishRequireResult);
+							assert.isTrue(data.pub2Status == null);
+						}
+					}
+				);
+			}
+
+			return {
+				&#039;publish&#039;: createPublishTest(true),
+				&#039;no publish&#039;: createPublishTest()
+			};
+		})(),
+
+		&#039;top level module by paths&#039;: loaderTest(
+			require.toUrl(&#039;./loader/index.html&#039;),
+			{
+				packages: [
+					{ name: &#039;dojo&#039;, location: &#039;node_modules/dojo&#039; }
+				]
+			},
+			function (callback) {
+				var myModule1Value = {};
+				var myModule2Value = {};
+
+				define(&#039;myModule1&#039;, [], myModule1Value);
+				define(&#039;myModule2&#039;, [], myModule2Value);
+
+				require({
+					aliases: [
+						// yourModule --&gt; myModule1
+						[ &#039;yourModule&#039;, &#039;myModule1&#039; ],
+
+						// yourOtherModule --&gt; myModule1
+						[ /yourOtherModule/, &#039;myModule1&#039; ],
+
+						// yourModule/*/special --&gt; yourModule/common/special
+						// this will result in a resubmission to finally resolve in the next one
+						[ /yourOtherModule\/([^\/]+)\/special/, &#039;yourOtherModule/common/special&#039; ],
+
+						// yourModule/common/special --&gt; myModule2
+						// notice the regex above also finds yourOtherModule/common/special;
+						// the extra parenthesized subexprs make this have priority
+						[ /(yourOtherModule\/(common))\/special/, &#039;myModule2&#039; ]
+					],
+					paths: { myTopLevelModule: &#039;./tests/functional/_base/loader/myTopLevelModule&#039; }
+				});
+
+				require([
+					&#039;myTopLevelModule&#039;,
+					&#039;myModule1&#039;,
+					&#039;myModule2&#039;,
+					&#039;yourModule&#039;,
+					&#039;yourOtherModule&#039;,
+					&#039;yourOtherModule/stuff/special&#039;
+				], function (myModule, myModule1, myModule2, yourModule, yourOtherModule, special) {
+					// top level module via path
+					var myTopLevelModule = this.myTopLevelModule;
+					var results =
+						myModule1Value === myModule1 &amp;&amp;
+						myModule1Value === yourModule &amp;&amp;
+						myModule1Value === yourOtherModule &amp;&amp;
+						myModule2Value === myModule2 &amp;&amp;
+						myModule2Value === special &amp;&amp;
+						myTopLevelModule.name === &#039;myTopLevelModule&#039; &amp;&amp;
+						myTopLevelModule.myModule.name === &#039;myTopLevelModule.myModule&#039;;
+					callback(results);
+				});
+			},
+			function (data) {
+				assert.isTrue(data);
+			}
+		),
+
+		&#039;config/test&#039;: loaderTest(
+			require.toUrl(&#039;./loader/index.html&#039;),
+			{
+				async: true,
+				baseUrl: &#039;../../../..&#039;,
+				packages: [
+					{
+						name: &#039;loader&#039;,
+						location: &#039;tests/functional/_base/loader/config&#039;,
+						packageMap: {
+							&#039;pkg&#039;: &#039;pkgMapped&#039;
+						}
+					},
+					{
+						name: &#039;pkg&#039;,
+						location: &#039;tests/functional/_base/loader/config/pkg&#039;
+					},
+					{
+						name: &#039;pkgMapped&#039;,
+						location: &#039;tests/functional/_base/loader/config/pkg&#039;,
+						packageMap: {
+							&#039;pkg&#039;: &#039;pkgMapped&#039;
+						}
+					},
+					{
+						name: &#039;dojo&#039;,
+						location: &#039;node_modules/dojo&#039;
+					}
+				],
+				config: {
+					&#039;loader/someModuleConfiggedPriorToBoot&#039;: {
+						someConfig: &#039;this is the config for someModuleConfiggedPriorToBoot&#039;
+					}
+				}
+			},
+			function (callback) {
+				function mixin(destination, source) {
+					for (var key in source) {
+						if (Object.prototype.hasOwnProperty.call(source, key)) {
+							destination[key] = source[key];
+						}
+					}
+					return destination;
+				}
+				require({
+					config: {
+						&#039;loader/someModule&#039;: {
+							someConfig: &#039;this is the config for someModule-someConfig&#039;
+						},
+						&#039;pkgMapped/m1&#039;: {
+							globalConfig: &#039;globalConfigForpkgMapped/m1&#039;,
+							isMapped: true
+						},
+						&#039;pkgMapped/m2&#039;: {
+							globalConfig: &#039;globalConfigForpkgMapped/m2&#039;
+						}
+					}
+				});
+
+				require([
+					&#039;loader/someModuleConfiggedPriorToBoot&#039;,
+					&#039;loader/someModule&#039;
+				], function (someModuleConfiggedPriorToBoot, someModule) {
+					var results = {
+						someModuleConfiggedPriorToBootConfig: mixin({}, someModuleConfiggedPriorToBoot.getConfig()),
+						someModuleConfig: mixin({}, someModule.getConfig()),
+						someModuleM1Config: mixin({}, someModule.m1.getConfig()),
+						someModuleM2Config: mixin({}, someModule.m2.getConfig())
+					};
+
+					require({
+						config: {
+							&#039;loader/someModule&#039;: {
+								someMoreConfig: &#039;this is the config for someModule-someMoreConfig&#039;
+							}
+						}
+					});
+
+					require([&#039;loader/someModule&#039;], function (someModuleAfterConfig) {
+						mixin(results, {
+							someModuleAfterConfig: mixin({}, someModuleAfterConfig.getConfig())
+						});
+						require({
+							config: {
+								&#039;pkg/m1&#039;: { globalConfig: &#039;globalConfigForM1&#039; },
+								&#039;pkg/m2&#039;: { globalConfig: &#039;globalConfigForM2&#039; }
+							}
+						}, [ &#039;pkg/m1&#039;, &#039;pkg/m2&#039; ], function (m1, m2) {
+							callback(mixin(results, {
+								m1Config: m1.getConfig(),
+								m2Config: m2.getConfig()
+							}));
+						});
+					});
+				});
+			},
+			function (data) {
+				assert.deepEqual(data.someModuleConfiggedPriorToBootConfig, {
+					someConfig: &#039;this is the config for someModuleConfiggedPriorToBoot&#039;
+				});
+				assert.deepEqual(data.someModuleConfig, {
+					someConfig: &#039;this is the config for someModule-someConfig&#039;
+				});
+				assert.deepEqual(data.someModuleM1Config, {
+					globalConfig: &#039;globalConfigForpkgMapped/m1&#039;,
+					isMapped: true,
+					configThroughMappedRefForM1: &#039;configThroughMappedRefForM1&#039;
+				});
+				assert.deepEqual(data.someModuleM2Config, {
+					globalConfig: &#039;globalConfigForpkgMapped/m2&#039;,
+					configThroughMappedRefForM1: &#039;configThroughMappedRefForM1&#039;,
+					config1: &#039;mapped-config1&#039;,
+					config2: &#039;mapped-config2&#039;,
+					config3: &#039;mapped-config3&#039;
+				});
+				assert.deepEqual(data.someModuleAfterConfig, {
+					someConfig: &#039;this is the config for someModule-someConfig&#039;,
+					someMoreConfig: &#039;this is the config for someModule-someMoreConfig&#039;
+				});
+				assert.deepEqual(data.m1Config, {
+					globalConfig: &#039;globalConfigForM1&#039;
+				});
+				assert.deepEqual(data.m2Config, {
+					globalConfig: &#039;globalConfigForM2&#039;,
+					config1: &#039;config1&#039;,
+					config2: &#039;config2&#039;,
+					config3: &#039;config3&#039;
+				});
+			}
+		),
+
+		mapping: loaderTest(
+			require.toUrl(&#039;./loader/index.html&#039;),
+			{
+				async: true,
+				packages: [
+					{ name: &#039;dojo&#039;, location: &#039;node_modules/dojo&#039; }
+				],
+				map: {
+					&#039;my/replacement/A&#039;: {
+						&#039;my/A&#039;: &#039;my/A&#039;
+					},
+					&#039;*&#039;: {
+						&#039;my/A&#039;: &#039;my/replacement/A&#039;
+					}
+				}
+			},
+			function (callback) {
+				// simulate a built layer, this is added to dojo.js by the builder
+				require({
+					cache: {
+						&#039;my/replacement/A&#039;: function () {
+							define([ &#039;../A&#039; ], function () {
+								return { it: &#039;is a replacement module&#039; };
+							});
+						},
+						&#039;my/A&#039;: function () {
+							define([ &#039;./B&#039; ], function () {
+								return { it: &#039;is the original module&#039; };
+							});
+						},
+						&#039;my/B&#039;: function () {
+							define([], function () {
+								return { it: &#039;is a module dependency&#039; };
+							});
+						}
+					}
+				});
+
+				// consume pending cache, the following are added at the end of a built dojo.js in a closure
+				require({ cache: {} });
+				!require.async &amp;&amp; require([ &#039;dojo&#039; ]);
+				require.boot &amp;&amp; require.apply(null, require.boot);
+
+				// begin test:
+				// moving modules from the pending cache to the module cache should ignore
+				// any mapping, pathing, or alias rules
+				var handle = require.on(&#039;error&#039;, function () {
+					handle.remove();
+					callback({ error: true });
+				});
+
+				require([ &#039;my/A&#039; ], function (A) {
+					handle.remove();
+					callback({ aIt: A.it });
+				});
+			},
+			function (data) {
+				if (data.error) {
+					assert.fail();
+				}
+				else {
+					assert.strictEqual(data.aIt, &#039;is a replacement module&#039;);
+				}
+			}
+		),
+
+		compactPath: loaderTest(
+			require.toUrl(&#039;./loader/index.html&#039;),
+			{ isDebug: 1, async: 1 },
+			function (callback) {
+				var compactPath = require.compactPath;
+				callback([
+					compactPath(&#039;../../dojo/../../mytests&#039;),
+					compactPath(&#039;module&#039;),
+					compactPath(&#039;a/./b&#039;),
+					compactPath(&#039;a/../b&#039;),
+					compactPath(&#039;a/./b/./c/./d&#039;),
+					compactPath(&#039;a/../b/../c/../d&#039;),
+					compactPath(&#039;a/b/c/../../d&#039;),
+					compactPath(&#039;a/b/c/././d&#039;),
+					compactPath(&#039;./a/b&#039;),
+					compactPath(&#039;../a/b&#039;),
+					compactPath(&#039;&#039;)
+				]);
+			},
+			function (data) {
+				assert.strictEqual(&#039;../../../mytests&#039;, data.shift());
+				assert.strictEqual(&#039;module&#039;, data.shift());
+				assert.strictEqual(&#039;a/b&#039;, data.shift());
+				assert.strictEqual(&#039;b&#039;, data.shift());
+				assert.strictEqual(&#039;a/b/c/d&#039;, data.shift());
+				assert.strictEqual(&#039;d&#039;, data.shift());
+				assert.strictEqual(&#039;a/d&#039;, data.shift());
+				assert.strictEqual(&#039;a/b/c/d&#039;, data.shift());
+				assert.strictEqual(&#039;a/b&#039;, data.shift());
+				assert.strictEqual(&#039;../a/b&#039;, data.shift());
+				assert.strictEqual(&#039;&#039;, data.shift());
+			}
+		),
+
+		modules: loaderTest(
+			require.toUrl(&#039;./loader/index.html&#039;),
+			{
+				async: 1,
+				baseUrl: &#039;./foo&#039;,
+				packages: [
+					{ name: &#039;testing&#039;, location: &#039;../../../../../&#039; },
+					{ name: &#039;dojo&#039;, location: &#039;../../../../../node_modules/dojo&#039; }
+				]
+			},
+			function (callback) {
+				require([
+					&#039;dojo&#039;,
+					&#039;dojo/has&#039;,
+					&#039;modules/anon&#039;,
+					&#039;modules/wrapped&#039;,
+					&#039;testing/tests/functional/_base/loader/modules/full&#039;,
+					&#039;modules/data&#039;,
+					&#039;modules/factoryArity&#039;,
+					&#039;modules/factoryArityExports&#039;,
+					&#039;testing/tests/functional/_base/loader/modules/idFactoryArity&#039;,
+					&#039;testing/tests/functional/_base/loader/modules/idFactoryArityExports&#039;
+				], function (dojo, has, anon, wrapped) {
+					callback([
+						has(&#039;dojo-amd-factory-scan&#039;),
+						anon.theAnswer,
+						require(&#039;modules/anon&#039;).five,
+						wrapped.five,
+						dojo.require(&#039;testing.tests.functional._base.loader.modules.wrapped&#039;).five,
+						require(&#039;modules/wrapped&#039;).five,
+						require(&#039;testing/tests/functional/_base/loader/modules/full&#039;).twiceTheAnswer,
+						require(&#039;modules/data&#039;).five,
+
+						require(&#039;modules/factoryArity&#039;).module.id,
+						require(&#039;modules/factoryArity&#039;).id,
+						require(&#039;modules/factoryArity&#039;).impliedDep,
+
+						require(&#039;modules/factoryArityExports&#039;).module.id,
+						require(&#039;modules/factoryArityExports&#039;).id,
+						require(&#039;modules/factoryArityExports&#039;).impliedDep,
+
+						require(&#039;testing/tests/functional/_base/loader/modules/idFactoryArity&#039;).module.id,
+						require(&#039;testing/tests/functional/_base/loader/modules/idFactoryArity&#039;).id,
+						require(&#039;testing/tests/functional/_base/loader/modules/idFactoryArity&#039;).impliedDep,
+
+						require(&#039;testing/tests/functional/_base/loader/modules/idFactoryArityExports&#039;).module.id,
+						require(&#039;testing/tests/functional/_base/loader/modules/idFactoryArityExports&#039;).id,
+						require(&#039;testing/tests/functional/_base/loader/modules/idFactoryArityExports&#039;).impliedDep
+					]);
+				});
+			},
+			function (data) {
+				assert.strictEqual(data.shift(), 1);
+				assert.strictEqual(data.shift(), 42);
+				assert.strictEqual(data.shift(), 5);
+				assert.strictEqual(data.shift(), 5);
+				assert.strictEqual(data.shift(), 5);
+				assert.strictEqual(data.shift(), 5);
+				assert.strictEqual(data.shift(), 84);
+				assert.strictEqual(data.shift(), 5);
+
+				assert.strictEqual(data.shift(), &#039;modules/factoryArity&#039;);
+				assert.strictEqual(data.shift(), &#039;factoryArity&#039;);
+				assert.strictEqual(data.shift(), &#039;impliedDep1&#039;);
+
+				assert.strictEqual(data.shift(), &#039;modules/factoryArityExports&#039;);
+				assert.strictEqual(data.shift(), &#039;factoryArityExports&#039;);
+				assert.strictEqual(data.shift(), &#039;impliedDep2&#039;);
+
+				assert.strictEqual(data.shift(), &#039;testing/tests/functional/_base/loader/modules/idFactoryArity&#039;);
+				assert.strictEqual(data.shift(), &#039;idFactoryArity&#039;);
+				assert.strictEqual(data.shift(), &#039;impliedDep3&#039;);
+
+				assert.strictEqual(data.shift(), &#039;testing/tests/functional/_base/loader/modules/idFactoryArityExports&#039;);
+				assert.strictEqual(data.shift(), &#039;idFactoryArityExports&#039;);
+				assert.strictEqual(data.shift(), &#039;impliedDep4&#039;);
+			}
+		)
+	});
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>
