@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/unit/request/xhr.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/unit/request/xhr.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">72.59</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">410</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">45.33</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">3.60</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+	&#039;intern!object&#039;,
+	&#039;intern/chai!assert&#039;,
+	&#039;../../../request/xhr&#039;,
+	&#039;../../../errors/RequestTimeoutError&#039;,
+	&#039;../../../errors/CancelError&#039;,
+	&#039;dojo/promise/all&#039;,
+	&#039;dojo/query&#039;,
+	&#039;require&#039;
+], function (registerSuite, assert, xhr, RequestTimeoutError, CancelError, all, query, require) {
+	var hasFormData = &#039;FormData&#039; in this &amp;&amp; typeof FormData === &#039;function&#039;;
+	var hasResponseType = typeof XMLHttpRequest !== &#039;undefined&#039; &amp;&amp;
+		typeof new XMLHttpRequest().responseType !== &#039;undefined&#039;;
+	var formData;
+
+	registerSuite({
+		name: &#039;dojo/request/xhr&#039;,
+
+		&#039;.get&#039;: function () {
+			var promise = xhr.get(&#039;/__services/request/xhr&#039;, {
+				preventCache: true,
+				handleAs: &#039;json&#039;
+			});
+
+			assert.isFunction(promise.then);
+			assert.isFunction(promise.cancel);
+			assert.isObject(promise.response);
+			assert.isFunction(promise.response.then);
+			assert.isFunction(promise.response.cancel);
+
+			return promise.response.then(function (response) {
+				assert.strictEqual(response.data.method, &#039;GET&#039;);
+				assert.strictEqual(response.xhr.readyState, 4);
+				return response;
+			});
+		},
+
+		&#039;.get 404&#039;: function () {
+			var def = this.async(),
+				promise = xhr.get(require.toUrl(&#039;./xhr_blarg.html&#039;), {
+					preventCache: true
+				});
+
+			promise.response.then(
+				def.reject,
+				def.callback(function (error) {
+					assert.strictEqual(error.response.status, 404);
+				})
+			);
+		},
+
+		&#039;.get with query&#039;: function () {
+			var def = this.async(),
+				promise = xhr.get(&#039;/__services/request/xhr?color=blue&#039;, {
+					query: {
+						foo: [ &#039;bar&#039;, &#039;baz&#039; ],
+						thud: &#039;thonk&#039;,
+						xyzzy: 3
+					},
+					handleAs: &#039;json&#039;
+				});
+
+			promise.response.then(def.callback(function (response) {
+				assert.strictEqual(response.data.method, &#039;GET&#039;);
+				var query = response.data.query;
+				assert.ok(query.color &amp;&amp; query.foo &amp;&amp; query.foo.length &amp;&amp; query.thud &amp;&amp; query.xyzzy);
+				assert.strictEqual(query.color, &#039;blue&#039;);
+				assert.strictEqual(query.foo.length, 2);
+				assert.strictEqual(query.thud, &#039;thonk&#039;);
+				assert.strictEqual(query.xyzzy, &#039;3&#039;);
+				assert.strictEqual(response.url, &#039;/__services/request/xhr?color=blue&amp;foo=bar&amp;foo=baz&amp;thud=thonk&amp;xyzzy=3&#039;);
+			}));
+		},
+
+		&#039;.post&#039;: function () {
+			var def = this.async(),
+				promise = xhr.post(&#039;/__services/request/xhr&#039;, {
+					data: { color: &#039;blue&#039; },
+					handleAs: &#039;json&#039;
+				});
+
+			promise.response.then(
+				def.callback(function (response) {
+					assert.strictEqual(response.data.method, &#039;POST&#039;);
+					var payload = response.data.payload;
+
+					assert.ok(payload &amp;&amp; payload.color);
+					assert.strictEqual(payload.color, &#039;blue&#039;);
+				}),
+				def.reject
+			);
+		},
+
+		&#039;.post with query&#039;: function () {
+			var def = this.async(),
+				promise = xhr.post(&#039;/__services/request/xhr&#039;, {
+					query: {
+						foo: [ &#039;bar&#039;, &#039;baz&#039; ],
+						thud: &#039;thonk&#039;,
+						xyzzy: 3
+					},
+					data: { color: &#039;blue&#039; },
+					handleAs: &#039;json&#039;
+				});
+
+			promise.then(
+				def.callback(function (data) {
+					assert.strictEqual(data.method, &#039;POST&#039;);
+					var query = data.query,
+						payload = data.payload;
+
+					assert.ok(query);
+					assert.deepEqual(query.foo, [ &#039;bar&#039;, &#039;baz&#039; ]);
+					assert.strictEqual(query.thud, &#039;thonk&#039;);
+					assert.strictEqual(query.xyzzy, &#039;3&#039;);
+
+					assert.ok(payload);
+					assert.strictEqual(payload.color, &#039;blue&#039;);
+				}),
+				def.reject
+			);
+		},
+
+		&#039;.post string payload&#039;: function () {
+			var def = this.async(),
+				promise = xhr.post(&#039;/__services/request/xhr&#039;, {
+					data: &#039;foo=bar&amp;color=blue&amp;height=average&#039;,
+					handleAs: &#039;json&#039;
+				});
+
+			promise.then(
+				def.callback(function (data) {
+					assert.strictEqual(data.method, &#039;POST&#039;);
+
+					var payload = data.payload;
+
+					assert.ok(payload);
+					assert.strictEqual(payload.foo, &#039;bar&#039;);
+					assert.strictEqual(payload.color, &#039;blue&#039;);
+					assert.strictEqual(payload.height, &#039;average&#039;);
+				}),
+				def.reject
+			);
+		},
+
+		&#039;.put&#039;: function () {
+			var def = this.async(),
+				promise = xhr.put(&#039;/__services/request/xhr&#039;, {
+					query: { foo: &#039;bar&#039; },
+					data: { color: &#039;blue&#039; },
+					handleAs: &#039;json&#039;
+				});
+
+			promise.then(
+				def.callback(function (data) {
+					assert.strictEqual(data.method, &#039;PUT&#039;);
+
+					assert.ok(data.payload);
+					assert.strictEqual(data.payload.color, &#039;blue&#039;);
+
+					assert.ok(data.query);
+					assert.strictEqual(data.query.foo, &#039;bar&#039;);
+				}),
+				def.reject
+			);
+		},
+
+		&#039;.del&#039;: function () {
+			var def = this.async(),
+				promise = xhr.del(&#039;/__services/request/xhr&#039;, {
+					query: { foo: &#039;bar&#039; },
+					handleAs: &#039;json&#039;
+				});
+
+			promise.then(
+				def.callback(function (data) {
+					assert.strictEqual(data.method, &#039;DELETE&#039;);
+					assert.strictEqual(data.query.foo, &#039;bar&#039;);
+				}),
+				def.reject
+			);
+		},
+
+		&#039;timeout&#039;: function () {
+			var def = this.async(),
+				promise = xhr.get(&#039;/__services/request/xhr&#039;, {
+					query: {
+						delay: &#039;3000&#039;
+					},
+					timeout: 1000
+				});
+
+			promise.then(
+				def.reject,
+				def.callback(function (error) {
+					assert.instanceOf(error, RequestTimeoutError);
+				})
+			);
+		},
+
+		cancel: function () {
+			var def = this.async(),
+				promise = xhr.get(&#039;/__services/request/xhr&#039;, {
+					query: {
+						delay: &#039;3000&#039;
+					}
+				});
+
+			promise.then(
+				def.reject,
+				def.callback(function (error) {
+					assert.instanceOf(error, CancelError);
+				})
+			);
+			promise.cancel();
+		},
+
+		sync: function () {
+			var called = false;
+
+			xhr.get(&#039;/__services/request/xhr&#039;, {
+				sync: true
+			}).then(function () {
+				called = true;
+			});
+
+			assert.ok(called);
+		},
+
+		&#039;cross-domain fails&#039;: function () {
+			var def = this.async();
+
+			xhr.get(&#039;http://dojotoolkit.org&#039;).response.then(
+				def.reject,
+				function () {
+					def.resolve(true);
+				}
+			);
+		},
+
+		headers: function () {
+			var def = this.async();
+
+			xhr.get(&#039;/__services/request/xhr&#039;).response.then(
+				def.callback(function (response) {
+					assert.notEqual(response.getHeader(&#039;Content-Type&#039;), null);
+				}),
+				def.reject
+			);
+		},
+
+		&#039;custom Content-Type&#039;: function () {
+			var def = this.async(),
+				expectedContentType = &#039;application/x-test-xhr&#039;;
+
+			function post(headers) {
+				return xhr.post(&#039;/__services/request/xhr&#039;, {
+					query: {
+						&#039;header-test&#039;: &#039;true&#039;
+					},
+					headers: headers,
+					data: &#039;testing&#039;,
+					handleAs: &#039;json&#039;
+				});
+			}
+
+			all({
+				lowercase: post({
+					&#039;content-type&#039;: expectedContentType
+				}),
+				uppercase: post({
+					&#039;CONTENT-TYPE&#039;: expectedContentType
+				})
+			}).then(
+				def.callback(function (results) {
+					assert.match(
+						results.lowercase.headers[&#039;content-type&#039;],
+						/^application\/x-test-xhr(?:;.*)?$/
+					);
+					assert.match(
+						results.uppercase.headers[&#039;content-type&#039;],
+						/^application\/x-test-xhr(?:;.*)?$/
+					);
+				}),
+				def.reject
+			);
+		},
+
+		&#039;queryable xml&#039;: function () {
+			var def = this.async();
+
+			xhr.get(&#039;/__services/request/xhr/xml&#039;, {
+				handleAs: &#039;xml&#039;
+			}).then(
+				def.callback(function (xmlDoc) {
+					var results = query(&#039;bar&#039;, xmlDoc);
+
+					assert.strictEqual(results.length, 2);
+				}),
+				def.reject
+			);
+		},
+
+		&#039;form data&#039;: {
+			setup: function () {
+				if(!hasFormData) { return; }
+
+				formData = new FormData();
+				formData.append(&#039;foo&#039;, &#039;bar&#039;);
+				formData.append(&#039;baz&#039;, &#039;blah&#039;);
+			},
+
+			post: function () {
+				if(!hasFormData) {
+					this.skip(&#039;No FormData to test&#039;);
+				}
+
+				var def = this.async();
+
+				xhr.post(&#039;/__services/request/xhr/multipart&#039;, {
+					data: formData,
+					handleAs: &#039;json&#039;
+				}).then(
+					def.callback(function (data) {
+						assert.deepEqual(data, { foo: &#039;bar&#039;, baz: &#039;blah&#039; });
+					}),
+					def.reject
+				);
+			},
+
+			teardown: function () {
+				formData = null;
+			}
+		},
+
+		&#039;response type&#039;: {
+			&#039;Blob&#039;: function () {
+				if (!hasResponseType) {
+					this.skip(&#039;No responseType to test&#039;);
+				}
+
+				return xhr.get(&#039;/__services/request/xhr/responseTypeGif&#039;, {
+					handleAs: &#039;blob&#039;
+				}).then(function (response) {
+					assert.strictEqual(response.constructor, Blob);
+				});
+			},
+
+			&#039;Blob POST&#039;: function () {
+				if (!hasResponseType) {
+					this.skip(&#039;No responseType to test&#039;);
+				}
+
+				return xhr.post(&#039;/__services/request/xhr/responseTypeGif&#039;, {
+					handleAs: &#039;blob&#039;
+				}).then(function (response) {
+					assert.strictEqual(response.constructor, Blob);
+				});
+			},
+
+			&#039;ArrayBuffer&#039;: function () {
+				if (!hasResponseType) {
+					this.skip(&#039;No responseType to test&#039;);
+				}
+
+				return xhr.get(&#039;/__services/request/xhr/responseTypeGif&#039;, {
+					handleAs: &#039;arraybuffer&#039;
+				}).then(function (response) {
+					assert.strictEqual(response.constructor, ArrayBuffer);
+				});
+			},
+
+			&#039;ArrayBuffer POST&#039;: function () {
+				if (!hasResponseType) {
+					this.skip(&#039;No responseType to test&#039;);
+				}
+
+				return xhr.post(&#039;/__services/request/xhr/responseTypeGif&#039;, {
+					handleAs: &#039;arraybuffer&#039;
+				}).then(function (response) {
+					assert.strictEqual(response.constructor, ArrayBuffer);
+				});
+			},
+
+			&#039;document&#039;: function () {
+				if (!hasResponseType) {
+					this.skip(&#039;No responseType to test&#039;);
+				}
+
+				return xhr.get(&#039;/__services/request/xhr/responseTypeDoc&#039;, {
+					handleAs: &#039;document&#039;
+				}).then(function (response) {
+					assert.strictEqual(response.constructor, document.constructor);
+				});
+			},
+
+			&#039;document POST&#039;: function () {
+				if (!hasResponseType) {
+					this.skip(&#039;No responseType to test&#039;);
+				}
+
+				return xhr.post(&#039;/__services/request/xhr/responseTypeDoc&#039;, {
+					handleAs: &#039;document&#039;
+				}).then(function (response) {
+					assert.strictEqual(response.constructor, document.constructor);
+				});
+			}
+		}
+	});
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

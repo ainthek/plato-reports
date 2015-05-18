@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/unit/store/DataStore.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/unit/store/DataStore.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">71.91</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">145</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">28.16</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.41</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+	&#039;intern!object&#039;,
+	&#039;intern/chai!assert&#039;,
+	&#039;../../../store/DataStore&#039;,
+	&#039;../../../data/ItemFileReadStore&#039;,
+	&#039;../../../data/ItemFileWriteStore&#039;,
+	&#039;dojo/_base/lang&#039;
+], function (registerSuite, assert, DataStore, ItemFileReadStore, ItemFileWriteStore, lang) {
+	var data, dataStore, store;
+
+	registerSuite({
+		name: &#039;dojo/store/DataStore&#039;,
+
+		beforeEach: function () {
+			data = {
+				items: [
+					{ id: 1, name: &#039;one&#039;, prime: false },
+					{ id: 2, name: &#039;two&#039;, even: true, prime: true },
+					{ id: 3, name: &#039;three&#039;, prime: true },
+					{ id: 4, name: &#039;four&#039;, even: true, prime: false },
+					{ id: 5, name: &#039;five&#039;, prime: true, children: [
+						{ _reference: 1 },
+						{ _reference: 2 },
+						{ _reference: 3 }
+					] }
+				],
+				identifier: &#039;id&#039;
+			};
+
+			dataStore = new ItemFileWriteStore({ data: lang.clone(data) });
+			dataStore.fetchItemByIdentity({ identity: null });
+			store = new DataStore({ store: dataStore });
+		},
+
+		construction: {
+			&#039;when using a read-only store then write methods unavailable&#039;: function () {
+				var readOnlyStore = new DataStore({ store: new ItemFileReadStore({}) });
+				assert.isNotFunction(readOnlyStore.put);
+				assert.isNotFunction(readOnlyStore.add);
+			}
+		},
+
+		&#039;.get&#039;: function () {
+			assert.equal(store.get(1).name, &#039;one&#039;);
+			assert.equal(store.get(4).name, &#039;four&#039;);
+			assert.isTrue(store.get(5).prime);
+			assert.equal(store.get(5).children[1].name, &#039;two&#039;);
+			assert.ok(typeof store.get(10) === &#039;undefined&#039;);
+		},
+
+		&#039;.query&#039;: {
+			&#039;basic query returns expected data&#039;: function () {
+				var dfd = this.async(500);
+				var query = { even: true };
+				var result = store.query(query);
+
+				result.map(dfd.callback(function (record) {
+					var expected = data.items[record.id - 1];
+					for (var key in record) {
+						if (record.hasOwnProperty(key)) {
+							assert.propertyVal(expected, key, record[key]);
+						}
+					}
+				}), lang.hitch(dfd, &#039;reject&#039;));
+			},
+
+			&#039;provides children&#039;: function () {
+				var dfd = this.async(500);
+				var query = { prime: true };
+
+				store.query(query).then(dfd.callback(
+					function (results) {
+						assert.lengthOf(results, 3);
+						assert.equal(results[2].children[2].name, &#039;three&#039;);
+					}
+				), lang.hitch(dfd, &#039;reject&#039;));
+			}
+		},
+
+		&#039;.put&#039;: {
+			&#039;update a record&#039;: function () {
+				var record = store.get(4);
+
+				assert.notOk(record.square);
+				record.square = true;
+				store.put(record);
+				record = store.get(4);
+				assert.isTrue(record.square);
+			},
+
+			&#039;add a new record&#039;: function () {
+				var data = { id: 6, perfect: true };
+
+				store.put(data);
+				assert.isTrue(store.get(6).perfect);
+			},
+
+			&#039;overwrite new&#039;: function () {
+				return store.put({
+					id: 8,
+					name: &#039;eight&#039;
+				}, {
+					overwrite: true
+				}).then(function () {
+					assert.fail();
+				}, function () {
+					// do nothing... test passes
+				});
+			}
+		},
+
+		&#039;.add&#039;: {
+			&#039;new record&#039;: function () {
+				store.add({
+					id: 7,
+					name: &#039;seven&#039;
+				});
+				assert.equal(store.get(7).name, &#039;seven&#039;);
+			},
+
+			&#039;existing record&#039;: function () {
+				return store.add({
+					id: 1,
+					name: &#039;one&#039;
+				}).then(function () {
+					assert.fail();
+				}, function () {
+					// do nothing... test passes
+				});
+			}
+		},
+
+		&#039;.remove&#039;: {
+			&#039;multiple calls&#039;: function () {
+				return store.remove(5).then(function (result) {
+					assert.ok(result);
+				}).then(function () {
+					return store.remove(7);
+				}).then(function (result) {
+					assert.ok(!result);
+				});
+			}
+		}
+	});
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

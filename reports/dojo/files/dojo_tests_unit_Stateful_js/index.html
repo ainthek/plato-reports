@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/unit/Stateful.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/unit/Stateful.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">65.88</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">206</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">35.20</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.92</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+	&#039;intern!object&#039;,
+	&#039;intern/chai!assert&#039;,
+	&#039;../../Stateful&#039;,
+	&#039;sinon&#039;,
+	&#039;dojo/_base/declare&#039;
+], function (registerSuite, assert, Stateful, sinon, declare) {
+	registerSuite({
+		name: &#039;dojo/Stateful&#039;,
+
+		&#039;.watch&#039;: {
+			&#039;notifies watcher when .set()&#039;: function () {
+				var name = &#039;foo&#039;;
+				var stateObj = new Stateful({ foo: 3 });
+				var onValueChange = sinon.stub();
+
+				stateObj.watch(name, onValueChange);
+				assert.equal(stateObj.get(name), 3);
+
+				stateObj.set(name, 4);
+				assert.isTrue(onValueChange.calledOnce);
+				assert.deepEqual([name, 3, 4], onValueChange.firstCall.args);
+				assert.equal(stateObj.get(name), 4);
+			},
+
+			&#039;handle.remove() stops notifications&#039;: function () {
+				var name = &#039;foo&#039;;
+				var stateObj = new Stateful({ foo: 3 });
+				var onValueChange = sinon.stub();
+				var handle = stateObj.watch(name, onValueChange);
+
+				stateObj.set(name, 4);
+				assert.isTrue(onValueChange.calledOnce);
+
+				handle.remove();
+				stateObj.set(name, 5);
+				assert.isTrue(onValueChange.calledOnce);
+			},
+
+			&#039;handle.remove() is reentrant and works correctly with another watch&#039;: function () {
+				var name = &#039;foo&#039;;
+				var stateObj = new Stateful({ foo: 3 });
+				var onValueChange1 = sinon.stub();
+				var onValueChange2 = sinon.stub();
+				var handle = stateObj.watch(name, onValueChange1);
+
+				stateObj.watch(name, onValueChange2);
+				stateObj.set(name, 4);
+				handle.remove();
+				handle.remove();
+				stateObj.set(name, 5);
+
+				assert.isTrue(onValueChange1.calledOnce);
+				assert.isTrue(onValueChange2.calledTwice);
+			},
+
+			&#039;wildcard watcher&#039;: function () {
+				var stateObj = new Stateful();
+				var onAnyValueChange = sinon.stub();
+				var onFooValueChange = sinon.stub();
+
+				stateObj.set({ foo: 3, bar: 5 });
+				stateObj.watch(onAnyValueChange);
+				stateObj.watch(&#039;foo&#039;, onFooValueChange);
+
+				stateObj.set(&#039;foo&#039;, 4);
+				stateObj.set(&#039;bar&#039;, 6);
+
+				assert.isTrue(onAnyValueChange.calledTwice);
+				assert.isTrue(onFooValueChange.calledOnce);
+			}
+		},
+
+		&#039;.set&#039;: {
+			&#039;hashed value&#039;: function () {
+				var stateObj1 = new Stateful();
+				var onValueChange = sinon.stub();
+				var handle = stateObj1.watch(&#039;foo&#039;, onValueChange);
+				var stateObj2;
+
+				stateObj1.set({ foo: 3, bar: 5 });
+				assert.equal(stateObj1.get(&#039;foo&#039;), 3);
+				assert.equal(stateObj1.get(&#039;bar&#039;), 5);
+				assert.isTrue(onValueChange.calledOnce);
+
+				stateObj2 = new Stateful();
+				stateObj2.set(stateObj1);
+				assert.equal(stateObj2.get(&#039;foo&#039;), 3);
+				assert.equal(stateObj2.get(&#039;bar&#039;), 5);
+				// stateObj1 watchers should not be copied to stateObj2
+				assert.isTrue(onValueChange.calledOnce);
+				handle.unwatch();
+			}
+		},
+
+		&#039;functional getters and setters&#039;: {
+			&#039;accessor usage&#039;: function () {
+				var ExtendedStateful = declare([Stateful], {
+					foo: &#039;&#039;,
+					bar: 0,
+					baz: &#039;&#039;,
+
+					_fooSetter: function (value) {
+						this.foo = value;
+					},
+
+					_fooGetter: function () {
+						return &#039;bar&#039;;
+					},
+
+					_barSetter: function (value) {
+						this.bar = value;
+					}
+				});
+				var stateObj = new ExtendedStateful();
+
+				stateObj.set(&#039;foo&#039;, &#039;nothing&#039;);
+				stateObj.set(&#039;bar&#039;, 2);
+				stateObj.set(&#039;baz&#039;, &#039;bar&#039;);
+
+				assert.equal(stateObj.foo, &#039;nothing&#039;, &#039;attribute set properly&#039;);
+				assert.equal(stateObj.get(&#039;foo&#039;), &#039;bar&#039;, &#039;getter working properly&#039;);
+				assert.equal(stateObj.bar, 2, &#039;attribute set properly&#039;);
+				assert.equal(stateObj.get(&#039;bar&#039;), 2, &#039;getter working properly&#039;);
+				assert.equal(stateObj.baz, &#039;bar&#039;, &#039;property set properly&#039;);
+				assert.equal(stateObj.get(&#039;baz&#039;), &#039;bar&#039;, &#039;getter working properly&#039;);
+			},
+
+			&#039;parameter handling&#039;: function () {
+				var ExtendedStateful = declare([Stateful], {
+					foo: null,
+					bar: 5,
+
+					_fooSetter: function (value) {
+						this.foo = value;
+					},
+
+					_barSetter: function (value) {
+						this.bar = value;
+					}
+				});
+				var stateObj = new ExtendedStateful({
+					foo: function () {
+						return &#039;baz&#039;;
+					},
+					bar: 4
+				});
+
+				assert.typeOf(stateObj.foo, &#039;function&#039;);
+				assert.equal(stateObj.foo(), &#039;baz&#039;);
+				assert.equal(stateObj.get(&#039;bar&#039;), 4);
+			},
+
+			&#039;_changeAttrValue() inside a setter&#039;: function () {
+				var onFooValueChange = sinon.stub();
+				var onBarValueChange = sinon.stub();
+				var ExtendedStateful = declare([Stateful], {
+					foo: null,
+					bar: null,
+
+					_fooSetter: function (value) {
+						this._changeAttrValue(&#039;bar&#039;, value);
+						this.foo = value;
+					},
+
+					_barSetter: function (value) {
+						this._changeAttrValue(&#039;foo&#039;, value);
+						this.bar = value;
+					}
+				});
+				var stateObj = new ExtendedStateful();
+
+				stateObj.watch(&#039;foo&#039;, onFooValueChange);
+				stateObj.watch(&#039;bar&#039;, onBarValueChange);
+
+				stateObj.set(&#039;foo&#039;, 3);
+				assert.equal(stateObj.get(&#039;bar&#039;), 3);
+
+				stateObj.set(&#039;bar&#039;, 4);
+				assert.equal(stateObj.get(&#039;foo&#039;), 4);
+
+				assert.isTrue(onFooValueChange.calledTwice);
+				assert.isTrue(onBarValueChange.calledTwice);
+				assert.deepEqual([&#039;bar&#039;, null, 3], onBarValueChange.firstCall.args);
+				assert.deepEqual([&#039;foo&#039;, null, 3], onFooValueChange.firstCall.args);
+				assert.deepEqual([&#039;foo&#039;, 3, 4], onFooValueChange.secondCall.args);
+				assert.deepEqual([&#039;bar&#039;, 3, 4], onBarValueChange.secondCall.args);
+			},
+
+			&#039;serialize correctly with setters&#039;: function () {
+				var ExtendedStateful = declare([Stateful], {
+					foo: null,
+
+					_fooSetter: function (value) {
+						this.foo = value + &#039;baz&#039;;
+					}
+				});
+				var stateObj = new ExtendedStateful({
+					foo: &#039;bar&#039;
+				});
+
+				assert.equal(JSON.stringify(stateObj), &#039;{&quot;foo&quot;:&quot;barbaz&quot;}&#039;);
+			}
+		}
+	});
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

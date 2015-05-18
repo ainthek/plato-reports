@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/functional/fx.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/functional/fx.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">76.80</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">442</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">67.33</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">4.36</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/* globals fx, on, domGeometry, domClass, baseFx, aspect, createAnimationList */
+define([
+	&#039;require&#039;,
+	&#039;intern!object&#039;,
+	&#039;intern/chai!assert&#039;,
+	&#039;intern/dojo/node!leadfoot/helpers/pollUntil&#039;
+], function (require, registerSuite, assert, pollUntil) {
+	var FX_URL = &#039;./support/fx.html&#039;;
+
+	function getPage(context, url) {
+		return context.get(&#039;remote&#039;)
+			.setExecuteAsyncTimeout(5000)
+			.get(require.toUrl(url))
+			.then(pollUntil(&#039;return ready || null;&#039;));
+	}
+
+	function applyCompressClass(context) {
+		return context
+			.execute(function () {
+				domClass.add(&#039;foo&#039;, &#039;compressed&#039;);
+				return domGeometry.position(&#039;foo&#039;);
+			})
+			.then(function (results) {
+				assert.isTrue(results.h &lt; 10);
+			});
+	}
+
+	registerSuite({
+		name: &#039;dojo/fx&#039;,
+
+		&#039;.slideTo&#039;: function () {
+			return getPage(this, FX_URL)
+				.executeAsync(function (done) {
+					var anim = fx.slideTo({
+						node: &#039;foo&#039;,
+						duration: 500,
+						left: 500,
+						top: 50
+					}).play();
+
+					on(anim, &#039;End&#039;, function () {
+						done(domGeometry.getMarginBox(&#039;foo&#039;));
+					});
+				}).then(function (results) {
+					assert.equal(results.t, 50);
+					assert.equal(results.l, 500);
+				});
+		},
+
+		&#039;.wipeOut&#039;: {
+			&#039;.play&#039;: function () {
+				return getPage(this, FX_URL)
+					.executeAsync(function (done) {
+						var anim = fx.wipeOut({
+							node: &#039;foo&#039;
+						}).play();
+
+						on(anim, &#039;End&#039;, function () {
+							done(domGeometry.position(&#039;foo&#039;));
+						});
+					}).then(function (results) {
+						assert.isTrue(results.w &lt; 5);
+					});
+			},
+
+			&#039;onStop&#039;: function () {
+				return getPage(this, FX_URL)
+					.executeAsync(function (done) {
+						var anim = fx.wipeOut({
+							node: &#039;foo&#039;,
+							duration: 1000
+						});
+
+						aspect.after(anim, &#039;onStop&#039;, function () {
+							done(true);
+						}, true);
+						anim.play();
+						setTimeout(function () {
+							anim.stop();
+						}, 100);
+					})
+					.then(function (results) {
+						assert.isTrue(results);
+					});
+			}
+		},
+
+		&#039;.wipeIn&#039;: {
+			&#039;.play&#039;: function () {
+				return applyCompressClass(getPage(this, FX_URL))
+					.executeAsync(function (done) {
+						var anim = fx.wipeIn({
+							node: &#039;foo&#039;
+						}).play();
+
+						on(anim, &#039;End&#039;, function () {
+							done(domGeometry.position(&#039;foo&#039;));
+						});
+					}).then(function (results) {
+						assert.isTrue(results.h &gt; 10);
+					});
+			},
+
+			&#039;onStop&#039;: function () {
+				return applyCompressClass(getPage(this, FX_URL))
+					.executeAsync(function (done) {
+						var anim = fx.wipeIn({
+							node: &#039;foo&#039;,
+							duration: 1000
+						});
+
+						aspect.after(anim, &#039;onStop&#039;, function () {
+							done(true);
+						}, true);
+						anim.play();
+						setTimeout(function () {
+							anim.stop();
+						}, 100);
+					})
+					.then(function (results) {
+						assert.isTrue(results);
+					});
+			}
+		},
+
+		&#039;.chain&#039;: {
+			&#039;onEnd both children animations are stopped&#039;: function () {
+				return applyCompressClass(getPage(this, FX_URL))
+					.executeAsync(function (done) {
+						var wipeInAnim = fx.wipeIn({
+							node: &#039;foo&#039;,
+							duration: 500
+						});
+						var fadeOutAnim = baseFx.fadeOut({
+							node: &#039;foo&#039;,
+							duration: 500
+						});
+						var anim = fx.chain([wipeInAnim, fadeOutAnim]);
+
+						on(anim, &#039;End&#039;, function () {
+							done({
+								status: {
+									wipeIn: wipeInAnim.status(),
+									fadeOut: fadeOutAnim.status(),
+									anim: anim.status()
+								}
+							});
+						});
+
+						anim.play();
+					})
+					.then(function (results) {
+						assert.equal(results.status.wipeIn, &#039;stopped&#039;);
+						assert.equal(results.status.fadeOut, &#039;stopped&#039;);
+						assert.equal(results.status.anim, &#039;stopped&#039;);
+					});
+			},
+
+			&#039;delay&#039;: function () {
+				return getPage(this, FX_URL)
+					.executeAsync(function (done) {
+						var anim = fx.chain(createAnimationList());
+						var timer;
+
+						aspect.after(anim, &#039;onEnd&#039;, function () {
+							done({
+								expected: anim.duration,
+								actual: +(new Date()) - timer
+							});
+						}, true);
+
+						timer = +(new Date());
+						anim.play();
+					}).then(function (results) {
+						assert.isTrue(results.actual &gt; 100);
+						assert.closeTo(results.actual, results.actual, 100);
+					});
+			},
+
+			&#039;onEnd is called&#039;: function () {
+				return getPage(this, FX_URL)
+					.executeAsync(function (done) {
+						var fadeOutAnim = baseFx.fadeOut({ node: &#039;foo2&#039;, duration: 400 });
+						var fadeInAnim = baseFx.fadeIn({ node: &#039;foo2&#039;, duration: 400 });
+						var anim = fx.chain([fadeOutAnim, fadeInAnim]);
+						aspect.after(anim, &#039;onEnd&#039;, function () {
+							done();
+						}, true);
+						anim.play();
+					});
+			},
+
+			&#039;onPlay is called&#039;: function () {
+				return getPage(this, FX_URL)
+					.executeAsync(function (done) {
+						var fadeOutAnim = baseFx.fadeOut({ node: &#039;foo2&#039;, duration: 400 });
+						var fadeInAnim = baseFx.fadeIn({ node: &#039;foo2&#039;, duration: 400 });
+						var anim = fx.chain([fadeOutAnim, fadeInAnim]);
+						aspect.after(anim, &#039;onPlay&#039;, function () {
+							done();
+						}, true);
+						anim.play();
+					});
+			},
+
+			&#039;chain multiple combine animations&#039;: function () {
+				return getPage(this, FX_URL)
+					.executeAsync(function (done) {
+						// test chaining two combined() animations
+						var anim1 = fx.combine([
+							baseFx.fadeIn({ node: &#039;chained&#039; }),
+							baseFx.fadeOut({ node: &#039;chainedtoo&#039; })
+						]);
+						var anim2 = fx.combine([
+							baseFx.fadeOut({ node: &#039;chained&#039; }),
+							baseFx.fadeIn({ node: &#039;chainedtoo&#039; })
+						]);
+
+						var anim = fx.chain([anim1, anim2]);
+
+						aspect.after(anim, &#039;onEnd&#039;, function () {
+							done(true);
+						}, true);
+						anim.play();
+					})
+					.then(function (results) {
+						assert.isTrue(results);
+					});
+			}
+		},
+
+		&#039;.gotoPercent + .chain&#039;: function () {
+			return getPage(this, FX_URL)
+				.executeAsync(function (done) {
+					var anims = [
+						baseFx.fadeOut({ node: &#039;baz&#039; }),
+						baseFx.fadeIn({ node: &#039;baz&#039; }),
+						fx.wipeOut({ node: &#039;baz&#039; }),
+						fx.wipeIn({ node: &#039;baz&#039; }),
+						fx.slideTo({ node: &#039;baz&#039;, top: 200, left: 300 })
+					];
+					var chain = fx.chain(anims);
+					var length = anims.length;
+					var percent = 0.34;
+					var totalActive = length - Math.floor(percent * length);
+					var numRun = 0;
+
+					for (var i = 0, anim; (anim = anims[i]); i++) {
+						aspect.before(anim, &#039;onEnd&#039;, function () {
+							numRun++;
+						});
+					}
+
+					aspect.after(chain, &#039;onEnd&#039;, function () {
+						done(totalActive === numRun);
+					});
+
+					chain.gotoPercent(percent, true);
+				})
+				.then(function (result) {
+					assert.isTrue(result);
+				});
+		},
+
+		&#039;.combine&#039;: {
+			&#039;test basic functionality&#039;: function () {
+				return applyCompressClass(getPage(this, FX_URL))
+					.executeAsync(function (done) {
+						var wipeInAnim = fx.wipeIn({
+							node: &#039;foo&#039;,
+							duration: 500
+						});
+						var fadeInAnim = baseFx.fadeIn({
+							node: &#039;foo&#039;,
+							duration: 1000
+						});
+						var anim = fx.combine([wipeInAnim, fadeInAnim]);
+
+						aspect.after(anim, &#039;onEnd&#039;, function () {
+							done({
+								status: {
+									wipeIn: wipeInAnim.status(),
+									fadeIn: fadeInAnim.status(),
+									combine: anim.status()
+								}
+							});
+						}, true);
+
+						anim.play();
+					})
+					.then(function (results) {
+						assert.equal(results.status.wipeIn, &#039;stopped&#039;);
+						assert.equal(results.status.fadeIn, &#039;stopped&#039;);
+						assert.equal(results.status.combine, &#039;stopped&#039;);
+					});
+			},
+
+			&#039;beforeBegin is called&#039;: function () {
+				return getPage(this, FX_URL)
+					.executeAsync(function (done) {
+						var fadeOutAnim = baseFx.fadeOut({ node: &#039;foo2&#039;, duration: 400 });
+						var fadeInAnum = baseFx.fadeIn({ node: &#039;foo2&#039;, duration: 400 });
+						var anim = fx.combine([fadeOutAnim, fadeInAnum]);
+
+						aspect.after(anim, &#039;beforeBegin&#039;, function () {
+							done(true);
+						}, true);
+						anim.play();
+					})
+					.then(function (results) {
+						assert.isTrue(results);
+					});
+			},
+
+			&#039;delay&#039;: function () {
+				return getPage(this, FX_URL)
+					.executeAsync(function (done) {
+						var anim = fx.combine(createAnimationList());
+						var timer;
+
+						aspect.after(anim, &#039;onEnd&#039;, function () {
+							done({
+								expected: anim.duration,
+								actual: +(new Date()) - timer
+							});
+						}, true);
+
+						timer = +(new Date());
+						anim.play();
+					})
+					.then(function (results) {
+						assert.isTrue(results.actual &gt; 100);
+						assert.closeTo(results.actual, results.actual, 100);
+					});
+			},
+
+			&#039;onEnd is called&#039;: function () {
+				return getPage(this, FX_URL)
+					.executeAsync(function (done) {
+						var fadeOutAnim = baseFx.fadeOut({ node: &#039;foo2&#039;, duration: 400 });
+						var fadeInAnim = baseFx.fadeIn({ node: &#039;foo2&#039;, duration: 400 });
+						var anim = fx.combine([fadeOutAnim, fadeInAnim]);
+						aspect.after(anim, &#039;onEnd&#039;, function () {
+							done();
+						}, true);
+						anim.play();
+					});
+			},
+
+			&#039;onPlay is called&#039;: function () {
+				return getPage(this, FX_URL)
+					.executeAsync(function (done) {
+						var fadeOutAnim = baseFx.fadeOut({ node: &#039;foo2&#039;, duration: 400 });
+						var fadeInAnim = baseFx.fadeIn({ node: &#039;foo2&#039;, duration: 400 });
+						var anim = fx.combine([fadeOutAnim, fadeInAnim]);
+						aspect.after(anim, &#039;onPlay&#039;, function () {
+							done();
+						}, true);
+						anim.play();
+					});
+			},
+
+			&#039;combining chains&#039;: function () {
+				return getPage(this, FX_URL)
+					.executeAsync(function (done) {
+						// test combining two chained() animations
+						var anim1 = fx.chain([
+							baseFx.fadeIn({ node: &#039;chained&#039; }),
+							baseFx.fadeOut({ node: &#039;chained&#039; })
+						]);
+						var anim2 = fx.chain([
+							baseFx.fadeOut({ node: &#039;chainedtoo&#039; }),
+							baseFx.fadeIn({ node: &#039;chainedtoo&#039; })
+						]);
+						var anim = fx.combine([anim1, anim2]);
+
+						aspect.after(anim, &#039;onEnd&#039;, function () {
+							done(true);
+						}, true);
+						anim.play();
+					})
+					.then(function (results) {
+						assert.isTrue(results);
+					});
+			}
+		},
+
+		&#039;.stop&#039;: {
+			&#039;delay&#039;: function () {
+				return getPage(this, FX_URL)
+					.executeAsync(function (done) {
+						var anim = baseFx.fadeOut({ node: &#039;foo2&#039;, delay: 400 });
+						aspect.after(anim, &#039;onPlay&#039;, function () {
+							done(false);
+						}, true);
+						anim.play();
+						anim.stop();
+						setTimeout(function(){
+							done(true);
+						}, 500);
+					})
+					.then(function (results) {
+						assert.isTrue(results);
+					});
+			},
+
+			&#039;delay passed to play&#039;: function () {
+				return getPage(this, FX_URL)
+					.executeAsync(function (done) {
+						var anim = baseFx.fadeOut({ node: &#039;foo2&#039; });
+
+						aspect.after(anim, &#039;onPlay&#039;, function () {
+							done(false);
+						}, true);
+						anim.play(400);
+						anim.stop();
+						setTimeout(function(){
+							done(true);
+						}, 600);
+					})
+					.then(function (results) {
+						assert.isTrue(results);
+					});
+			}
+		},
+
+		&#039;.destroy&#039;: function () {
+			return getPage(this, FX_URL)
+				.executeAsync(function (done) {
+					var anim = baseFx.fadeOut({ node: &#039;foo&#039;, duration: 5000 });
+					var stopCalled = false;
+					aspect.after(anim, &#039;stop&#039;, function () {
+						stopCalled = true;
+					});
+					anim.destroy();
+					done(stopCalled);
+				})
+				.then(function (stopCalled) {
+					assert.isTrue(stopCalled);
+				});
+		}
+	});
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

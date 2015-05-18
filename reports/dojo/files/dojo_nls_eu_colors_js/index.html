@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/nls/eu/colors.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/nls/eu/colors.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">35.32</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">157</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">1.54</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.22</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define({      
+//begin v1.x content
+// local representation of all CSS3 named colors, companion to dojo.colors.  To be used where descriptive information
+// is required for each color, such as a palette widget, and not for specifying color programatically.
+
+//Note: due to the SVG 1.0 spec additions, some of these are alternate spellings for the same color (e.g. gray / grey).
+//TODO: should we be using unique rgb values as keys instead and avoid these duplicates, or rely on the caller to do the reverse mapping?
+aliceblue: &quot;alizia urdina&quot;,
+antiquewhite: &quot;zuri zaharra&quot;,
+aqua: &quot;aqua urdina&quot;,
+aquamarine: &quot;akuamarina&quot;,
+azure: &quot;urdin heraldikoa&quot;,
+beige: &quot;baixa&quot;,
+bisque: &quot;bisque kolorea&quot;,
+black: &quot;beltza&quot;,
+blanchedalmond: &quot;arbendol zuritua&quot;,
+blue: &quot;urdina&quot;,
+blueviolet: &quot;bioleta urdinxka&quot;,
+brown: &quot;marroia&quot;,
+burlywood: &quot;burlywood kolorea&quot;,
+cadetblue: &quot;kadete urdina&quot;,
+chartreuse: &quot;chartreuse kolorea&quot;,
+chocolate: &quot;txokolate kolorea&quot;,
+coral: &quot;koral gorria&quot;,
+cornflowerblue: &quot;nabar-lore kolorea&quot;,
+cornsilk: &quot;artobizar kolorea&quot;,
+crimson: &quot;gorrimina&quot;,
+cyan: &quot;ziana&quot;,
+darkblue: &quot;urdin iluna&quot;,
+darkcyan: &quot;zian iluna&quot;,
+darkgoldenrod: &quot;urre-hori iluna&quot;,
+darkgray: &quot;gris iluna&quot;,
+darkgreen: &quot;berde iluna&quot;,
+darkgrey: &quot;gris iluna&quot;, // same as darkgray
+darkkhaki: &quot;kaki-kolore iluna&quot;,
+darkmagenta: &quot;magenta iluna&quot;,
+darkolivegreen: &quot;oliba-berde iluna&quot;,
+darkorange: &quot;laranja iluna&quot;,
+darkorchid: &quot;orkidea-kolore iluna&quot;,
+darkred: &quot;gorri iluna&quot;,
+darksalmon: &quot;izokin-kolore iluna&quot;,
+darkseagreen: &quot;itsaso-berde iluna&quot;,
+darkslateblue: &quot;arbel-urdin iluna&quot;,
+darkslategray: &quot;arbel-gris iluna&quot;,
+darkslategrey: &quot;arbel-gris iluna&quot;, // same as darkslategray
+darkturquoise: &quot;turkesa iluna&quot;,
+darkviolet: &quot;bioleta iluna&quot;,
+deeppink: &quot;arrosa bizia&quot;,
+deepskyblue: &quot;zeru-urdin bizia&quot;,
+dimgray: &quot;gris ahula&quot;,
+dimgrey: &quot;gris ahula&quot;, // same as dimgray
+dodgerblue: &quot;dodger urdina&quot;,
+firebrick: &quot;adreilu erregogor kolorea&quot;,
+floralwhite: &quot;lore-zuria&quot;,
+forestgreen: &quot;baso-berdea&quot;,
+fuchsia: &quot;fuksia&quot;,
+gainsboro: &quot;gainsboro kolorea&quot;,
+ghostwhite: &quot;mamu-zuria&quot;,
+gold: &quot;urre kolorea&quot;,
+goldenrod: &quot;urre-horia&quot;,
+gray: &quot;grisa&quot;,
+green: &quot;berdea&quot;,
+greenyellow: &quot;hori berdexka&quot;,
+grey: &quot;grisa&quot;, // same as gray
+honeydew: &quot;eztialdi kolorea&quot;,
+hotpink: &quot;arrosa beroa&quot;,
+indianred: &quot;indiar gorria&quot;,
+indigo: &quot;indigoa&quot;,
+ivory: &quot;bori kolorea&quot;,
+khaki: &quot;kaki kolorea&quot;,
+lavender: &quot;izpiliku kolorea&quot;,
+lavenderblush: &quot;izpiliku kolore bizia&quot;,
+lawngreen: &quot;soropil-berdea&quot;,
+lemonchiffon: &quot;limoi-gaza kolorea&quot;,
+lightblue: &quot;urdin argia&quot;,
+lightcoral: &quot;koral kolore argia&quot;,
+lightcyan: &quot;zian argia&quot;,
+lightgoldenrodyellow: &quot;urre-hori argia&quot;,
+lightgray: &quot;gris argia&quot;,
+lightgreen: &quot;berde argia&quot;,
+lightgrey: &quot;gris argia&quot;, // same as lightgray
+lightpink: &quot;arrosa argia&quot;,
+lightsalmon: &quot;izokin kolore argia&quot;,
+lightseagreen: &quot;itsaso-berde argia&quot;,
+lightskyblue: &quot;zeru-urdin argia&quot;,
+lightslategray: &quot;arbel-gris argia&quot;,
+lightslategrey: &quot;arbel-gris argia&quot;, // same as lightslategray
+lightsteelblue: &quot;altzairu-urdin argia&quot;,
+lightyellow: &quot;hori argia&quot;,
+lime: &quot;lima kolorea&quot;,
+limegreen: &quot;lima-berdea&quot;,
+linen: &quot;liho kolorea&quot;,
+magenta: &quot;magenta&quot;,
+maroon: &quot;granatea&quot;,
+mediumaquamarine: &quot;erdi akuamarina&quot;,
+mediumblue: &quot;erdi urdina&quot;,
+mediumorchid: &quot;erdi orkidea kolorea&quot;,
+mediumpurple: &quot;erdi morea&quot;,
+mediumseagreen: &quot;erdi itsaso-berdea&quot;,
+mediumslateblue: &quot;erdi arbel-urdina&quot;,
+mediumspringgreen: &quot;erdi udaberri-berdia&quot;,
+mediumturquoise: &quot;erdi turkesa&quot;,
+mediumvioletred: &quot;erdi gorri ubela&quot;,
+midnightblue: &quot;gauerdi-urdina&quot;,
+mintcream: &quot;menta krema kolorea&quot;,
+mistyrose: &quot;arrosa lainotsu kolorea&quot;,
+moccasin: &quot;mokasin kolorea&quot;,
+navajowhite: &quot;navajo-zuria&quot;,
+navy: &quot;marina kolorea&quot;,
+oldlace: &quot;begizta zahar kolorea&quot;,
+olive: &quot;oliba kolorea&quot;,
+olivedrab: &quot;goroldio-berdea&quot;,
+orange: &quot;laranja&quot;,
+orangered: &quot;gorri laranjatua&quot;,
+orchid: &quot;orkidea kolorea&quot;,
+palegoldenrod: &quot;urre-hori margula&quot;,
+palegreen: &quot;berde margula&quot;,
+paleturquoise: &quot;turkesa margula&quot;,
+palevioletred: &quot;gorri ubel margula&quot;,
+papayawhip: &quot;papaia kolorea&quot;,
+peachpuff: &quot;mertxika-hostopil kolorea&quot;,
+peru: &quot;peru kolorea&quot;,
+pink: &quot;arrosa&quot;,
+plum: &quot;okaran kolorea&quot;,
+powderblue: &quot;hauts-urdina&quot;,
+purple: &quot;morea&quot;,
+red: &quot;gorria&quot;,
+rosybrown: &quot;arrosa-marroia&quot;,
+royalblue: &quot;urdin erreala&quot;,
+saddlebrown: &quot;zela-marroia&quot;,
+salmon: &quot;izokin-kolorea&quot;,
+sandybrown: &quot;area-marroia&quot;,
+seagreen: &quot;itsaso-berdea&quot;,
+seashell: &quot;maskor kolorea&quot;,
+sienna: &quot;siena&quot;,
+silver: &quot;zilar kolorea&quot;,
+skyblue: &quot;zeru-urdina&quot;,
+slateblue: &quot;arbel-urdina&quot;,
+slategray: &quot;arbel-grisa&quot;,
+slategrey: &quot;arbel-grisa&quot;, // same as slategray
+snow: &quot;elur kolorea&quot;,
+springgreen: &quot;udaberri-berdea&quot;,
+steelblue: &quot;altzairu-urdina&quot;,
+tan: &quot;beltzarana&quot;,
+teal: &quot;berde urdinxka&quot;,
+thistle: &quot;astakardu kolorea&quot;,
+tomato: &quot;tomate kolorea&quot;,
+transparent: &quot;gardena&quot;,
+turquoise: &quot;turkesa&quot;,
+violet: &quot;bioleta&quot;,
+wheat: &quot;gari kolorea&quot;,
+white: &quot;zuria&quot;,
+whitesmoke: &quot;ke-zuria&quot;,
+yellow: &quot;horia&quot;,
+yellowgreen: &quot;berde horixka&quot;
+//end v1.x content
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

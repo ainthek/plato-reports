@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/unit/Deferred.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/unit/Deferred.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">76.80</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">558</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">44.61</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">4.95</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+	&#039;intern!object&#039;,
+	&#039;intern/chai!assert&#039;,
+	&#039;sinon&#039;,
+	&#039;../../Deferred&#039;,
+	&#039;../../promise/Promise&#039;,
+	&#039;../../errors/CancelError&#039;
+], function (registerSuite, assert, sinon, Deferred, Promise, CancelError) {
+	registerSuite(function () {
+		var canceler;
+		var deferred;
+
+		return {
+			name: &#039;dojo/Deferred&#039;,
+
+			&#039;beforeEach&#039;: function () {
+				canceler = sinon.stub();
+				deferred = new Deferred(canceler);
+			},
+
+			&#039;.resolve&#039;: {
+				&#039;deferred receives result after resolving&#039;: function () {
+					var expected = {};
+
+					deferred.resolve(expected);
+					return deferred.then(function (result) {
+						assert.equal(result, expected);
+					});
+				},
+
+				&#039;promise receives result after resolving&#039;: function () {
+					var expected = {};
+
+					deferred.resolve(expected);
+					return deferred.promise.then(function (result) {
+						assert.equal(result, expected);
+					});
+				},
+
+				&#039;resolve() returns promise&#039;: function () {
+					var obj = {};
+					var returnedPromise = deferred.resolve(obj);
+
+					assert.instanceOf(returnedPromise, Promise);
+					assert.equal(returnedPromise, deferred.promise);
+				},
+
+				&#039;isResolved() returns true after resolving&#039;: function () {
+					assert.isFalse(deferred.isResolved());
+					deferred.resolve();
+					assert.isTrue(deferred.isResolved());
+				},
+
+				&#039;isFulfilled() returns true after resolving&#039;: function () {
+					assert.isFalse(deferred.isFulfilled());
+					deferred.resolve();
+					assert.isTrue(deferred.isFulfilled());
+				},
+
+				&#039;resolve() is ignored after having been fulfilled&#039;: function () {
+					assert.doesNotThrow(function () {
+						deferred.resolve();
+						deferred.resolve();
+					});
+				},
+
+				&#039;resolve() throws error after having been fulfilled and strict&#039;: function () {
+					deferred.resolve();
+					assert.throws(function () {
+						deferred.resolve({}, true);
+					}, Error);
+				},
+
+				&#039;resolve() watching success handlers are notified&#039;: function () {
+					var expected = {};
+					var successHandler = sinon.spy(function (result) {
+						assert.equal(result, expected);
+					});
+
+					deferred.then(successHandler);
+					assert.isFalse(successHandler.called);
+					deferred.resolve(expected);
+					assert.isTrue(successHandler.called);
+				},
+
+				&#039;resolve() is already bound to the deferred&#039;: function () {
+					var expected = {};
+					var resolve = deferred.resolve;
+
+					resolve(expected);
+					return deferred.then(function (result) {
+						assert.equal(result, expected);
+					});
+				}
+			},
+
+			&#039;.reject&#039;: {
+				&#039;deferred receives result after rejecting&#039;: function () {
+					var expected = {};
+
+					deferred.reject(expected);
+					return deferred.then(null, function (result) {
+						assert.equal(result, expected);
+					});
+				},
+
+				&#039;promise receives result after rejecting&#039;: function () {
+					var expected = {};
+
+					deferred.reject(expected);
+					return deferred.promise.then(null, function (result) {
+						assert.equal(result, expected);
+
+					});
+				},
+
+				&#039;reject() returns promise&#039;: function () {
+					var returnedPromise = deferred.reject({});
+
+					assert.instanceOf(returnedPromise, Promise);
+					assert.equal(returnedPromise, deferred.promise);
+				},
+
+				&#039;isRejected() returns true after rejecting&#039;: function () {
+					assert.isFalse(deferred.isRejected());
+					deferred.reject();
+					assert.isTrue(deferred.isRejected());
+				},
+
+				&#039;isFulfilled() returns true after rejecting&#039;: function () {
+					assert.isFalse(deferred.isFulfilled());
+					deferred.reject();
+					assert.isTrue(deferred.isFulfilled());
+				},
+
+				&#039;reject() is ignored after having been fulfilled&#039;: function () {
+					assert.doesNotThrow(function () {
+						deferred.reject();
+						deferred.reject();
+					});
+				},
+
+				&#039;reject() throws error after having been fulfilled and strict&#039;: function () {
+					deferred.reject();
+					assert.throws(function () {
+						deferred.reject({}, true);
+					}, Error);
+				},
+
+				&#039;reject() watching failure handlers are notified&#039;: function () {
+					var expected = {};
+					var failureHandler = sinon.spy(function (result) {
+						assert.equal(result, expected);
+					});
+
+					deferred.then(null, failureHandler);
+					assert.isFalse(failureHandler.called);
+					deferred.reject(expected);
+					assert.isTrue(failureHandler.called);
+				},
+
+				&#039;reject() is already bound to the deferred&#039;: function () {
+					var expected = {};
+					var reject = deferred.reject;
+
+					reject(expected);
+					return deferred.then(null, function (result) {
+						assert.equal(result, expected);
+					});
+				}
+			},
+			&#039;.progress&#039;: {
+				&#039;deferred receives result after progress&#039;: function () {
+					var expected = {};
+					var progressStub = sinon.stub();
+
+					deferred.then(null, null, progressStub);
+					deferred.progress(expected);
+					assert.isTrue(progressStub.calledOnce);
+					assert.equal(progressStub.lastCall.args[0], expected);
+				},
+
+				&#039;promise receives result after progres&#039;: function () {
+					var expected = {};
+					var progressStub = sinon.stub();
+
+					deferred.promise.then(null, null, progressStub);
+					deferred.progress(expected);
+					assert.isTrue(progressStub.calledOnce);
+					assert.equal(progressStub.lastCall.args[0], expected);
+				},
+
+				&#039;progress() returns promise&#039;: function () {
+					var returnedPromise = deferred.progress({});
+
+					assert.instanceOf(returnedPromise, Promise);
+					assert.equal(returnedPromise, deferred.promise);
+				},
+
+				&#039;isResolved() returns false after progress&#039;: function () {
+					assert.isFalse(deferred.isResolved());
+					deferred.progress();
+					assert.isFalse(deferred.isResolved());
+				},
+
+				&#039;isRejected() returns false after progress&#039;: function () {
+					assert.isFalse(deferred.isRejected());
+					deferred.progress();
+					assert.isFalse(deferred.isRejected());
+				},
+
+				&#039;isFulfilled() returns false after progress&#039;: function () {
+					assert.isFalse(deferred.isFulfilled());
+					deferred.progress();
+					assert.isFalse(deferred.isFulfilled());
+				},
+
+				&#039;progress() is ignored after having been fulfilled&#039;: function () {
+					var progressStub = sinon.stub();
+
+					deferred.promise.then(null, null, progressStub);
+					deferred.resolve();
+					deferred.progress();
+					assert.isFalse(progressStub.called);
+				},
+
+				&#039;progress() throws error after having been fulfilled and strict&#039;: function () {
+					deferred.resolve();
+					assert.throws(function () {
+						deferred.progress({}, true);
+					}, Error);
+				},
+
+				&#039;progress() results are not cached&#039;: function () {
+					var firstProgressData = {};
+					var secondProgressData = {};
+					var progressStub = sinon.stub();
+
+					deferred.progress(firstProgressData);
+					deferred.then(null, null, progressStub);
+					deferred.progress(secondProgressData);
+					assert.isTrue(progressStub.calledOnce);
+					assert.equal(progressStub.lastCall.args[0], secondProgressData);
+				},
+
+				&#039;progress() with chaining&#039;: function () {
+					var expected = {};
+					var innerDfd = new Deferred();
+					var progressStub = sinon.stub();
+
+					deferred
+						.then(function () {
+							return innerDfd;
+						})
+						.then(null, null, progressStub);
+
+					deferred.resolve();
+					assert.isFalse(progressStub.called);
+					innerDfd.progress(expected);
+					assert.isTrue(progressStub.calledOnce);
+					assert.equal(progressStub.lastCall.args[0], expected);
+				},
+
+				&#039;after progress(), the progback return value is emitted on the returned promise&#039;: function () {
+					var promise = deferred.then(null, null, function (n) {
+						return n * n;
+					});
+					var promiseStub = sinon.stub();
+
+					promise.then(null, null, promiseStub);
+					deferred.progress(2);
+					assert.equal(promiseStub.lastCall.args[0], 4);
+				},
+
+				&#039;progress() is already bound to the deferred&#039;: function () {
+					var progress = deferred.progress;
+					var progressStub = sinon.stub();
+
+					deferred.then(null, null, progressStub);
+					progress({});
+					assert.isTrue(progressStub.called);
+				}
+			},
+			&#039;.cancel&#039;: {
+				&#039;cancel() invokes a canceler&#039;: function () {
+					deferred.cancel();
+					assert.isTrue(canceler.called);
+				},
+
+				&#039;isCanceled() returns true after canceling&#039;: function () {
+					assert.isFalse(deferred.isCanceled());
+					deferred.cancel();
+					assert.isTrue(deferred.isCanceled());
+				},
+
+				&#039;isResolved() returns false after canceling&#039;: function () {
+					assert.isFalse(deferred.isResolved());
+					deferred.cancel();
+					assert.isFalse(deferred.isResolved());
+				},
+
+				&#039;isRejected() returns true after canceling&#039;: function () {
+					assert.isFalse(deferred.isRejected());
+					deferred.cancel();
+					assert.isTrue(deferred.isRejected());
+				},
+
+				&#039;isFulfilled() returns true after canceling&#039;: function () {
+					assert.isFalse(deferred.isFulfilled());
+					deferred.cancel();
+					assert.isTrue(deferred.isFulfilled());
+				},
+
+				&#039;cancel() is ignored after having been fulfilled&#039;: function () {
+					deferred.resolve();
+					deferred.cancel();
+					assert.isFalse(canceler.called);
+				},
+
+				&#039;cancel() throws error after having been fulfilled and strict&#039;: function () {
+					deferred.resolve();
+					assert.throws(function () {
+						deferred.cancel(null, true);
+					}, Error);
+				},
+
+				&#039;cancel() without reason results in CancelError&#039;: function () {
+					var reason = deferred.cancel();
+
+					return deferred.then(null, function (result) {
+						assert.equal(result, reason);
+						assert.instanceOf(result, CancelError);
+					});
+				},
+
+				&#039;cancel() returns default reason&#039;: function () {
+					assert.instanceOf(deferred.cancel(), CancelError);
+				},
+
+				&#039;reason is passed to canceler&#039;: function () {
+					var expected = {};
+
+					deferred.cancel(expected);
+					assert.equal(canceler.lastCall.args[0], expected);
+				},
+
+				&#039;cancels with reason returned from canceler&#039;: function () {
+					var expected = {};
+					var reason = deferred.cancel(expected);
+
+					assert.equal(reason, expected);
+					return deferred.then(null, function (result) {
+						assert.equal(result, expected);
+					});
+				},
+
+				&#039;cancel() returns reason from canceler&#039;: function () {
+					var expected = {};
+
+					canceler.returns(expected);
+					assert.equal(deferred.cancel(), expected);
+				},
+
+				&#039;cancel() returns reason from canceler, if canceler rejects with reason&#039;: function () {
+					var expected = {};
+					var canceler = function () {
+						deferred.reject(expected);
+						return expected;
+					};
+					var deferred = new Deferred(canceler);
+					var reason = deferred.cancel();
+
+					assert.equal(reason, expected);
+				},
+
+				&#039;with canceler not returning anything, returns default CancelError&#039;: function () {
+					var canceler = function () { };
+					var deferred = new Deferred(canceler);
+					var reason = deferred.cancel();
+
+					return deferred.then(null, function (result) {
+						assert.equal(result, reason);
+						assert.instanceOf(result, CancelError);
+					});
+				},
+
+				&#039;with canceler not returning anything, still returns passed reason&#039;: function () {
+					var canceler = function () { };
+					var deferred = new Deferred(canceler);
+					var expected = {};
+					var reason = deferred.cancel(expected);
+
+					assert.equal(reason, expected);
+					return deferred.then(null, function (result) {
+						assert.equal(result, expected);
+					});
+				},
+
+				&#039;cancel() does not reject promise if canceler resolves deferred&#039;: function () {
+					var canceler = function () {
+						deferred.resolve(expected);
+					};
+					var deferred = new Deferred(canceler);
+					var expected = {};
+
+					deferred.cancel();
+					return deferred.then(function (result) {
+						assert.equal(result, expected);
+					});
+				},
+
+				&#039;cancel() does not reject promise if canceler resolves a chain of promises&#039;: function () {
+					var canceler = function () {
+						deferred.resolve(expected);
+					};
+					var deferred = new Deferred(canceler);
+					var expected = {};
+					var lastPromise = deferred.then().then().then();
+
+					lastPromise.cancel();
+					assert.isTrue(deferred.isCanceled());
+					assert.isTrue(lastPromise.isCanceled());
+
+					return lastPromise.then(function (result) {
+						assert.equal(result, expected);
+					});
+				},
+
+				&#039;cancel() returns undefined if canceler resolves deferred&#039;: function () {
+					var canceler = function() {
+						deferred.resolve({});
+					};
+					var deferred = new Deferred(canceler);
+
+					assert.isUndefined(deferred.cancel());
+				},
+
+				&#039;cancel() does not change rejection value if canceler rejects deferred&#039;: function () {
+					var canceler = function () {
+						deferred.reject(expected);
+					};
+					var deferred = new Deferred(canceler);
+					var expected = {};
+
+					deferred.cancel();
+					return deferred.then(null, function (result) {
+						assert.equal(result, expected);
+					});
+				},
+
+				&#039;cancel() does not change rejection value if canceler rejects a chain of promises&#039;: function () {
+					var canceler = function () {
+						deferred.reject(expected);
+					};
+					var deferred = new Deferred(canceler);
+					var expected = {};
+					var lastPromise = deferred.then().then().then();
+
+					lastPromise.cancel();
+					assert.isTrue(deferred.isCanceled());
+					assert.isTrue(lastPromise.isCanceled());
+					return lastPromise.then(null, function (result) {
+						assert.equal(result, expected);
+					});
+				},
+
+				&#039;cancel() returns undefined if canceler rejects deferred&#039;: function () {
+					var canceler = function () {
+						deferred.reject({});
+					};
+					var deferred = new Deferred(canceler);
+
+					assert.isUndefined(deferred.cancel());
+				},
+
+				&#039;cancel() a promise chain&#039;: function () {
+					var cancelerStub = sinon.stub();
+					var deferred = new Deferred(cancelerStub);
+					var expected = {};
+
+					deferred.then().then().then().cancel(expected);
+					assert.isTrue(cancelerStub.called);
+					assert.equal(cancelerStub.lastCall.args[0], expected);
+				},
+
+				&#039;cancel() a returned promise&#039;: function () {
+					var obj = {};
+					var cancelerStub = sinon.stub();
+					var inner = new Deferred(cancelerStub);
+					var chain = deferred.then(function () {
+						return inner;
+					});
+
+					deferred.resolve();
+					chain.cancel(obj, true);
+					assert.isTrue(cancelerStub.calledOnce);
+					assert.equal(cancelerStub.lastCall.args[0], obj);
+				},
+
+				&#039;cancel() is already bound to the deferred&#039;: function () {
+					var cancel = deferred.cancel;
+
+					cancel();
+					return deferred.then(null, function (result) {
+						assert.instanceOf(result, CancelError);
+					});
+				}
+			},
+
+			&#039;.then&#039;: {
+				&#039;chained then()&#039;: function () {
+					function square(n) {
+						return n * n;
+					}
+
+					deferred.resolve(2);
+					return deferred.then(square).then(square).then(function (n) {
+						assert.equal(n, 16);
+					});
+				},
+
+				&#039;asynchronously chained then()&#039;: function () {
+					function asyncSquare(n) {
+						var inner = new Deferred();
+						setTimeout(function () {
+							inner.resolve(n * n);
+						}, 0);
+						return inner.promise;
+					}
+
+					deferred.resolve(2);
+					return deferred.then(asyncSquare).then(asyncSquare).then(function (n) {
+						assert.equal(n, 16);
+					});
+				},
+
+				&#039;then() is already bound to the deferred&#039;: function () {
+					var expected = {};
+					var then = deferred.then;
+
+					deferred.resolve(expected);
+					return then(function (result) {
+						assert.equal(result, expected);
+					});
+				},
+
+				&#039;then() with progback: returned promise is not fulfilled when progress is emitted&#039;: function () {
+					var progressStub = sinon.stub();
+					var promise = deferred.then(null, null, progressStub);
+
+					deferred.progress();
+					assert.isTrue(progressStub.called, &#039;Progress was received.&#039;);
+					assert.isFalse(promise.isFulfilled(), &#039;Promise is not fulfilled.&#039;);
+				}
+			}
+		};
+	});
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/unit/store/Observable.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/unit/store/Observable.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">64.30</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">215</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">38.21</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.42</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+	&#039;intern!object&#039;,
+	&#039;intern/chai!assert&#039;,
+	&#039;../../../store/Observable&#039;,
+	&#039;../../../_base/declare&#039;,
+	&#039;dojo/_base/lang&#039;,
+	&#039;dojo/_base/array&#039;,
+	&#039;../../../store/Memory&#039;,
+	&#039;sinon&#039;
+], function (registerSuite, assert, Observable, declare, lang, array, Memory, sinon) {
+	function createMyStore() {
+		var MyStore = declare([ Memory ], {
+			get: function () {
+				// need to make sure that this.inherited still works with Observable
+				return this.inherited(arguments);
+			}
+		});
+
+		var storeData = [
+			{ id: 0, name: &#039;zero&#039;, even: true, prime: false },
+			{ id: 1, name: &#039;one&#039;, prime: false },
+			{ id: 2, name: &#039;two&#039;, even: true, prime: true },
+			{ id: 3, name: &#039;three&#039;, prime: true },
+			{ id: 4, name: &#039;four&#039;, even: true, prime: false },
+			{ id: 5, name: &#039;five&#039;, prime: true }
+		];
+
+		return new Observable(new MyStore({ data: storeData }));
+	}
+
+	function createBigStore() {
+		var data = [], i;
+		for (i = 1; i &lt;= 100; i++) {
+			data.push({ id: i, name: &#039;item &#039; + i, order: i });
+		}
+
+		/* jshint newcap:false */
+		return Observable(new Memory({ data: data }));
+	}
+
+	registerSuite({
+		name: &#039;dojo/store/Observable&#039;,
+
+		&#039;.get&#039;: function () {
+			var store = createMyStore();
+			assert.equal(store.get(1).name, &#039;one&#039;);
+			assert.equal(store.get(4).name, &#039;four&#039;);
+			assert.isTrue(store.get(5).prime);
+		},
+
+		&#039;.query&#039;: {
+			&#039;empty query options&#039;: function () {
+				var store = createMyStore();
+				var results = store.query({});
+				assert.lengthOf(results, 6);
+			}
+		},
+
+		&#039;.observe&#039;: (function () {
+			var store, handlerStub, results, observer;
+
+			return {
+				beforeEach: function () {
+					store = createMyStore();
+					handlerStub = sinon.stub();
+					results = store.query({ prime: true });
+					observer = results.observe(handlerStub);
+				},
+
+				&#039;handler receives updates&#039;: {
+					&#039;update an existing matching record to no longer match query&#039;: function () {
+						var record = results[0];
+
+						record.prime = false;
+						store.put(record);
+						assert.deepEqual(handlerStub.firstCall.args[0], {
+							id: 2,
+							name: &#039;two&#039;,
+							even: true,
+							prime: false
+						});
+						assert.equal(handlerStub.firstCall.args[1], 0);
+						assert.equal(handlerStub.firstCall.args[2], -1);
+						assert.lengthOf(results, 2);
+					},
+
+					&#039;updating an existing non-matching record to match the query&#039;: function () {
+						var record = store.get(1);
+
+						record.prime = true;
+						store.put(record);
+						assert.deepEqual(handlerStub.firstCall.args[0], {
+							id: 1,
+							name: &#039;one&#039;,
+							prime: true
+						});
+						assert.equal(handlerStub.firstCall.args[1], -1);
+						assert.equal(handlerStub.firstCall.args[2], 3);
+						assert.lengthOf(results, 4);
+					},
+
+					&#039;does not receive updates from non-matching additions&#039;: function () {
+						assert.lengthOf(results, 3);
+						store.add({ id: 6, name: &#039;six&#039; });
+						assert.lengthOf(results, 3);
+						assert.isFalse(handlerStub.called);
+					},
+
+					&#039;adding new matching record&#039;: function () {
+						var record = { id: 7, name: &#039;seven&#039;, prime: true };
+
+						store.add(record);
+						assert.isTrue(handlerStub.called);
+						assert.deepEqual(handlerStub.firstCall.args[0], record);
+						assert.equal(handlerStub.firstCall.args[1], -1);
+						assert.equal(handlerStub.firstCall.args[2], 3);
+						assert.lengthOf(results, 4);
+					},
+
+					includeObjectUpdates: {
+						beforeEach: function () {
+							observer.cancel();
+						},
+
+						&#039;is false; does not notify about object updates&#039;: function () {
+							var record = results[0];
+
+							results.observe(handlerStub, false);
+							record.name = &#039;newName&#039;;
+							store.put(record);
+							assert.equal(handlerStub.callCount, 0);
+						},
+
+						&#039;is true, notifies about object updates&#039;: function () {
+							var record = results[0];
+
+							results.observe(handlerStub, true);
+							record.name = &#039;newName&#039;;
+							store.put(record);
+							assert.equal(handlerStub.callCount, 1);
+							assert.equal(handlerStub.firstCall.args[1], handlerStub.firstCall.args[2]);
+						}
+					}
+				},
+
+				&#039;observer#cancel() halts further updates&#039;: function () {
+					var record = results[0];
+
+					// Assert the expected length before altering the data set
+					assert.lengthOf(results, 3);
+
+					// updating the record will change the observed results
+					record.prime = false;
+					store.put(record);
+					assert.lengthOf(results, 2);
+					assert.lengthOf(store.query({ prime: true }), 2);
+					assert.equal(handlerStub.callCount, 1);
+
+					// cancel observation and the handler is no longer called
+					// and the results are no longer updated
+					observer.cancel();
+					record.prime = true;
+					store.put(record);
+					assert.lengthOf(results, 2);
+					assert.equal(handlerStub.callCount, 1);
+
+					// verify that the change did happen but was not tracked
+					assert.lengthOf(store.query({ prime: true }), 3);
+				},
+
+				&#039;observer#remove() is observer#cancel()&#039;: function () {
+					assert.isFunction(observer.cancel);
+					assert.equal(observer.cancel, observer.remove);
+				}
+			};
+		})(),
+
+		&#039;behaves as a mixin wrapper&#039;: function () {
+			assert.notInstanceOf(createMyStore(), Observable);
+			assert.notInstanceOf(createBigStore(), Observable);
+		},
+
+		&#039;paging tests&#039;: function () {
+			var options = { count: 25, sort: [{ attribute: &#039;order&#039; }] };
+			var bigStore = createBigStore();
+			var results = [
+				bigStore.query({}, lang.delegate(options, { start: 0 })),
+				bigStore.query({}, lang.delegate(options, { start: 25 })),
+				bigStore.query({}, lang.delegate(options, { start: 50 })),
+				bigStore.query({}, lang.delegate(options, { start: 75 }))
+			];
+			var observeHandler = sinon.stub();
+
+			array.forEach(results, function (result) {
+				result.observe(observeHandler, true);
+			});
+
+			bigStore.add({ id: 101, name: &#039;one oh one&#039;, order: 2.5 });
+			assert.lengthOf(results[0], 26);
+			assert.lengthOf(results[1], 25);
+			assert.lengthOf(results[2], 25);
+			assert.lengthOf(results[3], 25);
+
+			bigStore.remove(101);
+			assert.equal(observeHandler.callCount, 2);
+			assert.lengthOf(results[0], 25);
+
+			bigStore.add({ id: 102, name: &#039;one oh two&#039;, order: 26.5 });
+			assert.lengthOf(results[0], 25);
+			assert.lengthOf(results[1], 26);
+			assert.lengthOf(results[2], 25);
+			assert.equal(observeHandler.callCount, 3);
+		}
+	});
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/unit/number.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/unit/number.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">49.63</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">475</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">75.55</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">10.62</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+	&#039;intern!object&#039;,
+	&#039;intern/chai!assert&#039;,
+	&#039;../../number&#039;,
+	&#039;../../i18n&#039;
+], function (registerSuite, assert, number) {
+
+	var defaultLocale = &#039;en-us&#039;;
+
+	function assertStrictNaN(value) {
+		// reliable test for NaN (not subject to coersion)
+		assert.notStrictEqual(value, value);
+	}
+
+	function isStrictNaN(value) {
+		// reliable test for NaN (not subject to coercion)
+		// isNaN(undefined) return true in Chrome 40
+		return value !== value;
+	}
+
+	function decimalNumberDiff(num1, num2) {
+		//TODO: should be more accurate when dojo/number finish rounding in the future
+		var diffBound = 1e-3;
+		var diff = num1 - num2;
+
+		if (Math.abs(diff) &lt; diffBound) {
+			return true;
+		}
+		else if (isNaN(Math.abs(diff))) {
+			var s = num1.toString().split(num2)[1];
+			s = s.replace(&#039;,&#039;, &#039;0&#039;).replace(&#039;\u066b&#039;, &#039;0&#039;);
+			return (Number(s) &lt; diffBound);
+		}
+		return false;
+	}
+
+	function checkFormatParseCycle(options, sourceInput, expected, backwardCheck) {
+		// backwardCheck is a boolean indicating whether test needs a roundtrip, e.g. format-&gt;parse-&gt;format
+		if (options == null) {
+			var pattern = options.pattern;
+			var locale = options.locale;
+			//TODO: add more fields
+		}
+
+		var str = pattern == null ? &#039;default&#039; : pattern;
+		var result = number.format(sourceInput, options);
+		if (isStrictNaN(expected)) {
+			assertStrictNaN(result);
+		} else {
+			assert.strictEqual(result, expected);
+		}
+		if (backwardCheck) {
+			var resultParsed = number.parse(result,options);
+			if (!decimalNumberDiff(resultParsed, sourceInput)) {
+			    assert.strictEqual(resultParsed, sourceInput);
+			}
+			var resultParsedReformatted = number.format(resultParsed, options);
+		    if (!decimalNumberDiff(result, resultParsedReformatted)) {
+				assert.strictEqual(resultParsedReformatted, result);
+			}
+		}
+	}
+
+	function checkParse(options, sourceInput, expected) {
+		var str = &#039;default&#039;;
+		if (options &amp;&amp; options.pattern != null) {
+			str = options.pattern;
+		}
+		//print(&#039;input:&#039; + sourceInput);
+		var result = number.parse(sourceInput, options);
+		//print(&#039;result :&#039; + result);
+		if (isStrictNaN(expected)) {
+			assertStrictNaN(result);
+		} else {
+			assert.strictEqual(result, expected);
+		}
+	}
+
+	function checkRounding(num, maxFractionDigits, expected, locale) {
+		var pattern = &#039;#0.&#039;;
+		for (var i = 0; i &lt; maxFractionDigits; i++) {
+			pattern += &#039;#&#039;;
+		}
+		var result = number.format(num,{locale: locale || defaultLocale, pattern:pattern});
+		assert.strictEqual(result, expected);
+	}
+
+	registerSuite({
+		name: &#039;dojo/number&#039;,
+
+		// TODO: setup function to load locales?
+
+		&#039;.invalid&#039;: function () {
+			assert.isNull(number.format(NaN));
+			assert.isNull(number.format(Number.NaN));
+			assert.isNull(number.format(Infinity));
+			assert.isNull(number.format(-Infinity));
+		},
+
+		&#039;.round&#039;: {
+			basic: function () {
+				assert.strictEqual(number.round(0), 0);
+				assert.strictEqual(number.round(0.5), 1);
+				assert.strictEqual(number.round(-0.5), -1);
+				assert.strictEqual(number.round(0.05, 1), 0.1);
+				assert.strictEqual(number.round(0.09, 1), 0.1);
+				assert.strictEqual(number.round(0.04999999, 1), 0.0);
+				assert.strictEqual(number.round(0.09499999, 1), 0.1);
+				assert.strictEqual(number.round(0.095, 1), 0.1);
+				assert.strictEqual(number.round(0.09999999, 1), 0.1);
+				assert.strictEqual(number.round(-0.05, 1), -0.1);
+				assert.strictEqual(number.round(1.05, 1), 1.1);
+				assert.strictEqual(number.round(-1.05, 1), -1.1);
+				// assert.strictEqual(number.round(-162.295, 2), -162.29); // see ticket #7930, dojox.math.round
+				// assert.strictEqual(number.round(162.295, 2), 162.29); // ibid
+			},
+
+			multiple: function() {
+				assert.strictEqual(number.round(123.4525, 2, 5), 123.455);
+				assert.strictEqual(number.round(123.452, 2, 5), 123.45);
+				assert.strictEqual(number.round(123.454, 2, 5), 123.455);
+				assert.strictEqual(number.round(123.456, 2, 5), 123.455);
+				assert.strictEqual(number.round(-123.452, 2, 5), -123.45);
+				assert.strictEqual(number.round(-123.4525, 2, 5), -123.455);
+				assert.strictEqual(number.round(-123.454, 2, 5), -123.455);
+				assert.strictEqual(number.round(-123.456, 2, 5), -123.455);
+			},
+
+			speleotrove: function() {
+				// submitted Mike Cowlishaw (IBM, CCLA), see http://speleotrove.com/decimal/#testcases
+				assert.strictEqual(number.round(12345 + -0.1), 12345, &#039;radx200&#039;);
+				assert.strictEqual(number.round(12345 + -0.01), 12345, &#039;radx201&#039;);
+				assert.strictEqual(number.round(12345 + -0.001), 12345, &#039;radx202&#039;);
+				assert.strictEqual(number.round(12345 + -0.00001), 12345, &#039;radx203&#039;);
+				assert.strictEqual(number.round(12345 + -0.000001), 12345, &#039;radx204&#039;);
+				assert.strictEqual(number.round(12345 + -0.0000001), 12345, &#039;radx205&#039;);
+				assert.strictEqual(number.round(12345 + 0), 12345, &#039;radx206&#039;);
+				assert.strictEqual(number.round(12345 + 0.0000001), 12345, &#039;radx207&#039;);
+				assert.strictEqual(number.round(12345 + 0.000001), 12345, &#039;radx208&#039;);
+				assert.strictEqual(number.round(12345 + 0.00001), 12345, &#039;radx209&#039;);
+				assert.strictEqual(number.round(12345 + 0.0001), 12345, &#039;radx210&#039;);
+				assert.strictEqual(number.round(12345 + 0.001), 12345, &#039;radx211&#039;);
+				assert.strictEqual(number.round(12345 + 0.01), 12345, &#039;radx212&#039;);
+				assert.strictEqual(number.round(12345 + 0.1), 12345, &#039;radx213&#039;);
+
+				assert.strictEqual(number.round(12346 + 0.49999), 12346, &#039;radx215&#039;);
+				assert.strictEqual(number.round(12346 + 0.5), 12347, &#039;radx216&#039;);
+				assert.strictEqual(number.round(12346 + 0.50001), 12347, &#039;radx217&#039;);
+
+				assert.strictEqual(number.round(12345 + 0.4), 12345, &#039;radx220&#039;);
+				assert.strictEqual(number.round(12345 + 0.49), 12345, &#039;radx221&#039;);
+				assert.strictEqual(number.round(12345 + 0.499), 12345, &#039;radx222&#039;);
+				assert.strictEqual(number.round(12345 + 0.49999), 12345, &#039;radx223&#039;);
+				assert.strictEqual(number.round(12345 + 0.5), 12346, &#039;radx224&#039;);
+				assert.strictEqual(number.round(12345 + 0.50001), 12346, &#039;radx225&#039;);
+				assert.strictEqual(number.round(12345 + 0.5001), 12346, &#039;radx226&#039;);
+				assert.strictEqual(number.round(12345 + 0.501), 12346, &#039;radx227&#039;);
+				assert.strictEqual(number.round(12345 + 0.51), 12346, &#039;radx228&#039;);
+				assert.strictEqual(number.round(12345 + 0.6), 12346, &#039;radx229&#039;);
+
+				//negatives
+				assert.strictEqual(number.round(-12345 + -0.1), -12345, &#039;rsux200&#039;);
+				assert.strictEqual(number.round(-12345 + -0.01), -12345, &#039;rsux201&#039;);
+				assert.strictEqual(number.round(-12345 + -0.001), -12345, &#039;rsux202&#039;);
+				assert.strictEqual(number.round(-12345 + -0.00001), -12345, &#039;rsux203&#039;);
+				assert.strictEqual(number.round(-12345 + -0.000001), -12345, &#039;rsux204&#039;);
+				assert.strictEqual(number.round(-12345 + -0.0000001), -12345, &#039;rsux205&#039;);
+				assert.strictEqual(number.round(-12345 + 0), -12345, &#039;rsux206&#039;);
+				assert.strictEqual(number.round(-12345 + 0.0000001), -12345, &#039;rsux207&#039;);
+				assert.strictEqual(number.round(-12345 + 0.000001), -12345, &#039;rsux208&#039;);
+				assert.strictEqual(number.round(-12345 + 0.00001), -12345, &#039;rsux209&#039;);
+				assert.strictEqual(number.round(-12345 + 0.0001), -12345, &#039;rsux210&#039;);
+				assert.strictEqual(number.round(-12345 + 0.001), -12345, &#039;rsux211&#039;);
+				assert.strictEqual(number.round(-12345 + 0.01), -12345, &#039;rsux212&#039;);
+				assert.strictEqual(number.round(-12345 + 0.1), -12345, &#039;rsux213&#039;);
+
+				assert.strictEqual(number.round(-12346 + 0.49999), -12346, &#039;rsux215&#039;);
+				assert.strictEqual(number.round(-12346 + 0.5), -12346, &#039;rsux216&#039;);
+				assert.strictEqual(number.round(-12346 + 0.50001   ), -12345, &#039;rsux217&#039;);
+
+				assert.strictEqual(number.round(-12345 + 0.4), -12345, &#039;rsux220&#039;);
+				assert.strictEqual(number.round(-12345 + 0.49), -12345, &#039;rsux221&#039;);
+				assert.strictEqual(number.round(-12345 + 0.499), -12345, &#039;rsux222&#039;);
+				assert.strictEqual(number.round(-12345 + 0.49999), -12345, &#039;rsux223&#039;);
+				assert.strictEqual(number.round(-12345 + 0.5), -12345, &#039;rsux224&#039;);
+				assert.strictEqual(number.round(-12345 + 0.50001), -12344, &#039;rsux225&#039;);
+				assert.strictEqual(number.round(-12345 + 0.5001), -12344, &#039;rsux226&#039;);
+				assert.strictEqual(number.round(-12345 + 0.501), -12344, &#039;rsux227&#039;);
+				assert.strictEqual(number.round(-12345 + 0.51), -12344, &#039;rsux228&#039;);
+				assert.strictEqual(number.round(-12345 + 0.6), -12344, &#039;rsux229&#039;);
+
+				assert.strictEqual(number.round(12345 /  1), 12345, &#039;rdvx401&#039;);
+				assert.strictEqual(number.round(12345 /  1.0001), 12344, &#039;rdvx402&#039;);
+				assert.strictEqual(number.round(12345 /  1.001), 12333, &#039;rdvx403&#039;);
+				assert.strictEqual(number.round(12345 /  1.01), 12223, &#039;rdvx404&#039;);
+				assert.strictEqual(number.round(12345 /  1.1), 11223, &#039;rdvx405&#039;);
+
+				assert.strictEqual(number.round(12355 / 4, 1), 3088.8, &#039;rdvx406&#039;);
+				assert.strictEqual(number.round(12345 / 4, 1), 3086.3, &#039;rdvx407&#039;);
+				assert.strictEqual(number.round(12355 / 4.0001, 1), 3088.7, &#039;rdvx408&#039;);
+				assert.strictEqual(number.round(12345 / 4.0001, 1), 3086.2, &#039;rdvx409&#039;);
+				assert.strictEqual(number.round(12345 / 4.9, 1), 2519.4, &#039;rdvx410&#039;);
+				assert.strictEqual(number.round(12345 / 4.99, 1), 2473.9, &#039;rdvx411&#039;);
+				assert.strictEqual(number.round(12345 / 4.999, 1), 2469.5, &#039;rdvx412&#039;);
+				assert.strictEqual(number.round(12345 / 4.9999, 1), 2469.0, &#039;rdvx413&#039;);
+				assert.strictEqual(number.round(12345 / 5, 1), 2469, &#039;rdvx414&#039;);
+				assert.strictEqual(number.round(12345 / 5.0001, 1), 2469.0, &#039;rdvx415&#039;);
+				assert.strictEqual(number.round(12345 / 5.001, 1), 2468.5, &#039;rdvx416&#039;);
+				assert.strictEqual(number.round(12345 / 5.01, 1), 2464.1, &#039;rdvx417&#039;);
+				assert.strictEqual(number.round(12345 / 5.1, 1), 2420.6, &#039;rdvx418&#039;);
+
+				assert.strictEqual(number.round(12345 * 1), 12345, &#039;rmux401&#039;);
+				assert.strictEqual(number.round(12345 * 1.0001), 12346, &#039;rmux402&#039;);
+				assert.strictEqual(number.round(12345 * 1.001), 12357, &#039;rmux403&#039;);
+				assert.strictEqual(number.round(12345 * 1.01), 12468, &#039;rmux404&#039;);
+				assert.strictEqual(number.round(12345 * 1.1), 13580, &#039;rmux405&#039;);
+				assert.strictEqual(number.round(12345 * 4), 49380, &#039;rmux406&#039;);
+				assert.strictEqual(number.round(12345 * 4.0001), 49381, &#039;rmux407&#039;);
+				assert.strictEqual(number.round(12345 * 4.9), 60491, &#039;rmux408&#039;);
+				assert.strictEqual(number.round(12345 * 4.99), 61602, &#039;rmux409&#039;);
+				assert.strictEqual(number.round(12345 * 4.999), 61713, &#039;rmux410&#039;);
+				assert.strictEqual(number.round(12345 * 4.9999), 61724, &#039;rmux411&#039;);
+				assert.strictEqual(number.round(12345 * 5), 61725, &#039;rmux412&#039;);
+				assert.strictEqual(number.round(12345 * 5.0001), 61726, &#039;rmux413&#039;);
+				assert.strictEqual(number.round(12345 * 5.001), 61737, &#039;rmux414&#039;);
+				assert.strictEqual(number.round(12345 * 5.01), 61848, &#039;rmux415&#039;);
+
+				// assert.strictEqual(number.round(12345 * 12), 1.4814E+5, &#039;rmux416&#039;);
+				// assert.strictEqual(number.round(12345 * 13), 1.6049E+5, &#039;rmux417&#039;);
+				// assert.strictEqual(number.round(12355 * 12), 1.4826E+5, &#039;rmux418&#039;);
+				// assert.strictEqual(number.round(12355 * 13), 1.6062E+5, &#039;rmux419&#039;);
+			}
+		},
+
+		&#039;.format&#039;: {
+			&#039;old tests&#039;: function () {
+				assert.strictEqual(number.format(123, {pattern: &#039;0000&#039;}), &#039;0123&#039;);
+				assert.strictEqual(number.format(-1234567.89, {pattern: &#039;#,##,##0.000##&#039;, locale: &#039;en-us&#039;}), &#039;-12,34,567.890&#039;);
+				assert.strictEqual(number.format(-1234567.890123, {pattern: &#039;#,##,##0.000##&#039;, locale: &#039;en-us&#039;}), &#039;-12,34,567.89012&#039;);
+				assert.strictEqual(number.format(-1234567.890123, {pattern: &#039;#,##0.000##;(#,##0.000##)&#039;, locale: &#039;en-us&#039;}), &#039;(1,234,567.89012)&#039;);
+				assert.strictEqual(number.format(-1234567.890123, {pattern: &#039;#,##0.000##;(#)&#039;, locale: &#039;en-us&#039;}), &#039;(1,234,567.89012)&#039;);
+				assert.strictEqual(number.format(0.501, {pattern: &#039;#0.#%&#039;, locale: &#039;en-us&#039;}), &#039;50.1%&#039;);
+				assert.strictEqual(number.format(1998, {pattern: &#039;00&#039;}), &#039;98&#039;);
+				assert.strictEqual(number.format(1998, {pattern: &#039;00000&#039;}), &#039;01998&#039;);
+				assert.strictEqual(number.format(0.125, {pattern: &#039;0.##&#039;, locale: &#039;en-us&#039;}), &#039;0.13&#039;); //NOTE: expects round_half_up, not round_half_even
+				assert.strictEqual(number.format(0.125, {pattern: &#039;0.0000&#039;, locale: &#039;en-us&#039;}), &#039;0.1250&#039;);
+				assert.strictEqual(number.format(0.100004, {pattern: &#039;0.####&#039;, locale: &#039;en-us&#039;}), &#039;0.1&#039;);
+
+				assert.strictEqual(number.format(-12.3, {places:0, locale: &#039;en-us&#039;}), &#039;-12&#039;);
+				assert.strictEqual(number.format(-1234567.89, {locale: &#039;en-us&#039;}), &#039;-1,234,567.89&#039;);
+				// assert.strictEqual(number.format(-1234567.89, {locale: &#039;en-in&#039;}), &#039;-12,34,567.89&#039;);
+				assert.strictEqual(number.format(-1234567.89, {places:0, locale: &#039;en-us&#039;}), &#039;-1,234,568&#039;);
+				// assert.strictEqual(number.format(-1234567.89, {places:0, locale: &#039;en-in&#039;}), &#039;-12,34,568&#039;);
+				assert.strictEqual(number.format(-1000.1, {places:2, locale: &#039;fr-fr&#039;}), &#039;-1\xa0000,10&#039;);
+				assert.strictEqual(number.format(-1000.1, {places:2, locale: &#039;en-us&#039;}), &#039;-1,000.10&#039;);
+				assert.strictEqual(number.format(-1000.1, {places:2, locale: &#039;fr-fr&#039;}), &#039;-1\xa0000,10&#039;);
+				assert.strictEqual(number.format(-1234.56, {places:2, locale: &#039;de-de&#039;}), &#039;-1.234,56&#039;);
+				assert.strictEqual(number.format(-1000.1, {places:2, locale: &#039;en-us&#039;}), &#039;-1,000.10&#039;);
+				assert.strictEqual(number.format(1.23456, {places:2, locale: &#039;en-us&#039;, type: &#039;percent&#039;}), &#039;123.46%&#039;);
+				assert.strictEqual(number.format(123.4, {places:&#039;1,3&#039;, locale: &#039;en-us&#039;}), &#039;123.4&#039;);
+				assert.strictEqual(number.format(123.45, {places:&#039;1,3&#039;, locale: &#039;en-us&#039;}), &#039;123.45&#039;);
+				assert.strictEqual(number.format(123.456, {places:&#039;1,3&#039;, locale: &#039;en-us&#039;}), &#039;123.456&#039;);
+
+				// rounding
+				assert.strictEqual(number.format(-1234567.89, {places:0, locale: &#039;en-us&#039;}), &#039;-1,234,568&#039;);
+				// assert.strictEqual(number.format(-1234567.89, {places:0, locale: &#039;en-in&#039;}), &#039;-12,34,568&#039;);
+				assert.strictEqual(number.format(-1000.114, {places:2, locale: &#039;en-us&#039;}), &#039;-1,000.11&#039;);
+				assert.strictEqual(number.format(-1000.115, {places:2, locale: &#039;en-us&#039;}), &#039;-1,000.12&#039;);
+				assert.strictEqual(number.format(-1000.116, {places:2, locale: &#039;en-us&#039;}), &#039;-1,000.12&#039;);
+				assert.strictEqual(number.format(-0.0001, {places:2, locale: &#039;en-us&#039;}), &#039;-0.00&#039;);
+				assert.strictEqual(number.format(0, {places:2, locale: &#039;en-us&#039;}), &#039;0.00&#039;);
+
+				// change decimal places
+				assert.strictEqual(number.format(-1000.1, {places:3, locale: &#039;fr-fr&#039;}), &#039;-1\xa0000,100&#039;);
+				assert.strictEqual(number.format(-1000.1, {places:3, locale: &#039;en-us&#039;}), &#039;-1,000.100&#039;);
+			},
+
+			patterns: function() {
+				var patterns = ([ &#039;#0.#&#039;, &#039;#0.&#039;, &#039;#.0&#039;, &#039;#&#039; ]);
+				var patternsLength = patterns.length;
+				var num = ([ &#039;0&#039;, &#039;0&#039;, &#039;0.0&#039;, &#039;0&#039; ]);
+				var options;
+				//icu4j result seems doesn&#039;t work as:
+				//var num = ([&#039;0&#039;,&#039;0.&#039;, &#039;.0&#039;, &#039;0&#039;]);
+				for (var i=0; i&lt;patternsLength; ++i) {
+					options = {pattern:patterns[i], locale: &#039;en-us&#039;};
+					checkFormatParseCycle(options, 0, num[i], false);
+				}
+			},
+
+			rounding: function() {
+				checkRounding(0.000179999, 5, &#039;0.00018&#039;);
+				checkRounding(0.00099, 4, &#039;0.001&#039;);
+				checkRounding(17.6995, 3, &#039;17.7&#039;);
+				checkRounding(15.3999, 0, &#039;15&#039;);
+				checkRounding(-29.6, 0, &#039;-30&#039;);
+			},
+
+			perMill: function() {
+				var result = number.format(0.4857,{pattern: &#039;###.###\u2030&#039;, locale: &#039;en-us&#039;});
+				assert.strictEqual(result, &#039;485.7\u2030&#039;);
+			},
+
+			grouping: function() {
+				var options = {pattern:&#039;#,##,###&#039;,locale:&#039;en-us&#039;};
+				//step1: 123456789 formated=&gt; 12,34,56,789
+				//step2:12,34,56,789 parsed=&gt; 123456789 =&gt; formated =&gt; 12,34,56,789
+				checkFormatParseCycle(options, 123456789, &#039;12,34,56,789&#039;, true);
+			}
+		},
+
+		&#039;.parse&#039;: {
+			&#039;old tests&#039;: function() {
+				assert.strictEqual(number.parse(&#039;1000&#039;, {locale: &#039;en-us&#039;}), 1000);
+				assert.strictEqual(number.parse(&#039;1000.123&#039;, {locale: &#039;en-us&#039;}), 1000.123);
+				assert.strictEqual(number.parse(&#039;1,000&#039;, {locale: &#039;en-us&#039;}), 1000);
+				assert.strictEqual(number.parse(&#039;-1000&#039;, {locale: &#039;en-us&#039;}), -1000);
+				assert.strictEqual(number.parse(&#039;-1000.123&#039;, {locale: &#039;en-us&#039;}), -1000.123);
+				assert.strictEqual(number.parse(&#039;-1,234,567.89&#039;, {locale: &#039;en-us&#039;}), -1234567.89);
+				assert.strictEqual(number.parse(&#039;-1 234 567,89&#039;, {locale: &#039;fr-fr&#039;}), -1234567.89);
+				assertStrictNaN(number.parse(&#039;-1 234 567,89&#039;, {locale: &#039;en-us&#039;}));
+
+				assert.strictEqual(number.parse(&#039;0123&#039;, {pattern: &#039;0000&#039;}), 123);
+
+				assertStrictNaN(number.parse(&#039;10,00&#039;, {locale: &#039;en-us&#039;}));
+				assertStrictNaN(number.parse(&#039;1000.1&#039;, {locale: &#039;fr-fr&#039;}));
+
+				assertStrictNaN(number.parse(&#039;&#039;));
+				assertStrictNaN(number.parse(&#039;abcd&#039;));
+
+				// should allow unlimited precision, by default
+				assert.strictEqual(number.parse(&#039;1.23456789&#039;, {locale: &#039;en-us&#039;}), 1.23456789);
+
+				// test whitespace
+				// assert.strictEqual(-1234567, number.parse(&#039;  -1,234,567  &#039;, {locale: &#039;en-us&#039;}));
+
+				// assert.ok(number.parse(&#039;9.1093826E-31&#039;));
+				assert.strictEqual(number.parse(&#039;123%&#039;, {locale: &#039;en-us&#039;, type: &#039;percent&#039;}), 1.23);
+				assert.strictEqual(number.parse(&#039;123%&#039;, {places:0, locale: &#039;en-us&#039;, type: &#039;percent&#039;}), 1.23);
+				assertStrictNaN(number.parse(&#039;123.46%&#039;, {places:0, locale: &#039;en-us&#039;, type: &#039;percent&#039;}));
+				assert.strictEqual(number.parse(&#039;123.46%&#039;, {places:2, locale: &#039;en-us&#039;, type: &#039;percent&#039;}), 1.2346);
+				assert.strictEqual(number.parse(&#039;50.1%&#039;, {pattern: &#039;#0.#%&#039;, locale: &#039;en-us&#039;}), 0.501);
+
+				assert.strictEqual(number.parse(&#039;123.4&#039;, {pattern: &#039;#0.#&#039;, locale: &#039;en-us&#039;}), 123.4);
+				assert.strictEqual(number.parse(&#039;-123.4&#039;, {pattern: &#039;#0.#&#039;, locale: &#039;en-us&#039;}), -123.4);
+				assert.strictEqual(number.parse(&#039;123.4&#039;, {pattern: &#039;#0.#;(#0.#)&#039;, locale: &#039;en-us&#039;}), 123.4);
+				assert.strictEqual(number.parse(&#039;(123.4)&#039;, {pattern: &#039;#0.#;(#0.#)&#039;, locale: &#039;en-us&#039;}), -123.4);
+
+				assert.isNull(number.format(&#039;abcd&#039;, {pattern: &#039;0000&#039;}));
+
+				assert.strictEqual(number.parse(&#039;123&#039;, {places: 0}), 123);
+				assert.strictEqual(number.parse(&#039;123&#039;, {places:&#039;0&#039;}), 123);
+				assert.strictEqual(number.parse(&#039;123.4&#039;, {places:1, locale: &#039;en-us&#039;}), 123.4);
+				assert.strictEqual(number.parse(&#039;123.45&#039;, {places:&#039;1,3&#039;, locale: &#039;en-us&#039;}), 123.45);
+				assert.strictEqual(number.parse(&#039;123.45&#039;, {places:&#039;0,2&#039;, locale: &#039;en-us&#039;}), 123.45);
+			},
+			&#039;t18466&#039;: function () {
+				var locale = &quot;fr&quot;;
+				checkParse({ pattern: &quot;#,###.00 ¤;(#,###.00) ¤&quot;, locale: locale }, &quot;1,00 &quot;, NaN);
+				checkParse({ pattern: &quot;#,###.00 ¤;(#,###.00) ¤&quot;, locale: locale }, &quot;1,00&quot;, 1);
+				checkParse({ pattern: &quot;#,###.00¤;(#,###.00)¤&quot;, locale: locale }, &quot;1,00 &quot;, NaN);
+				checkParse({ pattern: &quot;#,###.00¤;(#,###.00)¤&quot;, locale: locale }, &quot;1,00&quot;, 1);
+				checkParse({ pattern: &quot;#,###.00 ¤;(#,###.00) ¤&quot;, locale: locale }, &quot;1 000,00 &quot;, NaN);
+				checkParse({ pattern: &quot;#,###.00 ¤;(#,###.00) ¤&quot;, locale: locale }, &quot;1 000,00&quot;, 1000);
+				checkParse({ pattern: &quot;#,###.00¤;(#,###.00)¤&quot;, locale: locale }, &quot;1 000,00 &quot;, NaN);
+				checkParse({ pattern: &quot;#,###.00¤;(#,###.00)¤&quot;, locale: locale }, &quot;1 000,00&quot;, 1000);
+				checkFormatParseCycle({ pattern: &quot;#,###.00 ¤;(#,###.00) ¤&quot;, locale: locale }, &quot;1200&quot;, &quot;1\xa0200,00&quot;, true)
+				checkFormatParseCycle({ pattern: &quot;#,###.00¤;(#,###.00)¤&quot;, locale: locale }, &quot;1200&quot;, &quot;1\xa0200,00&quot;, true)
+				checkFormatParseCycle({ pattern: &quot;#,###.00 ¤;(#,###.00) ¤&quot;, locale: locale }, &quot;1200 &quot;, &quot;1\xa0200,00&quot;, true)
+				checkFormatParseCycle({ pattern: &quot;#,###.00¤;(#,###.00)¤&quot;, locale: locale }, &quot;1200 &quot;, &quot;1\xa0200,00&quot;, true)
+
+				checkParse({ pattern: &quot;¤ #,###.00;¤ (#,###.00)&quot;, locale: locale }, &quot; 1,00&quot;, NaN);
+				checkParse({ pattern: &quot;¤ #,###.00;¤ (#,###.00)&quot;, locale: locale }, &quot;1,00&quot;, 1);
+				checkParse({ pattern: &quot;¤#,###.00;¤(#,###.00)&quot;, locale: locale }, &quot; 1,00&quot;, NaN);
+				checkParse({ pattern: &quot;¤#,###.00;¤(#,###.00)&quot;, locale: locale }, &quot;1,00&quot;, 1);
+				checkParse({ pattern: &quot;¤ #,###.00;¤ (#,###.00)&quot;, locale: locale }, &quot; 1 000,00&quot;, NaN);
+				checkParse({ pattern: &quot;¤ #,###.00;¤ (#,###.00)&quot;, locale: locale }, &quot;1 000,00&quot;, 1000);
+				checkParse({ pattern: &quot;¤#,###.00;¤(#,###.00)&quot;, locale: locale }, &quot; 1 000,00&quot;, NaN);
+				checkParse({ pattern: &quot;¤#,###.00;¤(#,###.00)&quot;, locale: locale }, &quot;1 000,00&quot;, 1000);
+				checkFormatParseCycle({ pattern: &quot;¤ #,###.00;¤ (#,###.00)&quot;, locale: locale }, &quot;1200&quot;, &quot;1\xa0200,00&quot;, true)
+				checkFormatParseCycle({ pattern: &quot;¤#,###.00;¤(#,###.00)&quot;, locale: locale }, &quot;1200&quot;, &quot;1\xa0200,00&quot;, true)
+				checkFormatParseCycle({ pattern: &quot;¤ #,###.00;¤ (#,###.00)&quot;, locale: locale }, &quot; 1200&quot;, &quot;1\xa0200,00&quot;, true)
+				checkFormatParseCycle({ pattern: &quot;¤#,###.00;¤(#,###.00)&quot;, locale: locale }, &quot; 1200 &quot;, &quot;1\xa0200,00&quot;, true)
+
+
+			}
+		},
+
+		// These tests refer to specific tests in ICU4J
+		&#039;ICU4J Regressions&#039;: function () {
+
+			// NumberFormatRegressionTest.Test4161100
+			checkFormatParseCycle({ pattern: &#039;#0.#&#039;, locale: &#039;en-us&#039; }, -0.09, &#039;-0.1&#039;, false);
+
+
+			// NumberRegression.Test4087535, NumberRegression.Test4243108
+			checkFormatParseCycle({ places: 0 }, 0, &#039;0&#039;, false);
+			// TODO: in icu4j,0.1 should be formatted to &#039;.1&#039; when minimumIntegerDigits=0
+			checkFormatParseCycle({ places: 0 }, 0.1, &#039;0&#039;, false);
+			checkParse({ pattern: &#039;#0.#####&#039;, locale: &#039;en-us&#039;}, 123.55456,123.55456);
+			//!! fails because default pattern only has 3 decimal places
+			// checkParse(null, 123.55456, 123.55456);
+
+			// See whether it fails first format 0.0 ,parse &#039;99.99&#039;,and then reformat 0.0
+			checkFormatParseCycle({ pattern: &#039;#.#&#039; }, 0.0, &#039;0&#039;, false);
+			checkParse({ locale: &#039;en-us&#039; }, &#039;99.99&#039;, 99.99);
+			checkFormatParseCycle({ pattern: &#039;#.#&#039; }, 0.0, &#039;0&#039;, false);
+
+
+			// NumberRegression.Test4088503, NumberRegression.Test4106658
+			checkFormatParseCycle({ places: 0 }, 123, &#039;123&#039;, false);
+
+			// TODO: differernt from ICU where -0.0 is formatted to &#039;-0&#039;
+			checkFormatParseCycle({ locale: &#039;en-us&#039; }, -0.0, &#039;0&#039;, false);
+
+			// TODO: differernt from ICU where -0.0001 is formatted to &#039;-0&#039;
+			checkFormatParseCycle({ locale: &#039;en-us&#039;, places: 6 }, -0.0001, &#039;-0.000100&#039;, false);
+
+
+			// NumberRegression.Test4086575
+			var locale = &#039;fr&#039;;
+			var pattern = &#039;###.00;(###.00)&#039;;
+			var options = { pattern:pattern,locale: locale };
+
+			// no group separator
+			checkFormatParseCycle(options, 1234, &#039;1234,00&#039;, false);
+			checkFormatParseCycle(options, -1234, &#039;(1234,00)&#039;, false);
+
+			// space as group separator
+			pattern = &#039;#,###.00;(#,###.00)&#039;;
+			options = { pattern: pattern, locale: locale };
+			checkFormatParseCycle(options, 1234, &#039;1\u00a0234,00&#039;, false); // Expect 1 234,00
+			checkFormatParseCycle(options, -1234, &#039;(1\u00a0234,00)&#039;, false); // Expect (1 234,00)
+
+
+			// NumberRegression.Test4092480, NumberRegression.Test4074454
+			var patterns = ([ &#039;#0000&#039;, &#039;#000&#039;, &#039;#00&#039;, &#039;#0&#039;, &#039;#&#039; ]);
+			var expected = ([ &#039;0042&#039;, &#039;042&#039;, &#039;42&#039;, &#039;42&#039;, &#039;42&#039; ]);
+
+			for (var i = 0; i &lt; patterns.length; i ++) {
+				checkFormatParseCycle({ pattern: patterns[i] }, 42, expected[i], false);
+				checkFormatParseCycle({ pattern: patterns[i] }, -42, &#039;-&#039; + expected[i], false);
+			}
+
+			checkFormatParseCycle({ pattern : &#039;#,#00.00;-#.#&#039;, locale: &#039;en-us&#039; },3456.78,&#039;3,456.78&#039;,false);
+			//!!Failed case
+			// checkFormatParseCycle({pattern:&#039;#,#00.00 p&#039;&#039;ieces;-#,#00.00 p&#039;&#039;ieces&#039;},3456.78,&#039;3,456.78 p&#039;ieces&#039;,false);
+			// checkFormatParseCycle({pattern:&#039;000.0#0&#039;},3456.78,null,false);
+			// checkFormatParseCycle({pattern:&#039;0#0.000&#039;},3456.78,null,false);
+
+
+			// NumberRegression.Test4052223
+			checkParse({ pattern: &#039;#,#00.00&#039; }, &#039;abc3&#039;, NaN);
+
+			//TODO: got NaN instead of 1.222, is it ok?
+			//checkParse({pattern:&#039;#,##0.###&#039;,locale:&#039;en-us&#039;},&#039;1.222,111&#039;,1.222);
+			//checkParse({pattern:&#039;#,##0.###&#039;,locale:&#039;en-us&#039;},&#039;1.222x111&#039;,1.222);
+
+			//got NaN for illegal input, ok
+			checkParse(null,&#039;hello: ,.#$@^&amp;**10x&#039;, NaN);
+
+
+			// NumberRegression.Test4125885
+			checkFormatParseCycle({ pattern: &#039;000.00&#039;, locale: &#039;en-us&#039; }, 12.34, &#039;012.34&#039;, false);
+			checkFormatParseCycle({ pattern: &#039;+000.00%;-000.00%&#039;, locale: &#039;en-us&#039; }, 0.1234, &#039;+012.34%&#039;, false);
+			checkFormatParseCycle({ pattern: &#039;##,###,###.00&#039;, locale: &#039;en-us&#039;}, 9.02, &#039;9.02&#039;, false);
+
+			var patterns = ([ &#039;#.00&#039;, &#039;0.00&#039;, &#039;00.00&#039;, &#039;#0.0#&#039;, &#039;#0.00&#039; ]);
+			var expected = ([ &#039;1.20&#039;, &#039;1.20&#039;, &#039;01.20&#039;, &#039;1.2&#039;, &#039;1.20&#039; ]);
+			for (var i = 0; i &lt; patterns.length; i++){
+				checkFormatParseCycle({ pattern: patterns[i], locale: &#039;en-us&#039; }, 1.2, expected[i], false);
+			}
+		}
+	});
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

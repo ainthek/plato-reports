@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/functional/_base/loader/requirejs.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/functional/_base/loader/requirejs.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">71.34</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">615</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">66.45</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">6.32</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+	&#039;require&#039;,
+	&#039;intern!object&#039;,
+	&#039;intern/chai!assert&#039;,
+	&#039;./support/loaderTest&#039;,
+	&#039;./support/pageReady&#039;
+], function (require, registerSuite, assert, loaderTest, pageReady) {
+	function syncAsyncTests(url, exec) {
+		url = require.toUrl(url);
+		var sep = url.indexOf(&#039;?&#039;) &gt; -1 ? &#039;&amp;&#039; : &#039;?&#039;;
+		return {
+			&#039;sync&#039;: pageReady(url, exec),
+			&#039;async&#039;: pageReady(url + sep + &#039;async&#039;, exec)
+		};
+	}
+	registerSuite({
+		name: &#039;dojo/_base/loader - requirejs&#039;,
+
+		simple: syncAsyncTests(
+			&#039;./requirejs/simple.html&#039;,
+			function (command) {
+				return command.executeAsync(function (callback) {
+					require({
+						baseUrl: &#039;./&#039;
+					}, [
+						&#039;map&#039;, &#039;simple&#039;, &#039;dimple&#039;, &#039;func&#039;
+					], function (map, simple, dimple, func) {
+						callback(JSON.stringify({
+							mapName: map.name,
+							simpleColor: simple.color,
+							dimpleColor: dimple.color,
+							funcOut: func()
+						}));
+					});
+				}).then(function (data) {
+					data = JSON.parse(data);
+					assert.strictEqual(data.mapName, &#039;map&#039;);
+					assert.strictEqual(data.simpleColor, &#039;blue&#039;);
+					assert.strictEqual(data.dimpleColor, &#039;dimple-blue&#039;);
+					assert.strictEqual(data.funcOut, &#039;You called a function&#039;);
+				}).executeAsync(function (callback) {
+					var path = this.location.href.replace(/simple\.html.*$/, &#039;foo&#039;);
+					var index = path.indexOf(&#039;:&#039;);
+					var noProtocolPath = path.substring(index + 1, path.length).replace(/foo/, &#039;bar&#039;);
+					var self = this;
+
+					require([ path, noProtocolPath ], function () {
+						callback(JSON.stringify({
+							fooName: self.foo.name,
+							barName: self.bar.name
+						}));
+					});
+				}).then(function (data) {
+					data = JSON.parse(data);
+					assert.strictEqual(data.fooName, &#039;foo&#039;);
+					assert.strictEqual(data.barName, &#039;bar&#039;);
+				});
+			}
+		),
+
+		config: syncAsyncTests(
+			&#039;./requirejs/config.html&#039;,
+			function (command) {
+				return command.executeAsync(function (callback) {
+					callback(JSON.stringify(window.testData));
+				}).then(function (data) {
+					data = JSON.parse(data);
+					assert.strictEqual(data.simpleColor, &#039;blue&#039;);
+					assert.strictEqual(data.dimpleColor, &#039;dimple-blue&#039;);
+					assert.strictEqual(data.funcOut, &#039;You called a function&#039;);
+				});
+			}
+		),
+
+		&#039;simple, no head&#039;: syncAsyncTests(
+			&#039;./requirejs/simple-nohead.html&#039;,
+			function (command) {
+				return command.executeAsync(function (callback) {
+					require([ &#039;simple&#039;, &#039;dimple&#039;, &#039;func&#039;], function (simple, dimple, func) {
+						callback(JSON.stringify({
+							simpleColor: simple.color,
+							dimpleColor: dimple.color,
+							funcOut: func()
+						}));
+					});
+				}).then(function (data) {
+					data = JSON.parse(data);
+					assert.strictEqual(data.simpleColor, &#039;blue&#039;);
+					assert.strictEqual(data.dimpleColor, &#039;dimple-blue&#039;);
+					assert.strictEqual(data.funcOut, &#039;You called a function&#039;);
+				});
+			}
+		),
+
+		circular: pageReady(
+			require.toUrl(&#039;./requirejs/circular.html?async&#039;),
+			function (command) {
+				return command.executeAsync(function (callback) {
+					require([&#039;require&#039;, &#039;two&#039;, &#039;funcTwo&#039;, &#039;funcThree&#039;],
+						function (require, two, FuncTwo, funcThree) {
+							var args = two.doSomething();
+							var twoInst = new FuncTwo(&#039;TWO&#039;);
+							callback(JSON.stringify({
+								size: args.size,
+								color: args.color,
+								name: twoInst.name,
+								oneName: twoInst.oneName(),
+								three: funcThree(&#039;THREE&#039;)
+							}));
+						});
+				}).then(function (data) {
+					data = JSON.parse(data);
+					assert.strictEqual(data.size, &#039;small&#039;);
+					assert.strictEqual(data.color, &#039;redtwo&#039;);
+					assert.strictEqual(data.name, &#039;TWO&#039;);
+					assert.strictEqual(data.oneName, &#039;ONE-NESTED&#039;);
+					assert.strictEqual(data.three, &#039;THREE-THREE_SUFFIX&#039;);
+				});
+			}
+		),
+
+		&#039;url fetch&#039;: syncAsyncTests(
+			&#039;./requirejs/urlfetch/urlfetch.html&#039;,
+			function (command) {
+				return command.executeAsync(function (callback) {
+					require({
+						baseUrl: &#039;./&#039;,
+						paths: {
+							&#039;one&#039;: &#039;two&#039;,
+							&#039;two&#039;: &#039;two&#039;,
+							&#039;three&#039;: &#039;three&#039;,
+							&#039;four&#039;: &#039;three&#039;
+						}
+					}, [ &#039;one&#039;, &#039;two&#039;, &#039;three&#039;, &#039;four&#039; ], function (one, two, three, four) {
+						var scripts = document.getElementsByTagName(&#039;script&#039;);
+						var counts = {};
+						var url;
+
+						/* First confirm there is only one script tag for each module */
+						for (var i = scripts.length - 1; i &gt; -1; i--) {
+							url = scripts[i].src;
+							if (url) {
+								if (!(url in counts)) {
+									counts[url] = 0;
+								}
+								counts[url] += 1;
+							}
+						}
+
+						var data = {
+							oneName: one.name,
+							twoOneName: two.oneName,
+							twoName: two.name,
+							threeName: three.name,
+							fourThreeName: four.threeName,
+							fourName: four.name
+						};
+						if (require.async) {
+							data.counts = [];
+							for (var prop in counts) {
+								data.counts.push(counts[prop]);
+							}
+						}
+						callback(JSON.stringify(data));
+					});
+				}).then(function (data) {
+					data = JSON.parse(data);
+
+					if (data.counts) {
+						var count;
+						while ((count = data.counts.shift()) !== undefined) {
+							assert.strictEqual(count, 1);
+						}
+					}
+					assert.strictEqual(data.oneName, &#039;one&#039;);
+					assert.strictEqual(data.twoOneName, &#039;one&#039;);
+					assert.strictEqual(data.twoName, &#039;two&#039;);
+					assert.strictEqual(data.threeName, &#039;three&#039;);
+					assert.strictEqual(data.fourThreeName, &#039;three&#039;);
+					assert.strictEqual(data.fourName, &#039;four&#039;);
+				});
+			}
+		),
+
+		dataMain: syncAsyncTests(
+			&#039;./requirejs/dataMain.html&#039;,
+			function (command) {
+				return command.execute(function () {
+					return this.simple.color;
+				}).then(function (data) {
+					assert.strictEqual(data, &#039;blue&#039;);
+				});
+			}
+		),
+
+		depoverlap: syncAsyncTests(
+			&#039;./requirejs/depoverlap.html&#039;,
+			function (command) {
+				return command.execute(function () {
+					//First confirm there is only one script tag for each module:
+					var scripts = this.document.getElementsByTagName(&#039;script&#039;);
+					var i;
+					var counts = {};
+					var modName;
+					var something;
+
+					for (i = scripts.length - 1; i &gt; -1; i--) {
+						modName = scripts[i].getAttribute(&#039;data-requiremodule&#039;);
+						if (modName) {
+							if (!(modName in counts)) {
+								counts[modName] = 0;
+							}
+							counts[modName] += 1;
+						}
+					}
+
+					something = this.uno.doSomething();
+
+					return {
+						counts: counts,
+						unoName: this.uno.name,
+						dosName: something.dosName,
+						tresName: something.tresName
+					};
+				}).then(function (data) {
+					//Now that we counted all the modules make sure count
+					//is always one.
+					var counts = data.counts;
+					for (var prop in counts) {
+						assert.strictEqual(counts[prop], 1);
+					}
+
+					assert.strictEqual(data.unoName, &#039;uno&#039;);
+					assert.strictEqual(data.dosName, &#039;dos&#039;);
+					assert.strictEqual(data.tresName, &#039;tres&#039;);
+				});
+			}
+		),
+		// TODO: there are more of the i18n tests...
+		&#039;i18n&#039;: {
+			&#039;i18n&#039;: (function () {
+				function i18nTest(command) {
+					return command.executeAsync(function (callback) {
+						//Allow locale to be set via query args.
+						var locale = null;
+						var query = this.location.href.split(&#039;#&#039;)[0].split(&#039;?&#039;)[1];
+						var match = query &amp;&amp; query.split(&#039;&amp;&#039;)[0].match(/locale=([\w-]+)/);
+						if (match) {
+							locale = match[1];
+						}
+
+						//Allow bundle name to be loaded via query args.
+						var bundle = &#039;i18n!nls/colors&#039;;
+						match = query &amp;&amp; query.match(/bundle=([^\&amp;]+)/);
+						if (match) {
+							bundle = match[1];
+						}
+
+						var red = &#039;red&#039;;
+						var blue = &#039;blue&#039;;
+						var green = &#039;green&#039;;
+
+						if (locale &amp;&amp; locale.indexOf(&#039;en-us-surfer&#039;) !== -1 || bundle.indexOf(&#039;nls/en-us-surfer/colors&#039;) !== -1) {
+							red = &#039;red, dude&#039;;
+						}
+						else if ((locale &amp;&amp; locale.indexOf(&#039;fr-&#039;) !== -1) || bundle.indexOf(&#039;fr-&#039;) !== -1) {
+							red = &#039;rouge&#039;;
+							blue = &#039;bleu&#039;;
+						}
+
+						require([ &#039;dojo&#039; ], function (dojo) {
+							// dojo/i18n! looks at dojo.locale
+							locale &amp;&amp; (dojo.locale = locale);
+							require([ bundle ], function (colors) {
+								callback({
+									red: {actual: colors.red, expected: red},
+									blue: {actual: colors.blue, expected: blue},
+									green: {actual: colors.green, expected: green}
+								});
+							});
+						});
+					}).then(function (data) {
+						assert.strictEqual(data.red.actual, data.red.expected);
+						assert.strictEqual(data.blue.actual, data.blue.expected);
+						assert.strictEqual(data.green.actual, data.green.expected);
+					});
+				}
+
+				return {
+					&#039;locale unknown&#039;: syncAsyncTests(&#039;./requirejs/i18n/i18n.html?bundle=i18n!nls/fr-fr/colors&#039;, i18nTest),
+					&#039;base&#039;: syncAsyncTests(&#039;./requirejs/i18n/i18n.html&#039;, i18nTest),
+					&#039;locale&#039;: syncAsyncTests(&#039;./requirejs/i18n/i18n.html?locale=en-us-surfer&#039;, i18nTest),
+					&#039;bundle&#039;: syncAsyncTests(&#039;./requirejs/i18n/i18n.html?bundle=i18n!nls/en-us-surfer/colors&#039;, i18nTest)
+				};
+			})(),
+
+			common: (function () {
+				function commonTest(command) {
+					return command.executeAsync(function (callback) {
+						//Allow locale to be set via query args.
+						var locale = null;
+						var query = this.location.href.split(&#039;#&#039;)[0].split(&#039;?&#039;)[1];
+						var match = query &amp;&amp; query.match(/locale=([\w-]+)/);
+
+						if (match) {
+							locale = match[1];
+						}
+
+						var red = &#039;red&#039;;
+						var blue = &#039;blue&#039;;
+
+						if (locale &amp;&amp; locale.indexOf(&#039;en-us-surfer&#039;) !== -1) {
+							red = &#039;red, dude&#039;;
+						}
+						else if ((locale &amp;&amp; locale.indexOf(&#039;fr-&#039;) !== -1)) {
+							red = &#039;rouge&#039;;
+							blue = &#039;bleu&#039;;
+						}
+
+						require([ &#039;dojo&#039; ], function (dojo) {
+							// dojo/i18n! looks at dojo.locale
+							locale &amp;&amp; (dojo.locale = locale);
+							require([ &#039;commonA&#039;, &#039;commonB&#039; ], function (commonA, commonB) {
+								callback({
+									commonA: {actual: commonA, expected: red},
+									commonB: {actual: commonB, expected: blue}
+								});
+							});
+						});
+					}).then(function (data) {
+						assert.strictEqual(data.commonA.actual, data.commonA.expected);
+						assert.strictEqual(data.commonB.actual, data.commonB.expected);
+					});
+				}
+
+				return {
+					base: syncAsyncTests(&#039;./requirejs/i18n/i18n.html&#039;, commonTest),
+					locale: syncAsyncTests(&#039;./requirejs/i18n/i18n.html?locale=en-us-surfer&#039;, commonTest)
+				};
+			})()
+		},
+
+		paths: syncAsyncTests(&#039;./requirejs/paths/paths.html&#039;, function (command) {
+			return command.executeAsync(function (callback) {
+				var scriptCounter = 0;
+				var self = this;
+
+				require({
+					baseUrl: &#039;./&#039;,
+					packages: [
+						{
+							name: &#039;first&#039;,
+							location: &#039;first.js&#039;,
+							main: &#039;./first&#039;
+						}
+					]
+				}, [ &#039;first!whatever&#039; ], function (first) {
+					//First confirm there is only one script tag for each
+					//module:
+					var scripts = self.document.getElementsByTagName(&#039;script&#039;);
+					var modName;
+
+					for (var i = scripts.length - 1; i &gt; -1; i--) {
+						modName = scripts[i].getAttribute(&#039;src&#039;);
+						if (/first\.js$/.test(modName)) {
+							scriptCounter += 1;
+						}
+					}
+
+					var result = {
+						async: require.async,
+						globalCounter: self.globalCounter,
+						name: first.name,
+						secondName: first.secondName
+
+					};
+					if (require.async) {
+						result.scriptCounter = scriptCounter;
+					}
+					callback(result);
+				});
+			}).then(function (data) {
+				if (data.async) {
+					assert.strictEqual(data.scriptCounter, 1);
+				}
+
+				assert.strictEqual(data.globalCounter, 2);
+				assert.strictEqual(data.name, &#039;first&#039;);
+				assert.strictEqual(data.secondName, &#039;second&#039;);
+			});
+		}),
+
+		relative: syncAsyncTests(&#039;./requirejs/relative/relative.html&#039;, function (command) {
+			return command.executeAsync(function (callback) {
+				// alias dojo&#039;s text module to text!
+				define(&#039;text&#039;, [ &#039;dojo/text&#039; ], function (text) {
+					return text;
+				});
+
+				require({
+					baseUrl: require.has(&#039;host-browser&#039;) ? &#039;./&#039; : &#039;./relative/&#039;,
+					paths: {
+						text: &#039;../../text&#039;
+					}
+				}, [ &#039;foo/bar/one&#039; ], function (one) {
+					callback({
+						name: one.name,
+						twoName: one.twoName,
+						threeName: one.threeName,
+						message: one.message.replace(/\r|\n/g, &#039;&#039;)
+					});
+				});
+			}).then(function (data) {
+				assert.strictEqual(data.name, &#039;one&#039;);
+				assert.strictEqual(data.twoName, &#039;two&#039;);
+				assert.strictEqual(data.threeName, &#039;three&#039;);
+				assert.strictEqual(data.message, &#039;hello world&#039;);
+			});
+		}),
+
+		text: (function () {
+			function textTest(command, useAlias) {
+				return command.executeAsync(function (useAlias, callback) {
+					if (useAlias) {
+						// alias dojo&#039;s text module to text!
+						require({ aliases: [
+							[ &#039;text&#039;, &#039;dojo/text&#039; ]
+						] });
+					}
+					else {
+						define(&#039;text&#039;, [ &#039;dojo/text&#039; ], function (text) {
+							return text;
+						});
+					}
+
+					require({
+						baseUrl: &#039;./&#039;,
+						paths: {
+							text: &#039;../../text&#039;
+						}
+					}, [
+						&#039;widget&#039;,
+						&#039;local&#039;,
+						&#039;text!resources/sample.html!strip&#039;
+					], function (widget, local, sampleText) {
+						var results = [];
+
+						function makeResults(expected, actual) {
+							results.push({
+								actual: actual.replace(/\s{2,}|\n/g, &#039;&#039;),
+								expected: expected
+							});
+						}
+
+						makeResults(&#039;&lt;span&gt;Hello World!&lt;/span&gt;&#039;, sampleText);
+						makeResults(&#039;&lt;div data-type=&quot;widget&quot;&gt;&lt;h1&gt;This is a widget!&lt;/h1&gt;&lt;p&gt;I am in a widget&lt;/p&gt;&lt;/div&gt;&#039;, widget.template);
+						makeResults(&#039;subwidget&#039;, widget.subWidgetName);
+						makeResults(&#039;&lt;div data-type=&quot;subwidget&quot;&gt;&lt;h1&gt;This is a subwidget&lt;/h1&gt;&lt;/div&gt;&#039;, widget.subWidgetTemplate);
+						makeResults(&#039;&lt;span&gt;This! is template2&lt;/span&gt;&#039;, widget.subWidgetTemplate2);
+						makeResults(&#039;&lt;h1&gt;Local&lt;/h1&gt;&#039;, local.localHtml);
+						callback(results);
+					});
+				}, [useAlias]).then(function (data) {
+					var test;
+					while ((test = data.shift())) {
+						assert.strictEqual(test.actual, test.expected);
+					}
+				});
+			}
+
+			return {
+				alias: syncAsyncTests(&#039;./requirejs/text/text.html&#039;, function (command) {
+					return textTest(command, true);
+				}),
+				&#039;non-alias&#039;: syncAsyncTests(&#039;./requirejs/text/text.html&#039;, textTest)
+			};
+		})(),
+
+		&#039;text only&#039;: syncAsyncTests(&#039;./requirejs/text/textOnly.html&#039;, function (command) {
+			return command.executeAsync(function (callback) {
+				// alias dojo&#039;s text module to text!
+				define(&#039;text&#039;, [ &#039;dojo/text&#039; ], function (text) {
+					return text;
+				});
+
+				require({
+					baseUrl: &#039;./&#039;,
+					paths: {
+						text: &#039;../../text&#039;
+					}
+				}, [ &#039;text!resources/sample.html!strip&#039;], function (sampleText) {
+					callback(sampleText);
+				});
+			}).then(function (data) {
+				assert.strictEqual(data, &#039;&lt;span&gt;Hello World!&lt;/span&gt;&#039;);
+			});
+		}),
+
+		exports: pageReady(
+			require.toUrl(&#039;./requirejs/exports/exports.html&#039;),
+			function (command) {
+				return command.executeAsync(function (callback) {
+					require({
+						baseUrl: require.has(&#039;host-browser&#039;) ? &#039;./&#039; : &#039;./exports/&#039;
+					}, [
+						&#039;vanilla&#039;,
+						&#039;funcSet&#039;,
+						&#039;assign&#039;,
+						&#039;assign2&#039;,
+						&#039;usethis&#039;,
+						&#039;implicitModule&#039;,
+						&#039;simpleReturn&#039;
+					], function (vanilla, funcSet, assign, assign2, usethis, implicitModule, simpleReturn) {
+						callback({
+							vanillaName: vanilla.name,
+							funcSet: funcSet,
+							assign: assign,
+							assign2: assign2,
+							implicitModule: implicitModule(),
+							simpleReturn: simpleReturn()
+						});
+					});
+				}).then(function (data) {
+					assert.strictEqual(data.vanillaName, &#039;vanilla&#039;);
+					assert.strictEqual(data.funcSet, &#039;funcSet&#039;);
+					assert.strictEqual(data.assign, &#039;assign&#039;);
+					assert.strictEqual(data.assign2, &#039;assign2&#039;);
+					assert.strictEqual(data.implicitModule, &#039;implicitModule&#039;);
+					assert.strictEqual(data.simpleReturn, &#039;simpleReturn&#039;);
+				});
+			}
+		),
+		uniques: syncAsyncTests(&#039;./requirejs/uniques/uniques.html&#039;, function (command) {
+			return command.executeAsync(function (callback) {
+				require({
+						baseUrl: &#039;./&#039;
+				}, [ &#039;one&#039;, &#039;two&#039;, &#039;three&#039; ], function (one, two, three) {
+					callback({
+						oneName: one.name,
+						oneThreeName: one.threeName,
+						oneThreeName2: one.threeName2,
+						twoOneName: two.oneName,
+						twoOneName2: two.oneName2,
+						twoName: two.name,
+						twoThreeName: two.threeName,
+						threeName: three.name
+					});
+				});
+			}).then(function (data) {
+				assert.strictEqual(data.oneName, &#039;one&#039;);
+				assert.strictEqual(data.oneThreeName, &#039;three&#039;);
+				assert.strictEqual(data.oneThreeName2, &#039;three&#039;);
+				assert.strictEqual(data.twoOneName, &#039;one&#039;);
+				assert.strictEqual(data.twoOneName2, &#039;one&#039;);
+				assert.strictEqual(data.twoName, &#039;two&#039;);
+				assert.strictEqual(data.twoThreeName, &#039;three&#039;);
+				assert.strictEqual(data.threeName, &#039;three&#039;);
+			});
+		})/*,
+		TODO: Fix these tests
+		&#039;simple, bad base&#039;: (function () {
+			function badBaseTest(command) {
+				return command.executeAsync(function (callback) {
+					// set the base URL
+					require({ baseUrl: window.testBase + &#039;/loader/requirejs/&#039; });
+
+					require([ &#039;simple&#039;, &#039;dimple&#039;, &#039;func&#039; ], function (simple, dimple, func) {
+						callback({
+							simple: simple.color,
+							dimple: dimple.color,
+							func: func()
+						});
+					});
+				}).then(function (data) {
+					assert.strictEqual(data.simple, &#039;blue&#039;);
+					assert.strictEqual(data.dimple, &#039;dimple-blue&#039;);
+					assert.strictEqual(data.func, &#039;You called a function&#039;);
+
+					return this.session.executeAsync(function (callback) {
+						//This test is only in the HTML since it uses an URL for a require
+						//argument. It will not work well in say, the Rhino tests.
+						var path = location.href.replace(/simple-badbase\.html.*$/, &#039;foo&#039;);
+						var index = path.indexOf(&#039;:&#039;);
+						var noProtocolPath = path.substring(index + 1, path.length).replace(/foo/, &#039;bar&#039;);
+
+						require([ path, noProtocolPath ], function () {
+							callback({
+								foo: window.foo.name,
+								bar: window.bar.name
+							});
+						});
+					}).then(function (data) {
+						assert.strictEqual(data.foo, &#039;foo&#039;);
+						assert.strictEqual(data.bar, &#039;bar&#039;);
+					});
+				});
+			}
+
+			return {
+				sync: pageReady(require.toUrl(&#039;./requirejs/simple-badbase.html&#039;), badBaseTest),
+				async: pageReady(require.toUrl(&#039;./requirejs/simple-badbase.html?async&#039;), function (command) {
+					return command.executeAsync(function (callback) {
+						require([ &#039;dojo/sniff&#039; ], function (has) {
+							callback(has(&#039;ie&#039;));
+						});
+					}).then(function (ie) {
+						if (!ie || ie &gt; 6) {
+							return badBaseTest(this.session);
+						}
+					});
+				})
+			};
+		})()*/
+	});
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

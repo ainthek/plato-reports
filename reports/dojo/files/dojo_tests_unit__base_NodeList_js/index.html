@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/unit/_base/NodeList.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/unit/_base/NodeList.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">65.56</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">881</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">69.16</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">11.58</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+    &#039;intern!object&#039;,
+    &#039;intern/chai!assert&#039;,
+    &#039;sinon&#039;,
+    &#039;../../../_base/NodeList&#039;,
+    &#039;dojo&#039;,
+    &#039;../../../query&#039;,
+    &#039;../../../on&#039;,
+    &#039;../../../dom-construct&#039;,
+    &#039;../../../dom-attr&#039;,
+    &#039;../../../string&#039;,
+    &#039;../../../parser&#039;,
+    &#039;../../../_base/array&#039;
+], function (registerSuite, assert, sinon, NodeList, dojo, query, on, domConstruct, domAttr) {
+    registerSuite({
+        name: &#039;dojo/_base/NodeList&#039;,
+
+        &quot;connect()&quot;: (function () {
+            return {
+                &quot;delegates to dojo.connect for each node&quot;: function () {
+                    //arrange
+                    var nodes =
+                        [
+                            document.createElement(&quot;div&quot;),
+                            document.createElement(&quot;div&quot;)
+                        ],
+                        nodeList = new NodeList(nodes),
+                        origDojoConnect = dojo.connect,
+                        callback = function () { },
+                        event = &quot;onClick&quot;,
+                        capturedArguments = [],
+                        capturedThis = [];
+
+                    dojo.connect = function () {
+                        capturedArguments.push(arguments);
+                        capturedThis = this;
+                    }
+
+                    //act
+                    nodeList.connect(event, callback);
+
+                    //assert
+                    for (var i in nodes) {
+                        assert.propertyVal(capturedArguments,
+                            { 0: event, 1: callback });
+                        assert.propertyVal(capturedThis, nodes[i]);
+                    }
+
+                    dojo.connect = origDojoConnect;
+
+                }
+            };
+        })(),
+        &quot;coords()&quot;: (function () {
+            var coords =
+                [
+                    {
+                        l: 1,
+                        t: 2,
+                        w: 3,
+                        h: 4
+                    }, {
+                        l: 10,
+                        t: 11,
+                        w: 12,
+                        h: 13
+                    }
+                ],
+                nodes,
+                nodeList,
+                container;
+
+            return {
+                setup: function () {
+                    nodes = [];
+
+                    container = document.createElement(&quot;div&quot;);
+                    for (var i in coords) {
+                        var node = document.createElement(&quot;div&quot;);
+                        nodes.push(node);
+                        container.appendChild(node);
+                        node.style.position = &quot;absolute&quot;;
+                        node.style.left = coords[i].l + &quot;px&quot;;
+                        node.style.top = coords[i].t + &quot;px&quot;;
+                        node.style.width = coords[i].w + &quot;px&quot;;
+                        node.style.height = coords[i].h + &quot;px&quot;;
+                    }
+
+                    nodeList = new NodeList(nodes);
+
+                    document.body.appendChild(container);
+                },
+                teardown: function () {
+                    document.body.removeChild(container);
+                },
+                &quot;returns array of the nodelist&#039;s nodes&#039; coordinates&quot;: function () {
+                    //arrange
+
+
+                    //act
+                    var result = nodeList.coords();
+
+                    //assert
+                    for (var i in coords) {
+                        for (var j in coords[i]) {
+                            assert.propertyVal(result[i], coords[i][j]);
+                        }
+                    }
+
+                }
+            };
+        })(),
+        &quot;events&quot;: (function () {
+            var events = [
+                &quot;blur&quot;, &quot;focus&quot;, &quot;change&quot;, &quot;click&quot;, &quot;error&quot;, &quot;keydown&quot;, &quot;keypress&quot;,
+                &quot;keyup&quot;, &quot;load&quot;, &quot;mousedown&quot;, &quot;mouseenter&quot;, &quot;mouseleave&quot;, &quot;mousemove&quot;,
+                &quot;mouseout&quot;, &quot;mouseover&quot;, &quot;mouseup&quot;, &quot;submit&quot;
+            ];
+            return {
+                &quot;delegates wiring of event handlers for each to NodeList::connect with correct arguments&quot;: function () {
+
+                    //arrange
+                    var nodes =
+                        [
+                            document.createElement(&quot;input&quot;),
+                            document.createElement(&quot;div&quot;)
+                        ],
+                        nodeList = new NodeList(nodes),
+                        capturedArgs = [],
+                        mock = sinon.stub(nodeList, &quot;connect&quot;),
+                        results = [];
+
+                    for (var i in events) {
+                        mock.withArgs(&quot;on&quot; + events[i], events[i] + &quot;0&quot;, events[i] + &quot;1&quot;)
+                            .returns(events[i] + &quot;return&quot;);
+                    }
+
+                    //act
+                    for (var i in events) {
+                        results.push(nodeList[&quot;on&quot; + events[i]](events[i] + &quot;0&quot;, events[i] + &quot;1&quot;));
+                    }
+
+                    //assert
+                    for (var i in events) {
+                        assert.isTrue(mock.calledWith(&quot;on&quot; + events[i], events[i] + &quot;0&quot;, events[i] + &quot;1&quot;));
+                        assert.include(results, events[i] + &quot;return&quot;);
+                    }
+
+                }
+            };
+        })(),
+        &quot;validation tests&quot;: (function () {
+            var firstSubContainer,
+                secondSubContainer,
+                thirdSubContainer,
+                container,
+                idIndex = 0,
+                baseId = &quot;_base/NodeList&quot;,
+                sq100Id = baseId + idIndex++
+
+            var tn;
+            var c, t, s, fourElementNL;
+
+            var listen = on; //alias of dojo/on
+
+            function verify(/*dojo.NodeList*/nl, /*Array*/ids) {
+                for (var i = 0, node; node = nl[i]; i++) {
+                    assert.equal(node.id, ids[i]);
+                }
+                //Make sure lengths are equal.
+                assert.equal(i, ids.length);
+            }
+
+            return {
+                setup: function () {
+                    container = document.createElement(&quot;div&quot;);
+
+                    firstSubContainer = document.createElement(&quot;div&quot;);
+
+                    var sq100 = document.createElement(&quot;div&quot;);
+                    firstSubContainer.appendChild(sq100);
+                    sq100.id = sq100Id;
+                    sq100.style.width = &quot;120px&quot;;
+                    sq100.style.height = &quot;130px&quot;;
+
+                    secondSubContainer = document.createElement(&quot;div&quot;);
+
+                    var frag = domConstruct.toDom(
+                        &#039;&lt;h1&gt;testing dojo.NodeList&lt;/h1&gt;&#039; +
+                        &#039;&lt;div id=&quot;sq100-NodeList&quot; style=&quot;position:absolute;left:100px;top:100px;width:100px;height:100px;&quot;&gt;&#039; +
+                        &#039;    100px square, abs&#039; +
+                        &#039;&lt;/div&gt;&#039; +
+                        &#039;&lt;div id=&quot;t-NodeList&quot;&gt;&#039; +
+                        &#039;    &lt;span id=&quot;c1-NodeList&quot;&gt;c1&lt;/span&gt;&#039; +
+                        &#039;&lt;/div&gt;&#039;);
+
+
+                    domConstruct.place(frag, secondSubContainer);
+
+                    thirdSubContainer = document.createElement(&quot;div&quot;);
+                    var frag = domConstruct.toDom(
+                        &#039;&lt;div&gt;&lt;/div&gt;&#039; +
+                        &#039;&lt;div&gt;&lt;/div&gt;&#039; +
+                        &#039;&lt;div&gt;&lt;/div&gt;&#039; +
+                        &#039;&lt;div&gt;&lt;/div&gt;&#039; +
+                        &#039;&lt;div&gt;&lt;/div&gt;&#039; +
+                        &#039;&lt;div&gt;&lt;/div&gt;&#039; +
+                        &#039;&lt;div&gt;&lt;/div&gt;&#039; +
+                        &#039;&lt;div&gt;&lt;/div&gt;&#039; +
+                        &#039;&lt;div&gt;&lt;/div&gt;&#039;);
+                    domConstruct.place(frag, thirdSubContainer);
+
+                    container.appendChild(firstSubContainer);
+                    container.appendChild(secondSubContainer);
+                    container.appendChild(thirdSubContainer);
+                    document.body.appendChild(container);
+                    c = dojo.byId(&quot;c1-NodeList&quot;);
+                    t = dojo.byId(&quot;t-NodeList&quot;);
+                    s = dojo.byId(&quot;sq100-NodeList&quot;);
+                    fourElementNL = new NodeList(c, t, c, t);
+                },
+                teardown: function () {
+                    document.body.removeChild(container);
+                },
+                &quot;connect&quot;: function () {
+                    var ih = &quot;&lt;div&gt;&quot; +
+                            &quot;    &lt;span&gt;&lt;/span&gt;&quot; +
+                            &quot;&lt;/div&gt;&quot; +
+                            &quot;&lt;span class=&#039;thud&#039;&gt;&quot; +
+                            &quot;    &lt;button&gt;blah&lt;/button&gt;&quot; +
+                            &quot;&lt;/span&gt;&quot;;
+
+                    tn = document.createElement(&quot;div&quot;);
+                    tn.innerHTML = ih;
+                    document.body.appendChild(tn);
+
+                    var ctr = 0;
+                    var nl = query(&quot;button&quot;, tn).connect(&quot;onclick&quot;, function () {
+                        ctr++;
+                    });
+                    nl[0].click();
+                    assert.equal(1, ctr);
+                    nl[0].click();
+                    nl[0].click();
+                    assert.equal(3, ctr);
+                },
+                &quot;coords&quot;: function () {
+                    var tnl = new NodeList(dojo.byId(sq100Id));
+                    assert.isTrue(dojo.isArray(tnl));
+                    assert.equal(120, tnl.coords()[0].w, 120);
+                    assert.equal(130, tnl.coords()[0].h, 130);
+                    assert.equal(query(&quot;body *&quot;).coords().length, document.body.getElementsByTagName(&quot;*&quot;).length);
+                    assert.equal(query(&quot;body *&quot;).position().length, document.body.getElementsByTagName(&quot;*&quot;).length);
+                },
+
+                // constructor tests
+                &quot;ctor&quot;: function () {
+                    var nl = new NodeList();
+                    nl.push(c);
+                    assert.equal(nl.length, 1);
+                },
+                &quot;ctorArgs&quot;: function () {
+                    var nl = new NodeList(4);
+                    nl.push(c);
+                    assert.equal(nl.length, 5);
+                },
+                &quot;ctorArgs2&quot;: function () {
+                    var nl = new NodeList(c, t);
+                    assert.equal(nl.length, 2);
+                    assert.equal(nl[0], c);
+                    assert.equal(nl[1], t);
+                },
+                // iteration and array tests
+                &quot;forEach&quot;: function () {
+                    var lastItem;
+                    var nl = new NodeList(c, t);
+                    nl.forEach(function (i) { lastItem = i; });
+                    assert.equal(lastItem, t);
+
+                    var r = nl.forEach(function (i, idx, arr) {
+                        assert.instanceOf(arr, NodeList);
+                        assert.equal(arr.length, 2);
+                    });
+                    assert.instanceOf(r, NodeList);
+                    assert.equal(nl, r);
+                },
+
+                &quot;indexOf&quot;: function () {
+                    assert.equal(fourElementNL.indexOf(c), 0);
+                    assert.equal(fourElementNL.indexOf(t), 1);
+                    assert.equal(fourElementNL.indexOf(null), -1);
+                },
+
+                &quot;lastIndexOf&quot;: function () {
+                    assert.equal(fourElementNL.lastIndexOf(c), 2);
+                    assert.equal(fourElementNL.lastIndexOf(t), 3);
+                    assert.equal(fourElementNL.lastIndexOf(null), -1);
+                },
+
+                &quot;every&quot;: function () {
+                    var ctr = 0;
+                    var ret = fourElementNL.every(function () {
+                        ctr++;
+                        return true;
+                    });
+                    assert.equal(ctr, 4);
+                    assert.isTrue(ret);
+
+                    ctr = 0;
+                    var ret = fourElementNL.every(function () {
+                        ctr++;
+                        return false;
+                    });
+                    assert.equal(ctr, 1);
+                    assert.isFalse(ret);
+                },
+
+                &quot;some&quot;: function () {
+                    var ret = fourElementNL.some(function () {
+                        return true;
+                    });
+                    assert.isTrue(ret);
+
+                    var ret = fourElementNL.some(function (i) {
+                        return (i.id == &quot;t-NodeList&quot;);
+                    });
+                    assert.isTrue(ret);
+                },
+
+                &quot;map&quot;: function () {
+                    var ret = fourElementNL.map(function () {
+                        return true;
+                    });
+
+                    for (var i = 0; i &lt; ret.length; i++) {
+                        assert.equal(ret[i], true);
+                    }
+
+                    verify(ret.end(), [&quot;c1-NodeList&quot;, &quot;t-NodeList&quot;, &quot;c1-NodeList&quot;, &quot;t-NodeList&quot;]);
+
+                    var cnt = 0;
+                    var ret = fourElementNL.map(function () {
+                        return cnt++;
+                    });
+                    // assert.equal([0, 1, 2, 3], ret);
+
+                    assert.instanceOf(ret, NodeList);
+
+                    // make sure that map() returns a NodeList
+                    var sum = 0;
+                    fourElementNL.map(function () { return 2; }).forEach(function (x) { sum += x; });
+                    assert.equal(sum, 8);
+                },
+
+                &quot;slice&quot;: function () {
+                    var pnl = new NodeList(t, t, c);
+                    assert.equal(pnl.slice(1).length, 2);
+                    assert.equal(pnl.length, 3);
+                    assert.equal(pnl.slice(-1)[0], c);
+                    assert.equal(pnl.slice(-2).length, 2);
+                    verify(pnl.slice(1).end(), [&quot;t-NodeList&quot;, &quot;t-NodeList&quot;, &quot;c1-NodeList&quot;]);
+                },
+
+                &quot;splice&quot;: function () {
+                    var pnl = new NodeList(t, t, c);
+                    console.debug(pnl.splice(1));
+
+                    /*
+                    assert.equal(pnl.splice(1).length, 2);
+                    assert.equal(pnl.length, 1);
+                    pnl = new NodeList(t, t, c);
+                    assert.equal(pnl.splice(-1)[0], c);
+                    assert.equal(pnl.length, 2);
+                    pnl = new NodeList(t, t, c);
+                    assert.equal(pnl.splice(-2).length, 2);
+                    */
+                },
+
+                &quot;spliceInsert&quot;: function () {
+                    // insert 1
+                    var pnl = new NodeList(t, t, c);
+                    pnl.splice(0, 0, c);
+                    assert.equal(pnl.length, 4);
+                    assert.equal(pnl[0], c);
+
+                    // insert multiple
+                    pnl = new NodeList(t, t, c);
+                    pnl.splice(0, 0, c, s);
+                    assert.equal(pnl.length, 5);
+                    assert.equal(pnl[0], c);
+                    assert.equal(pnl[1], s);
+                    assert.equal(pnl[2], t);
+
+                    // insert multiple at offset
+                    pnl = new NodeList(t, t, c);
+                    pnl.splice(1, 0, c, s);
+                    assert.equal(pnl.length, 5);
+                    assert.equal(pnl[0], t);
+                    assert.equal(pnl[1], c);
+                    assert.equal(pnl[2], s);
+                    assert.equal(pnl[3], t);
+                },
+
+                &quot;spliceDel&quot;: function () {
+                    // clobbery 1
+                    var pnl = new NodeList(c, t, s);
+                    pnl.splice(0, 1);
+                    assert.equal(pnl.length, 2);
+                    assert.equal(pnl[0], t);
+
+                    // clobber multiple
+                    pnl = new NodeList(c, t, s);
+                    pnl.splice(0, 2);
+                    assert.equal(pnl.length, 1);
+                    assert.equal(pnl[0], s);
+
+                    // ...at an offset
+                    pnl = new NodeList(c, t, s);
+                    pnl.splice(1, 1);
+                    assert.equal(pnl.length, 2);
+                    assert.equal(pnl[0], c);
+                    assert.equal(pnl[1], s);
+
+                },
+
+                &quot;spliceInsertDel&quot;: function () {
+                    // clobbery 1
+                    var pnl = new NodeList(c, t, s);
+                    pnl.splice(1, 1, s);
+                    assert.equal(pnl.length, 3);
+                    assert.deepEqual(pnl, new NodeList(c, s, s));
+
+                    pnl = new NodeList(c, t, s);
+                    pnl.splice(1, 2, s);
+                    assert.equal(pnl.length, 2);
+                    assert.deepEqual(pnl, new NodeList(c, s));
+                },
+
+                // sub-search
+                &quot;queryTest&quot;: function () {
+                    var pnl = new NodeList(t);
+                    assert.equal(pnl.query(&quot;span&quot;)[0], c);
+                    if (name != &quot;t-NodeList&quot;) {
+                        // this gets messed up by new DOM nodes the second time around
+                        assert.equal(query(&quot;:last-child&quot;, secondSubContainer)[0], t);
+                        assert.equal(query(&quot;:last-child&quot;, secondSubContainer)[1], c);
+                        assert.equal(pnl.query().length, 1);
+                        verify(pnl.query(&quot;span&quot;).end(), [&quot;t-NodeList&quot;]);
+                    }
+                },
+
+                &quot;filter&quot;: function () {
+                    if (name != &quot;t-NodeList&quot;) {
+                        // this gets messed up by new DOM nodes the second time around
+                        assert.equal(c, query(&quot;:first-child&quot;, secondSubContainer).filter(&quot;:last-child&quot;)[0]);
+                        assert.equal(query(&quot;*&quot;, container).filter(function (n) { return (n.nodeName.toLowerCase() == &quot;span&quot;); }).length, 1);
+
+                        var filterObj = {
+                            filterFunc: function (n) {
+                                return (n.nodeName.toLowerCase() == &quot;span&quot;);
+                            }
+                        };
+                        assert.equal(query(&quot;*&quot;, container).filter(filterObj.filterFunc).length, 1);
+                        assert.equal(query(&quot;*&quot;, container).filter(filterObj.filterFunc, filterObj).length, 1);
+                        verify((new NodeList(t)).filter(&quot;span&quot;).end(), [&quot;t-NodeList&quot;]);
+                    }
+                },
+
+                // layout DOM functions
+                &quot;position&quot;: function () {
+                    var tnl = new NodeList(dojo.byId(&#039;sq100-NodeList&#039;));
+                    assert.isTrue(dojo.isArray(tnl));
+                    assert.equal(tnl.position()[0].w, 100);
+                    assert.equal(tnl.position()[0].h, 100);
+                    assert.equal(query(&quot;body *&quot;).position().length, document.body.getElementsByTagName(&quot;*&quot;).length);
+                },
+
+                &quot;styleGet&quot;: function () {
+                    // test getting
+                    var tnl = new NodeList(s);
+                    assert.equal(tnl.style(&quot;opacity&quot;)[0], 1);
+                    tnl.push(t);
+                    dojo.style(t, &quot;opacity&quot;, 0.5);
+                    assert.equal(tnl.style(&quot;opacity&quot;).slice(-1)[0], 0.5);
+                    tnl.style(&quot;opacity&quot;, 1);
+                },
+
+                &quot;styleSet&quot;: function () {
+                    // test setting
+                    var tnl = new NodeList(s, t);
+                    tnl.style(&quot;opacity&quot;, 0.5);
+                    assert.equal(dojo.style(tnl[0], &quot;opacity&quot;), 0.5);
+                    assert.equal(dojo.style(tnl[1], &quot;opacity&quot;), 0.5);
+                    // reset
+                    tnl.style(&quot;opacity&quot;, 1);
+                },
+
+                &quot;style&quot;: function () {
+                    var tnl = new NodeList(s, t);
+                    tnl.style(&quot;opacity&quot;, 1);
+                    assert.equal(tnl.style(&quot;opacity&quot;)[0], 1);
+                    dojo.style(t, &quot;opacity&quot;, 0.5);
+                    assert.equal(tnl.style(&quot;opacity&quot;)[0], 1.0);
+                    assert.equal(tnl.style(&quot;opacity&quot;)[1], 0.5);
+                    // reset things
+                    tnl.style(&quot;opacity&quot;, 1);
+                },
+
+                &quot;addRemoveClass&quot;: function () {
+                    var tnl = new NodeList(s, t);
+                    tnl.addClass(&quot;a&quot;);
+                    assert.equal(s.className, &quot;a&quot;);
+                    assert.equal(t.className, &quot;a&quot;);
+                    tnl.addClass(&quot;a b&quot;);
+                    assert.equal(s.className, &quot;a b&quot;);
+                    assert.equal(t.className, &quot;a b&quot;);
+                    tnl.addClass([&quot;a&quot;, &quot;c&quot;]);
+                    assert.equal(s.className, &quot;a b c&quot;);
+                    assert.equal(t.className ,&quot;a b c&quot;);
+                    tnl.removeClass();
+                    assert.equal(s.className, &quot;&quot;);
+                    assert.equal(t.className, &quot;&quot;);
+                    tnl.addClass(&quot;    a&quot;);
+                    assert.equal(s.className, &quot;a&quot;);
+                    assert.equal(t.className, &quot;a&quot;);
+                    tnl.addClass(&quot; a  b &quot;);
+                    assert.equal(s.className, &quot;a b&quot;);
+                    assert.equal(t.className, &quot;a b&quot;);
+                    tnl.addClass(&quot; c  b a &quot;);
+                    assert.equal(s.className, &quot;a b c&quot;);
+                    assert.equal(t.className, &quot;a b c&quot;);
+                    tnl.removeClass(&quot; b&quot;);
+                    assert.equal(s.className, &quot;a c&quot;);
+                    assert.equal(t.className, &quot;a c&quot;);
+                    tnl.removeClass(&quot;a b &quot;);
+                    assert.equal(s.className, &quot;c&quot;);
+                    assert.equal(t.className, &quot;c&quot;);
+                    tnl.removeClass([&quot;a&quot;, &quot;c&quot;]);
+                    assert.equal(s.className, &quot;&quot;);
+                    assert.equal(t.className, &quot;&quot;);
+                    tnl.addClass(&quot;a b c&quot;);
+                    tnl.replaceClass(&quot;d e&quot;, &quot;a b&quot;);
+                    assert.equal(s.className, &quot;c d e&quot;, &quot;class is c d e after replacing a b with d e&quot;);
+                    assert.equal(t.className, &quot;c d e&quot;, &quot;class is c d e after replacing a b with d e&quot;);
+                    tnl.replaceClass(&quot;f&quot;, &quot;d&quot;);
+                    assert.equal(s.className, &quot;c e f&quot;, &quot;class is c e f after replacing d with f&quot;);
+                    assert.equal(t.className, &quot;c e f&quot;, &quot;class is c e f after replacing d with f&quot;);
+                    tnl.replaceClass(&quot;d&quot;);
+                    assert.equal(s.className, &quot;d&quot;);
+                    assert.equal(t.className, &quot;d&quot;);
+                    tnl.removeClass();
+                    assert.equal(s.className, &quot;&quot;, &quot;empty class&quot;);
+                    assert.equal(t.className, &quot;&quot;, &quot;empty class&quot;);
+                },
+
+                &quot;concat&quot;: function () {
+                    if (name != &quot;t&quot;) {
+                        // this isn&#039;t supported in the new query method
+                        var spans = query(&quot;span&quot;, secondSubContainer);
+                        var divs = query(&quot;div&quot;, secondSubContainer);
+                        var cat = spans.concat(divs);
+                        console.debug(cat);
+                        assert.isTrue(cat.constructor == NodeList || cat.constructor == NodeList);
+                        assert.equal(cat.length, (divs.length + spans.length));
+                        verify(cat.end(), [&quot;c1-NodeList&quot;]);
+                    }
+                },
+
+                &quot;concat2&quot;: function () {
+                    var spans = query(&quot;span&quot;, secondSubContainer);
+                    var divs = query(&quot;div&quot;, secondSubContainer);
+                    assert.instanceOf(spans.concat([]), NodeList);
+                },
+
+                &quot;concat3&quot;: function () {
+                    var spans = query(&quot;span&quot;, secondSubContainer);
+                    var divs = query(&quot;div&quot;, secondSubContainer);
+                    var cat = spans.concat(divs);
+
+                    assert.instanceOf(cat, NodeList);
+                },
+                &quot;concat4&quot;: function () {
+                    var res = (new dojo.NodeList()).concat([]);
+                    assert.equal(res.length, 0);
+                },
+                &quot;place&quot;: function () {
+                    var ih = &quot;&lt;div&gt;&lt;span&gt;&lt;/span&gt;&lt;/div&gt;&lt;span class=&#039;thud&#039;&gt;&lt;b&gt;blah&lt;/b&gt;&lt;/span&gt;&quot;;
+
+                    var tn = document.createElement(&quot;div&quot;);
+                    tn.innerHTML = ih;
+                    dojo.body().appendChild(tn);
+                    var nl = query(&quot;b&quot;, tn).place(tn, &quot;first&quot;);
+                    assert.instanceOf(nl,NodeList);
+                    assert.equal(nl.length, 1);
+                    assert.equal(nl[0].nodeName.toLowerCase(), &quot;b&quot;);
+                    assert.equal(nl[0].parentNode, tn);
+                    assert.equal(nl[0], tn.firstChild);
+                },
+
+                &quot;orphan&quot;: function () {
+                    var ih = &quot;&lt;div&gt;&lt;span&gt;&lt;/span&gt;&lt;/div&gt;&lt;span class=&#039;thud&#039;&gt;&lt;b&gt;blah&lt;/b&gt;&lt;/span&gt;&quot;;
+
+                    var tn = document.createElement(&quot;div&quot;);
+                    tn.innerHTML = ih;
+                    dojo.body().appendChild(tn);
+                    var nl = query(&quot;span&quot;, tn).orphan();
+                    assert.instanceOf(nl, NodeList);
+
+                    assert.equal(nl.length, 2);
+                    assert.equal(tn.getElementsByTagName(&quot;*&quot;).length, 1);
+
+                    tn.innerHTML = ih;
+                    var nl = query(&quot;*&quot;, tn).orphan(&quot;b&quot;);
+                    assert.equal(nl.length, 1);
+                    assert.equal(nl[0].innerHTML, &quot;blah&quot;);
+                },
+
+                &quot;adopt&quot;: function () {
+                    var div = query(dojo.create(&quot;div&quot;));
+                    div.adopt(dojo.create(&quot;span&quot;));
+                    div.adopt(dojo.create(&quot;em&quot;), &quot;first&quot;);
+                    assert.equal(2, query(&quot;*&quot;, div[0]).length, 2);
+                    assert.equal(div[0].firstChild.tagName.toLowerCase(), &quot;em&quot;);
+                    assert.equal(div[0].lastChild.tagName.toLowerCase(), &quot;span&quot;);
+                },
+
+                &quot;addContent&quot;: function () {
+                    //text content
+                    var tn = document.createElement(&quot;div&quot;);
+                    var nl = query(tn).addContent(&quot;some text content&quot;);
+
+                    assert.equal(nl[0].childNodes.length, 1);
+                    assert.equal(nl[0].firstChild.nodeValue, &quot;some text content&quot;);
+
+                    //move a node
+                    var mNode = document.createElement(&quot;span&quot;);
+                    mNode.id = &quot;addContent1&quot;;
+                    mNode.innerHTML = &quot;hello&quot;;
+                    dojo.body().appendChild(mNode);
+                    assert.isNotNull(dojo.byId(&quot;addContent1&quot;));
+
+                    nl.addContent(mNode);
+                    assert.isNull(dojo.byId(&quot;addContent1&quot;));
+                    assert.equal(nl[0].lastChild.id, &quot;addContent1&quot;);
+
+                    //put in multiple content/clone node
+                    tn.innerHTML = &#039;&lt;select&gt;&lt;option name=&quot;second&quot;  value=&quot;second&quot; selected&gt;second&lt;/option&gt;&lt;/select&gt;&#039;;
+                    nl = query(&quot;select&quot;, tn).addContent(&#039;&lt;option name=&quot;first&quot; value=&quot;first&quot;&gt;first&lt;/option&gt;&#039;, &quot;first&quot;);
+                    nl.forEach(function (node) {
+                        assert.equal(node.options[0].value, &quot;first&quot;);
+                        assert.isFalse(node.options[0].selected);
+                    });
+
+                    //Some divs to use for addContent template actions.
+                    var templs = domConstruct.toDom(&#039;&lt;div class=&quot;multitemplate&quot;&gt;&lt;/div&gt;&lt;div class=&quot;multitemplate&quot;&gt;&lt;/div&gt;&#039;);
+                    domConstruct.place(templs, document.body);
+                    templs = query(&quot;.multitemplate&quot;);
+
+                    //templateFunc test
+                    templs.addContent({
+                        template: &#039;&lt;b&gt;[name]&lt;/b&gt;&#039;,
+                        templateFunc: function (str, obj) { return str.replace(/\[name\]/g, obj.name); },
+                        name: &quot;bar&quot;
+                    });
+
+                    var bolds = templs.query(&quot;b&quot;);
+                    assert.equal(bolds.length, 2);
+                    bolds.forEach(function (node) {
+                        assert.equal(node.innerHTML, &quot;bar&quot;);
+                    });
+
+                    //template with dojo.string.substitute used.
+                    templs.addContent({
+                        template: &quot;&lt;p&gt;${name}&lt;/p&gt;&quot;,
+                        name: &quot;baz&quot;
+                    });
+
+                    var ps = templs.query(&quot;p&quot;);
+                    assert.equal(ps.length, 2);
+                    ps.forEach(function (node) {
+                        assert.equal(node.innerHTML, &quot;baz&quot;);
+                    });
+
+                    //Try a dojo.declared thing.
+                    dojo.declare(&quot;dojo.testsDOH.Mini&quot;, null, {
+                        constructor: function (args, node) {
+                            dojo.mixin(this, args);
+                            node.innerHTML = this.name;
+                            this.domNode = node;
+                        },
+                        name: &quot;&quot;
+                    });
+
+                    templs.addContent({
+                        template: &#039;&lt;i dojoType=&quot;dojo.testsDOH.Mini&quot;&gt;cool&lt;/i&gt;&#039;,
+                        parse: true
+                    });
+
+
+                    var declaredNodes = templs.query(&quot;[dojoType]&quot;);
+
+                    assert.equal(declaredNodes.length, 2);
+                    dojo.forEach(declaredNodes, function (node) {
+                        assert.equal(node.innerHTML, &quot;cool&quot;);
+                    });
+
+                    //Get rid of the junk used for template testing.
+                    templs.orphan();
+                },
+
+
+                &quot;on&quot;: function () {
+                    var ctr = 0;
+                    dojo.body().appendChild(tn);
+                    var nl = query(&quot;button&quot;, tn);
+                    var handle = nl.on(&quot;click&quot;, function () {
+                        ctr++;
+                    });
+                    nl[0].click();
+                    assert.equal(ctr, 1);
+                    var inButton = nl[0].appendChild(document.createElement(&quot;span&quot;));
+                    listen.emit(nl[0], &quot;click&quot;, {
+                    });
+                    listen.emit(inButton, &quot;click&quot;, {
+                        bubbles: true
+                    });
+                    listen.emit(inButton, &quot;click&quot;, {
+                        bubbles: false
+                    });
+                    assert.equal(ctr, 3);
+                    handle.remove();
+                    listen.emit(nl[0], &quot;click&quot;, {
+                    });
+                    assert.equal(ctr, 3);
+                },
+                &quot;onDelegate&quot;: function () {
+                    var ctr = 0;
+                    dojo.body().appendChild(tn);
+                    var nl = query(&quot;.thud&quot;, tn);
+                    var bl = query(&quot;button&quot;, tn);
+                    var handle = nl.on(&quot;button:click&quot;, function () {
+                        assert.equal(bl[0], this);
+                        ctr++;
+                    });
+                    assert.equal(ctr, 0);
+                    listen.emit(nl[0], &quot;click&quot;, {
+                    });
+                    listen.emit(bl[0], &quot;click&quot;, {
+                        bubbles: true
+                    });
+                    assert.equal(ctr, 1);
+                    handle.remove();
+                    listen.emit(bl[0], &quot;click&quot;, {
+                        bubbles: true
+                    });
+                    assert.equal(ctr, 1);
+                    // listen and on should behave the same
+                    query(tn).on(&quot;.thud:click, .thud button:custom&quot;, function () {
+                        ctr++;
+                    });
+                    listen.emit(bl[0], &quot;click&quot;, {
+                        bubbles: true
+                    });
+                    assert.equal(ctr, 2);
+                    listen.emit(bl[0], &quot;click&quot;, {
+                        bubbles: false
+                    });
+                    assert.equal(ctr, 2);
+                    listen.emit(bl[0], &quot;custom&quot;, {
+                        bubbles: true
+                    });
+                    assert.equal(ctr, 3);
+                    listen.emit(bl[0], &quot;mouseout&quot;, {
+                        bubbles: true
+                    });
+                    assert.equal(ctr, 3);
+                    bl[0].click();
+                    assert.equal(ctr, 4);
+                },
+
+                &quot;at&quot;: function () {
+                    var divs = query(&quot;div&quot;, thirdSubContainer);
+                    var at0 = divs.at(0);
+                    assert.equal( at0[0], divs[0]);
+                    if (name != &quot;t-NodeList&quot;) {
+                        // this gets messed up by new DOM nodes the second time around
+
+                        var at1 = divs.at(1, 3, 5);
+                        assert.equal(at1[0], divs[1]);
+                        assert.equal(at1[1], divs[3]);
+                        assert.equal(at1[2], divs[5]);
+
+                        var at2 = divs.at(3, 6, 9);
+                        assert.equal(at2.length, 2);
+
+                        var at3 = divs.at(3, 6).at(1);
+                        assert.equal(at3[0], divs[6]);
+
+                        var ending = divs.at(0).end();
+                        assert.equal(ending, divs);
+
+                        var at4 = divs.at(-1);
+                        assert.equal(at4[0], divs[divs.length - 1]);
+
+                        var at5 = divs.at(1, -1);
+                        assert.equal(divs[1], at5[0]);
+                        assert.equal(divs[divs.length - 1], at5[1]);
+                    }
+
+                },
+
+                &quot;attr&quot;: function () {
+                    var divs = query(&quot;div&quot;);
+                    var ids = divs.attr(&quot;id&quot;);
+                },
+
+                &quot;_adaptAsForEach&quot;: function () {
+                    var passes = false;
+                    var count = 0;
+                    var i = {
+                        setTrue: function (node) {
+                            count++;
+                            passes = true;
+                        }
+                    };
+                    NodeList.prototype.setTrue = NodeList._adaptAsForEach(i.setTrue, i);
+                    var divs = query(&quot;div&quot;).setTrue();
+                    assert.isTrue(passes);
+                    assert.equal(divs.length, count);
+                },
+
+                &quot;instantiate&quot;: function () {
+                    //Insert some divs to use for test
+                    domConstruct.place(&#039;&lt;p id=&quot;thinger&quot;&gt;Hi&lt;/p&gt;&lt;p id=&quot;thinger2&quot;&gt;Hi&lt;/p&gt;&#039;, document.body);
+
+                    var test = 0;
+                    dojo.declare(&quot;testsDOH._base.NodeList.some.Thing&quot;, null, {
+                        foo: &quot;baz&quot;,
+                        constructor: function (props, node) {
+                            dojo.mixin(this, props);
+                            assert.equal(this.foo, &quot;bar&quot;, test++);
+                        }
+                    });
+
+                    query(&quot;#thinger&quot;).instantiate(testsDOH._base.NodeList.some.Thing, {
+                        foo: &quot;bar&quot;
+                    });
+
+                    query(&quot;#thinger2&quot;).instantiate(&quot;testsDOH._base.NodeList.some.Thing&quot;, {
+                        foo: &quot;bar&quot;
+                    });
+
+                    assert.equal(test, 2);
+
+                    //clean up the divs inserted for the test.
+                    query(&quot;#thinger, #thinger2&quot;).orphan();
+                },
+
+                &quot;removeAttr&quot;: function () {
+                                        // buildup
+                    domConstruct.place(&#039;&lt;p id=&quot;attr&quot; title=&quot;Foobar&quot;&gt;Hi&lt;/p&gt;&#039;, document.body);
+
+                    var n = query(&quot;#attr&quot;);
+
+                    assert.isTrue(dojo.hasAttr(n[0], &quot;title&quot;));
+
+                    var t = n.attr(&quot;title&quot;);
+                    assert.equal(t, &quot;Foobar&quot;);
+
+                    n.removeAttr(&quot;title&quot;);
+
+                    t = domAttr.has(n[0], &quot;title&quot;);
+                    assert.isFalse(t);
+
+                    // cleanup
+                    n.orphan();
+                }
+            };
+        })()
+    });
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

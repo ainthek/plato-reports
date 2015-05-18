@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/functional/window/iframe_content/scrollDocuments.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/functional/window/iframe_content/scrollDocuments.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">64.49</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">99</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">10.57</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.37</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+	&#039;dojo/string&#039;,
+	&#039;dojo/_base/array&#039;,
+	&#039;dojo/sniff&#039;,
+	&#039;dojo/text!tests/functional/window/iframe_content/scrollTemplate.html&#039;,
+	// test document templates
+	&#039;dojo/text!tests/functional/window/iframe_content/htmlPadding.html&#039;,
+	&#039;dojo/text!tests/functional/window/iframe_content/absoluteTd.html&#039;,
+	&#039;dojo/text!tests/functional/window/iframe_content/innerScrollable.html&#039;,
+	&#039;dojo/text!tests/functional/window/iframe_content/table.html&#039;,
+	&#039;dojo/text!tests/functional/window/iframe_content/noScroll.html&#039;,
+	&#039;dojo/text!tests/functional/window/iframe_content/oversizedContent.html&#039;
+], function (
+	string,
+	arrayUtil,
+	has,
+	documentTemplate,
+	paddingTemplate,
+	absoluteTdTemplate,
+	innerScrollableTemplate,
+	tableTemplate,
+	noScrollTemplate,
+	oversizedTemplate
+) {
+	// Responsible for constructing iFrame source documents for various scroll tests.
+
+	var docTypes = {
+		strict: &#039;&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.01//EN&quot; &quot;http://www.w3.org/TR/html4/strict.dtd&quot;&gt;&#039; ,
+		loose: &#039;&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0 Transitional//EN&quot; &quot;http://www.w3.org/TR/html4/loose.dtd&quot;&gt;&#039;,
+		quirks: &#039;&#039;
+	};
+
+	var directions = [ &#039;rtl&#039;, &#039;ltr&#039; ];
+	var documents = [];
+
+	function defineLayoutScenario(name, label, styles, content) {
+		var type;
+
+		for (type in docTypes) {
+			arrayUtil.forEach(directions, function (direction) {
+				var html = string.substitute(documentTemplate, {
+					docType: docTypes[type],
+					direction: direction,
+					styles: styles,
+					content: content
+				});
+
+				documents.push({
+					label: label + &#039; &#039; + type + &#039; &#039; + direction,
+					html: html,
+					id: name + &#039;_&#039; + type + &#039;_&#039; + direction
+				});
+			});
+		}
+	}
+
+	// Define different document layout testing senarios.
+
+	defineLayoutScenario(
+		&#039;padding&#039;,
+		&#039;HTML/BODY padding&#039;,
+		&#039;HTML, BODY { padding:50px 9px; }&#039; +
+		&#039;HTML { overflow-x:hidden !important; /*IE6*/ }&#039;,
+		paddingTemplate);
+
+	defineLayoutScenario(
+		&#039;oversized&#039;,
+		&#039;Oversized Content&#039;,
+		&#039;&#039;,
+		oversizedTemplate);
+
+	defineLayoutScenario(
+		&#039;absoluteTd&#039;,
+		&#039;position:absolute TD content&#039;,
+		&#039;html, body {height: 700px;}&#039;,
+		absoluteTdTemplate);
+
+	defineLayoutScenario(
+		&#039;innerScrollable&#039;,
+		&#039;Inner scrollable content with scrollbars&#039;,
+		&#039;HTML { overflow:hidden !important; /*IE6*/ }&#039; +
+		&#039;BODY { padding: 10px; }&#039; +
+		has(&#039;opera&#039;) ? &#039;TABLE {float: left}&#039; : &#039;&#039;,
+		innerScrollableTemplate);
+
+	defineLayoutScenario(
+		&#039;table&#039;,
+		&#039;Table&#039;,
+		&#039;HTML { overflow-x:hidden !important; /*IE6*/ }&#039;,
+		tableTemplate);
+
+	defineLayoutScenario(
+		&#039;noScroll&#039;,
+		&#039;No scroll&#039;,
+		&#039;HTML { overflow-x:hidden !important; /*IE6*/ }&#039;,
+		noScrollTemplate);
+
+	return documents;
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

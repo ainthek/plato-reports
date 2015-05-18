@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/unit/dom-attr.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/unit/dom-attr.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">68.42</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">832</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">51.73</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">8.58</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+    &#039;intern!object&#039;,
+    &#039;intern/chai!assert&#039;,
+        &#039;../../dom-attr&#039;,
+        &#039;../../dom-prop&#039;,
+        &#039;../../dom-style&#039;,
+        &#039;dojo/dom-construct&#039;,
+        &#039;dojo/sniff&#039;
+
+], function (registerSuite, assert, domAttr, domProp, domStyle, domConstruct, has, Deferred) {
+
+    var attr = &quot;data-dojo-test-attribute&quot;;
+    var value = &quot;the value&quot;;
+    var node;
+    var nodeIdIndex = 1;
+
+    function generateId() {
+        return &quot;nodeid_&quot; + nodeIdIndex++;
+    }
+
+    registerSuite({
+        name: &#039;dojo/dom-attr&#039;,
+
+        &quot;.get&quot;: {
+            beforeEach: function () {
+                node = domConstruct.toDom(&quot;&lt;div &quot; +
+                  attr + &quot;=&#039;&quot; + value + &quot;&#039;&gt;&lt;/div&gt;&quot;);
+                domConstruct.place(node, document.body);
+            },
+
+            afterEach: function () {
+                domConstruct.destroy(node);
+            },
+
+            &quot;node + valid attribute&quot;: function () {
+                //arrange
+
+                //act
+                var result = domAttr.get(node, attr);
+
+                //assert
+                assert.equal(result, value, &quot;when a Node and valid attribute are passed, then the correct value is returned&quot;);
+
+            },
+
+            &quot;string + valid attribute&quot;: function () {
+                //arrange
+                var nodeId = generateId();
+                node.setAttribute(&quot;id&quot;, nodeId);
+
+                //act
+                var result = domAttr.get(nodeId, attr);
+
+                //assert
+                assert.equal(result, value, &quot;when a Node and valid attribute are passed, then the correct value is returned&quot;);
+
+            },
+
+            &quot;node + &#039;innerHTML&#039; returns property&quot;: function () {
+                //arrange
+                var expected = &quot;the expected value&quot;;
+                node.innerHTML = expected;
+                node.setAttribute(&quot;innerHTML&quot;, &quot;not the expected value&quot;);
+
+                //act
+                var result = domAttr.get(node, &quot;innerHTML&quot;);
+
+                //assert
+                assert.equal(result, expected,
+                    &quot;when an attribute and a property exist on the node, then the property is returned&quot;);
+
+            },
+
+            &quot;returns correct values&quot;: function () {
+                //arrange
+                var testAttributes = {
+                    &quot;title&quot;: &quot;the first value&quot;,
+                    &quot;name&quot;: &quot;the second value&quot;,
+                    &quot;data-dojo-type&quot;: &quot;the third value&quot;
+                };
+
+                for (var a in testAttributes) {
+                    node.setAttribute(a, testAttributes[a]);
+                }
+
+                //act
+                var result = {};
+                for (var a in testAttributes) {
+                    result[a] = domAttr.get(node, a);
+                }
+
+                //assert
+                for (var a in result) {
+                    assert.equal(result[a], testAttributes[a], &quot;when an attribute is requested, then the correct value is returned&quot;);
+                }
+
+            },
+
+            &quot;forcedProp&quot;: function () {
+                //arrange
+                var propName = &quot;innerHTML&quot;;
+                node[propName] = &quot;the property value&quot;;
+
+                //act
+                var result = domAttr.get(node, propName);
+
+                //assert
+                assert.equal(result, node[propName], &quot;when the requested attribute is a &#039;forced prop&#039;, then the correct value is returned&quot;);
+
+            },
+
+            &quot;textContent&quot;: function () {
+
+                //arrange
+                var expected = &quot;the expected result&quot;;
+                node.innerHTML = expected;
+
+                //act
+                var result = domAttr.get(node, &quot;textContent&quot;);
+
+                //assert
+                assert.equal(result, expected, &quot;when the textContent is requested, then the result from dom-prop::get is returned&quot;);
+            },
+
+            &quot;boolean&quot;: function () {
+                //arrange
+                var name = &quot;the boolean attribute&quot;;
+                var value = true;
+                node[name] = value;
+
+                //assert
+                var result = domAttr.get(node, name);
+
+                //act
+                assert.strictEqual(result, value, &quot;when the attribute&#039;s value is a boolean, then it is returned correctly&quot;);
+            },
+
+            &quot;function&quot;: function () {
+                //arrange
+                var name = &quot;the boolean attribute&quot;;
+                var value = function () { };
+                node[name] = value;
+
+                //assert
+                var result = domAttr.get(node, name);
+
+                //act
+                assert.strictEqual(result, value, &quot;when the attribute&#039;s value is a function, then it is returned correctly&quot;);
+            },
+
+            &quot;missing attribute&quot;: function () {
+                //arrange
+                var name = &quot;the none existent attribute&quot;;
+                node.getAttributeNode = function () { return null; };
+                node[name] = undefined;
+
+                //act
+                var result = domAttr.get(node, name);
+
+                //assert
+                assert.isNull(result, &quot;when the attribute doesn&#039;t exist, then &#039;null&#039; is returned&quot;);
+            }
+        },
+
+        &quot;.set&quot;: {
+
+            beforeEach: function () {
+                node = domConstruct.toDom(&quot;&lt;div&gt;&lt;/div&gt;&quot;);
+                domConstruct.place(node, document.body);
+            },
+
+            afterEach: function () {
+                domConstruct.destroy(node);
+            },
+
+            &quot;node + name + value&quot;: function () {
+                //arrange
+
+                //act
+                domAttr.set(node, attr, value);
+
+                //assert
+                assert.equal(node.getAttribute(attr), value,
+                    &quot;when a node&#039;s attribute is set, then the node is updated properly&quot;);
+
+            },
+            &quot;string + name + value&quot;: function () {
+                //arrange
+                var nodeId = generateId();
+                node.setAttribute(&quot;id&quot;, nodeId);
+
+                //act
+                domAttr.set(nodeId, attr, value);
+
+                //assert
+                assert.equal(node.getAttribute(attr), value,
+                    &quot;when a node&#039;s id is provided to set, then the node is updated properly&quot;);
+            },
+            &quot;node + dictionary&quot;: function () {
+                //arrange
+                var attributes = {
+                    name: &quot;the name&quot;,
+                    &quot;data-foo&quot;: &quot;the foo value&quot;,
+                    title: &quot;the title&quot;
+                };
+
+                //act
+                domAttr.set(node, attributes);
+
+                //assert
+                for (var a in attributes) {
+                    assert.equal(attributes[a], node.getAttribute(a),
+                      &quot;when a hash of attributes is set onto a node, then the attributes are set properly&quot;);
+                }
+            },
+            &quot;node + forcedProp&quot;: function () {
+                //arrange
+                var attributeName = &quot;class&quot;;
+                var value = &quot;the-css-class&quot;;
+
+                //act
+                domAttr.set(node, attributeName, value);
+
+                //assert
+                assert.equal(node.className, value,
+                    &quot;when the attribute is a forcedProp, then it is set properly&quot;);
+
+            },
+            &quot;node + name + boolean&quot;: function () {
+                //arrange
+                var attr = &quot;data-boolean&quot;;
+                var value = true;
+
+                //act
+                domAttr.set(node, attr, value);
+
+                //assert
+                assert.equal(node[attr], value,
+                    &quot;when the attribute&#039;s value is a boolean, then it is set properly&quot;);
+            },
+            &quot;node + name + function&quot;: function () {
+                //arrange
+                var attr = &quot;data-function&quot;;
+                var value = function () { };
+                var origDomPropSet = domProp.set;
+                var setNode, setName, setValue;
+
+                domProp.set = function (node, name, value) {
+                    setNode = node;
+                    setName = name;
+                    setValue = value;
+                }
+
+                //act
+                domAttr.set(node, attr, value);
+
+                //assert
+                assert.equal(setValue, value,
+                    &quot;when the attribute&#039;s value is a function, then it is set properly&quot;);
+                domProp.set = origDomPropSet;
+            },
+
+            &quot;node + &#039;style&#039; + string&quot;: function () {
+                //arrange
+                var style = &quot;color: black;&quot;;
+                var styleNode, styleValue;
+
+                //act
+                domAttr.set(node, &quot;style&quot;, style);
+
+                //assert
+                assert.equal(node.getAttribute(&quot;style&quot;), style,
+                    &quot;when the attribute is &#039;style&#039; and a dictionary is set, then it is set properly&quot;);
+            },
+
+            &quot;node + &#039;style&#039; + dictionary&quot;: function () {
+                //arrange
+                var styles = {
+                    color: &quot;white&quot;,
+                    backgroundColor: &quot;red&quot;,
+                    opacity: 0
+                };
+                var styleNode, styleValue;
+
+                var origDomStyle = domStyle.set;
+                domStyle.set = function (node, value) {
+                    setNode = node;
+                    setValue = value;
+                }
+
+                //act
+                domAttr.set(node, &quot;style&quot;, styles);
+
+                //assert
+                assert.equal(setValue, styles,
+                    &quot;when the attribute is &#039;style&#039; and a dictionary is set, then it is set properly&quot;);
+                domStyle.set = origDomStyle;
+            }
+        },
+
+        &quot;.remove&quot;: {
+            beforeEach: function () {
+                node = domConstruct.toDom(&quot;&lt;div &quot; +
+                  attr + &quot;=&#039;&quot; + value + &quot;&#039;&gt;&lt;/div&gt;&quot;);
+                domConstruct.place(node, document.body);
+            },
+
+            afterEach: function () {
+                domConstruct.destroy(node);
+            },
+
+            &quot;node + attribute&quot;: function () {
+                //arrange
+
+                //act
+                domAttr.remove(node, attr);
+
+                //assert
+                assert.isNull(node.getAttribute(attr),
+                    &quot;when an attribute is removed from a node, then its value becomes &#039;null&#039;&quot;);
+            },
+            &quot;string + attribute&quot;: function () {
+                //arrange
+                var nodeId = generateId();
+                node.setAttribute(&quot;id&quot;, nodeId);
+
+                //act
+                domAttr.remove(nodeId, attr);
+
+                //assert
+                assert.isNull(node.getAttribute(attr),
+                    &quot;when a node&#039;s id is used, then the requested attribute is removed&quot;);
+            },
+            &quot;node + &#039;className&#039;&quot;: function () {
+                //arrange
+
+                //act
+                domAttr.remove(node, &quot;className&quot;);
+
+                //assert
+                assert.isNull(node.getAttribute(&quot;class&quot;),
+                    &quot;when a class in the &#039;attrNames&#039; array, then the proper attribute is removed&quot;);
+            }
+        },
+
+        &quot;.getNodeProp&quot;: {
+            beforeEach: function () {
+                node = domConstruct.toDom(&quot;&lt;div &quot; +
+                  attr + &quot;=&#039;&quot; + value + &quot;&#039;&gt;&lt;/div&gt;&quot;);
+                domConstruct.place(node, document.body);
+            },
+
+            afterEach: function () {
+                domConstruct.destroy(node);
+            },
+
+            &quot;node + name&quot;: function () {
+                //arrange
+
+                //act
+                var result = domAttr.getNodeProp(node, attr);
+
+                //assert
+                assert.equal(result, value,
+                    &quot;when an attribute is requested from a node, then the correct value is returned&quot;);
+
+            },
+            &quot;string + name&quot;: function () {
+                //arrange
+                var nodeId = generateId();
+                node.setAttribute(&quot;id&quot;, nodeId);
+
+                //act
+                var result = domAttr.getNodeProp(nodeId, attr);
+
+                //assert
+                assert.equal(result, value,
+                    &quot;when a node&#039;s id is passed, then the correct value is returned&quot;);
+            },
+            &quot;node + &#039;className&#039;&quot;: function () {
+                //arrange
+                var value = &quot;the-css-class&quot;;
+                node.setAttribute(&quot;class&quot;, value);
+
+                //act
+                var result = domAttr.getNodeProp(node, &quot;className&quot;);
+
+                //assert
+                assert.equal(result, value,
+                    &quot;when &#039;className&#039; is requested, then the node&#039;s class is returned&quot;);
+
+            },
+            &quot;node + &#039;innerHTML&#039; returns property&quot;: function () {
+                //arrange
+                var value = &quot;the innerHTML value&quot;;
+                node.innerHTML = value;
+                node.setAttribute(&quot;innerHTML&quot;, &quot;not the expected value&quot;);
+
+                //act
+                var result = domAttr.getNodeProp(node, &quot;innerHTML&quot;);
+
+                //assert
+                assert.equal(result, value,
+                    &quot;when &#039;innerHTML&#039; is requested and there is both a property and attribute with that name, &quot; +
+                   &quot;then the node&#039;s property is returned&quot;);
+            },
+            &quot;node + &#039;name&#039; returns property&quot;: function () {
+                //arrange
+                var expected = &quot;the value&quot;;
+                var attr = &quot;name&quot;;
+                node[attr] = expected;
+                node.setAttribute(attr, &quot;not the expected value&quot;);
+
+                //act
+                var result = domAttr.getNodeProp(node, attr);
+
+                //assert
+                assert.equal(result, value,
+                    &quot;when an attribute is requested and there is both a property and attribute with that name, &quot; +
+                   &quot;then the node&#039;s property is returned&quot;);
+            }
+        },
+
+        &quot;.has&quot;: {
+            beforeEach: function () {
+                node = domConstruct.toDom(&quot;&lt;div &quot; +
+                  attr + &quot;=&#039;&quot; + value + &quot;&#039;&gt;&lt;/div&gt;&quot;);
+                domConstruct.place(node, document.body);
+            },
+
+            afterEach: function () {
+                domConstruct.destroy(node);
+            },
+            &quot;node + name&quot;: function () {
+                //arrange
+
+                //acct
+                var result = domAttr.has(node, attr);
+
+                //assert
+                assert.isTrue(result,
+                    &quot;when an existing attribute on a node is checked for, then the call returns &#039;true&#039;&quot;);
+            },
+            &quot;string + name&quot;: function () {
+                //arrange
+                var nodeId = generateId();
+                node.setAttribute(&quot;id&quot;, nodeId);
+
+                //acct
+                var result = domAttr.has(nodeId, attr);
+
+                //assert
+                assert.isTrue(result,
+                    &quot;when a node&#039;s id is provided and the requested attribute exists, then the call returns &#039;true&#039;&quot;);
+            },
+            &quot;node + &#039;innerHTML&#039;&quot;: function () {
+                //arrange
+                node.innerHTML = null;
+
+                //act
+                var result = domAttr.has(node, &quot;innerHTML&quot;);
+
+                //assert
+                assert.isTrue(!!result,
+                    &quot;when the &#039;innerHTML&#039; is requested, then it always returns truthy&quot;);
+
+            },
+            &quot;node + non existent name&quot;: function () {
+                //arrange
+
+                //acct
+                var result = domAttr.has(node, &quot;doesnotexist&quot;);
+
+                //assert
+                assert.isFalse(!!result,
+                    &quot;when an attribute that doesn&#039;t exist on a node is checked for, then the call returns &#039;true&#039;&quot;);
+            }
+        },
+        &quot;validation tests&quot;: (function () {
+            var container,
+                inputNoType,
+                inputWithType,
+                inputNoTabindex,
+                inputTabindexMinusOne,
+                inputTabindexZero,
+                inputTabindexOne,
+                inputTextValue,
+                inputNoDisabled,
+                inputWithDisabled,
+                inputWithDisabledTrue,
+                divNoTabindex,
+                divTabindexMinusOne,
+                divTabindexZero,
+                divTabindexOne,
+                labelNoFor,
+                labelWithFor,
+                inputWithLabel;
+
+            return {
+                setup: function () {
+                    container = domConstruct.toDom(&quot;&lt;div&gt;&lt;/div&gt;&quot;);
+                    inputNoType = domConstruct.toDom(&#039;&lt;input id=&quot;input-no-type&quot;&gt;&#039;);
+                    inputWithType = domConstruct.toDom(&#039;&lt;input id=&quot;input-with-type&quot; type=&quot;checkbox&quot;&gt;&#039;);
+                    inputNoTabindex = domConstruct.toDom(&#039;&lt;input id=&quot;input-no-tabindex&quot;&gt;&#039;);
+                    inputTabindexMinusOne = domConstruct.toDom(&#039;&lt;input id=&quot;input-tabindex-minus-1&quot; tabIndex=&quot;-1&quot;&gt;&#039;);
+                    inputTabindexZero = domConstruct.toDom(&#039;&lt;input id=&quot;input-tabindex-0&quot; tabIndex=&quot;0&quot;&gt;&#039;);
+                    inputTabindexOne = domConstruct.toDom(&#039;&lt;input id=&quot;input-tabindex-1&quot; tabIndex=&quot;1&quot;&gt;&#039;);
+                    inputTextValue = domConstruct.toDom(&#039;&lt;input id=&quot;input-text-value&quot; type=&quot;text&quot; value=&quot;123&quot;&gt;&#039;);
+                    inputNoDisabled = domConstruct.toDom(&#039;&lt;input id=&quot;input-no-disabled&quot; type=&quot;text&quot;&gt;&#039;);
+                    inputWithDisabled = domConstruct.toDom(&#039;&lt;input id=&quot;input-with-disabled&quot; type=&quot;text&quot; disabled&gt;&#039;);
+                    inputWithDisabledTrue = domConstruct.toDom(&#039;&lt;input id=&quot;input-with-disabled-true&quot; disabled=&quot;disabled&quot;&gt;&#039;);
+                    divNoTabindex = domConstruct.toDom(&#039;&lt;div id=&quot;div-no-tabindex&quot;&gt;&lt;/div&gt;&#039;);
+                    divTabindexMinusOne = domConstruct.toDom(&#039;&lt;div id=&quot;div-tabindex-minus-1&quot; tabIndex=&quot;-1&quot;&gt;&lt;/div&gt;&#039;);
+                    divTabindexZero = domConstruct.toDom(&#039;&lt;div id=&quot;div-tabindex-0&quot; tabIndex=&quot;0&quot;&gt;&lt;/div&gt;&#039;);
+                    divTabindexOne = domConstruct.toDom(&#039;&lt;div id=&quot;div-tabindex-1&quot; tabIndex=&quot;1&quot;&gt;&lt;/div&gt;&#039;);
+                    labelNoFor = domConstruct.toDom(&#039;&lt;label id=&quot;label-no-for&quot;&gt;label with no for &lt;/label&gt;&lt;input type=&quot;text&quot; id=&quot;label-test-input&quot;&gt;&#039;);
+                    labelWithFor = domConstruct.toDom(&#039;&lt;label id=&quot;label-with-for&quot; for=&quot;input-with-label&quot;&gt;label with for &lt;/label&gt;&#039;);
+                    inputWithLabel = domConstruct.toDom(&#039;&lt;input type=&quot;text&quot; id=&quot;input-with-label&quot;&gt;&#039;);
+
+                    domConstruct.place(container, document.body);
+                    domConstruct.place(inputNoType, container);
+                    domConstruct.place(inputWithType, container);
+                    domConstruct.place(inputNoTabindex, container);
+                    domConstruct.place(inputTabindexMinusOne, container);
+                    domConstruct.place(inputTabindexZero, container);
+                    domConstruct.place(inputTabindexOne, container);
+                    domConstruct.place(inputTextValue, container);
+                    domConstruct.place(inputNoDisabled, container);
+                    domConstruct.place(inputWithDisabled, container);
+                    domConstruct.place(inputWithDisabledTrue, container);
+                    domConstruct.place(divNoTabindex, container);
+                    domConstruct.place(divTabindexMinusOne, container);
+                    domConstruct.place(divTabindexZero, container);
+                    domConstruct.place(divTabindexOne, container);
+                    domConstruct.place(labelNoFor, container);
+                    domConstruct.place(labelWithFor, container);
+                    domConstruct.place(inputWithLabel, container);
+                },
+                teardown: function () {
+                    domConstruct.destroy(container);
+                },
+                &quot;getTypeInput&quot;: function () {
+                    assert.isFalse(domAttr.has(inputNoType, &quot;type&quot;));
+                    assert.isNull(domAttr.get(inputNoType, &quot;type&quot;));
+                    assert.isTrue(domAttr.has(inputWithType, &quot;type&quot;));
+                    assert.equal(domAttr.get(inputWithType, &quot;type&quot;), &quot;checkbox&quot;);
+                },
+                &quot;getWithString&quot;: function () {
+                    assert.isFalse(domAttr.has(inputNoType.id, &quot;type&quot;));
+                    assert.isNull(domAttr.get(inputNoType.id, &quot;type&quot;));
+                    assert.isTrue(domAttr.has(inputWithType.id, &quot;type&quot;));
+                    assert.equal(domAttr.get(inputWithType.id, &quot;type&quot;), &quot;checkbox&quot;);
+                },
+                &quot;attrId&quot;: function () {
+                    assert.isTrue(domAttr.has(divNoTabindex.id, &quot;id&quot;));
+                    assert.equal(divNoTabindex.id, domAttr.get(divNoTabindex.id, &quot;id&quot;));
+                    var div = document.createElement(&quot;div&quot;);
+                    assert.isFalse(domAttr.has(div, &quot;id&quot;));
+                    assert.isNull(domAttr.get(div, &quot;id&quot;));
+                    var nodeId = generateId();
+                    domAttr.set(div, &quot;id&quot;, nodeId);
+                    assert.isTrue(domAttr.has(div, &quot;id&quot;));
+                    assert.equal(domAttr.get(div, &quot;id&quot;), nodeId);
+                    domAttr.remove(div, &quot;id&quot;);
+                    assert.isFalse(domAttr.has(div, &quot;id&quot;));
+                    assert.isNull(domAttr.get(div, &quot;id&quot;));
+                },
+                &quot;getTabindexDiv&quot;: function () {
+                    assert.isFalse(domAttr.has(divNoTabindex, &quot;tabIndex&quot;));
+                    assert.isTrue(domAttr.get(divNoTabindex, &quot;tabIndex&quot;) &lt;= 0);
+                    assert.isTrue(domAttr.has(divTabindexMinusOne, &quot;tabIndex&quot;));
+                    if (!has(&quot;opera&quot;)) {
+                        // Opera (at least &lt;= 9) does not support tabIndex=&quot;-1&quot;
+                        assert.equal(domAttr.get(divTabindexMinusOne, &quot;tabIndex&quot;), -1);
+                    }
+                    assert.isTrue(domAttr.has(divTabindexZero, &quot;tabIndex&quot;));
+                    assert.equal(domAttr.get(divTabindexZero, &quot;tabIndex&quot;), 0);
+                    assert.equal(domAttr.get(divTabindexOne, &quot;tabIndex&quot;), 1);
+                },
+                &quot;getTabindexInput&quot;: function () {
+                    assert.isFalse(domAttr.has(&quot;input-no-tabindex&quot;, &quot;tabIndex&quot;));
+                    assert.isFalse(!!domAttr.get(&quot;input-no-tabindex&quot;, &quot;tabIndex&quot;));
+                    assert.isTrue(domAttr.has(&quot;input-tabindex-minus-1&quot;, &quot;tabIndex&quot;));
+                    if (!has(&quot;opera&quot;)) {
+                        // Opera (at least &lt;= 9) does not support tabIndex=&quot;-1&quot;
+                        assert.equal(domAttr.get(&quot;input-tabindex-minus-1&quot;, &quot;tabIndex&quot;), -1);
+                    }
+                    assert.isTrue(domAttr.has(&quot;input-tabindex-0&quot;, &quot;tabIndex&quot;));
+                    assert.equal(domAttr.get(&quot;input-tabindex-0&quot;, &quot;tabIndex&quot;), 0);
+                    assert.equal(domAttr.get(&quot;input-tabindex-1&quot;, &quot;tabIndex&quot;), 1);
+                },
+                &quot;setTabindexDiv&quot;: function () {
+                    var div = document.createElement(&quot;div&quot;);
+                    assert.isNull(domAttr.get(div, &quot;tabIndex&quot;));
+                    domAttr.set(div, &quot;tabIndex&quot;, -1);
+                    if (!has(&quot;opera&quot;)) {
+                        // Opera (at least &lt;= 9) does not support tabIndex=&quot;-1&quot;
+                        assert.equal(domAttr.get(div, &quot;tabIndex&quot;), -1);
+                    }
+                    domAttr.set(div, &quot;tabIndex&quot;, 0);
+                    assert.equal(domAttr.get(div, &quot;tabIndex&quot;), 0);
+                    domAttr.set(div, &quot;tabIndex&quot;, 1);
+                    assert.equal(domAttr.get(div, &quot;tabIndex&quot;), 1);
+                },
+                &quot;setTabindexInput&quot;: function () {
+                    var input = document.createElement(&quot;input&quot;);
+                    assert.isTrue(domAttr.get(input, &quot;tabIndex&quot;) &lt;= 0);
+                    domAttr.set(input, &quot;tabIndex&quot;, -1);
+                    if (!has(&quot;opera&quot;)) {
+                        // Opera (at least &lt;= 9) does not support tabIndex=&quot;-1&quot;
+                        assert.equal(domAttr.get(input, &quot;tabIndex&quot;), -1);
+                    }
+                    domAttr.set(input, &quot;tabIndex&quot;, 0);
+                    assert.equal(domAttr.get(input, &quot;tabIndex&quot;), 0);
+                    domAttr.set(input, &quot;tabIndex&quot;, 1);
+                    assert.equal(domAttr.get(input, &quot;tabIndex&quot;), 1);
+                },
+                &quot;removeTabindexFromDiv&quot;: function () {
+                    var div = document.createElement(&quot;div&quot;);
+                    domAttr.set(div, &quot;tabIndex&quot;, 1);
+                    assert.equal(domAttr.get(div, &quot;tabIndex&quot;), 1);
+                    domAttr.remove(div, &quot;tabIndex&quot;);
+                    assert.isNull(domAttr.get(div, &quot;tabIndex&quot;));
+                },
+                &quot;removeDisabledFromInput&quot;: function () {
+                    var input = document.createElement(&quot;input&quot;);
+                    domAttr.set(input, &quot;disabled&quot;, true);
+                    assert.isTrue(domAttr.get(input, &quot;disabled&quot;));
+                    domAttr.remove(input, &quot;disabled&quot;);
+                    assert.isFalse(domAttr.get(input, &quot;disabled&quot;));
+                },
+                &quot;removeTabindexFromInput&quot;: function () {
+                    var input = document.createElement(&quot;input&quot;);
+                    domAttr.set(input, &quot;tabIndex&quot;, 1);
+                    assert.equal(domAttr.get(input, &quot;tabIndex&quot;), 1);
+                    domAttr.remove(input, &quot;tabIndex&quot;);
+                    assert.isNull(domAttr.get(input, &quot;tabIndex&quot;));
+                },
+                &quot;setReadonlyInput&quot;: function () {
+                    var input = document.createElement(&quot;input&quot;);
+                    assert.isFalse(domAttr.get(input, &quot;readonly&quot;));
+                    domAttr.set(input, &quot;readonly&quot;, true);
+                    assert.isTrue(domAttr.get(input, &quot;readonly&quot;));
+                    domAttr.set(input, &quot;readonly&quot;, false);
+                    assert.isFalse(domAttr.get(input, &quot;readonly&quot;));
+                },
+                &quot;attr_map&quot;: function () {
+                    var input = document.createElement(&quot;input&quot;),
+                        input2 = document.createElement(&quot;input&quot;),
+                        ctr = 0,
+                        callbackFired = false,
+                        map = {
+                            &quot;tabIndex&quot;: 1,
+                            &quot;type&quot;: &quot;text&quot;,
+                            &quot;onfocus&quot;: function (e) {
+                                ctr++;
+                                callbackFired = true;
+                            }
+                        };
+                    domAttr.set(input, map);
+                    domAttr.set(input2, {
+                        &quot;onfocus&quot;: function (e) {
+                            callbackFired = true;
+                        }
+                    });
+                    document.body.appendChild(input);
+                    document.body.appendChild(input2);
+                    assert.equal(domAttr.get(input, &quot;tabIndex&quot;), map.tabIndex, &quot;tabIndex&quot;);
+                    assert.equal(domAttr.get(input, &quot;type&quot;), map.type, &quot;type&quot;);
+                    assert.equal(ctr, 0, &quot;onfocus ctr == 0&quot;);
+                    var def = this.async(1000);
+
+                    firstCallback = def.callback(function () {
+                        if (callbackFired) {
+                            console.log(&quot;one&quot;);
+                            assert.equal(ctr, 1, &quot;onfocus ctr == 1&quot;);
+                            callbackFired = false;
+                            input2.focus();
+                        } else {
+                            setTimeout(firstCallback, 50); //try again in a bit
+                        }
+                    });
+
+                    secondCallback = def.callback(function () {
+                        if (callbackFired) {
+                            console.log(&quot;two&quot;);
+                            callbackFired = false;
+                            input.focus();
+                        } else {
+                            setTimeout(secondCallback, 50); //try again in a bit
+                        }
+                    });
+                    thirdCallback = def.callback(function () {
+                        if (callbackFired) {
+                            console.log(&quot;three&quot;);
+                            assert.equal(ctr, 2, &quot;onfocus ctr == 2&quot;);
+                            callbackFired = false;
+                        } else {
+                            setTimeout(thirdCallback, 50); //try again in a bit
+                        }
+                    });
+                    callbackFired = false;
+                    firstCallback();
+                    input.focus();
+                },
+                &quot;attr_reconnect&quot;: function () {
+                    var input = document.createElement(&quot;input&quot;),
+                        input2 = document.createElement(&quot;input&quot;),
+                        callbackFired = false;
+                    var ctr = 0;
+                    domAttr.set(input, &quot;type&quot;, &quot;text&quot;);
+                    domAttr.set(input, &quot;onfocus&quot;, function (e) { ctr++; callbackFired = true});
+                    domAttr.set(input, &quot;onfocus&quot;, function (e) { ctr++; callbackFired = true });
+                    domAttr.set(input, &quot;onfocus&quot;, function (e) { ctr++; callbackFired = true });
+                    domAttr.set(input2, &quot;onfocus&quot;, function (e) { callbackFired = true });
+                    document.body.appendChild(input);
+                    document.body.appendChild(input2);
+                    assert.equal(domAttr.get(input, &quot;type&quot;), &quot;text&quot;);
+                    assert.equal(ctr, 0);
+                    var def = this.async(1000);
+
+                    firstCallback = def.callback(function () {
+                        if (callbackFired) {
+                            assert.equal(ctr, 1, &quot;onfocus ctr == 1&quot;);
+                            callbackFired = false;
+                            input2.focus();
+                        } else {
+                            setTimeout(firstCallback, 50); //try again in a bit
+                        }
+                    });
+
+                    secondCallback = def.callback(function () {
+                        if (callbackFired) {
+                            callbackFired = false;
+                            input.focus();
+                        } else {
+                            setTimeout(secondCallback, 50); //try again in a bit
+                        }
+                    });
+                    thirdCallback = def.callback(function () {
+                        if (callbackFired) {
+                            assert.equal(ctr, 2, &quot;onfocus ctr == 2&quot;);
+                            callbackFired = false;
+                        } else {
+                            setTimeout(thirdCallback, 50); //try again in a bit
+                        }
+                    });
+
+                    callbackFired = false;
+                    firstCallback();
+                    input.focus();
+                },
+                &quot;attrSpecials&quot;: function () {
+                    var node = document.createElement(&quot;div&quot;),
+                        styleMap = {
+                            opacity: 0.5,
+                            width: &quot;30px&quot;,
+                            border: &quot;1px solid black&quot;
+                        },
+                        propMap = {
+                            innerHTML: &quot;howdy!&quot;
+                        };
+                    document.body.appendChild(node);
+                    domAttr.set(node, { style: styleMap });
+                    assert.equal(node.style.opacity, styleMap.opacity);
+                    assert.equal(node.style.width, styleMap.width);
+                    assert.equal(node.style.borderWidth, styleMap.border.split(&quot; &quot;)[0]);
+                    domAttr.set(node, propMap);
+                    assert.equal(node.innerHTML, propMap.innerHTML);
+                    assert.equal(domAttr.get(node, &quot;innerHTML&quot;), propMap.innerHTML);
+                    domAttr.set(node, &quot;innerHTML&quot;, &quot;&lt;span&gt;howdy!&lt;/span&gt;&quot;);
+                    assert.equal(node.firstChild.nodeType, 1);
+                    assert.equal(node.firstChild.nodeName.toLowerCase(), &quot;span&quot;);
+                    assert.equal(node.innerHTML.toLowerCase(), &quot;&lt;span&gt;howdy!&lt;/span&gt;&quot;);
+                    assert.equal(domAttr.get(node, &quot;innerHTML&quot;).toLowerCase(), &quot;&lt;span&gt;howdy!&lt;/span&gt;&quot;);
+                },
+                &quot;testLabelForAttr&quot;: function () {
+                    // create label with no for attribute make sure requesting
+                    // it as for and html for returns null
+                    var label = document.createElement(&quot;label&quot;);
+                    if (!has(&quot;ie&quot;)) {
+                        // IE always assumes that &quot;for&quot; is present
+                        assert.isNull(domAttr.get(label, &quot;for&quot;));
+                        assert.isNull(domAttr.get(label, &quot;htmlFor&quot;));
+                    }
+                    // add a for attribute and test that can get by requesting for
+                    domAttr.set(label, &quot;for&quot;, &quot;testId&quot;);
+                    assert.equal(domAttr.get(label, &quot;for&quot;), &quot;testId&quot;);
+                    // add as htmlFor and make sure it is returned when requested as htmlFor
+                    var label2 = document.createElement(&quot;label&quot;);
+                    domAttr.set(label2, &quot;htmlFor&quot;, &quot;testId2&quot;);
+                    assert.equal(domAttr.get(label2, &quot;htmlFor&quot;), &quot;testId2&quot;);
+                    // check than when requested as for or htmlFor attribute is found
+                    assert.isTrue(domAttr.has(label, &quot;for&quot;));
+                    assert.isTrue(domAttr.has(label2, &quot;htmlfor&quot;));
+                    // test from markup
+
+                    // make sure testing if has attribute using for or htmlFor
+                    // both return null when no value set
+                    if (!has(&quot;ie&quot;)) {
+                        // IE always assumes that &quot;for&quot; is present
+                        assert.isFalse(domAttr.has(labelNoFor, &quot;for&quot;));
+                        assert.isFalse(domAttr.has(labelNoFor, &quot;htmlFor&quot;));
+                    }
+                    // when markup includes for make certain testing if has attribute
+                    // using for or htmlFor returns true
+                    assert.isTrue(domAttr.has(labelWithFor, &quot;for&quot;));
+                    assert.isTrue(domAttr.has(labelWithFor, &quot;htmlFor&quot;));
+                    // when markup include for attrib make sure can retrieve using for or htmlFor
+                    assert.equal(domAttr.get(labelWithFor, &quot;for&quot;), &quot;input-with-label&quot;);
+                    assert.equal(domAttr.get(labelWithFor, &quot;htmlFor&quot;), &quot;input-with-label&quot;);
+                },
+                &quot;attrInputTextValue&quot;: function () {
+                    assert.equal(inputTextValue.value, &quot;123&quot;);
+                    assert.equal(domAttr.get(&quot;input-text-value&quot;, &quot;value&quot;), &quot;123&quot;);
+                    domAttr.set(&quot;input-text-value&quot;, &quot;value&quot;, &quot;abc&quot;);
+                    assert.equal(inputTextValue.value, &quot;abc&quot;);
+                    assert.equal(domAttr.get(&quot;input-text-value&quot;, &quot;value&quot;), &quot;abc&quot;);
+                    inputTextValue.value = &quot;xyz&quot;;
+                    assert.equal(inputTextValue.value, &quot;xyz&quot;);
+                    assert.equal(domAttr.get(&quot;input-text-value&quot;, &quot;value&quot;), &quot;xyz&quot;);
+                    inputTextValue.value = &quot;123&quot;; // fixes initialization problem when the test is reloaded
+                },
+                &quot;testInputDisabled&quot;: function () {
+                    assert.isFalse(domAttr.get(&quot;input-no-disabled&quot;, &quot;disabled&quot;));
+                    assert.isTrue(domAttr.get(&quot;input-with-disabled&quot;, &quot;disabled&quot;));
+                    assert.isTrue(domAttr.get(&quot;input-with-disabled-true&quot;, &quot;disabled&quot;));
+                }
+            };
+        })()
+    });
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

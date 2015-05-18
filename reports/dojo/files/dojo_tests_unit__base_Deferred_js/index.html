@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/unit/_base/Deferred.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/unit/_base/Deferred.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">80.96</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">283</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">40.26</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.28</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+	&#039;intern!object&#039;,
+	&#039;intern/chai!assert&#039;,
+	&#039;intern/dojo/_base/kernel&#039;,
+	&#039;dojo/when&#039;,
+	&#039;dojo/_base/Deferred&#039;
+], function (
+	registerSuite,
+	assert,
+	kernel,
+	when,
+	Deferred
+) {
+	function delay(ms) {
+		var d = new Deferred();
+		ms = ms || 20;
+		setTimeout(function () {
+			d.progress(0.5);
+		}, ms / 2);
+		setTimeout(function () {
+			d.resolve();
+		}, ms);
+		return d.promise;
+	}
+
+	registerSuite({
+		name: &#039;dojo/_base/Deferred&#039;,
+
+		&#039;.callback()&#039;: function () {
+			var dfd = new Deferred();
+			dfd.addCallback(this.async().callback(function (res) {
+				assert.equal(res, 5);
+			}));
+			dfd.callback(5);
+		},
+
+		&#039;.callback() with args&#039;: function () {
+			var dfd = new Deferred();
+			dfd.addCallback(kernel.global, this.async().callback(function (base, res) {
+				assert.equal(base + res, 35);
+			}), 30);
+			dfd.callback(5);
+		},
+
+		&#039;.errBack()&#039;: function () {
+			var dfd = new Deferred();
+			dfd.addErrback(this.async().callback(function () {
+				assert.ok(true);
+			}));
+			dfd.errback();
+		},
+
+		&#039;.callback() twice&#039;: function () {
+			var dfd = new Deferred();
+			var cnt = 0;
+			var thrown = false;
+			dfd.addCallback(function () {
+				return ++cnt;
+			});
+			dfd.callback();
+			assert.equal(cnt, 1);
+			try {
+				dfd.callback();
+			} catch (e) {
+				thrown = true;
+			}
+			assert.isTrue(thrown);
+		},
+
+		&#039;.addBoth()&#039;: function () {
+			var dfd = new Deferred();
+			dfd.addBoth(this.async().callback(function () {
+				assert.ok(true);
+			}));
+			dfd.callback();
+		},
+
+		&#039;.addCallback() nested&#039;: function () {
+			var dfd = new Deferred();
+			dfd.addCallback(function () {
+				dfd.addCallback(this.async().callback(function (res2) {
+					assert.equal(&#039;blue&#039;, res2);
+				}));
+				return &#039;blue&#039;;
+			});
+			dfd.callback(&#039;red&#039;);
+		},
+
+		&#039;.then() simple&#039;: function () {
+			delay().then(this.async().callback(function () {
+				assert.ok(true);
+			}));
+		},
+
+		&#039;.then() chaining&#039;: function () {
+			var p = delay();
+			var p2 = p.then(function () {
+				return 1;
+			});
+			var p3 = p2.then(function () {
+				return 2;
+			});
+			p3.then(function () {
+				p2.then(function (v1) {
+					p3.then(this.async().callback(function (v2) {
+						assert.equal(v1, 1);
+						assert.equal(v2, 2);
+					}));
+				});
+			});
+		},
+
+		&#039;when() simple&#039;: function () {
+			when(delay(), this.async().callback(function () {
+				assert.ok(true);
+			}));
+		},
+
+		&#039;progress&#039;: function () {
+			var percentDone;
+			when(delay(), this.async().callback(function () {
+				assert.equal(percentDone, 0.5);
+			}), function () {},
+			function (completed) {
+				percentDone = completed;
+			});
+		},
+
+		&#039;.cancel() then derivative&#039;: function () {
+			var def = new Deferred();
+			var def2 = def.then();
+			var hasThrown = false;
+			try {
+				def2.cancel();
+			} catch (e) {
+				hasThrown = true;
+			}
+
+			assert.isFalse(hasThrown);
+		},
+
+		&#039;.cancel() promise value&#039;: function () {
+			var cancelledDef;
+			var def = new Deferred(function (_def) {
+				cancelledDef = _def;
+			});
+			def.promise.cancel();
+			assert.equal(def, cancelledDef);
+		},
+
+		&#039;.error() result&#039;: function () {
+			var def = new Deferred();
+			var result = new Error(&#039;rejected&#039;);
+			def.reject(result);
+			assert.equal(def.fired, 1);
+			assert.equal(def.results[1], result);
+		},
+
+		&#039;global leak&#039;: function () {
+			var def = new Deferred();
+			def.then(this.async().callback(function () {
+				assert.isUndefined(kernel.global.results, &#039;results is leaking into global&#039;);
+				assert.isUndefined(kernel.global.fired, &#039;fired is leaking into global&#039;);
+			}));
+			def.resolve(true);
+		},
+
+		&#039;back and forth process&#039;: function () {
+			var def = new Deferred();
+
+			def.addErrback(function () {
+				return &#039;ignore error and throw this good string&#039;;
+			}).addCallback(function () {
+				throw new Error(&#039;error1&#039;);
+			}).addErrback(function () {
+				return &#039;ignore second error and make it good again&#039;;
+			}).addCallback(this.async().callback(function () {
+				assert.ok(true);
+			}));
+
+			def.errback(&#039;&#039;);
+		},
+
+		&#039;back and forth process then&#039;: function () {
+			var def = new Deferred();
+
+			def.then(null, function () {
+				return &#039;ignore error and throw this good string&#039;;
+			}).then(function () {
+				throw &#039;error1&#039;;
+			}).then(null, function () {
+				return &#039;ignore second error and make it good again&#039;;
+			}).then(this.async().callback(function () {
+				assert.ok(true);
+			}));
+
+			def.reject(&#039;&#039;);
+		},
+
+		&#039;return error object&#039;: function () {
+			var def = new Deferred();
+
+			def.addCallback(function () {
+				return new Error(&#039;returning an error should work same as throwing&#039;);
+			}).addErrback(this.async().callback(function () {
+				assert.ok(true);
+			}));
+
+			def.callback();
+		},
+
+		&#039;return error object then&#039;: function () {
+			var def = new Deferred();
+
+			def.then(function () {
+				return new Error(&#039;returning an error should NOT work same as throwing&#039;);
+			}).then(this.async().callback(function () {
+				assert.ok(true);
+			}));
+
+			def.resolve();
+		},
+
+		&#039;errBack with promise&#039;: function () {
+			var def = new Deferred();
+
+			def.addCallbacks(function () {}, function (err) {
+				return err;
+			});
+			def.promise.then(null, this.async().callback(function () {
+				assert.ok(true);
+			}));
+			def.errback(new Error());
+		},
+
+		&#039;test dojo promise progress basic&#039;: function () {
+			var a = new Deferred();
+			var b = new Deferred();
+			var called = false;
+
+			a.then(function () {
+				b.then(function () {
+					if (!called) {
+						console.log(&#039;Boo. ProgressBasic not called&#039;);
+					}
+				}, function () {
+					console.log(&#039;Unexpected&#039;);
+				}, this.async().callback(function () {
+					called = true;
+					assert.ok(called);
+				}));
+			});
+
+			a.resolve();
+			b.progress();
+			b.resolve();
+		},
+
+		&#039;test dojo promise progress chain&#039;: function () {
+			var a = new Deferred();
+			var b = new Deferred();
+			var called = false;
+
+			a.then(function () {
+				return b;
+			}).then(function () {
+				if (!called) {
+					console.log(&#039;Boo. ProgressChain not called&#039;);
+				}
+			}, function () {
+				console.log(&#039;Unexpected&#039;);
+			}, this.async().callback(function () {
+				called = true;
+				assert.ok(called);
+			}));
+
+			a.resolve();
+			b.progress();
+			b.resolve();
+		}
+
+	});
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

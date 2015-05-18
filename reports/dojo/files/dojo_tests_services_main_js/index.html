@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/services/main.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/services/main.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">74.27</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">139</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">26.03</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.10</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+	&#039;require&#039;,
+	&#039;exports&#039;,
+	&#039;./util&#039;,
+	&#039;intern/dojo/errors/CancelError&#039;,
+	&#039;intern/dojo/node!http&#039;,
+	&#039;intern/dojo/node!url&#039;,
+	&#039;intern/dojo/node!querystring&#039;,
+	&#039;intern/dojo/node!glob&#039;,
+	&#039;intern/dojo/node!http-proxy&#039;,
+	&#039;intern/dojo/node!jsgi-node&#039;,
+	&#039;intern/dojo/node!jsgi-node/jsgi/node&#039;,
+	&#039;intern/dojo/node!formidable&#039;
+], function (require, exports, util, CancelError, http, url, qs, glob, httpProxy, jsgi, node, formidable) {
+	var nodeWrapper = node.Node,
+		proxy = new httpProxy.RoutingProxy();
+
+	require = (function (require) {
+		return function (dep) {
+			return new util.Promise(function (resolve) {
+				require([ dep ], function (module) {
+					resolve(module);
+				});
+			});
+		};
+	})(require);
+
+	function Multipart(nextApp) {
+		//	summary:
+		//		Returns JSGI middleware for handling multi-part forms.
+		//		If a multi-part request is detected, a promise will be added
+		//		to the request object at the &quot;data&quot; property. It will resolve
+		//		to the fields sent in the multi-part request.
+		var multipartRE = /^multipart\/form-data;/;
+
+		return function (request) {
+			var headers = request.headers;
+			if (headers[&#039;content-type&#039;] &amp;&amp; multipartRE.test(headers[&#039;content-type&#039;])) {
+				request.data = new util.Promise(function (resolve, reject) {
+					nodeWrapper(function (nodeRequest) {
+						var parser = new formidable.IncomingForm();
+						parser.parse(nodeRequest, function (err, fields, files) {
+							if (err) {
+								reject(err);
+							}
+							for (var key in files) {
+								fields[key] = files[key];
+							}
+							resolve(fields);
+						});
+					})(request);
+				});
+			}
+
+			return nextApp(request);
+		};
+	}
+
+	exports.start = function (port) {
+		return util.call(glob, &#039;**/*.service.js&#039;, {
+			cwd: &#039;./tests/services&#039;
+		}).then(function (files) {
+			return util.map(files, function (filename) {
+				return require(&#039;./&#039; + filename.slice(0, -3)).then(function (module) {
+					var name = filename.slice(0, -11);
+					return {
+						regexp: new RegExp(&#039;^\/&#039; + name.replace(/\//g, &#039;\\/&#039;) + &#039;(\\/.*)?$&#039;),
+						module: module
+					};
+				});
+			});
+		}).then(function (services) {
+			var serviceRE = /^\/__services(\/.*)$/,
+				servicesHandler = new jsgi.Listener(new Multipart(function (request) {
+					var urlInfo = url.parse(request.pathInfo, true),
+						query = qs.parse(request.queryString),
+						pathInfo = urlInfo.pathname.match(serviceRE),
+						serviceURL = pathInfo &amp;&amp; pathInfo[1],
+						response;
+
+					if (serviceURL) {
+						request.urlInfo = urlInfo;
+						request.query = query;
+						request.serviceURL = serviceURL;
+
+						services.some(function (service) {
+							var match = serviceURL.match(service.regexp);
+							if (match) {
+								request.urlInfo.pathname = match[1];
+								response = service.module.call(null, request);
+								return true;
+							}
+						});
+					}
+
+					if (!response) {
+						return {
+							status: 500,
+							headers: {
+								&#039;Content-Type&#039;: &#039;text/html;charset=utf-8&#039;
+							},
+							body: [
+								&#039;&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;title&gt;No services&lt;/title&gt;&lt;/head&gt;&#039; +
+								&#039;&lt;body&gt;No services&lt;/body&gt;&lt;/html&gt;&#039;
+							]
+						};
+					}
+					else if (typeof response.then === &#039;function&#039;) {
+						return response.then(function (data) {
+							return data;
+						}, function (error) {
+							if (error instanceof CancelError) {
+								// Handle any canceled promises, like from a canceled request
+								return {
+									body: [ &#039;&#039; ]
+								};
+							}
+							throw error;
+						});
+					}
+					return response;
+				}));
+			var server = http.createServer(function (request, response) {
+				if (request.url.indexOf(&#039;/__services/&#039;) === 0) {
+					servicesHandler(request, response);
+				}
+				else {
+					proxy.proxyRequest(request, response, {
+						host: &#039;localhost&#039;,
+						port: 9000
+					});
+				}
+			});
+			server.listen(port || 9001);
+
+			return server;
+		});
+	};
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

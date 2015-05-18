@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/unit/_base/xhr.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/unit/_base/xhr.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">71.85</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">404</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">30.35</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">3.57</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+	&#039;intern!object&#039;,
+	&#039;intern/chai!assert&#039;,
+	&#039;../../../_base/kernel&#039;,
+	&#039;../../../_base/xhr&#039;,
+	&#039;../../../_base/Deferred&#039;,
+	&#039;../../../topic&#039;,
+	&#039;dojo/_base/array&#039;,
+	&#039;dojo/query&#039;,
+	&#039;dojo/json&#039;,
+	&#039;dojo/dom-construct&#039;,
+	&#039;dojo/Deferred&#039;,
+	&#039;dojo/promise/all&#039;,
+	&#039;dojo/domReady!&#039;
+], function (registerSuite, assert, dojo, xhr, baseDeferred, topic,
+			 array, query, JSON, domConstruct, Deferred, all) {
+	var form, topicCount, remover;
+	registerSuite({
+		name: &#039;dojo/_base/xhr&#039;,
+
+		&#039;text content handler&#039;: function () {
+			assert.strictEqual(
+				dojo._contentHandlers.text({
+					responseText: &#039;foo bar baz &#039;
+				}),
+				&#039;foo bar baz &#039;
+			);
+		},
+
+		&#039;json content handler&#039;: function () {
+			var object = {
+				foo: &#039;bar&#039;,
+				baz: [
+					{ thonk: &#039;blarg&#039; },
+					&#039;xyzzy!&#039;
+				]
+			};
+			assert.deepEqual(
+				dojo._contentHandlers.json({
+					responseText: JSON.stringify(object)
+				}),
+				object
+			);
+		},
+
+		&#039;json-comment-filtered handler&#039;: function () {
+			var object = {
+				foo: &#039;bar&#039;,
+				baz: [
+					{ thonk: &#039;blarg&#039; },
+					&#039;xyzzy!&#039;
+				]
+			};
+
+			assert.throws(function () {
+				dojo._contentHandlers[&#039;json-comment-filtered&#039;]({
+					responseText: JSON.stringify(object)
+				});
+			});
+			assert.deepEqual(
+				dojo._contentHandlers[&#039;json-comment-filtered&#039;]({
+					responseText: &#039;\tblag\n/*&#039; + JSON.stringify(object) + &#039;*/\n\r\t\r&#039;
+				}),
+				object
+			);
+			assert.deepEqual(
+				dojo._contentHandlers[&#039;json-comment-optional&#039;]({
+					responseText: &#039;\tblag\n/*&#039; + JSON.stringify(object) + &#039;*/\n\r\t\r&#039;
+				}),
+				object
+			);
+		},
+
+		&#039;javascript content handler&#039;: function () {
+			var object = {
+				foo: &#039;bar&#039;,
+				baz: [
+					{ thonk: &#039;blarg&#039; },
+					&#039;xyzzy!&#039;
+				]
+			};
+
+			assert.deepEqual(
+				dojo._contentHandlers[&#039;javascript&#039;]({
+					responseText: &#039;(&#039; + JSON.stringify(object) + &#039;)&#039;
+				}),
+				object
+			);
+			assert.ok(
+				dojo._contentHandlers[&#039;javascript&#039;]({
+					responseText: &#039;true;&#039;
+				})
+			);
+			assert.ok(
+				!dojo._contentHandlers[&#039;javascript&#039;]({
+					responseText: &#039;false;&#039;
+				})
+			);
+		},
+
+		&#039;xml content handler&#039;: function () {
+			var fakeXHR = {
+				responseText: &#039;&lt;foo&gt;&lt;bar baz=&quot;thonk&quot;&gt;blarg&lt;/bar&gt;&lt;/foo&gt;&#039;
+			};
+
+			if (&#039;DOMParser&#039; in dojo.global) {
+				var parser = new DOMParser();
+				fakeXHR.responseXML = parser.parseFromString(fakeXHR.responseText, &#039;text/xml&#039;);
+			}
+
+			var xmlDoc = dojo._contentHandlers[&#039;xml&#039;](fakeXHR);
+			assert.strictEqual(xmlDoc.documentElement.tagName, &#039;foo&#039;);
+		},
+
+		&#039;.get&#039;: {
+			success: function () {
+				var dfd = this.async(30000, 2),
+					xdfd = xhr.get({
+						url: &#039;/__services/request/xhr&#039;,
+						preventCache: true,
+						handleAs: &#039;json&#039;,
+						load: dfd.callback(function (data, ioArgs) {
+							assert.strictEqual(ioArgs.xhr.readyState, 4);
+							return data;
+						})
+					});
+
+				assert.instanceOf(xdfd, baseDeferred);
+
+				xdfd.addCallback(dfd.callback(function (data) {
+					assert.strictEqual(data.method, &#039;GET&#039;);
+				}));
+				xdfd.addErrback(dfd.reject);
+			},
+
+			&#039;404 status&#039;: function () {
+				var dfd = this.async(30000, 2),
+					xdfd = xhr.get({
+						url: &#039;xhr_blarg.html&#039;,
+						error: dfd.callback(function (err, ioArgs) {
+							assert.strictEqual(ioArgs.xhr.status, 404);
+							return err;
+						})
+					});
+
+				xdfd.addCallback(dfd.reject);
+				xdfd.addErrback(dfd.resolve);
+			},
+
+			content: function () {
+				var dfd = this.async(),
+					xdfd = xhr.get({
+						url: &#039;/__services/request/xhr?color=blue&#039;,
+						content: {
+							foo: [ &#039;bar&#039;, &#039;baz&#039; ],
+							thud: &#039;thonk&#039;,
+							xyzzy: 3
+						}
+					});
+
+				xdfd.addCallback(dfd.callback(function () {
+					assert.strictEqual(
+						xdfd.ioArgs.url,
+						&#039;/__services/request/xhr?color=blue&amp;foo=bar&amp;foo=baz&amp;thud=thonk&amp;xyzzy=3&#039;
+					);
+				}));
+			},
+
+			form: {
+				setup: function () {
+					form = domConstruct.place(&#039;&lt;form id=&quot;f3&quot; style=&quot;border: 1px solid black;&quot;&gt;&lt;input id=&quot;f3_spaces&quot; type=&quot;hidden&quot; name=&quot;spaces&quot; value=&quot;string with spaces&quot;&gt;&lt;/form&gt;&#039;, document.body);
+				},
+
+				teardown: function () {
+					domConstruct.destroy(form);
+					form = null;
+				},
+
+				&#039;serialize&#039;: function () {
+					var dfd = this.async(),
+						xdfd = xhr.get({
+							url: &#039;/__services/request/xhr&#039;,
+							form: &#039;f3&#039;
+						});
+
+					xdfd.addCallback(dfd.callback(function () {
+						assert.strictEqual(
+							xdfd.ioArgs.url,
+							&#039;/__services/request/xhr?spaces=string%20with%20spaces&#039;
+						);
+					}));
+				},
+
+				&#039;with content&#039;: function () {
+					var dfd = this.async(),
+						xdfd = xhr.get({
+							url: &#039;/__services/request/xhr&#039;,
+							form: &#039;f3&#039;,
+							content: { spaces: &#039;blah&#039; }
+						});
+
+					xdfd.addCallback(dfd.callback(function () {
+						assert.strictEqual(
+							xdfd.ioArgs.url,
+							&#039;/__services/request/xhr?spaces=blah&#039;
+						);
+					}));
+				}
+			}
+		},
+
+		&#039;.post&#039;: {
+			success: function () {
+				var dfd = this.async();
+
+				xhr.post({
+					url: &#039;/__services/request/xhr?foo=bar&#039;,
+					content: { color: &#039;blue&#039; },
+					handleAs: &#039;json&#039;,
+					handle: dfd.callback(function (data) {
+						assert.strictEqual(data.method, &#039;POST&#039;);
+						assert.deepEqual(data.query, { foo: &#039;bar&#039; });
+						assert.deepEqual(data.payload, { color: &#039;blue&#039; });
+					})
+				});
+			},
+
+			&#039;with content&#039;: function () {
+				var dfd = this.async(),
+					xdfd = xhr.post({
+						url: &#039;/__services/request/xhr&#039;,
+						content: {
+							foo: [ &#039;bar&#039;, &#039;baz&#039; ],
+							thud: &#039;thonk&#039;,
+							xyzzy: 3
+						}
+					});
+
+				xdfd.addCallback(dfd.callback(function () {
+					assert.strictEqual(xdfd.ioArgs.query, &#039;foo=bar&amp;foo=baz&amp;thud=thonk&amp;xyzzy=3&#039;);
+				}));
+				xdfd.addErrback(dfd.reject);
+			},
+
+			form: {
+				setup: function () {
+					form = domConstruct.place(&#039;&lt;form id=&quot;f4&quot; style=&quot;border: 1px solid black;&quot; action=&quot;/__services/request/xhr&quot;&gt;&lt;input id=&quot;f4_action&quot; type=&quot;hidden&quot; name=&quot;action&quot; value=&quot;Form with input named action&quot;&gt;&lt;/form&gt;&#039;, document.body);
+				},
+
+				teardown: function () {
+					domConstruct.destroy(form);
+					form = null;
+				},
+
+				&#039;serialize&#039;: function () {
+					var dfd = this.async(),
+						xdfd = xhr.post({
+							form: &#039;f4&#039;
+						});
+
+					xdfd.addCallback(dfd.resolve);
+					xdfd.addErrback(dfd.reject);
+				}
+			},
+
+			raw: function () {
+				var dfd = this.async(),
+					xdfd = xhr.post({
+						url: &#039;/__services/request/xhr&#039;,
+						postData: &#039;foo=bar&amp;color=blue&amp;height=average&#039;,
+						handleAs: &#039;json&#039;
+					});
+
+				xdfd.addCallback(dfd.callback(function (data) {
+					assert.deepEqual(data.payload, {
+						foo: &#039;bar&#039;,
+						color: &#039;blue&#039;,
+						height: &#039;average&#039;
+					});
+				}));
+				xdfd.addErrback(dfd.reject);
+			}
+		},
+
+		&#039;.put&#039;: function () {
+			var dfd = this.async(),
+				xdfd = xhr.put({
+					url: &#039;/__services/request/xhr?foo=bar&#039;,
+					content: { color: &#039;blue&#039; },
+					handleAs: &#039;json&#039;
+				});
+
+			xdfd.addCallback(dfd.callback(function (data) {
+				assert.strictEqual(data.method, &#039;PUT&#039;);
+				assert.deepEqual(data.query, { foo: &#039;bar&#039; });
+				assert.deepEqual(data.payload, { color: &#039;blue&#039; });
+			}));
+			xdfd.addErrback(dfd.reject);
+		},
+
+		&#039;.del&#039;: function () {
+			var dfd = this.async(),
+				xdfd = xhr.del({
+					url: &#039;/__services/request/xhr&#039;,
+					preventCache: true,
+					handleAs: &#039;json&#039;
+				});
+
+			xdfd.addCallback(dfd.callback(function (data) {
+				assert.strictEqual(data.method, &#039;DELETE&#039;);
+			}));
+			xdfd.addErrback(dfd.reject);
+		},
+
+		cancel: function () {
+			var dfd = this.async(),
+				xdfd = xhr.post({
+					url: &#039;/__services/request/xhr?delay=3000&#039;
+				});
+
+			xdfd.addCallback(dfd.reject);
+			xdfd.addErrback(dfd.callback(function (error) {
+				assert.instanceOf(error, Error);
+				assert.strictEqual(error.dojoType, &#039;cancel&#039;);
+			}));
+
+			xdfd.cancel();
+		},
+
+		&#039;xml queryable&#039;: function () {
+			var dfd = this.async(),
+				xdfd = xhr.get({
+					url: &#039;/__services/request/xhr/xml&#039;,
+					handleAs: &#039;xml&#039;
+				});
+
+			xdfd.addCallback(dfd.callback(function (xmlDoc) {
+				var results = query(&#039;bar&#039;, xmlDoc);
+				assert.strictEqual(results.length, 2);
+			}));
+			xdfd.addErrback(dfd.reject);
+		},
+
+		ioPublish: {
+			setup: function () {
+				dojo.config.ioPublish = true;
+				topicCount = {};
+
+				var handles = [];
+				remover = function () {
+					array.forEach(handles, function (handle) {
+						handle.remove();
+					});
+					handles = null;
+				};
+
+				array.forEach(
+					[ &#039;start&#039;, &#039;send&#039;, &#039;load&#039;, &#039;error&#039;, &#039;done&#039; ],
+					function (name) {
+						topicCount[name] = 0;
+						handles.push(
+							topic.subscribe(&#039;/dojo/io/&#039; + name, function () {
+								topicCount[name] += 1;
+							})
+						);
+					}
+				);
+			},
+
+			teardown: function () {
+				dojo.config.ioPublish = false;
+				remover();
+			},
+
+			counts: function () {
+				var dfd = this.async(),
+					dfd1 = new Deferred(),
+					xdfd1 = xhr.get({ url: &#039;/__services/request/xhr?delay=1000&#039; }),
+					dfd2 = new Deferred(),
+					xdfd2 = xhr.get({ url: &#039;/__services/request/xhr?delay=1000&#039; });
+
+				xdfd1.addCallback(dfd1.resolve);
+				xdfd1.addErrback(dfd1.reject);
+				xdfd2.addCallback(dfd2.resolve);
+				xdfd2.addErrback(dfd2.reject);
+
+				all([dfd1, dfd2]).then(
+					function () {
+						setTimeout(dfd.callback(function () {
+							assert.deepEqual(topicCount, {
+								start: 1,
+								send: 2,
+								load: 2,
+								error: 0,
+								done: 2
+							});
+						}), 100);
+					},
+					dfd.reject
+				);
+			}
+		}
+	});
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - dojo/tests/unit/io/iframe.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>dojo/tests/unit/io/iframe.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">71.02</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">249</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">28.52</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.07</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">define([
+	&#039;intern!object&#039;,
+	&#039;intern/chai!assert&#039;,
+	&#039;../../../io/iframe&#039;,
+	&#039;../../../_base/kernel&#039;,
+	&#039;../../../topic&#039;,
+	&#039;dojo/dom&#039;,
+	&#039;dojo/dom-construct&#039;,
+	&#039;dojo/domReady!&#039;
+], function (registerSuite, assert, iframe, kernel, topic, dom, domConstruct) {
+	function form(method, test) {
+		return {
+			setup: function () {
+				domConstruct.place(&#039;&lt;form id=&quot;postTest&quot; method=&quot;&#039; + method + &#039;&quot; enctype=&quot;multipart/form-data&quot;&gt;&lt;/form&gt;&#039;, document.body);
+			},
+
+			test: test,
+
+			teardown: function () {
+				domConstruct.destroy(&#039;postTest&#039;);
+			}
+		};
+	}
+
+	registerSuite({
+		name: &#039;dojo/io/iframe&#039;,
+
+		GET: {
+			text: function () {
+				var dfd = this.async(),
+					fdfd = iframe.send({
+						url: &#039;/__services/request/iframe?type=text&#039;,
+						method: &#039;GET&#039;,
+						timeout: 5000,
+						preventCache: true,
+						handle: dfd.callback(function (response) {
+							assert.strictEqual(response, &#039;iframe succeeded&#039;);
+						})
+					});
+
+				fdfd.addErrback(dfd.reject);
+			},
+
+			&#039;JSON with form&#039;: form(&#039;GET&#039;, function () {
+				var dfd = this.async(),
+					fdfd = iframe.send({
+						url: &#039;/__services/request/iframe&#039;,
+						form: &#039;postTest&#039;,
+						content: {
+							type: &#039;json&#039;,
+							color: &#039;blue&#039;,
+							size: 42
+						},
+						timeout: 5000,
+						preventCache: true,
+						handleAs: &#039;json&#039;,
+						handle: dfd.callback(function (response) {
+							assert.strictEqual(response.query.color, &#039;blue&#039;);
+							assert.strictEqual(response.query.size, &#039;42&#039;);
+						})
+					});
+
+				fdfd.addErrback(dfd.reject);
+			}),
+
+			&#039;JSON&#039;: function () {
+				var dfd = this.async(),
+					fdfd = iframe.send({
+						url: &#039;/__services/request/iframe&#039;,
+						content: {
+							type: &#039;json&#039;,
+							color: &#039;blue&#039;,
+							size: 42
+						},
+						timeout: 5000,
+						preventCache: true,
+						handleAs: &#039;json&#039;,
+						handle: dfd.callback(function (response) {
+							assert.strictEqual(response.query.color, &#039;blue&#039;);
+							assert.strictEqual(response.query.size, &#039;42&#039;);
+						})
+					});
+
+				fdfd.addErrback(dfd.reject);
+			},
+
+			&#039;JSON without POST&#039;: function () {
+				var dfd = this.async(),
+					fdfd = iframe.send({
+						url: &#039;/__services/request/iframe&#039;,
+						method: &#039;POST&#039;,
+						content: {
+							type: &#039;json&#039;,
+							color: &#039;blue&#039;,
+							size: 42
+						},
+						timeout: 5000,
+						preventCache: true,
+						handleAs: &#039;json&#039;,
+						handle: dfd.callback(function (response) {
+							assert.strictEqual(response.method, &#039;GET&#039;);
+							assert.strictEqual(response.query.color, &#039;blue&#039;);
+							assert.strictEqual(response.query.size, &#039;42&#039;);
+						})
+					});
+
+				fdfd.addErrback(dfd.reject);
+			},
+
+			&#039;JavaScript&#039;: function () {
+				var dfd = this.async(),
+					fdfd = iframe.send({
+						url: &#039;/__services/request/iframe&#039;,
+						content: {
+							type: &#039;javascript&#039;
+						},
+						timeout: 5000,
+						preventCache: true,
+						handleAs: &#039;javascript&#039;,
+						handle: dfd.callback(function () {
+							assert.strictEqual(window.iframeTestingFunction(), 42);
+						})
+					});
+
+				fdfd.addErrback(dfd.reject);
+			},
+
+			&#039;HTML&#039;: function () {
+				var dfd = this.async(),
+					fdfd = iframe.send({
+						url: &#039;/__services/request/iframe&#039;,
+						content: {
+							type: &#039;html&#039;
+						},
+						timeout: 5000,
+						preventCache: true,
+						handleAs: &#039;html&#039;,
+						handle: dfd.callback(function (response) {
+							assert.strictEqual(response.getElementsByTagName(&#039;h1&#039;)[0].innerHTML, &#039;SUCCESSFUL HTML response&#039;);
+						})
+					});
+
+				fdfd.addErrback(dfd.reject);
+			},
+			&#039;XML&#039;: function () {
+				var dfd = this.async(),
+					fdfd = iframe.send({
+						url: &#039;/__services/request/iframe&#039;,
+						content: {
+							type: &#039;xml&#039;
+						},
+						timeout: 5000,
+						preventCache: true,
+						handleAs: &#039;xml&#039;,
+						handle: dfd.callback(function (response) {
+							assert.strictEqual(response.documentElement.getElementsByTagName(&#039;child&#039;).length, 4);
+						})
+					});
+
+				fdfd.addErrback(dfd.reject);
+			},
+			&#039;content array&#039;: function () {
+				var dfd = this.async(),
+					fdfd = iframe.send({
+						url: &#039;/__services/request/iframe&#039;,
+						content: {
+							type: &#039;text&#039;,
+							tag: [ &#039;value1&#039;, &#039;value2&#039; ]
+						},
+						timeout: 5000,
+						preventCache: true,
+						handle: dfd.callback(function (response) {
+							assert.notInstanceOf(response, Error);
+						})
+					});
+
+				fdfd.addErrback(dfd.reject);
+			}
+		},
+
+		POST: form(&#039;POST&#039;, function () {
+			var dfd = this.async(),
+				fdfd = iframe.send({
+					url: &#039;/__services/request/iframe?type=json&#039;,
+					method: &#039;post&#039;,
+					form: &#039;postTest&#039;,
+					content: {
+						color: &#039;blue&#039;,
+						size: 42
+					},
+					timeout: 5000,
+					preventCache: true,
+					handleAs: &#039;json&#039;,
+					handle: dfd.callback(function (response) {
+						assert.strictEqual(response.method, &#039;POST&#039;);
+						assert.strictEqual(response.payload.color, &#039;blue&#039;);
+						assert.strictEqual(response.payload.size, &#039;42&#039;);
+					})
+				});
+
+			fdfd.addErrback(dfd.reject);
+		}),
+
+		&#039;ioPublish&#039;: {
+			before: function () {
+				kernel.config.ioPublish = true;
+
+				this._testTopicCount = 0;
+				var self = this;
+				function increment() {
+					self._testTopicCount++;
+				}
+				var handles = [
+					topic.subscribe(&#039;/dojo/io/start&#039;, increment),
+					topic.subscribe(&#039;/dojo/io/send&#039;, increment),
+					topic.subscribe(&#039;/dojo/io/load&#039;, increment),
+					topic.subscribe(&#039;/dojo/io/done&#039;, increment)
+				];
+
+				this._remover = function () {
+					for (var i = 0; i &lt; handles.length; i++) {
+						handles[i].remove();
+					}
+				};
+			},
+
+			test: function () {
+				var dfd = this.async();
+				var self = this;
+
+				topic.subscribe(&#039;/dojo/io/stop&#039;, dfd.callback(function () {
+					self.parent._testTopicCount++;
+					assert.strictEqual(self.parent._testTopicCount, 5);
+				}));
+
+				iframe.send({
+					url: &#039;/__services/request/iframe&#039;,
+					timeout: 5000,
+					preventCache: true
+				});
+			},
+
+			after: function () {
+				this._remover();
+				kernel.config.ioPublish = false;
+			}
+		}
+	});
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>
